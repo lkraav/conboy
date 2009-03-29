@@ -1,0 +1,12 @@
+Source: conboy
+Section: user/other
+Priority: optional
+Maintainer: Cornelius Hald <hald@icandy.de>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.6.0
+
+Package: conboy
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Conboy is a note taking application. It is a port of the famous Tomboy written in C.
+

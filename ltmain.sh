@@ -1,0 +1,1 @@
+/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/arch_tools/share/libtool/ltmain.sh

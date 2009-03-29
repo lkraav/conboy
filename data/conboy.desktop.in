@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Name=Conboy
+Exec=@prefix@/bin/conboy
+Icon=conboy
+X-Window-Icon=conboy
+X-Window-Icon-Dimmed=conboy
+X-Osso-Service=de.zwong.conboy
+X-Osso-Type=application/x-executable

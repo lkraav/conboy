@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Conboy
+Icon=conboy
+Type=default
+X-Path=/usr/lib/hildon-desktop/libconboy_applet.so
+

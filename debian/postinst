@@ -1,0 +1,9 @@
+#!/bin/sh
+#update the icon cache
+gtk-update-icon-cache -f /usr/share/icons/hicolor
+
+# copy the desktop file for use
+( cd /usr/share/applications/hildon/ && mv conboy.inactive conboy.desktop )
+
+# select the installation folder
+maemo-select-menu-location conboy.desktop
