@@ -1,3 +1,6 @@
+#ifndef CALLBACKS_H
+#define CALLBACKS_H
+
 gboolean
 on_window_close_button_clicked		   (GtkObject		*window,
 										GdkEvent		*event,
@@ -86,3 +89,5 @@ gboolean
 on_hardware_key_pressed					(GtkWidget			*widget,
 									 	 GdkEventKey		*event,
 									 	 gpointer           *user_data);
+
+#endif /* CALLBACKS_H */

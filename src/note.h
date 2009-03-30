@@ -1,5 +1,5 @@
-#ifndef NOTE_H_
-#define NOTE_H_
+#ifndef NOTE_H
+#define NOTE_H
 
 void note_open(Note* metadata);
 
@@ -25,4 +25,4 @@ void note_close_window(Note *note);
 
 const gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer);
 
-#endif /*NOTE_H_*/
+#endif /* NOTE_H */

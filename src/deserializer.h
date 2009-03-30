@@ -1,3 +1,6 @@
+#ifndef DESERIALIZER_H
+#define DESERIALIZER_H
+
 gboolean
 deserialize_from_tomboy (GtkTextBuffer *register_buffer,
                                         GtkTextBuffer *content_buffer,
@@ -8,3 +11,4 @@ deserialize_from_tomboy (GtkTextBuffer *register_buffer,
                                         gpointer       user_data,
                                         GError       **error);
 
+#endif /* DESERIALIZER_H */

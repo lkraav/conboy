@@ -55,10 +55,12 @@ void note_open_in_new_window(Note* note) {
 	gtk_window_set_default_size(GTK_WINDOW(note->window), 500, 300);
 	hildon_program_add_window(program, HILDON_WINDOW(note->window));
 	
+	/* TODO: File checking inside note_load_to_buffer should be fixed */
 	if (note->filename != NULL) {
 		note_load_to_buffer(note->filename, note->buffer, note);
 	}
 	
+	note_format_title(note->buffer);
 	note_set_window_title_from_buffer(GTK_WINDOW(note->window), note->buffer);
 	
 	gtk_text_buffer_get_iter_at_offset(note->buffer, &iter, note->cursor_position);
@@ -115,17 +117,17 @@ void note_open_new_with_title(const gchar* title) {
 	GtkTextIter start, end;
 	const gchar *text = g_strconcat(title, "\n\n", "Describe your new note here.", NULL);
 	
-	Note *metadata = g_slice_alloc0(sizeof(Note));
-	note_open_in_new_window(metadata);
+	Note *note = g_slice_alloc0(sizeof(Note));
+	note_open_in_new_window(note);
 	
-	gtk_text_buffer_set_text(metadata->buffer, text, -1);
-	note_format_title(metadata->buffer);
-	note_set_window_title_from_buffer(GTK_WINDOW(metadata->window), metadata->buffer);
+	gtk_text_buffer_set_text(note->buffer, text, -1);
+	note_format_title(note->buffer);
+	note_set_window_title_from_buffer(GTK_WINDOW(note->window), note->buffer);
 	
-	gtk_text_buffer_get_iter_at_line(metadata->buffer, &start, 2);
-	gtk_text_buffer_get_end_iter(metadata->buffer, &end);
+	gtk_text_buffer_get_iter_at_line(note->buffer, &start, 2);
+	gtk_text_buffer_get_end_iter(note->buffer, &end);
 	
-	gtk_text_buffer_select_range(metadata->buffer, &start, &end);
+	gtk_text_buffer_select_range(note->buffer, &start, &end);
 }
 
 void note_open_by_title(const char* title) {
@@ -345,7 +347,7 @@ void note_save(Note *note) {
 	data = gtk_text_buffer_serialize(note->buffer, note->buffer,
 			app_data->serializer, &start, &end, &length);
 	
-	/* Write to disk */	
+	/* Write to disk */
 	file = fopen(note->filename, "wb");
 	fwrite(data, sizeof(guint8), length, file);
 	fclose(file);

@@ -1,5 +1,5 @@
-#ifndef HELLO_NAVIGATOR_PLUGIN_H
-#define HELLO_NAVIGATOR_PLUGIN_H
+#ifndef CONBOY_APPLET_H
+#define CONBOY_APPLET_H
 
 #include <glib-object.h>
 
@@ -46,4 +46,4 @@ GtkWidget * hello_world_button_new (int padding );
 
 G_END_DECLS
 
-#endif /* HELLO_NAVIGATOR_PLUGIN_H */
+#endif /* CONBOY_APPLET_H */

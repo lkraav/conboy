@@ -29,22 +29,20 @@
 #include <time.h>
 
 #include "support.h"
-#include "xml.h"
 #include "serializer.h"
 #include "deserializer.h"
 #include "metadata.h"
 #include "interface.h"
 #include "callbacks.h"
+#include "note.h"
 
 #include "localisation.h"
-/* Defines to add the application to dbus and keep it running
- * Please do not modify "APP_NAME" (or other defines) to different name
- */
+
 #define APP_NAME "conboy"
 #define APP_VER "0.1"
 #define APP_SERVICE "de.zwong.conboy"
 #define APP_METHOD "/de/zwong/conboy"
-/* end defines */
+
 
 
 
@@ -75,9 +73,6 @@ main (int argc, char *argv[])
   program = HILDON_PROGRAM(hildon_program_get_instance());
   g_set_application_name("Conboy");
  
-  
-  
-  /*note_open_in_new_window(metadata);*/
   note_open(metadata);
 
   gtk_main();

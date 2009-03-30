@@ -33,8 +33,6 @@ conboy_SOURCES = \
         src/support.h \
         src/support.c \
         src/localisation.h \
-        src/xml.h \
-        src/xml.c \
         src/serializer.h \
         src/serializer.c \
         src/deserializer.h \

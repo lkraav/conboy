@@ -65,9 +65,8 @@ libconboy_applet_la_OBJECTS = $(am_libconboy_applet_la_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_conboy_OBJECTS = main.$(OBJEXT) interface.$(OBJEXT) \
-	callbacks.$(OBJEXT) support.$(OBJEXT) xml.$(OBJEXT) \
-	serializer.$(OBJEXT) deserializer.$(OBJEXT) metadata.$(OBJEXT) \
-	note.$(OBJEXT)
+	callbacks.$(OBJEXT) support.$(OBJEXT) serializer.$(OBJEXT) \
+	deserializer.$(OBJEXT) metadata.$(OBJEXT) note.$(OBJEXT)
 conboy_OBJECTS = $(am_conboy_OBJECTS)
 conboy_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -80,8 +79,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/deserializer.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/interface.Po ./$(DEPDIR)/main.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/metadata.Po ./$(DEPDIR)/note.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/serializer.Po ./$(DEPDIR)/support.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/xml.Po
+@AMDEP_TRUE@	./$(DEPDIR)/serializer.Po ./$(DEPDIR)/support.Po
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
@@ -274,8 +272,6 @@ conboy_SOURCES = \
         src/support.h \
         src/support.c \
         src/localisation.h \
-        src/xml.h \
-        src/xml.c \
         src/serializer.h \
         src/serializer.c \
         src/deserializer.h \
@@ -438,7 +434,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/note.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/serializer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/support.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xml.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \
@@ -583,30 +578,6 @@ support.lo: src/support.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/support.Plo' tmpdepfile='$(DEPDIR)/support.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o support.lo `test -f 'src/support.c' || echo '$(srcdir)/'`src/support.c
-
-xml.o: src/xml.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT xml.o -MD -MP -MF "$(DEPDIR)/xml.Tpo" -c -o xml.o `test -f 'src/xml.c' || echo '$(srcdir)/'`src/xml.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/xml.Tpo" "$(DEPDIR)/xml.Po"; else rm -f "$(DEPDIR)/xml.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/xml.c' object='xml.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/xml.Po' tmpdepfile='$(DEPDIR)/xml.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o xml.o `test -f 'src/xml.c' || echo '$(srcdir)/'`src/xml.c
-
-xml.obj: src/xml.c
-@am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT xml.obj -MD -MP -MF "$(DEPDIR)/xml.Tpo" -c -o xml.obj `if test -f 'src/xml.c'; then $(CYGPATH_W) 'src/xml.c'; else $(CYGPATH_W) '$(srcdir)/src/xml.c'; fi`; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/xml.Tpo" "$(DEPDIR)/xml.Po"; else rm -f "$(DEPDIR)/xml.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/xml.c' object='xml.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/xml.Po' tmpdepfile='$(DEPDIR)/xml.TPo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o xml.obj `if test -f 'src/xml.c'; then $(CYGPATH_W) 'src/xml.c'; else $(CYGPATH_W) '$(srcdir)/src/xml.c'; fi`
-
-xml.lo: src/xml.c
-@am__fastdepCC_TRUE@	if $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT xml.lo -MD -MP -MF "$(DEPDIR)/xml.Tpo" -c -o xml.lo `test -f 'src/xml.c' || echo '$(srcdir)/'`src/xml.c; \
-@am__fastdepCC_TRUE@	then mv -f "$(DEPDIR)/xml.Tpo" "$(DEPDIR)/xml.Plo"; else rm -f "$(DEPDIR)/xml.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/xml.c' object='xml.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/xml.Plo' tmpdepfile='$(DEPDIR)/xml.TPlo' @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(LIBTOOL) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o xml.lo `test -f 'src/xml.c' || echo '$(srcdir)/'`src/xml.c
 
 serializer.o: src/serializer.c
 @am__fastdepCC_TRUE@	if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT serializer.o -MD -MP -MF "$(DEPDIR)/serializer.Tpo" -c -o serializer.o `test -f 'src/serializer.c' || echo '$(srcdir)/'`src/serializer.c; \

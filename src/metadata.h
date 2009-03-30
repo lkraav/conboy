@@ -1,3 +1,6 @@
+#ifndef METADATA_H
+#define METADATA_H
+
 #include <gconf/gconf-client.h>
 
 typedef struct
@@ -48,3 +51,5 @@ time_t get_iso8601_time_in_seconds(const gchar *time_string);
 const gchar* note_get_new_filename();
 
 const gchar* get_uuid();
+
+#endif /* METADATA_H */
