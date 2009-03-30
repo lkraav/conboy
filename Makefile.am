@@ -56,7 +56,7 @@ libconboy_applet_la_LDFLAGS = -module -avoid-version
 
 # LDADD
 conboy_LDADD = \
-        $(DEPS_LIBS) $(HILDON_LIBS) $(OSSO_LIBS) $(HILDONFM_LIBS) $(XML2_LIBS) $(GCONF_LIBS)
+        $(DEPS_LIBS) $(HILDON_LIBS) $(OSSO_LIBS) $(GCONF_LIBS) $(HILDONDESKTOP_LIBS)
 
 libconboy_applet_la_LIBADD = \
 		$(DEPS_LIBS) $(HILDONDESKTOP_LIBS)
