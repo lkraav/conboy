@@ -61,7 +61,6 @@ static void serialize_text(GtkTextBuffer *buffer, SerializationContext *context,
 	GSList *tag_list, *new_tag_list;
 	GSList *active_tags;
 
-	/* TODO: Write correct <title> */
 	g_string_append(context->text_str, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
 	g_string_append(context->text_str, "<note version=\"0.3\" xmlns:link=\"http://beatniksoftware.com/tomboy/link\" xmlns:size=\"http://beatniksoftware.com/tomboy/size\" xmlns=\"http://beatniksoftware.com/tomboy\">\n");
 	g_string_append(context->text_str, "  <title>");
@@ -188,8 +187,8 @@ static void serialize_text(GtkTextBuffer *buffer, SerializationContext *context,
 		/* TODO: Schoener ?! */
 		GtkTextTag *taggg = tag_list->data;
 		gchar *tag_name = taggg->name;
-		g_string_append_printf (context->text_str, "</%s>", tag_name);
-		g_free(tag_name);
+		g_string_append_printf(context->text_str, "</%s>", tag_name);
+		/*g_free(tag_name);*/ /* TODO: To comment this, seemed to fix this crappy bug. See if really */ 
 	}
 
 	g_slist_free (active_tags);
@@ -237,21 +236,16 @@ guint8 * serialize_to_tomboy(GtkTextBuffer *register_buffer,
 
 	SerializationContext context;
 	GString *text;
-	GtkTextIter title_end;
-	Note *metadata;
+	Note *note;
 	
-	metadata = (Note*)user_data;
+	note = (Note*)user_data;
 
 	context.tags = g_hash_table_new(NULL, NULL);
 	context.text_str = g_string_new(NULL);
 	context.start = *start;
 	context.end = *end;
 	
-	
-	
-	serialize_text(content_buffer, &context, metadata);
-	
-	
+	serialize_text(content_buffer, &context, note);
 
 	text = g_string_new(NULL);
 	
@@ -260,7 +254,7 @@ guint8 * serialize_to_tomboy(GtkTextBuffer *register_buffer,
 	
 	g_string_append_len(text, context.text_str->str, context.text_str->len);
 
-	serialize_metadata(text, metadata);
+	serialize_metadata(text, note);
 
 	g_hash_table_destroy(context.tags);
 	g_string_free(context.text_str, TRUE);
@@ -272,6 +266,6 @@ guint8 * serialize_to_tomboy(GtkTextBuffer *register_buffer,
 
 	/* Must return new allocated array of guint8 which contains the serialized data or NULL if error
 	 * occured */
-	return (guint8 *) g_string_free(text, FALSE);
+	return (guint8*) g_string_free(text, FALSE);
 }
 
