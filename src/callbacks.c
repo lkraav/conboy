@@ -7,9 +7,11 @@
 #include <stdlib.h>
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-banner.h>
+#include <libhildondesktop/hildon-thumb-menu-item.h>
 #include <glib/gstdio.h>
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
+
 
 #include "callbacks.h"
 #include "support.h"
@@ -150,22 +152,32 @@ void
 on_notes_button_clicked				   (GtkButton		*button,
 										gpointer		 user_data) {
 	
-	AppData *app_data = (AppData*)user_data;
+	AppData *app_data = get_app_data();
 	GtkWidget *menu_item;
 	Note *note;
 	GtkWidget *menu = gtk_menu_new ();
 	GList *notes = app_data->all_notes;
 	
+	GtkWidget *image_small, *image_large;
+	
 	while(notes != NULL) {
 	
 		note = notes->data;
-		menu_item = gtk_menu_item_new_with_label(note->title);
+		/* TODO: Don't hardcode the path to the icons*/
+		/* TODO: When starting from Eclipse, use local paths, not from /usr/share/ */
+		menu_item = hildon_thumb_menu_item_new_with_labels(note->title, note->title, "Open Note...");
+		image_small = gtk_image_new_from_file("/usr/share/icons/hicolor/26x26/hildon/conboy.png");
+		image_large = gtk_image_new_from_file("/usr/share/icons/hicolor/40x40/hildon/conboy.png");
+		hildon_thumb_menu_item_set_images(HILDON_THUMB_MENU_ITEM(menu_item), image_small, image_large);
+		
 		g_signal_connect(G_OBJECT(menu_item), "activate",
 		            	 G_CALLBACK(on_notes_menu_item_activated),
 		            	 note);
 		gtk_menu_append(menu, menu_item);
 		notes = notes->next;
 	}
+	
+	hildon_menu_set_thumb_mode(GTK_MENU(menu), TRUE);
 	
 	gtk_widget_show_all(menu);
 

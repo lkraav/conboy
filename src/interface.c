@@ -101,7 +101,7 @@ GtkWidget* create_mainwin(Note *note) {
 
 	vbox1 = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(vbox1);
-	gtk_container_add(GTK_CONTAINER (mainwin), vbox1);
+	gtk_container_add(GTK_CONTAINER(mainwin), vbox1);
 
 	/* MENU */
 	menu = gtk_menu_new();
@@ -109,7 +109,7 @@ GtkWidget* create_mainwin(Note *note) {
 	menu_test = gtk_menu_item_new_with_label("Test");
 	gtk_menu_append(menu, menu_test);
 
-	menu_quit = gtk_menu_item_new_with_label("Quit");
+	menu_quit = gtk_menu_item_new_with_label("Close all notes");
 	gtk_menu_append(menu, menu_quit);
 
 	/* Must be at the end of the menu definition */
@@ -117,9 +117,11 @@ GtkWidget* create_mainwin(Note *note) {
 
 	/* TOOLBAR */
 	toolbar = gtk_toolbar_new();
-
+	
+	/*
 	quit_button = gtk_tool_button_new_from_stock("gtk-quit");
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), quit_button, -1);
+	*/
 
 	/*
 	save_button = gtk_tool_button_new_from_stock("gtk-save");
@@ -155,14 +157,19 @@ GtkWidget* create_mainwin(Note *note) {
 
 	gtk_widget_show_all(toolbar);
 
-	hildon_window_add_toolbar(HILDON_WINDOW(mainwin), GTK_TOOLBAR(toolbar));
+	/*hildon_window_add_toolbar(HILDON_WINDOW(mainwin), GTK_TOOLBAR(toolbar));*/
+	/* TODO: Maybe we can use one intance of the toolbar for all windows. */
+	HildonProgram *prg = hildon_program_get_instance();
+	if (hildon_program_get_common_toolbar(prg) == NULL) {
+		g_printerr("ADD THE TOOLBAR \n");
+		hildon_program_set_common_toolbar(prg, toolbar);
+	}
 
 	/* SCROLLED WINDOW */
 	scrolledwindow1 = gtk_scrolled_window_new(NULL, NULL);
 	gtk_widget_show(scrolledwindow1);
 	gtk_box_pack_start(GTK_BOX (vbox1), scrolledwindow1, TRUE, TRUE, 0);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW (scrolledwindow1), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW (scrolledwindow1), GTK_SHADOW_IN);
 
 	/* TEXT VIEW */
 	textview = gtk_text_view_new();
@@ -203,9 +210,11 @@ GtkWidget* create_mainwin(Note *note) {
 			G_CALLBACK (on_quit_button_clicked),
 			NULL);
 
+	/*
 	g_signal_connect ((gpointer) quit_button, "clicked",
 			G_CALLBACK (on_quit_button_clicked),
 			NULL);
+	*/
 
 	/*
 	g_signal_connect ((gpointer) save_button, "clicked",
@@ -235,7 +244,7 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	g_signal_connect ((gpointer) notes_button, "clicked",
 			G_CALLBACK (on_notes_button_clicked),
-			get_app_data());
+			NULL);
 	
 	g_signal_connect((gpointer)delete_button, "clicked",
 			G_CALLBACK(on_delete_button_clicked),
@@ -275,7 +284,9 @@ GtkWidget* create_mainwin(Note *note) {
 	GLADE_HOOKUP_OBJECT_NO_REF (mainwin, mainwin, "mainwin");
 	GLADE_HOOKUP_OBJECT (mainwin, vbox1, "vbox1");
 	GLADE_HOOKUP_OBJECT (mainwin, toolbar, "toolbar1");
+	/*
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(quit_button), "quit_button");
+	*/
 	/*
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(save_button), "save_button");
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(load_button), "load_button");
