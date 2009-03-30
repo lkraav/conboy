@@ -88,6 +88,10 @@ on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 gboolean
 on_hardware_key_pressed					(GtkWidget			*widget,
 									 	 GdkEventKey		*event,
-									 	 gpointer           *user_data);
+									 	 gpointer           user_data);
+
+void
+on_textview_tap_and_hold				(GtkWidget 			*widget,
+										 gpointer 			user_data);
 
 #endif /* CALLBACKS_H */

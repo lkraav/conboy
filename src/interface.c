@@ -132,12 +132,15 @@ GtkWidget* create_mainwin(Note *note) {
 	*/
 	
 	bold_button = gtk_toggle_tool_button_new_from_stock("gtk-bold");
+	gtk_widget_set_size_request(bold_button, 80, -1);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), bold_button, -1);
 	
 	italic_button = gtk_toggle_tool_button_new_from_stock("gtk-italic");
+	/*gtk_widget_set_size_request(italic_button, 50, -1);*/
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), italic_button, -1);
 	
 	strike_button = gtk_toggle_tool_button_new_from_stock("gtk-strikethrough");
+	/*gtk_widget_set_size_request(strike_button, 70, -1);*/
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), strike_button, -1);
 	
 	link_button = gtk_tool_button_new_from_stock("gtk-redo");
@@ -176,6 +179,9 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textview), GTK_WRAP_WORD);
 	gtk_widget_show(textview);
 	gtk_container_add(GTK_CONTAINER (scrolledwindow1), textview);
+	
+	/* Enable support for tap and hold on the textview */
+	gtk_widget_tap_and_hold_setup(textview, NULL, NULL, 0);
 	
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textview));
 	
@@ -262,6 +268,10 @@ GtkWidget* create_mainwin(Note *note) {
 			G_CALLBACK(on_text_buffer_modified_changed),
 			note);
 	
+	g_signal_connect ((gpointer)textview, "tap-and-hold",
+			G_CALLBACK(on_textview_tap_and_hold),
+			NULL);
+	
 	g_signal_connect ((gpointer)smaller_button, "clicked",
 			G_CALLBACK(on_smaller_button_clicked),
 			textview);
@@ -273,6 +283,8 @@ GtkWidget* create_mainwin(Note *note) {
 	g_signal_connect ((gpointer)mainwin, "key_press_event",
 			G_CALLBACK(on_hardware_key_pressed),
 			note);
+	
+	
 	
 	link_internal_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	g_signal_connect ((gpointer) link_internal_tag, "event",

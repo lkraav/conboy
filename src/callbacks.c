@@ -453,7 +453,7 @@ on_bigger_button_clicked				(GtkButton		*button,
 
 gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 									 GdkEventKey		*event,
-									 gpointer           *user_data)
+									 gpointer           user_data)
 {
 	Note *note = (Note*)user_data;
 	
@@ -471,9 +471,30 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 	case HILDON_HARDKEY_ESC:
 		on_window_close_button_clicked(GTK_OBJECT(note->window), NULL, note);
 		return TRUE;
+	
+	case HILDON_HARDKEY_FULLSCREEN:
+		/* TODO: Implement full screen. */
+		/* Should this be on application level: If fullscreen, then all windows fullscreen
+		 * Or on window leve: Toggle fullscreen on/off for every window
+		 * Or can only be the window which is active be fullscreen? */
+		/*
+		gtk_window_fullscreen(note->window);
+		gtk_window_unfullscreen(note->window);
+		*/
+		return TRUE;
 	}
 	
 	return FALSE;
 }
+
+void
+on_textview_tap_and_hold(GtkWidget *widget, gpointer user_data)
+{
+	/* We emit the popup-menu signal, this will make the
+	 * default context menu of the treeview pop up. */
+	gboolean bool;
+	g_signal_emit_by_name(widget, "popup-menu", &bool);
+}
+
 
 
