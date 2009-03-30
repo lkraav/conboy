@@ -301,6 +301,11 @@ void note_save(Note *note) {
 		return;
 	}
 	
+	/* If buffer is not dirty, don't save */
+	if (!gtk_text_buffer_get_modified(note->buffer)) {
+		return;
+	}
+	
 	/* Get time */
 	time = get_current_time_in_iso8601();
 	

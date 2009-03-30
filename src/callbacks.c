@@ -64,8 +64,18 @@ on_window_close_button_clicked		   (GtkObject		*window,
 	return TRUE; /* True to stop other handler from being invoked */
 }
 
-void on_quit_button_clicked(GtkButton *button, gpointer user_data) {
-	g_print("Quit button clicked.");
+void on_quit_button_clicked(GtkButton *button, gpointer user_data)
+{	
+	Note *note;
+	GList *open_notes = get_app_data()->open_notes;
+	
+	while (open_notes != NULL) {
+		note = (Note*)open_notes->data;
+		note_save(note);
+		note_close_window(note);
+		open_notes = g_list_next(open_notes);
+	}
+	
 	gtk_main_quit();
 }
 

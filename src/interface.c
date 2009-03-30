@@ -131,42 +131,44 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar1), load_button, -1);
 	*/
 	
-	bold_button = gtk_toggle_tool_button_new_from_stock("gtk-bold");
+	bold_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_BOLD);
 	gtk_widget_set_size_request(bold_button, 80, -1);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), bold_button, -1);
 	
-	italic_button = gtk_toggle_tool_button_new_from_stock("gtk-italic");
+	italic_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_ITALIC);
 	/*gtk_widget_set_size_request(italic_button, 50, -1);*/
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), italic_button, -1);
 	
-	strike_button = gtk_toggle_tool_button_new_from_stock("gtk-strikethrough");
+	strike_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_STRIKETHROUGH);
 	/*gtk_widget_set_size_request(strike_button, 70, -1);*/
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), strike_button, -1);
 	
-	link_button = gtk_tool_button_new_from_stock("gtk-redo");
+	link_button = gtk_tool_button_new_from_stock(GTK_STOCK_REDO);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), link_button, -1);
 	
 	delete_button = gtk_tool_button_new_from_stock(GTK_STOCK_DELETE);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), delete_button, -1);
 	
-	notes_button = gtk_tool_button_new_from_stock("gtk-file");
+	notes_button = gtk_tool_button_new_from_stock(GTK_STOCK_OPEN);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), notes_button, -1);
 	
-	smaller_button = gtk_tool_button_new_from_stock("gtk-zoom-out");
+	smaller_button = gtk_tool_button_new_from_stock(GTK_STOCK_ZOOM_OUT);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), smaller_button, -1);
 	
-	bigger_button = gtk_tool_button_new_from_stock("gtk-zoom-in");
+	bigger_button = gtk_tool_button_new_from_stock(GTK_STOCK_ZOOM_IN);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), bigger_button, -1);
 
 	gtk_widget_show_all(toolbar);
 
-	/*hildon_window_add_toolbar(HILDON_WINDOW(mainwin), GTK_TOOLBAR(toolbar));*/
+	hildon_window_add_toolbar(HILDON_WINDOW(mainwin), GTK_TOOLBAR(toolbar));
 	/* TODO: Maybe we can use one intance of the toolbar for all windows. */
+	/*
 	HildonProgram *prg = hildon_program_get_instance();
 	if (hildon_program_get_common_toolbar(prg) == NULL) {
 		g_printerr("ADD THE TOOLBAR \n");
 		hildon_program_set_common_toolbar(prg, toolbar);
 	}
+	*/
 
 	/* SCROLLED WINDOW */
 	scrolledwindow1 = gtk_scrolled_window_new(NULL, NULL);
