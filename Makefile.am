@@ -5,9 +5,9 @@ EXTRA_DIST = \
         debian/copyright \
         debian/control \
         debian/rules \
-		debian/changelog \
-		debian/postinst \
-		src/*
+        debian/changelog \
+        debian/postinst \
+        src/*
 
 # Sub directories
 SUBDIRS = data po
