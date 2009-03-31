@@ -98,22 +98,14 @@ gboolean is_note_list_changed() {
 }
 
 GList* create_note_list(AppData *app_data) {
-	
-	g_printerr("FFFILE: >%s< \n", app_data->user_path);
-	
+		
 	const gchar *filename; 
 	GList *notes = NULL;
 	GDir *dir = g_dir_open(app_data->user_path, 0, NULL);
 	Note *note;
-	
 	GMappedFile *file;
 	gchar *content;
 	gchar *start, *end;
-	
-	/*
-	 * TODO: We create a lot of Note objects here. They should be
-	 * freed or reused somehow.
-	 */
 	
 	while ((filename = g_dir_read_name(dir)) != NULL) {
 		if (g_str_has_suffix(filename, ".note")) {
@@ -122,11 +114,8 @@ GList* create_note_list(AppData *app_data) {
 			note = g_slice_new(Note); /* note = malloc(sizeof(Note)); */
 			notes = g_list_append(notes, note); /* faster is prepend and then reverse */
 			
-			/* Save app_data in note */
-			/*note->app_data = app_data;*/
-			
 			/* Save filename in note */
-			note->filename = g_strconcat(app_data->user_path, filename, NULL); /*g_strdup(filename);*/ /* copy string, otherwise it could be invalid outside of this function */
+			note->filename = g_strconcat(app_data->user_path, filename, NULL);
 			
 			/* Open file and read out title. Save title in note */
 			file = g_mapped_file_new(g_strconcat(app_data->user_path, filename, NULL), FALSE, NULL);
@@ -136,17 +125,12 @@ GList* create_note_list(AppData *app_data) {
 			end = g_strrstr(content, "</title>"); /* move another pointer to begining of </title> */
 			note->title = g_strndup(start, end - start); /* copy the area between start and end, which is the title */
 			g_mapped_file_free(file);
-			
 		}
 	}
-  
 	g_dir_close(dir);
 	return notes;
 }
 
-
-
-/* TODO: Replace with real UUID function */
 const gchar* get_uuid()
 {	
 	gchar *content;
@@ -155,7 +139,8 @@ const gchar* get_uuid()
 	return g_strdup(content);
 }
 
-const gchar* note_get_new_filename() {
+const gchar* note_get_new_filename()
+{
 	AppData *app_data = get_app_data();
 	return g_strconcat(app_data->user_path, get_uuid(), ".note", NULL);
 }

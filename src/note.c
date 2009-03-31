@@ -95,8 +95,6 @@ void note_format_title(GtkTextBuffer *buffer)
 
 const gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer)
 {	
-	/* TODO: If title is empty set title to "Untitled XY" XY=Number of notes */
-	
 	GtkTextIter start, end;
 	const gchar* title;
 	
@@ -217,6 +215,13 @@ void note_save(Note *note)
 	gtk_text_buffer_set_modified(note->buffer, FALSE);
 }
 
+void note_free(Note *note) {
+	note->buffer = NULL;
+	g_free(note->create_date);
+	g_free(note->filename);
+	/* TODO: Free the rest */
+}
+
 void note_close_window(Note *note)
 {
 	HildonProgram *program = hildon_program_get_instance();	
@@ -229,7 +234,7 @@ void note_close_window(Note *note)
 		hildon_program_remove_window(program, HILDON_WINDOW(note->window));
 		gtk_widget_destroy(GTK_WIDGET(note->window));
 		app_data->open_notes = g_list_remove(app_data->open_notes, note);
-		/* TODO: Free all data */
+		note_free(note);
 		return;
 	} 
 	

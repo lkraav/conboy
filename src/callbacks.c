@@ -293,6 +293,8 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 		tags = tags->next;
 	}
 	
+	g_slist_free(tags);
+	
 	/* unblock signals */
 	g_signal_handlers_unblock_by_func(bold_button, on_bold_button_clicked, NULL);
 	g_signal_handlers_unblock_by_func(italic_button, on_italic_button_clicked, NULL);
@@ -452,9 +454,12 @@ on_smaller_button_clicked			   (GtkButton		*button,
 	PangoFontDescription *font;
 	Note *note;
 	GList *note_list;
-		
-	app_data->font_size -= 5000;
-	g_printerr("Changed textsize to: %i \n", app_data->font_size);
+	
+	if (app_data->font_size > 5000) {
+		app_data->font_size -= 5000;
+	} else {
+		return;
+	}
 	gconf_client_set_int(app_data->client, "/apps/maemo/conboy/font_size", app_data->font_size, NULL);
 	
 	font = pango_font_description_new();
@@ -479,8 +484,11 @@ on_bigger_button_clicked				(GtkButton		*button,
 	Note *note;
 	GList *note_list;
 	
-	app_data->font_size += 5000;
-	g_printerr("Changed textsize to: %i \n", app_data->font_size);
+	if (app_data->font_size < 65000) {
+		app_data->font_size += 5000;
+	} else {
+		return;
+	}
 	gconf_client_set_int(app_data->client, "/apps/maemo/conboy/font_size", app_data->font_size, NULL);
 	
 	font = pango_font_description_new();

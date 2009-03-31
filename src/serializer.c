@@ -206,7 +206,6 @@ static void serialize_text(GtkTextBuffer *buffer, SerializationContext *context,
 		GtkTextTag *taggg = tag_list->data;
 		gchar *tag_name = taggg->name;
 		g_string_append_printf(context->text_str, "</%s>", tag_name);
-		/*g_free(tag_name);*/ /* TODO: To comment this, seemed to fix this crappy bug. See if really */ 
 	}
 
 	g_slist_free (active_tags);
