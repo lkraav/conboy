@@ -103,5 +103,4 @@ AC_OUTPUT([
     po/Makefile
     data/de.zwong.conboy.service
     data/conboy.desktop
-    debian/rules
 ])
