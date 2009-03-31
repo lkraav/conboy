@@ -1,3 +1,21 @@
+/* This file is part of Conboy.
+ * 
+ * Copyright (C) 2009 Cornelius Hald
+ *
+ * Conboy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Conboy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
@@ -123,6 +141,14 @@ on_strike_button_clicked			   (GtkButton		*button,
 }
 
 void
+on_highlight_button_clicked			   (GtkButton		*button,
+										gpointer		 user_data)
+{
+	g_printerr("HIGHLIGHT Button clicked\n");
+	change_format("highlight", button);
+}
+
+void
 on_link_button_clicked				   (GtkButton		*button,
 										gpointer		 user_data) 
 { 	
@@ -218,14 +244,14 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 										GtkTextMark		*mark,
 										gpointer		 user_data)
 {
-	GtkToggleToolButton *bold_button, *italic_button, *strike_button;
+	GtkToggleToolButton *bold_button, *italic_button, *strike_button, *highlight_button;
 	GSList *tags;
 	GtkTextTag *tag;
 	
-	bold_button   = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "bold_button"));
-	italic_button = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "italic_button"));
-	strike_button = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "strike_button"));
-	
+	bold_button      = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "bold_button"));
+	italic_button    = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "italic_button"));
+	strike_button    = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "strike_button"));
+	highlight_button = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "highlight_button"));
 	
 	/* TODO: This is only workaround for problem with repeated calls. Probably gives problems with
 	 * selection. We only call this if the "insert" mark changed. */
@@ -245,10 +271,12 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	g_signal_handlers_block_by_func(bold_button, on_bold_button_clicked, NULL);
 	g_signal_handlers_block_by_func(italic_button, on_italic_button_clicked, NULL);
 	g_signal_handlers_block_by_func(strike_button, on_strike_button_clicked, NULL);
+	g_signal_handlers_block_by_func(highlight_button, on_highlight_button_clicked, NULL);
 	
 	gtk_toggle_tool_button_set_active(bold_button, FALSE);
 	gtk_toggle_tool_button_set_active(italic_button, FALSE);
 	gtk_toggle_tool_button_set_active(strike_button, FALSE);
+	gtk_toggle_tool_button_set_active(highlight_button, FALSE);
 	
 	while (tags != NULL) {
 		tag = GTK_TEXT_TAG(tags->data);
@@ -258,6 +286,8 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 			gtk_toggle_tool_button_set_active(italic_button, TRUE);
 		} else if (g_strcasecmp(tag->name, "strikethrough") == 0) {
 			gtk_toggle_tool_button_set_active(strike_button, TRUE);
+		} else if (g_strcasecmp(tag->name, "highlight") == 0) {
+			gtk_toggle_tool_button_set_active(highlight_button, TRUE);
 		}
 		tags = tags->next;
 	}
@@ -266,6 +296,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	g_signal_handlers_unblock_by_func(bold_button, on_bold_button_clicked, NULL);
 	g_signal_handlers_unblock_by_func(italic_button, on_italic_button_clicked, NULL);
 	g_signal_handlers_unblock_by_func(strike_button, on_strike_button_clicked, NULL);
+	g_signal_handlers_unblock_by_func(highlight_button, on_highlight_button_clicked, NULL);
 	
 	/* TODO: Free tags list */
 
@@ -422,6 +453,7 @@ on_smaller_button_clicked			   (GtkButton		*button,
 	GList *note_list;
 		
 	app_data->font_size -= 5000;
+	g_printerr("Changed textsize to: %i \n", app_data->font_size);
 	gconf_client_set_int(app_data->client, "/apps/maemo/conboy/font_size", app_data->font_size, NULL);
 	
 	font = pango_font_description_new();
@@ -447,6 +479,7 @@ on_bigger_button_clicked				(GtkButton		*button,
 	GList *note_list;
 	
 	app_data->font_size += 5000;
+	g_printerr("Changed textsize to: %i \n", app_data->font_size);
 	gconf_client_set_int(app_data->client, "/apps/maemo/conboy/font_size", app_data->font_size, NULL);
 	
 	font = pango_font_description_new();

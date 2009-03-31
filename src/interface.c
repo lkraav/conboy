@@ -1,3 +1,21 @@
+/* This file is part of Conboy.
+ * 
+ * Copyright (C) 2009 Cornelius Hald
+ *
+ * Conboy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Conboy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -80,7 +98,7 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkWidget *scrolledwindow1;
 	GtkWidget *textview;
 	GtkTextBuffer *buffer;
-	GtkToolItem *quit_button;
+	/*GtkToolItem *quit_button;*/
 	/*GtkToolItem *save_button;*/
 	/*GtkToolItem *load_button;*/
 	GtkToolItem *bold_button;
@@ -89,8 +107,12 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkToolItem *link_button;
 	GtkToolItem *delete_button;
 	GtkToolItem *notes_button;
+	/*
 	GtkToolItem *smaller_button;
 	GtkToolItem *bigger_button;
+	*/
+	GtkToolItem *highlight_button;
+	GtkWidget *highlight_icon;
 	GtkTextTag *link_internal_tag;
 	
 	PangoFontDescription *font;
@@ -132,7 +154,7 @@ GtkWidget* create_mainwin(Note *note) {
 	*/
 	
 	bold_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_BOLD);
-	gtk_widget_set_size_request(bold_button, 80, -1);
+	gtk_widget_set_size_request(GTK_WIDGET(bold_button), 80, -1);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), bold_button, -1);
 	
 	italic_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_ITALIC);
@@ -143,6 +165,11 @@ GtkWidget* create_mainwin(Note *note) {
 	/*gtk_widget_set_size_request(strike_button, 70, -1);*/
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), strike_button, -1);
 	
+	highlight_icon = gtk_image_new_from_file("/usr/share/icons/hicolor/26x26/hildon/highlighter.png");	
+	highlight_button = gtk_toggle_tool_button_new();
+	gtk_tool_button_set_icon_widget(GTK_TOOL_BUTTON(highlight_button), highlight_icon);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), highlight_button, -1);
+	
 	link_button = gtk_tool_button_new_from_stock(GTK_STOCK_REDO);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), link_button, -1);
 	
@@ -152,11 +179,15 @@ GtkWidget* create_mainwin(Note *note) {
 	notes_button = gtk_tool_button_new_from_stock(GTK_STOCK_OPEN);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), notes_button, -1);
 	
+	
+	
+	/*
 	smaller_button = gtk_tool_button_new_from_stock(GTK_STOCK_ZOOM_OUT);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), smaller_button, -1);
 	
 	bigger_button = gtk_tool_button_new_from_stock(GTK_STOCK_ZOOM_IN);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), bigger_button, -1);
+	*/
 
 	gtk_widget_show_all(toolbar);
 
@@ -246,6 +277,10 @@ GtkWidget* create_mainwin(Note *note) {
 			G_CALLBACK (on_strike_button_clicked),
 			NULL);
 	
+	g_signal_connect ((gpointer) highlight_button, "clicked",
+			G_CALLBACK (on_highlight_button_clicked),
+			NULL);
+	
 	g_signal_connect ((gpointer) link_button, "clicked",
 			G_CALLBACK (on_link_button_clicked),
 			note);
@@ -274,18 +309,21 @@ GtkWidget* create_mainwin(Note *note) {
 			G_CALLBACK(on_textview_tap_and_hold),
 			NULL);
 	
+	/*
 	g_signal_connect ((gpointer)smaller_button, "clicked",
 			G_CALLBACK(on_smaller_button_clicked),
 			textview);
 	
+	
 	g_signal_connect ((gpointer)bigger_button, "clicked",
 			G_CALLBACK(on_bigger_button_clicked),
 			textview);
+	*/
 	
 	g_signal_connect ((gpointer)mainwin, "key_press_event",
 			G_CALLBACK(on_hardware_key_pressed),
 			note);
-	
+
 	
 	
 	link_internal_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
@@ -309,6 +347,7 @@ GtkWidget* create_mainwin(Note *note) {
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(italic_button), "italic_button");
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(strike_button), "strike_button");
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(strike_button), "link_button");
+	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(highlight_button), "highlight_button");
 	GLADE_HOOKUP_OBJECT (mainwin, scrolledwindow1, "scrolledwindow1");
 	GLADE_HOOKUP_OBJECT (mainwin, textview, "textview");
 
