@@ -21,8 +21,6 @@
 #include <sys/stat.h>
 #include <gtk/gtk.h>
 #include <hildon/hildon-window.h>
-#include <gconf/gconf.h>
-#include <gconf/gconf-client.h>
 
 /* without this, time.h will not include strptime() */
 #ifndef __USE_XOPEN
@@ -65,6 +63,7 @@ AppData* get_app_data() {
 		_app_data->open_notes = NULL;
 		_app_data->client = client;
 		_app_data->font_size = font_size;
+		_app_data->program = hildon_program_get_instance();
 	}
 	
 	return _app_data;

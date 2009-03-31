@@ -20,16 +20,18 @@
 #define METADATA_H
 
 #include <gconf/gconf-client.h>
+#include <hildon/hildon-program.h>
 
 typedef struct
 {
-	const gchar *user_path;
-	GList		*all_notes;
-	GList       *open_notes;
-	GdkAtom      serializer;
-	GdkAtom      deserializer;
-	gint         font_size;
-	GConfClient *client;
+	const gchar   *user_path;
+	GList		  *all_notes;
+	GList         *open_notes;
+	GdkAtom        serializer;
+	GdkAtom        deserializer;
+	gint           font_size;
+	GConfClient   *client;
+	HildonProgram *program;
 } AppData;
 
 typedef struct

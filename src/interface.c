@@ -23,11 +23,9 @@
 #include <stdio.h>
 
 #include <gdk/gdkkeysyms.h>
-#include <hildon/hildon-program.h>
 #include <gtk/gtk.h>
 #include <hildon/hildon-window.h>
-#include <gconf/gconf.h>
-#include <gconf/gconf-client.h>
+
 
 #include "callbacks.h"
 
@@ -223,9 +221,6 @@ GtkWidget* create_mainwin(Note *note) {
 	note->buffer = buffer;
 	note->window = HILDON_WINDOW(mainwin);
 	note->view = GTK_TEXT_VIEW(textview);
-	if (note->filename == NULL) {
-		note->filename = note_get_new_filename();
-	}
 	
 	register_serializer_and_deserializer(buffer, note);
 	

@@ -164,7 +164,7 @@ on_link_button_clicked				   (GtkButton		*button,
 	text = gtk_text_iter_get_text(&start, &end);
 	gtk_text_buffer_apply_tag_by_name(note->buffer, "link:internal", &start, &end);
 	
-	note_open_by_title(text);
+	note_show_by_title(text);
 }
 
 
@@ -232,7 +232,8 @@ on_notes_menu_item_activated		(GtkMenuItem *menuitem,
 									 gpointer     user_data)
 {
 	Note *note = (Note*)user_data;
-	note_open(note);
+	/*note_open(note);*/
+	note_show(note);
 }
 
 
@@ -360,7 +361,7 @@ on_link_internal_tag_event				(GtkTextTag  *tag,
 			link_text = gtk_text_iter_get_text(start, iter);
 			
 			g_printerr("Link: >%s< \n", link_text);
-			note_open_by_title(link_text);
+			note_show_by_title(link_text);
 		}	
 	}
 		

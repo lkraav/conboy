@@ -58,7 +58,7 @@ int
 main (int argc, char *argv[])
 {
   HildonProgram *program;
-  Note *metadata = g_slice_alloc0(sizeof(Note));
+  Note *note = g_slice_alloc0(sizeof(Note));
   osso_context_t *osso_context;
   AppData *app_data;
   
@@ -81,7 +81,8 @@ main (int argc, char *argv[])
   program = HILDON_PROGRAM(hildon_program_get_instance());
   g_set_application_name("Conboy");
  
-  note_open(metadata);
+  /*note_open(metadata);*/
+  note_show(note);
 
   gtk_main();
   
