@@ -25,6 +25,8 @@
 #include "metadata.h"
 #include "interface.h"
 #include "note.h"
+#include "serializer.h"
+#include "deserializer.h"
 
 /* TODO:
  * 
@@ -143,6 +145,7 @@ void note_save(Note *note)
 	AppData *app_data;
 	FILE *file;
 	
+	
 	/* If note is empty, don't save */
 	gtk_text_buffer_get_bounds(note->buffer, &start, &end);
 	content = gtk_text_iter_get_text(&start, &end);
@@ -150,10 +153,14 @@ void note_save(Note *note)
 		return;
 	}
 	
+	/* It's not really save to rely on buffer_modified() because adding tags, does
+	 * not make the buffer dirty. So better save here */
 	/* If buffer is not dirty, don't save */
+	/*
 	if (!gtk_text_buffer_get_modified(note->buffer)) {
 		return;
 	}
+	*/
 	
 	/* Get time */
 	time = get_current_time_in_iso8601();
@@ -198,13 +205,20 @@ void note_save(Note *note)
 	gtk_text_buffer_get_bounds(note->buffer, &start, &end);
 	
 	/* Start serialization */
+	/*
 	data = gtk_text_buffer_serialize(note->buffer, note->buffer,
 			app_data->serializer, &start, &end, &length);
+	*/
+	
+	serialize_note(note);
+	
 	
 	/* Write to disk */
+	/*
 	file = fopen(note->filename, "wb");
 	fwrite(data, sizeof(guint8), length, file);
 	fclose(file);
+	*/
 	
 	/* If first save, add to list of all notes */
 	if (!g_list_find(app_data->all_notes, note)) {
@@ -234,7 +248,8 @@ void note_close_window(Note *note)
 		hildon_program_remove_window(program, HILDON_WINDOW(note->window));
 		gtk_widget_destroy(GTK_WIDGET(note->window));
 		app_data->open_notes = g_list_remove(app_data->open_notes, note);
-		note_free(note);
+		/* Don't free note, because we reuse this in the menu with the available notes and when reopening */
+		/*note_free(note);*/
 		return;
 	} 
 	
@@ -298,7 +313,6 @@ void note_show(Note *note)
 		note_show_new(note);
 	}
 	
-	/*app_data->open_notes = g_list_first(app_data->open_notes); */ /* TODO: Not needed - but try first */
 	app_data->open_notes = g_list_append(app_data->open_notes, note);
 	
 	/* Format note title and update window title */
@@ -347,24 +361,30 @@ void note_show_existing(Note *note)
 	
 	/* iter defines where to start with inserting */
 	gtk_text_buffer_get_start_iter(note->buffer, &iter);
-	  
-	file = fopen(note->filename, "r");
+	
+	deserialize_note(note);
+	
+	/*file = fopen(note->filename, "r");*/
 	  
 	/* Get the number of bytes */
+	/*
 	fseek(file, 0L, SEEK_END);
 	length = ftell(file);
 	fseek(file, 0L, SEEK_SET);
 	text = (guint8*)g_malloc0(length * sizeof(guint8));
 	fread(text, sizeof(guint8), length, file);
 	fclose(file);
+	*/
 
-	/* Start serialization */
+	/* Start deserialization */
+	/*
 	app_data = get_app_data();
 	gtk_text_buffer_deserialize(note->buffer, note->buffer, app_data->deserializer, &iter, text, length, &error);
 	  
 	if (error != NULL) {
 		g_printerr("ERROR while deserializing: %s\n", error->message);
 	}
+	*/
 	
 	/* Set cursor possition */
 	gtk_text_buffer_get_iter_at_offset(note->buffer, &iter, note->cursor_position);

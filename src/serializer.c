@@ -1,288 +1,295 @@
-/* This file is part of Conboy.
- * 
- * Copyright (C) 2009 Cornelius Hald
- *
- * Conboy is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Conboy is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
- */
+#include <libxml/encoding.h>
+#include <libxml/xmlwriter.h>
 
-/* Based on gtktextbufferserialize.c from gtk+
- */
-
-#include <gtk/gtk.h>
-#include <hildon/hildon-window.h>
-#include <gconf/gconf.h>
-#include <gconf/gconf-client.h>
-
-#include "serializer.h"
+#include "note.h"
 #include "metadata.h"
+#include "serializer.h"
 
-typedef struct {
-	GString *text_str;
-	GHashTable *tags;
-	GtkTextIter start, end;
+static
+void write_header(xmlTextWriter *writer, Note *note)
+{
+	int rc;
 	
-} SerializationContext;
+	/* Enable indentation */
+	rc = xmlTextWriterSetIndent(writer, TRUE);
+	
+	/* Start document */
+	rc = xmlTextWriterStartDocument(writer, "1.0", "utf-8", NULL);
+	  
+	/* Start note element */
+	rc = xmlTextWriterStartElement(writer, BAD_CAST "note");
+	rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "version", BAD_CAST "0.3");
+	rc = xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xmlns", BAD_CAST "link", NULL, BAD_CAST "http://beatniksoftware.com/tomboy/link");
+	rc = xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xmlns", BAD_CAST "size", NULL, BAD_CAST "http://beatniksoftware.com/tomboy/size");
+	rc = xmlTextWriterWriteAttributeNS(writer, NULL, BAD_CAST "xmlns", NULL, BAD_CAST "http://beatniksoftware.com/tomboy");
+	  
+	/* Title element */
+	rc = xmlTextWriterWriteElement(writer, BAD_CAST "title", BAD_CAST note->title);
+}
 
-static void find_list_delta(GSList *old_list, GSList *new_list, GList **added,
-		GList **removed) {
-
-	GSList *tmp;
-	GList *tmp_added, *tmp_removed;
-
-	tmp_added = NULL;
-	tmp_removed = NULL;
-
-	/* Find added tags */
-	tmp = new_list;
-	while (tmp) {
-		if (!g_slist_find(old_list, tmp->data)) {
-			tmp_added = g_list_prepend(tmp_added, tmp->data);
-		}
-
-		tmp = tmp->next;
+gint depth = 0;
+gint new_depth = 0;
+gboolean list_active = FALSE;
+/**
+ * Writes a start element.
+ */
+static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
+{
+	gchar** strings;
+	gchar *tag_name;
+	
+	tag_name = g_strdup(tag->name);
+	
+	/* Ignore tags that start with "_". They are considered internal. */
+	if (g_ascii_strncasecmp(tag_name, "_", 1) == 0) {
+		return;
 	}
-
-	*added = tmp_added;
-
-	/* Find removed tags */
-	tmp = old_list;
-	while (tmp) {
-		if (!g_slist_find(new_list, tmp->data)) {
-			tmp_removed = g_list_prepend(tmp_removed, tmp->data);
-		}
-
-		tmp = tmp->next;
+	
+	/* Ignore <list> tags. */ /* TODO: Probably remove them from the GtkTextBuffer */
+	if (g_ascii_strncasecmp(tag_name, "list", -1) == 0) {
+		list_active = TRUE;
+		return;
 	}
-
-	/* We reverse the list here to match the xml semantics */
-	*removed = g_list_reverse(tmp_removed);
+	
+	/* If not a <list-item> tag, write it and return */
+	if (g_ascii_strncasecmp(tag_name, "list-item", 9) != 0) {
+		xmlTextWriterStartElement(writer, BAD_CAST tag_name);
+		return;
+	}
+	
+	/* It is a <list-item-*> tag */
+	strings = g_strsplit(tag_name, ":", 2);
+	new_depth = atoi(strings[1]);
+	
+	if (new_depth < depth) {
+		/* </list-item> */
+		xmlTextWriterEndElement(writer);
+		/* </list> */
+		xmlTextWriterEndElement(writer);
+		/* </list-item> */
+		xmlTextWriterEndElement(writer);
+		/* <list-item dir=ltr> */
+		xmlTextWriterStartElement(writer, BAD_CAST "list-item");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST "dir", BAD_CAST "ltr");
+	}
+	
+	
+	/* If there was an increase in depth, we need to add a <list> tag */
+	if (new_depth > depth) {
+		xmlTextWriterStartElement(writer, BAD_CAST "list");
+		xmlTextWriterStartElement(writer, BAD_CAST "list-item");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST "dir", BAD_CAST "ltr");
+	} else if (new_depth == depth) {
+		xmlTextWriterEndElement(writer); /* </list-item> */
+		xmlTextWriterStartElement(writer, BAD_CAST "list-item");
+		xmlTextWriterWriteAttribute(writer, BAD_CAST "dir", BAD_CAST "ltr");
+	}
+	
+	depth = new_depth;
+	g_strfreev(strings);
 }
 
 /**
- * Serializes all GtkTextTags by using there name as xml tags. E.g <tag_name></tag_name>.
- * Only GtkTextTags which name starts with an underscore (_) are ignored and not serialized.
+ * Writes a end element.
  */
-static void serialize_text(GtkTextBuffer *buffer, SerializationContext *context, Note* metadata) {
+static void write_end_element(GtkTextTag *tag, xmlTextWriter *writer)
+{
+	gint new_depth = 0;
+	gchar **strings;
+	gchar *tag_name;
+	
+	tag_name = g_strdup(tag->name);
+	
+	/* Ignore tags that start with "_". They are considered internal. */
+	if (g_ascii_strncasecmp(tag_name, "_", 1) == 0) {
+		return;
+	}
+	
+	/* If the list completely ends, reset the depth */
+	if (g_ascii_strncasecmp(tag_name, "list", -1) == 0) {
+		/* </list-item> */
+		xmlTextWriterEndElement(writer);
+		/* </list> */
+		xmlTextWriterEndElement(writer);
+		new_depth = 0;
+		depth = 0;
+		list_active = FALSE;
+		return;
+	}
+	
+	/* If it is not a <list-item> tag, just close it and return */
+	if (g_ascii_strncasecmp(tag_name, "list-item", 9) != 0) {
+		xmlTextWriterEndElement(writer);
+		return;
+	}
+	
+	
+	/*g_free(tag_name);*/
+}
 
-	GtkTextIter iter, old_iter;
-	GSList *tag_list, *new_tag_list;
-	GSList *active_tags;
-
-	g_string_append(context->text_str, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-	g_string_append(context->text_str, "<note version=\"0.3\" xmlns:link=\"http://beatniksoftware.com/tomboy/link\" xmlns:size=\"http://beatniksoftware.com/tomboy/size\" xmlns=\"http://beatniksoftware.com/tomboy\">\n");
-	g_string_append(context->text_str, "  <title>");
-	g_string_append(context->text_str, metadata->title);
-	g_string_append(context->text_str, "</title>\n");
-	g_string_append(context->text_str, "  <text xml:space=\"preserve\"><note-content version=\"0.1\">");
-
-	iter = context->start;
-	tag_list = NULL;
-	active_tags = NULL;
-
-	do {
-		GList *added, *removed;
-		GList *tmp;
-		gchar *tmp_text, *escaped_text;
-
-		new_tag_list = gtk_text_iter_get_tags (&iter);
-		find_list_delta (tag_list, new_tag_list, &added, &removed);
-
-		/* Handle removed tags */
-		for (tmp = removed; tmp; tmp = tmp->next)
-		{
-			GtkTextTag *tag = tmp->data;
-			gchar *tag_name = NULL;
-
-			/* Only close the tag if we didn't close it before (by using
-			 * the stack logic in the while() loop below)
-			 */
-			if (g_slist_find (active_tags, tag))
-			{
-				/* Append closing tag */
-				tag_name = g_markup_escape_text (tag->name, -1);
-				if (g_ascii_strncasecmp(tag_name, "_", 1) == 0) {
-					/* Ignore tags which start with "_" */
-					break;
-				}
-				g_string_append_printf (context->text_str, "</%s>", tag_name);
-
-				/* Drop all tags that were opened after this one (which are
-				 * above this on in the stack)
-				 */
-				while (active_tags->data != tag)
-				{
-					added = g_list_prepend (added, active_tags->data);
-					active_tags = g_slist_remove (active_tags, active_tags->data);
-					g_string_append_printf (context->text_str, "</%s>", tag_name);
-				}
-
-				active_tags = g_slist_remove (active_tags, active_tags->data);
-			}
-			g_free(tag_name);
+/**
+ * Writes plain text.
+ */
+static void write_text(const gchar *text, xmlTextWriter *writer)
+{
+	/* If the text starts with a BULLET character, we remove the BULLET character */
+	/* TODO: Maybe only do this if we are inside a <list-item>. */
+	
+	if (list_active) {
+		if (g_ascii_strncasecmp(BULLET, text, 4) == 0) {
+			text = g_strdup(text + sizeof(BULLET) - 1);
 		}
+		/* Remove trailing whitespaces */
+		/*text = g_strchomp(text);*/
+	}
+	
+	xmlTextWriterWriteString(writer, BAD_CAST text);
+}
 
-		/* Handle added tags */
-		for (tmp = added; tmp; tmp = tmp->next)
-		{
-			GtkTextTag *tag = tmp->data;
-			gchar *tag_name;
+/**
+ * Sort two GtkTextTags by their priority. Higher priority (bigger number)
+ * will be sorted to the left of the list
+ */
+static gint sort_by_prio(GtkTextTag *tag1, GtkTextTag *tag2)
+{	
+	if (tag1->priority == tag2->priority) {
+		g_printerr("ERROR: Two tags cannot have the same priority.\n");
+		return 0;
+	}
+	
+	/* If the priority of tag1 is higher is should be sorted to the left */
+	if (tag1->priority > tag2->priority) {
+		return -1;
+	} else {
+		return 1;
+	}
+}
 
-			/* Add it to the tag hash table */
-			g_hash_table_insert (context->tags, tag, tag);
-
-			if (tag->name)
-			{
-				tag_name = g_markup_escape_text (tag->name, -1);
-				if (g_ascii_strncasecmp(tag_name, "_", 1) == 0) {
-					/* Ignore tags which start with "_" */
-					break;
-				}
-
-				g_string_append_printf (context->text_str, "<%s>", tag_name);
-				g_free (tag_name);
-			}
-			else
-			{
-				/* TODO: Remove later */
-				g_printerr("ERROR: Only named tags are allowed!!!");
-			}
-
-			active_tags = g_slist_prepend (active_tags, tag);
-		}
-
-		g_slist_free (tag_list);
-		tag_list = new_tag_list;
-
-		g_list_free (added);
-		g_list_free (removed);
-
-		old_iter = iter;
-
-		/* Now try to go to either the next tag toggle, or if a pixbuf appears */
-		while (TRUE)
-		{
-			gunichar ch = gtk_text_iter_get_char (&iter);
-
-			if (ch == 0)
-			{
-				break;
-			}
-			else
-			gtk_text_iter_forward_char (&iter);
-
-			if (gtk_text_iter_toggles_tag (&iter, NULL))
+static
+void write_content(xmlTextWriter *writer, Note *note)
+{
+	int rc = 0;
+	GtkTextBuffer *buffer;
+	GtkTextIter start, end;
+	GtkTextIter *old_iter, *iter;
+	gchar *text;
+	GSList *start_tags = NULL, *end_tags = NULL;
+	
+	/* Start text element */
+	rc = xmlTextWriterStartElement(writer, BAD_CAST "text");
+	rc = xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xml", BAD_CAST "space", NULL, BAD_CAST "preserve");
+	
+	/* Disable indentation */
+	rc = xmlTextWriterSetIndent(writer, FALSE);
+	  
+	/* Start note-content element */
+	rc = xmlTextWriterStartElement(writer, BAD_CAST "note-content");
+	rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "version", BAD_CAST "0.1");
+	
+	/*****************************************************/
+	
+	
+	buffer = note->buffer;
+	
+	gtk_text_buffer_get_bounds(buffer, &start, &end);
+	iter = gtk_text_iter_copy(&start);
+	old_iter = gtk_text_iter_copy(&start);
+	
+	while (gtk_text_iter_compare(iter, &end) <= 0) {
+		
+		start_tags = gtk_text_iter_get_toggled_tags(iter, TRUE);
+		end_tags   = gtk_text_iter_get_toggled_tags(iter, FALSE);
+		
+		/* Write end tags */
+		g_slist_foreach(end_tags, (GFunc)write_end_element, writer);
+		
+		/* Sort start tags by priority */
+		start_tags = g_slist_sort(start_tags, (GCompareFunc)sort_by_prio);
+		
+		/* Write start tags */
+		g_slist_foreach(start_tags, (GFunc)write_start_element, writer);
+		
+		/* Move iter */
+		/* Remember position and set iter to next toggle */
+		gtk_text_iter_free(old_iter);
+		old_iter = gtk_text_iter_copy(iter);
+		
+		if (gtk_text_iter_compare(iter, &end) >= 0) {
 			break;
 		}
-
-		/* We might have moved too far */
-		if (gtk_text_iter_compare (&iter, &context->end)> 0)
-		iter = context->end;
-
-		/* Append the text */
-		tmp_text = gtk_text_iter_get_slice (&old_iter, &iter);
-		escaped_text = g_markup_escape_text (tmp_text, -1);
-		g_free (tmp_text);
-
-		g_string_append (context->text_str, escaped_text);
-		g_free (escaped_text);
+		gtk_text_iter_forward_to_tag_toggle(iter, NULL);
+		
+		/* Write text */
+		text = gtk_text_iter_get_text(old_iter, iter);
+		write_text(text, writer);
 	}
-
-	while (!gtk_text_iter_equal (&iter, &context->end));
-
-	/* Close any open tags */
-	for (tag_list = active_tags; tag_list; tag_list = tag_list->next) {
-		/* TODO: Schoener ?! */
-		GtkTextTag *taggg = tag_list->data;
-		gchar *tag_name = taggg->name;
-		g_string_append_printf(context->text_str, "</%s>", tag_name);
-	}
-
-	g_slist_free (active_tags);
-	g_string_append (context->text_str, "\n</note-content></text>\n");
+	
+	/*
+	g_slist_free(start_tags);
+	g_slist_free(end_tags);
+	g_free(text);
+	*/
+	/*
+	gtk_text_iter_free(&start);
+	gtk_text_iter_free(&end);
+	gtk_text_iter_free(iter);
+	gtk_text_iter_free(old_iter);
+	*/
+	
+	/**************************************************/
+	  
+	/* Close note-content */
+	rc = xmlTextWriterEndElement(writer);
+	  
+	/* Close text */
+	rc = xmlTextWriterEndElement(writer);
+	
+	/* Insert linebreak like in Tomboy format */
+	rc = xmlTextWriterWriteRaw(writer, BAD_CAST "\n");	
 }
 
-static void serialize_metadata(GString *str, Note *metadata) {
+static
+void write_footer(xmlTextWriter *writer, Note *note) 
+{
+	int rc;
 	
-	/* I'm not using printf for open_on_startup, because I want that
-	 * True and False are written like that and not TRUE and FALSE.
-	 * To stay as compatible with Tomboy as possible.
-	 */
-	const gchar *open_on_startup;
-	if (metadata->open_on_startup) {
-		open_on_startup = "True";
+	/* Enable indentation */
+	rc = xmlTextWriterSetIndent(writer, TRUE);
+		  
+	/* Meta data tags */
+	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "last-change-date", "%s", note->last_change_date);
+	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "last-metadata-change-date", "%s", note->last_metadata_change_date);
+	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "create-date", "%s", note->create_date);
+	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "cursor-position", "%i", note->cursor_position);
+	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "width", "%i", note->width);
+	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "height", "%i", note->height);
+	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "x", "%i", note->x);
+	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "y", "%i", note->y);
+	if (note->open_on_startup == TRUE) {
+		rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "open-on-startup", "True");
 	} else {
-		open_on_startup = "False";
+		rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "open-on-startup", "False");
+	}
+
+	/* End the document */
+	rc = xmlTextWriterEndDocument(writer);
+}
+
+void serialize_note(Note *note)
+{
+	xmlTextWriter *writer;
+	
+	if (note->filename == NULL) {
+		g_printerr("ERROR: Cannot save, filename of note is not set.\n");
+		return;
 	}
 	
-	g_string_append_printf(str, "  <last-change-date>%s</last-change-date>\n", metadata->last_change_date);
-	g_string_append_printf(str, "  <last-metadata-change-date>%s</last-metadata-change-date>\n", metadata->last_metadata_change_date);
-	g_string_append_printf(str, "  <create-date>%s</create-date>\n", metadata->create_date);
-	g_string_append_printf(str, "  <cursor-position>%i</cursor-position>\n", metadata->cursor_position);
-	g_string_append_printf(str, "  <width>%i</width>\n", metadata->width);
-	g_string_append_printf(str, "  <height>%i</height>\n", metadata->height);
-	g_string_append_printf(str, "  <x>%i</x>\n", metadata->x);
-	g_string_append_printf(str, "  <y>%i</y>\n", metadata->y);
-	g_string_append_printf(str, "  <open-on-startup>%s</open-on-startup>\n", open_on_startup);
-	g_string_append_printf(str, "</note>\n");
-
+	writer = xmlNewTextWriterFilename(note->filename, FALSE);
+	xmlTextWriterSetIndentString(writer, BAD_CAST "  ");
+	
+	write_header(writer, note);
+	write_content(writer, note);
+	write_footer(writer, note);
+	
+	xmlFreeTextWriter(writer);
 }
-
-guint8 * serialize_to_tomboy(GtkTextBuffer *register_buffer,
-		GtkTextBuffer *content_buffer, const GtkTextIter *start,
-		const GtkTextIter *end, gsize *length, gpointer user_data) {
-
-	/* 
-	 * register_buffer: the GtkTextBuffer for which the format is registered
-	 * content_buffer:	the GtkTextsBuffer to serialize
-	 * start: start of the block of text to serialize
-	 * end : end of the block of text to serialize 
-	 * length: Return location for the length of the serialized data
-	 * user_data: user data that was specified when registering the format
-	 */
-
-	SerializationContext context;
-	GString *text;
-	Note *note;
-	
-	note = (Note*)user_data;
-
-	context.tags = g_hash_table_new(NULL, NULL);
-	context.text_str = g_string_new(NULL);
-	context.start = *start;
-	context.end = *end;
-	
-	serialize_text(content_buffer, &context, note);
-
-	text = g_string_new(NULL);
-	
-	/* TODO: Add the static xml stuff here */
-	/*serialize_header(text);*/
-	
-	g_string_append_len(text, context.text_str->str, context.text_str->len);
-
-	serialize_metadata(text, note);
-
-	g_hash_table_destroy(context.tags);
-	g_string_free(context.text_str, TRUE);
-
-	*length = text->len;
-	
-	/* Mark the buffer as saved */
-	gtk_text_buffer_set_modified(content_buffer, FALSE);
-
-	/* Must return new allocated array of guint8 which contains the serialized data or NULL if error
-	 * occured */
-	return (guint8*) g_string_free(text, FALSE);
-}
-

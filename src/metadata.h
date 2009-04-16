@@ -22,6 +22,8 @@
 #include <gconf/gconf-client.h>
 #include <hildon/hildon-program.h>
 
+#define BULLET "\342\200\242 "
+
 typedef struct
 {
 	const gchar   *user_path;

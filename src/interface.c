@@ -45,18 +45,26 @@
 
 
 static void initialize_tags(GtkTextBuffer *buffer) {
+	/*
+	 * The order in which we add the tags here defines also the priority of the tags.
+	 * So if we apply, for example, bold and italic to one word, it will result
+	 * in <italic><bold>word</bold></italic>. Because bold has a higher priority
+	 * than italic.
+	 */
+	GtkTextTag *list_tag;
+	
+	gtk_text_buffer_create_tag(buffer, "centered", "justification", GTK_JUSTIFY_CENTER, NULL);
 	
 	gtk_text_buffer_create_tag(buffer, "bold", "weight", PANGO_WEIGHT_BOLD, NULL);
 	gtk_text_buffer_create_tag(buffer, "italic", "style", PANGO_STYLE_ITALIC, NULL);
 	gtk_text_buffer_create_tag(buffer, "strikethrough", "strikethrough", TRUE, NULL);
 	gtk_text_buffer_create_tag(buffer, "underline", "underline", PANGO_UNDERLINE_SINGLE, NULL);
 	gtk_text_buffer_create_tag(buffer, "monospace", "family", "monospace", NULL);
+	gtk_text_buffer_create_tag(buffer, "highlight", "background", "yellow", NULL);
 	
 	gtk_text_buffer_create_tag(buffer, "size:small", "scale", PANGO_SCALE_SMALL, NULL);
 	gtk_text_buffer_create_tag(buffer, "size:large", "scale", PANGO_SCALE_LARGE, NULL);
 	gtk_text_buffer_create_tag(buffer, "size:huge", "scale", PANGO_SCALE_X_LARGE, NULL);
-	
-	gtk_text_buffer_create_tag(buffer, "highlight", "background", "yellow", NULL);
 	
 	gtk_text_buffer_create_tag(buffer, "link:internal", "foreground", "blue", "underline", PANGO_UNDERLINE_SINGLE, NULL);
 	gtk_text_buffer_create_tag(buffer, "link:url", "foreground", "blue", "underline", PANGO_UNDERLINE_SINGLE, NULL);
@@ -64,8 +72,12 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 	
 	gtk_text_buffer_create_tag(buffer, "_title", "foreground", "blue", "underline", PANGO_UNDERLINE_SINGLE, "scale", PANGO_SCALE_X_LARGE, NULL);
 	
-	gtk_text_buffer_create_tag(buffer, "list", "left-margin", 40, NULL);
-	gtk_text_buffer_create_tag(buffer, "list-item", "indent", -20, NULL);
+	
+	gtk_text_buffer_create_tag(buffer, "list-item-A:1", "indent", -20, "left-margin", 25, "foreground", "red", NULL);
+	gtk_text_buffer_create_tag(buffer, "list-item-B:1", "indent", -20, "left-margin", 25, "foreground", "orange", NULL);
+	
+	
+	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
 	
 }
 
@@ -76,12 +88,16 @@ static void register_serializer_and_deserializer(GtkTextBuffer *buffer, Note *no
 	AppData *app_data = get_app_data();
 	
 	/* Serializer */
+	/*
 	serializer = serialize_to_tomboy;
 	app_data->serializer = gtk_text_buffer_register_serialize_format(buffer, "text/xml", serializer, note, NULL);
+	*/
 	
 	/* Deserializer */
+	/*
 	deserializer = deserialize_from_tomboy;
 	app_data->deserializer = gtk_text_buffer_register_deserialize_format(buffer, "text/xml", deserializer, note, NULL);
+	*/
 }
 
 GtkWidget* create_mainwin(Note *note) {
@@ -96,19 +112,17 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkWidget *scrolledwindow1;
 	GtkWidget *textview;
 	GtkTextBuffer *buffer;
-	/*GtkToolItem *quit_button;*/
-	/*GtkToolItem *save_button;*/
-	/*GtkToolItem *load_button;*/
+	
 	GtkToolItem *bold_button;
 	GtkToolItem *italic_button;
 	GtkToolItem *strike_button;
+	GtkToolItem *bullets_button;
 	GtkToolItem *link_button;
 	GtkToolItem *delete_button;
 	GtkToolItem *notes_button;
-	/*
-	GtkToolItem *smaller_button;
-	GtkToolItem *bigger_button;
-	*/
+	GtkToolItem *save_button;
+	GtkToolItem *load_button;
+	
 	GtkToolItem *highlight_button;
 	GtkWidget *highlight_icon;
 	GtkTextTag *link_internal_tag;
@@ -138,18 +152,8 @@ GtkWidget* create_mainwin(Note *note) {
 	/* TOOLBAR */
 	toolbar = gtk_toolbar_new();
 	
-	/*
-	quit_button = gtk_tool_button_new_from_stock("gtk-quit");
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), quit_button, -1);
-	*/
-
-	/*
-	save_button = gtk_tool_button_new_from_stock("gtk-save");
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar1), save_button, -1);
-	
-	load_button = gtk_tool_button_new_from_stock("gtk-open");
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar1), load_button, -1);
-	*/
+	load_button = gtk_tool_button_new_from_stock(GTK_STOCK_OPEN);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), load_button, -1);
 	
 	bold_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_BOLD);
 	gtk_widget_set_size_request(GTK_WIDGET(bold_button), 80, -1);
@@ -162,6 +166,9 @@ GtkWidget* create_mainwin(Note *note) {
 	strike_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_STRIKETHROUGH);
 	/*gtk_widget_set_size_request(strike_button, 70, -1);*/
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), strike_button, -1);
+	
+	bullets_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_CDROM);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), bullets_button, -1);
 	
 	highlight_icon = gtk_image_new_from_file("/usr/share/icons/hicolor/26x26/hildon/highlighter.png");	
 	highlight_button = gtk_toggle_tool_button_new();
@@ -177,15 +184,9 @@ GtkWidget* create_mainwin(Note *note) {
 	notes_button = gtk_tool_button_new_from_stock(GTK_STOCK_OPEN);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), notes_button, -1);
 	
+	save_button = gtk_tool_button_new_from_stock(GTK_STOCK_SAVE);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), save_button, -1);
 	
-	
-	/*
-	smaller_button = gtk_tool_button_new_from_stock(GTK_STOCK_ZOOM_OUT);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), smaller_button, -1);
-	
-	bigger_button = gtk_tool_button_new_from_stock(GTK_STOCK_ZOOM_IN);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), bigger_button, -1);
-	*/
 
 	gtk_widget_show_all(toolbar);
 
@@ -244,22 +245,6 @@ GtkWidget* create_mainwin(Note *note) {
 			G_CALLBACK (on_quit_button_clicked),
 			NULL);
 
-	/*
-	g_signal_connect ((gpointer) quit_button, "clicked",
-			G_CALLBACK (on_quit_button_clicked),
-			NULL);
-	*/
-
-	/*
-	g_signal_connect ((gpointer) save_button, "clicked",
-			G_CALLBACK (on_save_button_clicked),
-			metadata);
-	
-	g_signal_connect ((gpointer) load_button, "clicked",
-			G_CALLBACK (on_load_button_clicked),
-			buffer);
-	*/
-	
 	g_signal_connect ((gpointer) bold_button, "clicked",
 			G_CALLBACK (on_bold_button_clicked),
 			NULL);
@@ -270,6 +255,10 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	g_signal_connect ((gpointer) strike_button, "clicked",
 			G_CALLBACK (on_strike_button_clicked),
+			NULL);
+	
+	g_signal_connect ((gpointer) bullets_button, "clicked",
+			G_CALLBACK(on_bullets_button_clicked),
 			NULL);
 	
 	g_signal_connect ((gpointer) highlight_button, "clicked",
@@ -304,12 +293,16 @@ GtkWidget* create_mainwin(Note *note) {
 			G_CALLBACK(on_textview_tap_and_hold),
 			NULL);
 	
+	
+	g_signal_connect ((gpointer)save_button, "clicked",
+			G_CALLBACK(on_save_button_clicked),
+			note);
+	
+	g_signal_connect ((gpointer)load_button, "clicked",
+			G_CALLBACK(on_load_button_clicked),
+			note);
+	
 	/*
-	g_signal_connect ((gpointer)smaller_button, "clicked",
-			G_CALLBACK(on_smaller_button_clicked),
-			textview);
-	
-	
 	g_signal_connect ((gpointer)bigger_button, "clicked",
 			G_CALLBACK(on_bigger_button_clicked),
 			textview);
@@ -343,6 +336,7 @@ GtkWidget* create_mainwin(Note *note) {
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(strike_button), "strike_button");
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(strike_button), "link_button");
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(highlight_button), "highlight_button");
+	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(bullets_button), "bullets_button");
 	GLADE_HOOKUP_OBJECT (mainwin, scrolledwindow1, "scrolledwindow1");
 	GLADE_HOOKUP_OBJECT (mainwin, textview, "textview");
 

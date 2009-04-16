@@ -1,32 +1,8 @@
-/* This file is part of Conboy.
- * 
- * Copyright (C) 2009 Cornelius Hald
- *
- * Conboy is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Conboy is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
- */
+#ifndef DESERIALIZER_H_
+#define DESERIALIZER_H_
 
-#ifndef DESERIALIZER_H
-#define DESERIALIZER_H
+#include "metadata.h"
 
-gboolean
-deserialize_from_tomboy (GtkTextBuffer *register_buffer,
-                                        GtkTextBuffer *content_buffer,
-                                        GtkTextIter   *iter,
-                                        const guint8  *text,
-                                        gsize          length,
-                                        gboolean       create_tags,
-                                        gpointer       user_data,
-                                        GError       **error);
+void deserialize_note(Note *note);
 
-#endif /* DESERIALIZER_H */
+#endif /*DESERIALIZER_H_*/

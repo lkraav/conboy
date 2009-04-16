@@ -38,6 +38,8 @@
 #include "interface.h"
 
 #include "note.h"
+#include "serializer.h"
+#include "deserializer.h"
 
 static void change_format(const gchar* tag_name, GtkButton *button) {
 	
@@ -97,23 +99,23 @@ void on_quit_button_clicked(GtkButton *button, gpointer user_data)
 	gtk_main_quit();
 }
 
-void on_load_button_clicked(GtkButton *button, gpointer user_data) {
+void on_load_button_clicked(GtkButton *button, gpointer user_data)
+{
+	Note *note = (Note*)user_data;
+		
+	/* TODO: Probably a GError object would be good. E.g. if File does not exist etc... */
+	deserialize_note(note); 
 	
-	/*
-	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(user_data);
-	GtkWindow *win = GTK_WINDOW(lookup_widget(GTK_WIDGET(button), "mainwin"));
 	
-	note_load_to_buffer("/home/conny/test.ser", buffer);
-	  
 	
-	note_format_title(buffer);
-	note_set_window_title_from_buffer(win, buffer);
-	*/
+	note_show(note);
 }
 
 void on_save_button_clicked(GtkButton *button, gpointer user_data) {
 	Note *note = (Note*)user_data;
-	note_save(note);
+	
+	serialize_note(note);
+	
 }
 
 void
@@ -146,6 +148,108 @@ on_highlight_button_clicked			   (GtkButton		*button,
 {
 	g_printerr("HIGHLIGHT Button clicked\n");
 	change_format("highlight", button);
+}
+
+static void
+add_bullets(GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_iter)
+{
+	gint i = 0;
+	gint start_line = gtk_text_iter_get_line(start_iter);
+	gint end_line   = gtk_text_iter_get_line(end_iter);
+	gint total_lines = gtk_text_buffer_get_line_count(buffer);
+	gchar *list_item[2] = {"list-item-A:1", "list-item-B:1"}; /* TODO: Replace with get_depth_tag() from deserialzer2.c
+	
+	/* For each selected line */
+	for (i = start_line; i <= end_line; i++) {
+		
+		/* li decideds if we take list-item-A or list-item-B */
+		int li = i % 2;
+		
+		/* Insert bullet character */
+		gtk_text_buffer_get_iter_at_line(buffer, start_iter, i);
+		gtk_text_buffer_insert(buffer, start_iter, BULLET, -1);
+		
+		/* Surround line with "list-item" tags */
+		gtk_text_buffer_get_iter_at_line(buffer, start_iter, i);
+		if (i == end_line) {
+			gtk_text_buffer_get_iter_at_line(buffer, end_iter, i);
+			gtk_text_iter_forward_to_line_end(end_iter);
+		} else {
+			gtk_text_buffer_get_iter_at_line(buffer, end_iter, i + 1);
+		}
+		gtk_text_buffer_apply_tag_by_name(buffer, list_item[li], start_iter, end_iter);
+	}
+	
+	/* Surround it with "list" tags */
+	gtk_text_buffer_get_iter_at_line(buffer, start_iter, start_line);
+	gtk_text_buffer_get_iter_at_line(buffer, end_iter, end_line);
+	gtk_text_iter_forward_to_line_end(end_iter);
+	gtk_text_buffer_apply_tag_by_name(buffer, "list", start_iter, end_iter);
+}
+
+static void
+remove_bullets(GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_iter)
+{
+	gint i = 0;
+	gint start_line = gtk_text_iter_get_line(start_iter);
+	gint end_line = gtk_text_iter_get_line(end_iter);
+	
+	/* Remove tags */
+	gtk_text_buffer_get_iter_at_line(buffer, start_iter, start_line);
+	gtk_text_buffer_get_iter_at_line(buffer, end_iter, end_line);
+	gtk_text_iter_forward_to_line_end(end_iter);
+	
+	gtk_text_buffer_remove_tag_by_name(buffer, "list-item-A", start_iter, end_iter);
+	gtk_text_buffer_remove_tag_by_name(buffer, "list-item-B", start_iter, end_iter);
+	gtk_text_buffer_remove_tag_by_name(buffer, "list", start_iter, end_iter);
+		
+	/* Remove bullets */
+	for (i = start_line; i <= end_line; i++) {
+		gtk_text_buffer_get_iter_at_line(buffer, start_iter, i);
+		gtk_text_buffer_get_iter_at_line(buffer, end_iter, i);
+		gtk_text_iter_forward_chars(end_iter, 2);
+		gtk_text_buffer_delete(buffer, start_iter, end_iter);
+	}
+}
+
+void
+on_bullets_button_clicked				(GtkButton		*button,
+										 gpointer		 user_data)
+{
+	GtkWidget *view;
+	GtkTextBuffer *buffer;
+	GtkTextIter start_iter, end_iter;
+	
+	view = lookup_widget(GTK_WIDGET(button), "textview");
+	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
+	
+	if (gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(button))) {
+		/* The button just became active, so we should enable the formatting */
+		if (gtk_text_buffer_get_has_selection(buffer)) {
+			/* Something is selected */
+			gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter);
+			add_bullets(buffer, &start_iter, &end_iter);
+			
+		} else {
+			/* Nothing is selected */
+			gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer));
+			gtk_text_buffer_get_iter_at_mark(buffer, &end_iter, gtk_text_buffer_get_insert(buffer));
+			add_bullets(buffer, &start_iter, &end_iter);
+		}
+	} else {
+		/* The button just became deactive, so we should remove the formatting */
+		if (gtk_text_buffer_get_has_selection(buffer)) {
+			/* Something is selected */
+			gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter);
+			remove_bullets(buffer, &start_iter, &end_iter);
+			
+		} else {
+			/* Nothing is selected */
+			gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer));
+			gtk_text_buffer_get_iter_at_mark(buffer, &end_iter, gtk_text_buffer_get_insert(buffer));		
+			remove_bullets(buffer, &start_iter, &end_iter);
+		}
+	}
 }
 
 void
@@ -189,16 +293,14 @@ on_notes_button_clicked				   (GtkButton		*button,
 										gpointer		 user_data) {
 	
 	AppData *app_data = get_app_data();
-	GtkWidget *menu_item;
-	Note *note;
+	
 	GtkWidget *menu = gtk_menu_new ();
 	GList *notes = app_data->all_notes;
 	
-	GtkWidget *image_small, *image_large;
-	
 	while(notes != NULL) {
-	
-		note = notes->data;
+		GtkWidget *menu_item;
+		GtkWidget *image_small, *image_large;
+		Note *note = notes->data;
 		/* TODO: Don't hardcode the path to the icons*/
 		/* TODO: When starting from Eclipse, use local paths, not from /usr/share/ */
 		menu_item = hildon_thumb_menu_item_new_with_labels(note->title, note->title, "Open Note...");
@@ -232,7 +334,6 @@ on_notes_menu_item_activated		(GtkMenuItem *menuitem,
 									 gpointer     user_data)
 {
 	Note *note = (Note*)user_data;
-	/*note_open(note);*/
 	note_show(note);
 }
 
@@ -245,7 +346,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 										GtkTextMark		*mark,
 										gpointer		 user_data)
 {
-	GtkToggleToolButton *bold_button, *italic_button, *strike_button, *highlight_button;
+	GtkToggleToolButton *bold_button, *italic_button, *strike_button, *highlight_button, *bullets_button;
 	GSList *tags;
 	GtkTextTag *tag;
 	
@@ -253,6 +354,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	italic_button    = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "italic_button"));
 	strike_button    = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "strike_button"));
 	highlight_button = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "highlight_button"));
+	bullets_button   = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "bullets_button"));
 	
 	/* TODO: This is only workaround for problem with repeated calls. Probably gives problems with
 	 * selection. We only call this if the "insert" mark changed. */
@@ -273,11 +375,13 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	g_signal_handlers_block_by_func(italic_button, on_italic_button_clicked, NULL);
 	g_signal_handlers_block_by_func(strike_button, on_strike_button_clicked, NULL);
 	g_signal_handlers_block_by_func(highlight_button, on_highlight_button_clicked, NULL);
+	g_signal_handlers_block_by_func(bullets_button, on_bullets_button_clicked, NULL);
 	
 	gtk_toggle_tool_button_set_active(bold_button, FALSE);
 	gtk_toggle_tool_button_set_active(italic_button, FALSE);
 	gtk_toggle_tool_button_set_active(strike_button, FALSE);
 	gtk_toggle_tool_button_set_active(highlight_button, FALSE);
+	gtk_toggle_tool_button_set_active(bullets_button, FALSE);
 	
 	while (tags != NULL) {
 		tag = GTK_TEXT_TAG(tags->data);
@@ -289,6 +393,10 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 			gtk_toggle_tool_button_set_active(strike_button, TRUE);
 		} else if (g_strcasecmp(tag->name, "highlight") == 0) {
 			gtk_toggle_tool_button_set_active(highlight_button, TRUE);
+		} else if (g_strcasecmp(tag->name, "list-item-A") == 0) {
+			gtk_toggle_tool_button_set_active(bullets_button, TRUE);
+		} else if (g_strcasecmp(tag->name, "list-item-B") == 0) {
+			gtk_toggle_tool_button_set_active(bullets_button, TRUE);
 		}
 		tags = tags->next;
 	}
@@ -300,6 +408,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	g_signal_handlers_unblock_by_func(italic_button, on_italic_button_clicked, NULL);
 	g_signal_handlers_unblock_by_func(strike_button, on_strike_button_clicked, NULL);
 	g_signal_handlers_unblock_by_func(highlight_button, on_highlight_button_clicked, NULL);
+	g_signal_handlers_unblock_by_func(bullets_button, on_bullets_button_clicked, NULL);
 	
 	/* TODO: Free tags list */
 

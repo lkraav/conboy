@@ -50,6 +50,10 @@ on_strike_button_clicked			   (GtkButton		*button,
 										gpointer		 user_data);
 
 void
+on_bullets_button_clicked				(GtkButton		*button,
+										 gpointer		 user_data);
+
+void
 on_highlight_button_clicked			   (GtkButton		*button,
 										gpointer		 user_data);
 
@@ -116,5 +120,7 @@ on_hardware_key_pressed					(GtkWidget			*widget,
 void
 on_textview_tap_and_hold				(GtkWidget 			*widget,
 										 gpointer 			user_data);
+
+
 
 #endif /* CALLBACKS_H */

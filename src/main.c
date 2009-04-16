@@ -29,6 +29,10 @@
 #include <stdlib.h>
 
 #include <libxml/xmlreader.h>
+
+#include <libxml/encoding.h>
+#include <libxml/xmlwriter.h>
+
 #include <stdio.h>
 
 #ifndef __USE_XOPEN
@@ -37,8 +41,6 @@
 #include <time.h>
 
 #include "support.h"
-#include "serializer.h"
-#include "deserializer.h"
 #include "metadata.h"
 #include "interface.h"
 #include "callbacks.h"
@@ -47,9 +49,11 @@
 #include "localisation.h"
 
 #define APP_NAME "conboy"
-#define APP_VER "0.1"
+#define APP_VER "0.1.0"
 #define APP_SERVICE "de.zwong.conboy"
 #define APP_METHOD "/de/zwong/conboy"
+
+#define MY_ENCODING "utf-8"
 
 
 
@@ -61,10 +65,9 @@ main (int argc, char *argv[])
   Note *note = g_slice_alloc0(sizeof(Note));
   osso_context_t *osso_context;
   AppData *app_data;
-  
-  
+
   /* Init GTK */
-  gtk_init (&argc, &argv);
+  gtk_init(&argc, &argv);
   
   /* Call this to initialize it */
   app_data = get_app_data();

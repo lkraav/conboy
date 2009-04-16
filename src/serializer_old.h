@@ -16,34 +16,14 @@
  * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NOTE_H
-#define NOTE_H
+#ifndef SERIALIZER_H
+#define SERIALIZER_H
 
-#include <gtk/gtk.h>
-#include "metadata.h"
+guint8 * serialize_to_tomboy  (GtkTextBuffer     *register_buffer,
+                                                 GtkTextBuffer     *content_buffer,
+                                                 const GtkTextIter *start,
+                                                 const GtkTextIter *end,
+                                                 gsize             *length,
+                                                 gpointer           user_data);
 
-void note_format_title(GtkTextBuffer *buffer);
-
-void note_set_window_title_from_buffer(GtkWindow *win, GtkTextBuffer *buffer);
-
-void note_save(Note *note);
-
-void note_close_window(Note *note);
-
-const gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer);
-
-void note_show(Note *note);
-
-void note_show_by_title(const char* title);
-
-void note_show_existing(Note *note);
-
-void note_show_new(Note *note);
-
-gboolean note_is_open(Note *note);
-
-void note_set_focus(Note *note);
-
-gboolean note_exists(Note *note);
-
-#endif /* NOTE_H */
+#endif /* SERIALIZER_H */

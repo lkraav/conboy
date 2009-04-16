@@ -16,34 +16,17 @@
  * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NOTE_H
-#define NOTE_H
+#ifndef DESERIALIZER_H
+#define DESERIALIZER_H
 
-#include <gtk/gtk.h>
-#include "metadata.h"
+gboolean
+deserialize_from_tomboy (GtkTextBuffer *register_buffer,
+                                        GtkTextBuffer *content_buffer,
+                                        GtkTextIter   *iter,
+                                        const guint8  *text,
+                                        gsize          length,
+                                        gboolean       create_tags,
+                                        gpointer       user_data,
+                                        GError       **error);
 
-void note_format_title(GtkTextBuffer *buffer);
-
-void note_set_window_title_from_buffer(GtkWindow *win, GtkTextBuffer *buffer);
-
-void note_save(Note *note);
-
-void note_close_window(Note *note);
-
-const gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer);
-
-void note_show(Note *note);
-
-void note_show_by_title(const char* title);
-
-void note_show_existing(Note *note);
-
-void note_show_new(Note *note);
-
-gboolean note_is_open(Note *note);
-
-void note_set_focus(Note *note);
-
-gboolean note_exists(Note *note);
-
-#endif /* NOTE_H */
+#endif /* DESERIALIZER_H */
