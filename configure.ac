@@ -16,10 +16,6 @@ AC_PREFIX_DEFAULT(/usr)
 
 CFLAGS="$CFLAGS -Wall -ansi -pedantic -Wmissing-prototypes -Wmissing-declarations"
 
-PKG_CHECK_MODULES(DEPS, gtk+-2.0 >= 2.2 glib-2.0 >= 2.2)
-AC_SUBST(DEPS_CFLAGS)
-AC_SUBST(DEPS_LIBS)
-
 PKG_CHECK_MODULES(HILDON, hildon-1 >= 0.8.4)
 AC_SUBST(HILDON_LIBS)
 AC_SUBST(HILDON_CFLAGS)

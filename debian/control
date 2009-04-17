@@ -1,8 +1,8 @@
 Source: conboy
-Section: user/other
+Section: user/utilities
 Priority: optional
 Maintainer: Cornelius Hald <hald@icandy.de>
-Build-Depends: debhelper (>= 4.0.0)
+Build-Depends: debhelper (>= 4.0.0), intltool, libhildon1-dev, libhildonhelp-dev, libosso-gnomevfs2-dev, libosso-dev, libhildonfm2-dev, libhildondesktop-dev, libgconf2-dev, libxml2-dev, osso-af-settings
 Standards-Version: 3.6.0
 
 Package: conboy
