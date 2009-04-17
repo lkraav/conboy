@@ -1,5 +1,14 @@
+conboy (0.2.0) unstable; urgency=low
+
+  * Reading, writing and displaying of all Tomboy notes is now possible
+  * Added support for UTF-8 reading and writing
+  * On startup the last edited note is shown automatically
+  * The list of all notes is sorted by change date
+  
+ -- Cornelius Hald <hald@icandy.de>  Fri, 17 Apr 2009 17:07:00 -0100
+
 conboy (0.1.0) unstable; urgency=low
 
   * Initial version
 
- -- Cornelius Hald <hald@icandy.de>  Thu, 27 Mar 2008 17:22:00 -0100
+ -- Cornelius Hald <hald@icandy.de>  Thu, 27 Mar 2009 17:22:00 -0100
