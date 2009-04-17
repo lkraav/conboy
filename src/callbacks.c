@@ -104,17 +104,14 @@ void on_load_button_clicked(GtkButton *button, gpointer user_data)
 	Note *note = (Note*)user_data;
 		
 	/* TODO: Probably a GError object would be good. E.g. if File does not exist etc... */
-	deserialize_note(note); 
-	
-	
-	
-	note_show(note);
+	/*deserialize_note(note);*/ 
+	/*note_show(note);*/
 }
 
 void on_save_button_clicked(GtkButton *button, gpointer user_data) {
 	Note *note = (Note*)user_data;
 	
-	serialize_note(note);
+	/*serialize_note(note);*/
 	
 }
 
@@ -122,7 +119,6 @@ void
 on_bold_button_clicked				   (GtkButton		*button,
 										gpointer		 user_data)
 {
-	g_printerr("BOLD Button clicked\n");
 	change_format("bold", button);
 }
 
@@ -130,7 +126,6 @@ void
 on_italic_button_clicked			   (GtkButton		*button,
 										gpointer		 user_data)
 {
-	g_printerr("ITALIC Button clicked\n");
 	change_format("italic", button);
 }
 
@@ -138,7 +133,6 @@ void
 on_strike_button_clicked			   (GtkButton		*button,
 										gpointer		 user_data)
 {
-	g_printerr("STRIKE Button clicked\n");
 	change_format("strikethrough", button);
 }
 
@@ -146,7 +140,6 @@ void
 on_highlight_button_clicked			   (GtkButton		*button,
 										gpointer		 user_data)
 {
-	g_printerr("HIGHLIGHT Button clicked\n");
 	change_format("highlight", button);
 }
 

@@ -43,6 +43,12 @@
 #define GLADE_HOOKUP_OBJECT_NO_REF(component,widget,name) \
   g_object_set_data (G_OBJECT (component), name, widget)
 
+static void set_tool_button_icon_by_name(GtkToolButton *button, const gchar *icon_name)
+{
+	GtkWidget *image;
+	image = gtk_image_new_from_icon_name(icon_name, GTK_ICON_SIZE_SMALL_TOOLBAR);
+	gtk_tool_button_set_icon_widget(button, image);
+}
 
 static void initialize_tags(GtkTextBuffer *buffer) {
 	/*
@@ -51,8 +57,6 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 	 * in <italic><bold>word</bold></italic>. Because bold has a higher priority
 	 * than italic.
 	 */
-	GtkTextTag *list_tag;
-	
 	gtk_text_buffer_create_tag(buffer, "centered", "justification", GTK_JUSTIFY_CENTER, NULL);
 	
 	gtk_text_buffer_create_tag(buffer, "bold", "weight", PANGO_WEIGHT_BOLD, NULL);
@@ -72,20 +76,19 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 	
 	gtk_text_buffer_create_tag(buffer, "_title", "foreground", "blue", "underline", PANGO_UNDERLINE_SINGLE, "scale", PANGO_SCALE_X_LARGE, NULL);
 	
-	
 	gtk_text_buffer_create_tag(buffer, "list-item-A:1", "indent", -20, "left-margin", 25, "foreground", "red", NULL);
 	gtk_text_buffer_create_tag(buffer, "list-item-B:1", "indent", -20, "left-margin", 25, "foreground", "orange", NULL);
 	
-	
 	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
-	
 }
 
 static void register_serializer_and_deserializer(GtkTextBuffer *buffer, Note *note) {
 	
+	/*
 	GtkTextBufferDeserializeFunc deserializer;
 	GtkTextBufferSerializeFunc   serializer;
 	AppData *app_data = get_app_data();
+	*/
 	
 	/* Serializer */
 	/*
@@ -120,11 +123,8 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkToolItem *link_button;
 	GtkToolItem *delete_button;
 	GtkToolItem *notes_button;
-	GtkToolItem *save_button;
-	GtkToolItem *load_button;
-	
 	GtkToolItem *highlight_button;
-	GtkWidget *highlight_icon;
+	
 	GtkTextTag *link_internal_tag;
 	
 	PangoFontDescription *font;
@@ -152,27 +152,24 @@ GtkWidget* create_mainwin(Note *note) {
 	/* TOOLBAR */
 	toolbar = gtk_toolbar_new();
 	
-	load_button = gtk_tool_button_new_from_stock(GTK_STOCK_OPEN);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), load_button, -1);
-	
-	bold_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_BOLD);
-	gtk_widget_set_size_request(GTK_WIDGET(bold_button), 80, -1);
+	bold_button = gtk_toggle_tool_button_new();
+	set_tool_button_icon_by_name(GTK_TOOL_BUTTON(bold_button), "qgn_list_gene_bold");
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), bold_button, -1);
+	gtk_widget_set_size_request(GTK_WIDGET(bold_button), 80, -1);
 	
-	italic_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_ITALIC);
-	/*gtk_widget_set_size_request(italic_button, 50, -1);*/
+	italic_button = gtk_toggle_tool_button_new();
+	set_tool_button_icon_by_name(GTK_TOOL_BUTTON(italic_button), "qgn_list_gene_italic");
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), italic_button, -1);
 	
 	strike_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_STRIKETHROUGH);
-	/*gtk_widget_set_size_request(strike_button, 70, -1);*/
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), strike_button, -1);
 	
-	bullets_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_CDROM);
+	bullets_button = gtk_toggle_tool_button_new();
+	set_tool_button_icon_by_name(GTK_TOOL_BUTTON(bullets_button), "qgn_list_gene_bullets");
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), bullets_button, -1);
-	
-	highlight_icon = gtk_image_new_from_file("/usr/share/icons/hicolor/26x26/hildon/highlighter.png");	
-	highlight_button = gtk_toggle_tool_button_new();
-	gtk_tool_button_set_icon_widget(GTK_TOOL_BUTTON(highlight_button), highlight_icon);
+		
+	highlight_button = gtk_toggle_tool_button_new();                 
+	set_tool_button_icon_by_name(GTK_TOOL_BUTTON(highlight_button), "highlighter");
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), highlight_button, -1);
 	
 	link_button = gtk_tool_button_new_from_stock(GTK_STOCK_REDO);
@@ -183,9 +180,6 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	notes_button = gtk_tool_button_new_from_stock(GTK_STOCK_OPEN);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), notes_button, -1);
-	
-	save_button = gtk_tool_button_new_from_stock(GTK_STOCK_SAVE);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), save_button, -1);
 	
 
 	gtk_widget_show_all(toolbar);
@@ -225,16 +219,11 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	register_serializer_and_deserializer(buffer, note);
 	
-	/** FONT **/
-	/*
-	PangoContext *ctx = gtk_widget_get_pango_context(GTK_WIDGET(textview));
-	PangoFontDescription *font = pango_context_get_font_description(ctx);
-	*/
-	
+	/* Font */
 	font = pango_font_description_new();
 	pango_font_description_set_size(font, app_data->font_size);
 	gtk_widget_modify_font(GTK_WIDGET(textview), font);
-	/*****/
+	
 
 	/* SIGNALS */
 	g_signal_connect (G_OBJECT(mainwin), "delete-event",
@@ -293,27 +282,10 @@ GtkWidget* create_mainwin(Note *note) {
 			G_CALLBACK(on_textview_tap_and_hold),
 			NULL);
 	
-	
-	g_signal_connect ((gpointer)save_button, "clicked",
-			G_CALLBACK(on_save_button_clicked),
-			note);
-	
-	g_signal_connect ((gpointer)load_button, "clicked",
-			G_CALLBACK(on_load_button_clicked),
-			note);
-	
-	/*
-	g_signal_connect ((gpointer)bigger_button, "clicked",
-			G_CALLBACK(on_bigger_button_clicked),
-			textview);
-	*/
-	
 	g_signal_connect ((gpointer)mainwin, "key_press_event",
 			G_CALLBACK(on_hardware_key_pressed),
 			note);
 
-	
-	
 	link_internal_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	g_signal_connect ((gpointer) link_internal_tag, "event",
 			G_CALLBACK (on_link_internal_tag_event),
@@ -324,13 +296,6 @@ GtkWidget* create_mainwin(Note *note) {
 	GLADE_HOOKUP_OBJECT_NO_REF (mainwin, mainwin, "mainwin");
 	GLADE_HOOKUP_OBJECT (mainwin, vbox1, "vbox1");
 	GLADE_HOOKUP_OBJECT (mainwin, toolbar, "toolbar1");
-	/*
-	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(quit_button), "quit_button");
-	*/
-	/*
-	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(save_button), "save_button");
-	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(load_button), "load_button");
-	*/
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(bold_button), "bold_button");
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(italic_button), "italic_button");
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(strike_button), "strike_button");
