@@ -294,11 +294,10 @@ on_notes_button_clicked				   (GtkButton		*button,
 		GtkWidget *menu_item;
 		GtkWidget *image_small, *image_large;
 		Note *note = notes->data;
-		/* TODO: Don't hardcode the path to the icons*/
 		/* TODO: When starting from Eclipse, use local paths, not from /usr/share/ */
 		menu_item = hildon_thumb_menu_item_new_with_labels(note->title, note->title, "Open Note...");
-		image_small = gtk_image_new_from_file("/usr/share/icons/hicolor/26x26/hildon/conboy.png");
-		image_large = gtk_image_new_from_file("/usr/share/icons/hicolor/40x40/hildon/conboy.png");
+		image_small = gtk_image_new_from_icon_name("conboy", GTK_ICON_SIZE_SMALL_TOOLBAR);
+		image_large = gtk_image_new_from_icon_name("conboy", GTK_ICON_SIZE_DIALOG);
 		hildon_thumb_menu_item_set_images(HILDON_THUMB_MENU_ITEM(menu_item), image_small, image_large);
 		
 		g_signal_connect(G_OBJECT(menu_item), "activate",
