@@ -41,16 +41,26 @@
 #include "serializer.h"
 #include "deserializer.h"
 
-static void change_format(const gchar* tag_name, GtkButton *button) {
+static void change_format(const gchar* tag_name, GtkWidget *widget) {
 	
 	GtkWidget *view;
 	GtkTextBuffer *buffer;
 	GtkTextIter start_iter, end_iter;
+	gboolean activate;
 	
-	view = lookup_widget(GTK_WIDGET(button), "textview");
+	if (GTK_IS_TOGGLE_TOOL_BUTTON(widget)) {
+		activate = gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(widget));
+	} else if (GTK_IS_CHECK_MENU_ITEM(widget)) {
+		activate = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
+	} else {
+		g_printerr("ERROR: Widget must be a GtkToogleToolButton or GtkCheckMenuItem.\n");
+		activate = FALSE;
+	}
+	
+	view = lookup_widget(widget, "textview");
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
 	
-	if (gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(button))) {
+	if (activate) {
 		/* The button just became active, so we should enable the formatting */
 		if (gtk_text_buffer_get_has_selection(buffer)) {
 			/* Something is selected */
@@ -116,31 +126,38 @@ void on_save_button_clicked(GtkButton *button, gpointer user_data) {
 }
 
 void
-on_bold_button_clicked				   (GtkButton		*button,
+on_bold_button_clicked				   (GtkWidget		*widget,
 										gpointer		 user_data)
-{
-	change_format("bold", button);
+{	
+	change_format("bold", widget);
 }
 
 void
-on_italic_button_clicked			   (GtkButton		*button,
+on_italic_button_clicked			   (GtkWidget		*widget,
 										gpointer		 user_data)
 {
-	change_format("italic", button);
+	change_format("italic", widget);
 }
 
 void
-on_strike_button_clicked			   (GtkButton		*button,
+on_strike_button_clicked			   (GtkWidget		*widget,
 										gpointer		 user_data)
 {
-	change_format("strikethrough", button);
+	change_format("strikethrough", widget);
 }
 
 void
-on_highlight_button_clicked			   (GtkButton		*button,
+on_fixed_button_clicked					(GtkWidget		*widget,
+										 gpointer		 user_data)
+{
+	change_format("monospace", widget);
+}
+
+void
+on_highlight_button_clicked			   (GtkWidget		*widget,
 										gpointer		 user_data)
 {
-	change_format("highlight", button);
+	change_format("highlight", widget);
 }
 
 static void
@@ -149,7 +166,6 @@ add_bullets(GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_ite
 	gint i = 0;
 	gint start_line = gtk_text_iter_get_line(start_iter);
 	gint end_line   = gtk_text_iter_get_line(end_iter);
-	gint total_lines = gtk_text_buffer_get_line_count(buffer);
 	gchar *list_item[2] = {"list-item-A:1", "list-item-B:1"}; /* TODO: Replace with get_depth_tag() from deserialzer2.c
 	
 	/* For each selected line */
@@ -206,17 +222,27 @@ remove_bullets(GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_
 }
 
 void
-on_bullets_button_clicked				(GtkButton		*button,
+on_bullets_button_clicked				(GtkWidget		*widget,
 										 gpointer		 user_data)
 {
 	GtkWidget *view;
 	GtkTextBuffer *buffer;
 	GtkTextIter start_iter, end_iter;
+	gboolean activate;
 	
-	view = lookup_widget(GTK_WIDGET(button), "textview");
+	if (GTK_IS_TOGGLE_TOOL_BUTTON(widget)) {
+		activate = gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(widget));
+	} else if (GTK_IS_CHECK_MENU_ITEM(widget)) {
+		activate = gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
+	} else {
+		g_printerr("ERROR: Wiget must be a GtkToggleToolButton or a GtkCheckMenuItem.\n");
+		activate = FALSE;
+	}
+	
+	view = lookup_widget(widget, "textview");
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
 	
-	if (gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(button))) {
+	if (activate) {
 		/* The button just became active, so we should enable the formatting */
 		if (gtk_text_buffer_get_has_selection(buffer)) {
 			/* Something is selected */
@@ -339,6 +365,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 										gpointer		 user_data)
 {
 	GtkToggleToolButton *bold_button, *italic_button, *strike_button, *highlight_button, *bullets_button;
+	GtkCheckMenuItem *menu_bold, *menu_italic, *menu_strike, *menu_highlight, *menu_fixed, *menu_bullets;
 	GSList *tags;
 	GtkTextTag *tag;
 	
@@ -347,6 +374,13 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	strike_button    = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "strike_button"));
 	highlight_button = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "highlight_button"));
 	bullets_button   = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "bullets_button"));
+
+	menu_bold        = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(user_data), "menu_bold"));
+	menu_italic      = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(user_data), "menu_italic"));
+	menu_strike      = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(user_data), "menu_strike"));
+	menu_highlight   = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(user_data), "menu_highlight"));
+	menu_fixed       = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(user_data), "menu_fixed"));
+	menu_bullets     = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(user_data), "menu_bullets"));
 	
 	/* TODO: This is only workaround for problem with repeated calls. Probably gives problems with
 	 * selection. We only call this if the "insert" mark changed. */
@@ -357,38 +391,56 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	
 	tags = gtk_text_iter_get_tags(location);
 	
-	/*g_printerr("Cursor changed. Iter: %i  Mark: %s\n", gtk_text_iter_get_offset(location), gtk_text_mark_get_name(mark));*/
-	
 	/* Blocking signals here because the ..set_active() method makes the buttons
 	 * emit the clicked signal. And because of this the formatting changes.
 	 */
-	/* TODO: Replace following with "g_signal_handlers_unblock_matched" */
 	g_signal_handlers_block_by_func(bold_button, on_bold_button_clicked, NULL);
 	g_signal_handlers_block_by_func(italic_button, on_italic_button_clicked, NULL);
 	g_signal_handlers_block_by_func(strike_button, on_strike_button_clicked, NULL);
 	g_signal_handlers_block_by_func(highlight_button, on_highlight_button_clicked, NULL);
 	g_signal_handlers_block_by_func(bullets_button, on_bullets_button_clicked, NULL);
 	
+	g_signal_handlers_block_by_func(menu_bold, on_bold_button_clicked, NULL);
+	g_signal_handlers_block_by_func(menu_italic, on_italic_button_clicked, NULL);
+	g_signal_handlers_block_by_func(menu_strike, on_strike_button_clicked, NULL);
+	g_signal_handlers_block_by_func(menu_highlight, on_highlight_button_clicked, NULL);
+	g_signal_handlers_block_by_func(menu_fixed, on_fixed_button_clicked, NULL);
+	g_signal_handlers_block_by_func(menu_bullets, on_bullets_button_clicked, NULL);
+	
+	/* TODO: This can be optimized: Note disable all and then enable selected, but determine state and then
+	 * set the state. */
 	gtk_toggle_tool_button_set_active(bold_button, FALSE);
 	gtk_toggle_tool_button_set_active(italic_button, FALSE);
 	gtk_toggle_tool_button_set_active(strike_button, FALSE);
 	gtk_toggle_tool_button_set_active(highlight_button, FALSE);
 	gtk_toggle_tool_button_set_active(bullets_button, FALSE);
 	
+	gtk_check_menu_item_set_active(menu_bold, FALSE);
+	gtk_check_menu_item_set_active(menu_italic, FALSE);
+	gtk_check_menu_item_set_active(menu_strike, FALSE);
+	gtk_check_menu_item_set_active(menu_highlight, FALSE);
+	gtk_check_menu_item_set_active(menu_fixed, FALSE);
+	gtk_check_menu_item_set_active(menu_bullets, FALSE);
+	
 	while (tags != NULL) {
 		tag = GTK_TEXT_TAG(tags->data);
-		if (g_strcasecmp(tag->name, "bold") == 0) {
+		if (g_ascii_strcasecmp(tag->name, "bold") == 0) {
 			gtk_toggle_tool_button_set_active(bold_button, TRUE);
-		} else if (g_strcasecmp(tag->name, "italic") == 0) {
+			gtk_check_menu_item_set_active(menu_bold, TRUE);
+		} else if (g_ascii_strcasecmp(tag->name, "italic") == 0) {
 			gtk_toggle_tool_button_set_active(italic_button, TRUE);
-		} else if (g_strcasecmp(tag->name, "strikethrough") == 0) {
+			gtk_check_menu_item_set_active(menu_italic, TRUE);
+		} else if (g_ascii_strcasecmp(tag->name, "strikethrough") == 0) {
 			gtk_toggle_tool_button_set_active(strike_button, TRUE);
-		} else if (g_strcasecmp(tag->name, "highlight") == 0) {
+			gtk_check_menu_item_set_active(menu_strike, TRUE);
+		} else if (g_ascii_strcasecmp(tag->name, "highlight") == 0) {
 			gtk_toggle_tool_button_set_active(highlight_button, TRUE);
-		} else if (g_strcasecmp(tag->name, "list-item-A") == 0) {
+			gtk_check_menu_item_set_active(menu_highlight, TRUE);
+		} else if (g_ascii_strcasecmp(tag->name, "monospace") == 0) {
+			gtk_check_menu_item_set_active(menu_fixed, TRUE);
+		} else if (g_ascii_strncasecmp(tag->name, "list-item", 9) == 0) {
 			gtk_toggle_tool_button_set_active(bullets_button, TRUE);
-		} else if (g_strcasecmp(tag->name, "list-item-B") == 0) {
-			gtk_toggle_tool_button_set_active(bullets_button, TRUE);
+			gtk_check_menu_item_set_active(menu_bullets, TRUE);
 		}
 		tags = tags->next;
 	}
@@ -401,6 +453,13 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	g_signal_handlers_unblock_by_func(strike_button, on_strike_button_clicked, NULL);
 	g_signal_handlers_unblock_by_func(highlight_button, on_highlight_button_clicked, NULL);
 	g_signal_handlers_unblock_by_func(bullets_button, on_bullets_button_clicked, NULL);
+	
+	g_signal_handlers_unblock_by_func(menu_bold, on_bold_button_clicked, NULL);
+	g_signal_handlers_unblock_by_func(menu_italic, on_italic_button_clicked, NULL);
+	g_signal_handlers_unblock_by_func(menu_strike, on_strike_button_clicked, NULL);
+	g_signal_handlers_unblock_by_func(menu_highlight, on_highlight_button_clicked, NULL);
+	g_signal_handlers_unblock_by_func(menu_fixed, on_fixed_button_clicked, NULL);
+	g_signal_handlers_unblock_by_func(menu_bullets, on_bullets_button_clicked, NULL);
 	
 	/* TODO: Free tags list */
 

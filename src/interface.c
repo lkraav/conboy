@@ -103,13 +103,32 @@ static void register_serializer_and_deserializer(GtkTextBuffer *buffer, Note *no
 	*/
 }
 
+static
+void set_menu_item_label(GtkMenuItem *item, const gchar *text)
+{
+	GList *children = gtk_container_get_children(GTK_CONTAINER(item));
+	
+	if (children == NULL) {
+		g_printerr("ERROR: set_menu_item_label() expects a GtkMenuItem, which already contains a label.\n");
+		return;
+	}
+	
+	gtk_label_set_markup(GTK_LABEL(children->data), text);		
+}
+
 GtkWidget* create_mainwin(Note *note) {
 	
 	GtkWidget *mainwin;
 	GtkWidget *vbox1;
 	GtkWidget *menu;
+	
+	GtkWidget *menu_bold;
+	GtkWidget *menu_italic;
+	GtkWidget *menu_strike;
+	GtkWidget *menu_highlight;
+	GtkWidget *menu_fixed;
+	GtkWidget *menu_bullets;
 	GtkWidget *menu_quit;
-	GtkWidget *menu_test;
 
 	GtkWidget *toolbar;
 	GtkWidget *scrolledwindow1;
@@ -127,24 +146,56 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	GtkTextTag *link_internal_tag;
 	
+	GtkAccelGroup *accel_group;
+	
 	PangoFontDescription *font;
 	AppData *app_data = get_app_data();
 
 	mainwin = hildon_window_new();
-	gtk_window_set_title(GTK_WINDOW (mainwin), _("Conboy"));
+	gtk_window_set_title(GTK_WINDOW(mainwin), _("Conboy"));
 
+	accel_group = gtk_accel_group_new();
+	gtk_window_add_accel_group(GTK_WINDOW(mainwin), accel_group);
+	
 	vbox1 = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(vbox1);
 	gtk_container_add(GTK_CONTAINER(mainwin), vbox1);
 
+	
 	/* MENU */
 	menu = gtk_menu_new();
-
-	menu_test = gtk_menu_item_new_with_label("Test");
-	gtk_menu_append(menu, menu_test);
-
+	
+	menu_bold = gtk_check_menu_item_new_with_label("");
+	menu_italic = gtk_check_menu_item_new_with_label("");
+	menu_strike = gtk_check_menu_item_new_with_label("");
+	menu_highlight = gtk_check_menu_item_new_with_label("");
+	menu_fixed = gtk_check_menu_item_new_with_label("");
+	menu_bullets = gtk_check_menu_item_new_with_label("Bullets");
 	menu_quit = gtk_menu_item_new_with_label("Close all notes");
+	
+	set_menu_item_label(GTK_MENU_ITEM(menu_bold), "<b>Bold</b>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_italic), "<i>Italic</i>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_strike), "<s>Strikeout</s>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_highlight), "<span background=\"yellow\">Highlight</span>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_fixed), "<tt>Fixed Width</tt>");
+	
+	gtk_widget_add_accelerator(menu_bold, "activate", accel_group, GDK_b, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menu_italic, "activate", accel_group, GDK_i, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menu_strike, "activate", accel_group, GDK_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menu_highlight, "activate", accel_group, GDK_h, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menu_fixed, "activate", accel_group, GDK_f, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menu_quit, "activate", accel_group, GDK_q, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	
+	gtk_menu_append(menu, menu_bold);
+	gtk_menu_append(menu, menu_italic);
+	gtk_menu_append(menu, menu_strike);
+	gtk_menu_append(menu, menu_highlight);
+	gtk_menu_append(menu, menu_fixed);
+	gtk_menu_append(menu, gtk_separator_menu_item_new());
+	gtk_menu_append(menu, menu_bullets);
+	gtk_menu_append(menu, gtk_separator_menu_item_new());
 	gtk_menu_append(menu, menu_quit);
+	
 
 	/* Must be at the end of the menu definition */
 	hildon_window_set_menu(HILDON_WINDOW(mainwin), GTK_MENU(menu));
@@ -225,15 +276,41 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_widget_modify_font(GTK_WIDGET(textview), font);
 	
 
-	/* SIGNALS */
+	/* Window signals */
 	g_signal_connect (G_OBJECT(mainwin), "delete-event",
 	        G_CALLBACK(on_window_close_button_clicked),
 	        note);
+	
+	/* MenuItem signals */
+	g_signal_connect ((gpointer) menu_bold, "activate",
+			G_CALLBACK(on_bold_button_clicked),
+			NULL);
+	
+	g_signal_connect ((gpointer) menu_italic, "activate",
+			G_CALLBACK (on_italic_button_clicked),
+			NULL);
+	
+	g_signal_connect ((gpointer) menu_strike, "activate",
+			G_CALLBACK (on_strike_button_clicked),
+			NULL);
+	
+	g_signal_connect ((gpointer) menu_highlight, "activate",
+			G_CALLBACK (on_highlight_button_clicked),
+			NULL);
+	
+	g_signal_connect ((gpointer) menu_fixed, "activate",
+			G_CALLBACK (on_fixed_button_clicked),
+			NULL);
+	
+	g_signal_connect ((gpointer) menu_bullets, "activate",
+			G_CALLBACK (on_bullets_button_clicked),
+			NULL);
 	
 	g_signal_connect ((gpointer) menu_quit, "activate",
 			G_CALLBACK (on_quit_button_clicked),
 			NULL);
 
+	/* ToolButton signals */
 	g_signal_connect ((gpointer) bold_button, "clicked",
 			G_CALLBACK (on_bold_button_clicked),
 			NULL);
@@ -302,6 +379,15 @@ GtkWidget* create_mainwin(Note *note) {
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(strike_button), "link_button");
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(highlight_button), "highlight_button");
 	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(bullets_button), "bullets_button");
+	
+	GLADE_HOOKUP_OBJECT (mainwin, menu_bold, "menu_bold");
+	GLADE_HOOKUP_OBJECT (mainwin, menu_italic, "menu_italic");
+	GLADE_HOOKUP_OBJECT (mainwin, menu_strike, "menu_strike");
+	GLADE_HOOKUP_OBJECT (mainwin, menu_fixed, "menu_fixed");
+	GLADE_HOOKUP_OBJECT (mainwin, menu_highlight, "menu_highlight");
+	GLADE_HOOKUP_OBJECT (mainwin, menu_bullets, "menu_bullets");
+	
+	
 	GLADE_HOOKUP_OBJECT (mainwin, scrolledwindow1, "scrolledwindow1");
 	GLADE_HOOKUP_OBJECT (mainwin, textview, "textview");
 

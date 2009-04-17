@@ -38,23 +38,27 @@ on_load_button_clicked                 (GtkButton       *button,
                                         gpointer         user_data);
 
 void
-on_bold_button_clicked				   (GtkButton		*button,
+on_bold_button_clicked				   (GtkWidget		*widget,
 										gpointer		 user_data);
 
 void
-on_italic_button_clicked			   (GtkButton		*button,
+on_italic_button_clicked			   (GtkWidget		*widget,
 										gpointer		 user_data);
 
 void
-on_strike_button_clicked			   (GtkButton		*button,
+on_strike_button_clicked			   (GtkWidget		*widget,
 										gpointer		 user_data);
 
 void
-on_bullets_button_clicked				(GtkButton		*button,
+on_fixed_button_clicked					(GtkWidget		*widget,
 										 gpointer		 user_data);
 
 void
-on_highlight_button_clicked			   (GtkButton		*button,
+on_bullets_button_clicked				(GtkWidget		*widget,
+										 gpointer		 user_data);
+
+void
+on_highlight_button_clicked			   (GtkWidget		*widget,
 										gpointer		 user_data);
 
 void
