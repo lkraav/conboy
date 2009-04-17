@@ -257,9 +257,9 @@ void write_footer(xmlTextWriter *writer, Note *note)
 	rc = xmlTextWriterSetIndent(writer, TRUE);
 		  
 	/* Meta data tags */
-	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "last-change-date", "%s", note->last_change_date);
-	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "last-metadata-change-date", "%s", note->last_metadata_change_date);
-	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "create-date", "%s", note->create_date);
+	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "last-change-date", "%s", get_time_in_seconds_as_iso8601(note->last_change_date));
+	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "last-metadata-change-date", "%s", get_time_in_seconds_as_iso8601(note->last_metadata_change_date));
+	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "create-date", "%s", get_time_in_seconds_as_iso8601(note->create_date));
 	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "cursor-position", "%i", note->cursor_position);
 	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "width", "%i", note->width);
 	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "height", "%i", note->height);

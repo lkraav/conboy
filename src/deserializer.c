@@ -1,6 +1,8 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 
+#include <string.h>
+
 #include <libxml/encoding.h>
 #include <libxml/xmlreader.h>
 
@@ -74,15 +76,15 @@ static void
 handle_meta_data(gchar* tag_name, gchar* tag_content, Note *note)
 {	
 	if (strcmp(tag_name, "last-change-date") == 0) {
-		note->last_change_date = tag_content;
+		note->last_change_date = get_iso8601_time_in_seconds(tag_content);
 		return;
 	}
 	if (strcmp(tag_name, "last-metadata-change-date") == 0) {
-		note->last_metadata_change_date = tag_content;
+		note->last_metadata_change_date = get_iso8601_time_in_seconds(tag_content);
 		return;
 	}
 	if (strcmp(tag_name, "create-date") == 0) {
-		note->create_date = tag_content;
+		note->create_date = get_iso8601_time_in_seconds(tag_content);
 		return;
 	}
 	if (strcmp(tag_name, "cursor-position") == 0) {
@@ -291,7 +293,9 @@ GtkTextTag* get_depth_tag(ParseContext *ctx, GtkTextBuffer *buffer, gint line_nu
 	
 	tag = gtk_text_tag_table_lookup(buffer->tag_table, tag_name); 
 	if (tag == NULL) {
-		tag = gtk_text_buffer_create_tag(buffer, tag_name, "indent", -20, "left-margin", ctx->depth * 25, "foreground", color, NULL);
+		/* For debugging */
+		/*tag = gtk_text_buffer_create_tag(buffer, tag_name, "indent", -20, "left-margin", ctx->depth * 25, "foreground", color, NULL);*/
+		tag = gtk_text_buffer_create_tag(buffer, tag_name, "indent", -20, "left-margin", ctx->depth * 25, NULL);
 		/* Set the priority of the "list" tag to the maximum. It needs a higher priority then the newly created "list-item" tag */
 		gtk_text_tag_set_priority(gtk_text_tag_table_lookup(buffer->tag_table, "list"), gtk_text_tag_table_get_size(buffer->tag_table) - 1);
 	}

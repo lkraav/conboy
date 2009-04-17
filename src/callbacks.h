@@ -26,6 +26,10 @@ on_window_close_button_clicked		   (GtkObject		*window,
 										gpointer		 user_data);
 
 void
+on_new_button_clicked					(GtkWidget		*widget,
+										 gpointer		 user_data);
+
+void
 on_quit_button_clicked                 (GtkButton       *button,
                                         gpointer         user_data);
 

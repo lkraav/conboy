@@ -69,32 +69,25 @@ AppData* get_app_data() {
 	return _app_data;
 }
 
-int last_hash = 0;
-/* TUT NICHT */
-gboolean is_note_list_changed() {
+static
+gint compare_notes_by_change_date(gconstpointer a, gconstpointer b) {
 	
-	/*
-	struct stat buf;
-	time_t mtime;
-	const gchar *filename;
-	int hash = 0;
-	gboolean result;
-	GDir *dir = g_dir_open(NOTE_DIR, 0, NULL);
+	Note *n1 = (Note*)a;
+	Note *n2 = (Note*)b;
 	
-	while ((filename = g_dir_read_name(dir)) != NULL) {	
-		stat(filename, &buf);
-		mtime = buf.st_mtime;
-		hash = hash & mtime;
-		g_printerr("%s  Time: %i  Hash: %i \n", filename, mtime, hash);
+	if (n1->last_change_date > n2->last_change_date) {
+		return -1;
+	} else if (n1->last_change_date < n2->last_change_date) {
+		return 1;
+	} else {
+		return 0;
 	}
-	
-	g_dir_close(dir);
-	
-	result = (hash != last_hash);
-	last_hash = hash;
-	return result;
-	*/
-	return TRUE;
+}
+
+GList* sort_note_list_by_change_date(GList* note_list)
+{
+	/* Sort list using last-change-date */
+	return g_list_sort(note_list, compare_notes_by_change_date);
 }
 
 GList* create_note_list(AppData *app_data) {
@@ -106,13 +99,14 @@ GList* create_note_list(AppData *app_data) {
 	GMappedFile *file;
 	gchar *content;
 	gchar *start, *end;
+	gchar *tmp;
 	
 	while ((filename = g_dir_read_name(dir)) != NULL) {
 		if (g_str_has_suffix(filename, ".note")) {
 			
 			/* Create new note and append to list */
-			note = g_slice_new(Note); /* note = malloc(sizeof(Note)); */
-			notes = g_list_append(notes, note); /* faster is prepend and then reverse */
+			note = g_slice_new0(Note); /* note = malloc(sizeof(Note)); */
+			notes = g_list_prepend(notes, note);
 			
 			/* Save filename in note */
 			note->filename = g_strconcat(app_data->user_path, filename, NULL);
@@ -120,14 +114,26 @@ GList* create_note_list(AppData *app_data) {
 			/* Open file and read out title. Save title in note */
 			file = g_mapped_file_new(g_strconcat(app_data->user_path, filename, NULL), FALSE, NULL);
 			content = g_mapped_file_get_contents(file);			
+			
+			/* TODO: Maybe use real xml parser for this. But I think this way is faster */
 			start = g_strrstr(content, "<title>"); /* move pointer to begining of <title> */
 			start = start + sizeof(gchar) * 7; /* move another 7 characters to be after <title> */
 			end = g_strrstr(content, "</title>"); /* move another pointer to begining of </title> */
 			note->title = g_strndup(start, end - start); /* copy the area between start and end, which is the title */
+			
+			/* Read out last-change-date and save to note */
+			start = g_strrstr(content, "<last-change-date>");
+			start = start + sizeof(gchar) * 18;
+			end = g_strrstr(content, "</last-change-date>");
+			tmp = g_strndup(start, end - start);
+			note->last_change_date = get_iso8601_time_in_seconds(tmp);
+			g_free(tmp);
+			
 			g_mapped_file_free(file);
 		}
 	}
 	g_dir_close(dir);
+	notes = sort_note_list_by_change_date(notes);
 	return notes;
 }
 
@@ -145,21 +151,24 @@ const gchar* note_get_new_filename()
 	return g_strconcat(app_data->user_path, get_uuid(), ".note", NULL);
 }
 
+
 /**
- * Returns the current time as string formattet as in iso8601.
+ * Returns the given time as iso8601 formatted string.
  * Example: 2009-03-24T13:16:42.0000000+01:00
+ * 
+ * This method is needed, because the glib function
+ * g_time_val_to_iso8601() does only produce the short format without
+ * milliseconds. E.g. 2009-04-17T13:14:52Z
  */
-const gchar* get_current_time_in_iso8601() {
+const gchar* get_time_in_seconds_as_iso8601(time_t time_in_seconds) {
 	
 	gchar      time_string[40];
 	gchar     *minutes;
 	gchar     *text_pointer;
-	time_t     time_in_seconds;
 	struct tm *local_time;
 	gchar     *first_part;
 	gchar     *result;
 	
-	time(&time_in_seconds);
 	local_time = localtime(&time_in_seconds);
 	
 	/* Milliseconds are always 0 and timezone is +0100 -> should be +01:00 */
@@ -176,7 +185,20 @@ const gchar* get_current_time_in_iso8601() {
 	g_free(minutes);
 	g_free(first_part);
 	
-	return result;
+	return result;	
+}
+
+
+/**
+ * Returns the current time as string formattet as in iso8601.
+ * Example: 2009-03-24T13:16:42.0000000+01:00
+ * 
+ * This method is needed, because the glib function
+ * g_time_val_to_iso8601() does only produce the short format without
+ * milliseconds. E.g. 2009-04-17T13:14:52Z
+ */
+const gchar* get_current_time_in_iso8601() {
+	return get_time_in_seconds_as_iso8601(time(NULL));
 }
 
 time_t get_iso8601_time_in_seconds(const gchar *time_string) {

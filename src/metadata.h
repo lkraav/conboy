@@ -44,9 +44,9 @@ typedef struct
   const gchar   *title;
   const gchar   *filename;
   
-  const gchar *last_change_date;
-  const gchar *last_metadata_change_date;
-  const gchar *create_date;
+  time_t last_change_date;
+  time_t last_metadata_change_date;
+  time_t create_date;
   
   gint cursor_position;
   gint width;
@@ -66,7 +66,11 @@ GList* create_note_list(AppData *app_data);
 
 gboolean is_note_list_changed();
 
+GList* sort_note_list_by_change_date(GList* note_list);
+
 const gchar* get_current_time_in_iso8601();
+
+const gchar* get_time_in_seconds_as_iso8601(time_t time_in_seconds);
 
 time_t get_iso8601_time_in_seconds(const gchar *time_string);
 

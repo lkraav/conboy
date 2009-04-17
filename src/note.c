@@ -134,17 +134,13 @@ gboolean is_empty_str(const gchar* str)
 
 void note_save(Note *note)
 {		
-	const gchar* time;
+	time_t time_in_s;
 	const gchar* title;
 	const gchar* content;
 	GtkTextIter iter, start, end;
 	GtkTextMark *mark;
 	gint cursor_position;
-	guint8 *data;
-	gsize length;
 	AppData *app_data;
-	FILE *file;
-	
 	
 	/* If note is empty, don't save */
 	gtk_text_buffer_get_bounds(note->buffer, &start, &end);
@@ -153,17 +149,13 @@ void note_save(Note *note)
 		return;
 	}
 	
-	/* It's not really save to rely on buffer_modified() because adding tags, does
-	 * not make the buffer dirty. So better save here */
 	/* If buffer is not dirty, don't save */
-	/*
 	if (!gtk_text_buffer_get_modified(note->buffer)) {
 		return;
 	}
-	*/
 	
 	/* Get time */
-	time = get_current_time_in_iso8601();
+	time_in_s = time(NULL);
 	
 	/* Get cursor position */
 	mark = gtk_text_buffer_get_insert(note->buffer);
@@ -176,13 +168,13 @@ void note_save(Note *note)
 	/* Set meta data */
 	/* We don't change height, width, x and y and we don't need them */
 	note->title = g_strdup(title);
-	note->last_change_date = g_strdup(time);
-	note->last_metadata_change_date = g_strdup(time);
+	note->last_change_date = time_in_s;
+	note->last_metadata_change_date = time_in_s;
 	note->cursor_position = cursor_position;
 	note->open_on_startup = FALSE;
 	
-	if (note->create_date == NULL) {
-		note->create_date = g_strdup(time);
+	if (note->create_date == 0) {
+		note->create_date = time_in_s;
 	}
 	if (note->height == 0) {
 		note->height = 300;
@@ -205,20 +197,7 @@ void note_save(Note *note)
 	gtk_text_buffer_get_bounds(note->buffer, &start, &end);
 	
 	/* Start serialization */
-	/*
-	data = gtk_text_buffer_serialize(note->buffer, note->buffer,
-			app_data->serializer, &start, &end, &length);
-	*/
-	
 	serialize_note(note);
-	
-	
-	/* Write to disk */
-	/*
-	file = fopen(note->filename, "wb");
-	fwrite(data, sizeof(guint8), length, file);
-	fclose(file);
-	*/
 	
 	/* If first save, add to list of all notes */
 	if (!g_list_find(app_data->all_notes, note)) {
@@ -241,8 +220,6 @@ void note_close_window(Note *note)
 	HildonProgram *program = hildon_program_get_instance();	
 	AppData *app_data = get_app_data();
 	guint count = g_list_length(app_data->open_notes);
-	
-	g_printerr("Open windows: %i \n", count);
 	
 	if (count > 1) {
 		hildon_program_remove_window(program, HILDON_WINDOW(note->window));

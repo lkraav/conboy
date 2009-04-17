@@ -81,6 +81,9 @@ static void change_format(const gchar* tag_name, GtkWidget *widget) {
 			/* TODO: Implement that style should be removed from here */
 		}
 	}
+	
+	/* Manually set the buffer to modified, because inserting tags, doesn't do this automatically */
+	gtk_text_buffer_set_modified(buffer, TRUE);	
 }
 
 gboolean
@@ -123,6 +126,14 @@ void on_save_button_clicked(GtkButton *button, gpointer user_data) {
 	
 	/*serialize_note(note);*/
 	
+}
+
+void
+on_new_button_clicked					(GtkWidget		*widget,
+										 gpointer		 user_data)
+{
+	Note *note = g_new0(Note, 1);
+	note_show(note);
 }
 
 void
@@ -311,11 +322,19 @@ void
 on_notes_button_clicked				   (GtkButton		*button,
 										gpointer		 user_data) {
 	
-	AppData *app_data = get_app_data();
-	
 	GtkWidget *menu = gtk_menu_new ();
-	GList *notes = app_data->all_notes;
+	AppData *app_data = get_app_data();
+	GList *notes;
 	
+	if (app_data->all_notes == NULL) {
+		return;
+	}
+	
+	/* TODO: This might become a perf. problem with many notes */
+	/* Then we should take care of sorting when inserting and updating elements */
+	app_data->all_notes = sort_note_list_by_change_date(app_data->all_notes);
+	
+	notes = app_data->all_notes;
 	while(notes != NULL) {
 		GtkWidget *menu_item;
 		GtkWidget *image_small, *image_large;
@@ -574,6 +593,7 @@ on_delete_button_clicked			   (GtkButton		*button,
 	}
 	
 	app_data = get_app_data();
+	/* TODO: Free note */
 	app_data->all_notes = g_list_remove(app_data->all_notes, note);
 }
 

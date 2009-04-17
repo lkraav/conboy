@@ -76,10 +76,16 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 	
 	gtk_text_buffer_create_tag(buffer, "_title", "foreground", "blue", "underline", PANGO_UNDERLINE_SINGLE, "scale", PANGO_SCALE_X_LARGE, NULL);
 	
+	/* For debugging */
+	/*
 	gtk_text_buffer_create_tag(buffer, "list-item-A:1", "indent", -20, "left-margin", 25, "foreground", "red", NULL);
 	gtk_text_buffer_create_tag(buffer, "list-item-B:1", "indent", -20, "left-margin", 25, "foreground", "orange", NULL);
-	
 	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
+	*/
+	
+	gtk_text_buffer_create_tag(buffer, "list-item-A:1", "indent", -20, "left-margin", 25, NULL);
+	gtk_text_buffer_create_tag(buffer, "list-item-B:1", "indent", -20, "left-margin", 25, NULL);
+	gtk_text_buffer_create_tag(buffer, "list", NULL);
 }
 
 static void register_serializer_and_deserializer(GtkTextBuffer *buffer, Note *note) {
@@ -122,6 +128,7 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkWidget *vbox1;
 	GtkWidget *menu;
 	
+	GtkWidget *menu_new;
 	GtkWidget *menu_bold;
 	GtkWidget *menu_italic;
 	GtkWidget *menu_strike;
@@ -135,6 +142,7 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkWidget *textview;
 	GtkTextBuffer *buffer;
 	
+	GtkToolItem *new_button;
 	GtkToolItem *bold_button;
 	GtkToolItem *italic_button;
 	GtkToolItem *strike_button;
@@ -165,6 +173,7 @@ GtkWidget* create_mainwin(Note *note) {
 	/* MENU */
 	menu = gtk_menu_new();
 	
+	menu_new = gtk_menu_item_new_with_label("Create New Note");
 	menu_bold = gtk_check_menu_item_new_with_label("");
 	menu_italic = gtk_check_menu_item_new_with_label("");
 	menu_strike = gtk_check_menu_item_new_with_label("");
@@ -186,6 +195,8 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_widget_add_accelerator(menu_fixed, "activate", accel_group, GDK_f, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 	gtk_widget_add_accelerator(menu_quit, "activate", accel_group, GDK_q, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 	
+	gtk_menu_append(menu, menu_new);
+	gtk_menu_append(menu, gtk_separator_menu_item_new());
 	gtk_menu_append(menu, menu_bold);
 	gtk_menu_append(menu, menu_italic);
 	gtk_menu_append(menu, menu_strike);
@@ -203,10 +214,13 @@ GtkWidget* create_mainwin(Note *note) {
 	/* TOOLBAR */
 	toolbar = gtk_toolbar_new();
 	
+	new_button = gtk_tool_button_new_from_stock(GTK_STOCK_NEW);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), new_button, -1);
+	
 	bold_button = gtk_toggle_tool_button_new();
 	set_tool_button_icon_by_name(GTK_TOOL_BUTTON(bold_button), "qgn_list_gene_bold");
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), bold_button, -1);
-	gtk_widget_set_size_request(GTK_WIDGET(bold_button), 80, -1);
+	gtk_widget_set_size_request(GTK_WIDGET(bold_button), 70, -1);
 	
 	italic_button = gtk_toggle_tool_button_new();
 	set_tool_button_icon_by_name(GTK_TOOL_BUTTON(italic_button), "qgn_list_gene_italic");
@@ -282,6 +296,10 @@ GtkWidget* create_mainwin(Note *note) {
 	        note);
 	
 	/* MenuItem signals */
+	g_signal_connect ((gpointer) menu_new, "activate",
+			G_CALLBACK(on_new_button_clicked),
+			NULL);
+	
 	g_signal_connect ((gpointer) menu_bold, "activate",
 			G_CALLBACK(on_bold_button_clicked),
 			NULL);
@@ -311,6 +329,10 @@ GtkWidget* create_mainwin(Note *note) {
 			NULL);
 
 	/* ToolButton signals */
+	g_signal_connect ((gpointer) new_button, "clicked",
+			G_CALLBACK (on_new_button_clicked),
+			NULL);
+	
 	g_signal_connect ((gpointer) bold_button, "clicked",
 			G_CALLBACK (on_bold_button_clicked),
 			NULL);

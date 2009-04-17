@@ -49,7 +49,7 @@
 #include "localisation.h"
 
 #define APP_NAME "conboy"
-#define APP_VER "0.1.0"
+#define APP_VER "0.2.0"
 #define APP_SERVICE "de.zwong.conboy"
 #define APP_METHOD "/de/zwong/conboy"
 
@@ -62,7 +62,7 @@ int
 main (int argc, char *argv[])
 {
   HildonProgram *program;
-  Note *note = g_slice_alloc0(sizeof(Note));
+  Note *note; /*= g_slice_alloc0(sizeof(Note));*/
   osso_context_t *osso_context;
   AppData *app_data;
 
@@ -84,11 +84,16 @@ main (int argc, char *argv[])
   program = HILDON_PROGRAM(hildon_program_get_instance());
   g_set_application_name("Conboy");
  
-  /*note_open(metadata);*/
+  /* Get the most recent note. If there is none, create new. */
+  if (app_data->all_notes != NULL && app_data->all_notes->data != NULL) {
+	  note = (Note*)app_data->all_notes->data;
+  } else {
+	  note = g_new0(Note, 1);
+  }
+  
   note_show(note);
 
   gtk_main();
-  
   
   /* Deinitialize OSSO */
   osso_deinitialize(osso_context);
