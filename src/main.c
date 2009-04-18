@@ -62,7 +62,7 @@ int
 main (int argc, char *argv[])
 {
   HildonProgram *program;
-  Note *note; /*= g_slice_alloc0(sizeof(Note));*/
+  Note *note;
   osso_context_t *osso_context;
   AppData *app_data;
 

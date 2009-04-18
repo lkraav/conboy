@@ -88,7 +88,7 @@ handle_meta_data(gchar* tag_name, gchar* tag_content, Note *note)
 		return;
 	}
 	if (strcmp(tag_name, "cursor-position") == 0) {
-		note->cursor_position = atoi(tag_content); /* TODO Convert to gint */
+		note->cursor_position = atoi(tag_content);
 		return;
 	}
 	if (strcmp(tag_name, "width") == 0) {
@@ -470,14 +470,13 @@ ParseContext* init_parse_context(GtkTextBuffer *buffer, GtkTextIter *iter)
 	ctx->tag_stack = NULL;
 	gtk_text_buffer_get_iter_at_offset(buffer, iter, 0);
 	ctx->iter = iter;
-	/*ctx->list_item_flag = TRUE;*/
 	ctx->depth = 0;
 	return ctx;
 }
 
 static
 void destroy_parse_context(ParseContext *ctx) {
-	gtk_text_iter_free(ctx->iter);
+	ctx->iter = NULL;
 	g_slist_free(ctx->state_stack);
 	g_slist_free(ctx->tag_stack);
 	g_free(ctx);
@@ -517,6 +516,6 @@ void deserialize_note(Note *note)
 	
 	xmlCleanupParser();
 	
-	/*destroy_parse_context(ctx);*/
+	destroy_parse_context(ctx);
 	/*g_free(ctx);*/
 }

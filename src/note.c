@@ -28,14 +28,6 @@
 #include "serializer.h"
 #include "deserializer.h"
 
-/* TODO:
- * 
- * - note_format_title() and note_set_window_title_from_buffer() have a lot
- * of shared code. Also they are often called together. So maybe write a
- * function which has both functionalities.
- * 
- * 
- */
 
 /* Not needed right now. Maybe later again */
 static gint compare_title(gconstpointer a, gconstpointer b)
@@ -123,12 +115,22 @@ void note_set_window_title_from_buffer(GtkWindow *win, GtkTextBuffer *buffer)
 static
 gboolean is_empty_str(const gchar* str)
 {
-	/* TODO: A string only containing whitespaces should be handled as empty too */
-	if (strcmp(str, "") == 0) {
+	gchar *tmp;
+	
+	if (str == NULL) {
+		return TRUE;
+	}
+	
+	tmp = g_strdup(str);
+	g_strstrip(tmp);
+	
+	if (strcmp(tmp, "") == 0) {
 		return TRUE;
 	} else {
 		return FALSE;
 	}
+	
+	g_free(tmp);
 }
 
 
@@ -146,6 +148,7 @@ void note_save(Note *note)
 	gtk_text_buffer_get_bounds(note->buffer, &start, &end);
 	content = gtk_text_iter_get_text(&start, &end);
 	if (is_empty_str(content)) {
+		gtk_text_buffer_set_modified(note->buffer, FALSE);
 		return;
 	}
 	
@@ -210,9 +213,11 @@ void note_save(Note *note)
 
 void note_free(Note *note) {
 	note->buffer = NULL;
-	g_free(note->create_date);
+	note->view = NULL;
+	note->window = NULL;
 	g_free(note->filename);
-	/* TODO: Free the rest */
+	g_free(note->title);
+	g_free(note->version);
 }
 
 void note_close_window(Note *note)
@@ -330,42 +335,20 @@ void note_show_new(Note *note)
 void note_show_existing(Note *note)
 {	
 	GtkTextIter iter;
-	gsize length;
-	FILE *file = NULL;
-	GError *error = NULL;
-	guint8 *text = NULL;
-	AppData *app_data = get_app_data();
 	
 	/* iter defines where to start with inserting */
 	gtk_text_buffer_get_start_iter(note->buffer, &iter);
 	
+	/* start deserialization */
 	deserialize_note(note);
-	
-	/*file = fopen(note->filename, "r");*/
-	  
-	/* Get the number of bytes */
-	/*
-	fseek(file, 0L, SEEK_END);
-	length = ftell(file);
-	fseek(file, 0L, SEEK_SET);
-	text = (guint8*)g_malloc0(length * sizeof(guint8));
-	fread(text, sizeof(guint8), length, file);
-	fclose(file);
-	*/
 
-	/* Start deserialization */
-	/*
-	app_data = get_app_data();
-	gtk_text_buffer_deserialize(note->buffer, note->buffer, app_data->deserializer, &iter, text, length, &error);
-	  
-	if (error != NULL) {
-		g_printerr("ERROR while deserializing: %s\n", error->message);
-	}
-	*/
-	
 	/* Set cursor possition */
 	gtk_text_buffer_get_iter_at_offset(note->buffer, &iter, note->cursor_position);
-	gtk_text_buffer_place_cursor(note->buffer, &iter); 
+	gtk_text_buffer_place_cursor(note->buffer, &iter);
+	
+	/* Scroll to cursor position */
+	/* TODO: Does not scroll. Maybe we first need to show the widget?! */
+	gtk_text_view_scroll_to_iter(note->view, &iter, 0.0, TRUE, 0.5, 0.0);
 }
 
 

@@ -238,7 +238,7 @@ static void serialize_text(GtkTextBuffer *buffer, SerializationContext *context,
 
 	/* Close any open tags */
 	for (tag_list = active_tags; tag_list; tag_list = tag_list->next) {
-		/* TODO: Schoener ?! */
+		/* to do: Schoener ?! */
 		GtkTextTag *taggg = tag_list->data;
 		gchar *tag_name = taggg->name;
 		g_string_append_printf(context->text_str, "</%s>", tag_name);
@@ -302,7 +302,6 @@ guint8 * serialize_to_tomboy(GtkTextBuffer *register_buffer,
 
 	text = g_string_new(NULL);
 	
-	/* TODO: Add the static xml stuff here */
 	/*serialize_header(text);*/
 	
 	g_string_append_len(text, context.text_str->str, context.text_str->len);

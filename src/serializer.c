@@ -45,7 +45,7 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 		return;
 	}
 	
-	/* Ignore <list> tags. */ /* TODO: Probably remove them from the GtkTextBuffer */
+	/* Ignore <list> tags. */
 	if (g_ascii_strncasecmp(tag_name, "list", -1) == 0) {
 		list_active = TRUE;
 		return;
@@ -134,6 +134,9 @@ static void write_text(const gchar *text, xmlTextWriter *writer)
 {
 	/* If the text starts with a BULLET character, we remove the BULLET character */
 	/* TODO: Maybe only do this if we are inside a <list-item>. */
+	/* TODO: I think we should add s.th. like a <bullet> tag arround the BULLET
+	 * characters. It will make it easier to jump the cursor over them and here
+	 * we can just delete what's inside this tag.*/
 	
 	if (list_active) {
 		if (g_ascii_strncasecmp(BULLET, text, 4) == 0) {

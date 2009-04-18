@@ -23,6 +23,7 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-banner.h>
 #include <libhildondesktop/hildon-thumb-menu-item.h>
@@ -112,22 +113,6 @@ void on_quit_button_clicked(GtkButton *button, gpointer user_data)
 	gtk_main_quit();
 }
 
-void on_load_button_clicked(GtkButton *button, gpointer user_data)
-{
-	Note *note = (Note*)user_data;
-		
-	/* TODO: Probably a GError object would be good. E.g. if File does not exist etc... */
-	/*deserialize_note(note);*/ 
-	/*note_show(note);*/
-}
-
-void on_save_button_clicked(GtkButton *button, gpointer user_data) {
-	Note *note = (Note*)user_data;
-	
-	/*serialize_note(note);*/
-	
-}
-
 void
 on_new_button_clicked					(GtkWidget		*widget,
 										 gpointer		 user_data)
@@ -177,7 +162,7 @@ add_bullets(GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_ite
 	gint i = 0;
 	gint start_line = gtk_text_iter_get_line(start_iter);
 	gint end_line   = gtk_text_iter_get_line(end_iter);
-	gchar *list_item[2] = {"list-item-A:1", "list-item-B:1"}; /* TODO: Replace with get_depth_tag() from deserialzer2.c
+	gchar *list_item[2] = {"list-item-A:1", "list-item-B:1"}; /* TODO: Replace with get_depth_tag() from deserialzer2.c */
 	
 	/* For each selected line */
 	for (i = start_line; i <= end_line; i++) {
@@ -387,6 +372,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	GtkCheckMenuItem *menu_bold, *menu_italic, *menu_strike, *menu_highlight, *menu_fixed, *menu_bullets;
 	GSList *tags;
 	GtkTextTag *tag;
+	const gchar *mark_name;
 	
 	bold_button      = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "bold_button"));
 	italic_button    = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "italic_button"));
@@ -403,7 +389,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	
 	/* TODO: This is only workaround for problem with repeated calls. Probably gives problems with
 	 * selection. We only call this if the "insert" mark changed. */
-	const gchar *mark_name = gtk_text_mark_get_name(mark);
+	mark_name = gtk_text_mark_get_name(mark);
 	if ((mark_name == NULL) || (g_strcasecmp(mark_name, "selection_bound") == 0)) {
 		return;
 	}
@@ -443,21 +429,21 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	
 	while (tags != NULL) {
 		tag = GTK_TEXT_TAG(tags->data);
-		if (g_ascii_strcasecmp(tag->name, "bold") == 0) {
+		if (strcmp(tag->name, "bold") == 0) {
 			gtk_toggle_tool_button_set_active(bold_button, TRUE);
 			gtk_check_menu_item_set_active(menu_bold, TRUE);
-		} else if (g_ascii_strcasecmp(tag->name, "italic") == 0) {
+		} else if (strcmp(tag->name, "italic") == 0) {
 			gtk_toggle_tool_button_set_active(italic_button, TRUE);
 			gtk_check_menu_item_set_active(menu_italic, TRUE);
-		} else if (g_ascii_strcasecmp(tag->name, "strikethrough") == 0) {
+		} else if (strcmp(tag->name, "strikethrough") == 0) {
 			gtk_toggle_tool_button_set_active(strike_button, TRUE);
 			gtk_check_menu_item_set_active(menu_strike, TRUE);
-		} else if (g_ascii_strcasecmp(tag->name, "highlight") == 0) {
+		} else if (strcmp(tag->name, "highlight") == 0) {
 			gtk_toggle_tool_button_set_active(highlight_button, TRUE);
 			gtk_check_menu_item_set_active(menu_highlight, TRUE);
-		} else if (g_ascii_strcasecmp(tag->name, "monospace") == 0) {
+		} else if (strcmp(tag->name, "monospace") == 0) {
 			gtk_check_menu_item_set_active(menu_fixed, TRUE);
-		} else if (g_ascii_strncasecmp(tag->name, "list-item", 9) == 0) {
+		} else if (strncmp(tag->name, "list-item", 9) == 0) {
 			gtk_toggle_tool_button_set_active(bullets_button, TRUE);
 			gtk_check_menu_item_set_active(menu_bullets, TRUE);
 		}
@@ -479,9 +465,6 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	g_signal_handlers_unblock_by_func(menu_highlight, on_highlight_button_clicked, NULL);
 	g_signal_handlers_unblock_by_func(menu_fixed, on_fixed_button_clicked, NULL);
 	g_signal_handlers_unblock_by_func(menu_bullets, on_bullets_button_clicked, NULL);
-	
-	/* TODO: Free tags list */
-
 }
 
 void
@@ -626,27 +609,38 @@ on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 	g_timeout_add(10000, (GSourceFunc)note_save_callback, note);
 }
 
-void
-on_smaller_button_clicked			   (GtkButton		*button,
-										gpointer		 user_data)
+static
+void change_font_size_by(gint size)
 {
 	AppData *app_data = get_app_data();
 	PangoFontDescription *font;
 	Note *note;
 	GList *note_list;
 	
-	if (app_data->font_size > 5000) {
-		app_data->font_size -= 5000;
-	} else {
+	if (size == 0) {
 		return;
 	}
+	
+	if (size > 0) {
+		if (app_data->font_size + size <= 65000) {
+			app_data->font_size += size;
+		} else {
+			return;
+		}
+	} else {
+		if (app_data->font_size + size >= 5000) {
+			app_data->font_size += size;
+		} else {
+			return;
+		}
+	}
+	
 	gconf_client_set_int(app_data->client, "/apps/maemo/conboy/font_size", app_data->font_size, NULL);
 	
 	font = pango_font_description_new();
 	pango_font_description_set_size(font, app_data->font_size);
 	
-	note_list = g_list_first(app_data->open_notes);
-	
+	note_list = app_data->open_notes;
 	while (note_list != NULL) {
 		note = (Note*)note_list->data;
 		gtk_widget_modify_font(GTK_WIDGET(note->view), font);
@@ -655,32 +649,17 @@ on_smaller_button_clicked			   (GtkButton		*button,
 }
 
 void
+on_smaller_button_clicked			   (GtkButton		*button,
+										gpointer		 user_data)
+{
+	change_font_size_by(-5000);
+}
+
+void
 on_bigger_button_clicked				(GtkButton		*button,
 										gpointer		 user_data)
 {
-	/* TODO: This is copy&paste from on_smaller_button_clicked. */
-	AppData *app_data = get_app_data();
-	PangoFontDescription *font;
-	Note *note;
-	GList *note_list;
-	
-	if (app_data->font_size < 65000) {
-		app_data->font_size += 5000;
-	} else {
-		return;
-	}
-	gconf_client_set_int(app_data->client, "/apps/maemo/conboy/font_size", app_data->font_size, NULL);
-	
-	font = pango_font_description_new();
-	pango_font_description_set_size(font, app_data->font_size);
-	
-	note_list = g_list_first(app_data->open_notes);
-	
-	while (note_list != NULL) {
-		note = (Note*)note_list->data;
-		gtk_widget_modify_font(GTK_WIDGET(note->view), font);
-		note_list = g_list_next(note_list);
-	}
+	change_font_size_by(+5000);
 }
 
 gboolean on_hardware_key_pressed	(GtkWidget			*widget,

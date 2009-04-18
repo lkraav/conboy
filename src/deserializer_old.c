@@ -1012,14 +1012,14 @@ start_element_handler (GMarkupParseContext  *context,
 	
 	case STATE_FORMAT:
 	case STATE_CONTENT:
-		/* TODO: Make a definition what format-tags are. Then we can check if the tag is valid. */
+		/* to do: Make a definition what format-tags are. Then we can check if the tag is valid. */
 		
 		tag = gtk_text_tag_table_lookup(info->buffer->tag_table, element_name);
 		if (tag == NULL) {
 			g_printerr("ERROR: Can only be a <italic>, <bold>, etc... tag. But is <%s>.", element_name);
 		}
 		
-		/* TODO: Make finer separation and add STATE_LIST not only STATE_LIST_ITEM */
+		/* to do: Make finer separation and add STATE_LIST not only STATE_LIST_ITEM */
 		if (ELEMENT_IS("list-item")) {
 			push_state(info, STATE_LIST_ITEM);
 		} else {
@@ -1078,7 +1078,6 @@ end_element_handler (GMarkupParseContext  *context,
   		/* Reverse the list of spans. Otherwise all text spans (text blocks) will be in 
   		 * reverse order. */
   		info->spans = g_list_reverse (info->spans);
-  		/* TODO: Check if really needed and what it does. */
   		info->parsed_text = TRUE;
   		
   	} else {
@@ -1095,7 +1094,7 @@ end_element_handler (GMarkupParseContext  *context,
   break;
   
   case STATE_FORMAT:
-	  /* TODO: Add error handling: If not a valid formatting tag (bold, italic, etc.) then throw error */
+	  /* to do: Add error handling: If not a valid formatting tag (bold, italic, etc.) then throw error */
 	  pop_state(info);
 	  g_assert(peek_state(info) == STATE_FORMAT ||
 			   peek_state(info) == STATE_CONTENT);
@@ -1105,7 +1104,7 @@ end_element_handler (GMarkupParseContext  *context,
   case STATE_LIST_ITEM:
 	  pop_state(info);
 	  g_assert(peek_state(info) == STATE_FORMAT ||
-			   peek_state(info) == STATE_CONTENT); /* TODO: Should be STATE_LIST, but does not exist yet */
+			   peek_state(info) == STATE_CONTENT); /* to do: Should be STATE_LIST, but does not exist yet */
 	  info->tag_stack = g_slist_delete_link(info->tag_stack, info->tag_stack);
 	  break;
   
@@ -1164,7 +1163,7 @@ save_meta_data(gchar* tag_name, gchar* tag_content, Note *note)
 		return;
 	}
 	if (strcmp(tag_name, "cursor-position") == 0) {
-		note->cursor_position = atoi(tag_content); /* TODO Convert to gint */
+		note->cursor_position = atoi(tag_content);
 		return;
 	}
 	if (strcmp(tag_name, "width") == 0) {
@@ -1242,7 +1241,7 @@ text_handler (GMarkupParseContext  *context,
     	
     	span = g_new0(TextSpan, 1);
     	/* Insert bullet character */
-    	span->text = g_strconcat(BULLET, g_strndup(text, text_len), "\n", NULL); /*TODO: concat already copies, so we dont need strndup */
+    	span->text = g_strconcat(BULLET, g_strndup(text, text_len), "\n", NULL);
     	span->tags = g_slist_copy(info->tag_stack);
     	
     	info->spans = g_list_prepend(info->spans, span);
