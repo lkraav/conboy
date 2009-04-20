@@ -22,6 +22,8 @@
 #include <gtk/gtk.h>
 #include "metadata.h"
 
+Note* note_create_new();
+
 void note_format_title(GtkTextBuffer *buffer);
 
 void note_set_window_title_from_buffer(GtkWindow *win, GtkTextBuffer *buffer);

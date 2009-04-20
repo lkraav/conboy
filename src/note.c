@@ -20,14 +20,28 @@
 #include <glib.h>
 #include <string.h>
 
-#include "support.h"
-
 #include "metadata.h"
 #include "interface.h"
 #include "note.h"
 #include "serializer.h"
 #include "deserializer.h"
 
+
+Note* note_create_new()
+{
+	Note *note = g_new0(Note, 1);
+	UserInterface *ui = g_new0(UserInterface, 1);
+	note->ui = ui;
+	return note;
+}
+
+void note_free(Note *note)
+{
+	g_free(note->ui);
+	g_free(note->filename);
+	g_free(note->title);
+	g_free(note->version);
+}
 
 /* Not needed right now. Maybe later again */
 static gint compare_title(gconstpointer a, gconstpointer b)
@@ -47,7 +61,6 @@ static gint compare_title(gconstpointer a, gconstpointer b)
 	return strcmp(title1, title2);
 }
 
-
 void note_show_by_title(const char* title)
 {	
 	Note *note;
@@ -58,7 +71,7 @@ void note_show_by_title(const char* title)
 	element = g_list_find_custom(all_notes, title, compare_title);
 	
 	if (element == NULL) {
-		note = g_malloc0(sizeof(Note));
+		note = note_create_new();
 		note->title = title;
 		note_show(note);
 		return;
@@ -143,17 +156,18 @@ void note_save(Note *note)
 	GtkTextMark *mark;
 	gint cursor_position;
 	AppData *app_data;
+	GtkTextBuffer *buffer = note->ui->buffer;
 	
 	/* If note is empty, don't save */
-	gtk_text_buffer_get_bounds(note->buffer, &start, &end);
+	gtk_text_buffer_get_bounds(buffer, &start, &end);
 	content = gtk_text_iter_get_text(&start, &end);
 	if (is_empty_str(content)) {
-		gtk_text_buffer_set_modified(note->buffer, FALSE);
+		gtk_text_buffer_set_modified(buffer, FALSE);
 		return;
 	}
 	
 	/* If buffer is not dirty, don't save */
-	if (!gtk_text_buffer_get_modified(note->buffer)) {
+	if (!gtk_text_buffer_get_modified(buffer)) {
 		return;
 	}
 	
@@ -161,12 +175,12 @@ void note_save(Note *note)
 	time_in_s = time(NULL);
 	
 	/* Get cursor position */
-	mark = gtk_text_buffer_get_insert(note->buffer);
-	gtk_text_buffer_get_iter_at_mark(note->buffer, &iter, mark);
+	mark = gtk_text_buffer_get_insert(buffer);
+	gtk_text_buffer_get_iter_at_mark(buffer, &iter, mark);
 	cursor_position = gtk_text_iter_get_offset(&iter);
 
 	/* Get title */
-	title = note_extract_title_from_buffer(note->buffer); 
+	title = note_extract_title_from_buffer(buffer); 
 	
 	/* Set meta data */
 	/* We don't change height, width, x and y and we don't need them */
@@ -197,7 +211,7 @@ void note_save(Note *note)
 	g_printerr("Saving >%s< \n", note->title);
 	
 	/* Set start and end iterators for serialization */
-	gtk_text_buffer_get_bounds(note->buffer, &start, &end);
+	gtk_text_buffer_get_bounds(buffer, &start, &end);
 	
 	/* Start serialization */
 	serialize_note(note);
@@ -208,27 +222,21 @@ void note_save(Note *note)
 		app_data->all_notes = g_list_append(app_data->all_notes, note);
 	}
 	
-	gtk_text_buffer_set_modified(note->buffer, FALSE);
+	gtk_text_buffer_set_modified(buffer, FALSE);
 }
 
-void note_free(Note *note) {
-	note->buffer = NULL;
-	note->view = NULL;
-	note->window = NULL;
-	g_free(note->filename);
-	g_free(note->title);
-	g_free(note->version);
-}
+
 
 void note_close_window(Note *note)
 {
-	HildonProgram *program = hildon_program_get_instance();	
+	HildonProgram *program = hildon_program_get_instance();
+	HildonWindow *window = note->ui->window;
 	AppData *app_data = get_app_data();
 	guint count = g_list_length(app_data->open_notes);
 	
 	if (count > 1) {
-		hildon_program_remove_window(program, HILDON_WINDOW(note->window));
-		gtk_widget_destroy(GTK_WIDGET(note->window));
+		hildon_program_remove_window(program, window);
+		gtk_widget_destroy(GTK_WIDGET(window));
 		app_data->open_notes = g_list_remove(app_data->open_notes, note);
 		/* Don't free note, because we reuse this in the menu with the available notes and when reopening */
 		/*note_free(note);*/
@@ -265,8 +273,8 @@ gboolean note_exists(Note *note)
 
 void note_set_focus(Note *note)
 {
-	if (note->window != NULL) {
-		gtk_window_present(GTK_WINDOW(note->window));
+	if (note->ui->window != NULL) {
+		gtk_window_present(GTK_WINDOW(note->ui->window));
 	} else {
 		g_printerr("ERROR: Trying to focus a window that does not exist.\n");
 	}
@@ -275,6 +283,8 @@ void note_set_focus(Note *note)
 void note_show(Note *note)
 {
 	AppData *app_data = get_app_data();
+	GtkTextBuffer *buffer; /*= note->ui->buffer;*/
+	GtkWindow *window; /* = GTK_WINDOW(note->ui->window);*/
 	
 	/* If the note it already open, we bring this note to the foreground and return */
 	if (note_is_open(note)) {
@@ -283,11 +293,15 @@ void note_show(Note *note)
 	}
 	
 	create_mainwin(note);
-	gtk_window_set_default_size(GTK_WINDOW(note->window), 500, 300);
-	hildon_program_add_window(app_data->program, HILDON_WINDOW(note->window));
+	
+	buffer = note->ui->buffer;
+	window = GTK_WINDOW(note->ui->window);
+	
+	gtk_window_set_default_size(window, 500, 300);
+	hildon_program_add_window(app_data->program, HILDON_WINDOW(window));
 	
 	/* Block signals on TextBuffer until we are done with initializing the content. This is to prevent saves etc. */
-	g_signal_handlers_block_matched(note->buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, note);
+	g_signal_handlers_block_matched(buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, note);
 	
 	if (note_exists(note)) {
 		note_show_existing(note);
@@ -298,20 +312,21 @@ void note_show(Note *note)
 	app_data->open_notes = g_list_append(app_data->open_notes, note);
 	
 	/* Format note title and update window title */
-	note_format_title(note->buffer);
-	note_set_window_title_from_buffer(GTK_WINDOW(note->window), note->buffer); /* Replace this. And use note->title instead */
+	note_format_title(buffer);
+	note_set_window_title_from_buffer(window, buffer); /* Replace this. And use note->title instead */
 	
-	gtk_widget_show(GTK_WIDGET(note->window));	
+	gtk_widget_show(GTK_WIDGET(window));	
 	
-	gtk_text_buffer_set_modified(note->buffer, FALSE);
+	gtk_text_buffer_set_modified(buffer, FALSE);
 	
 	/* unblock signals */
-	g_signal_handlers_unblock_matched(note->buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, note);
+	g_signal_handlers_unblock_matched(buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, note);
 }
 
 void note_show_new(Note *note)
 {
 	AppData *app_data = get_app_data();
+	GtkTextBuffer *buffer = note->ui->buffer;
 	GtkTextIter start, end;
 	const gchar *content;
 	gint notes_count;
@@ -324,31 +339,32 @@ void note_show_new(Note *note)
 	}
 	
 	content = g_strconcat(note->title, "\n\n", "Describe your new note here.", NULL);
-	gtk_text_buffer_set_text(note->buffer, content, -1);
+	gtk_text_buffer_set_text(buffer, content, -1);
 	
 	/* Select the text */
-	gtk_text_buffer_get_iter_at_line(note->buffer, &start, 2);
-	gtk_text_buffer_get_end_iter(note->buffer, &end);
-	gtk_text_buffer_select_range(note->buffer, &start, &end);
+	gtk_text_buffer_get_iter_at_line(buffer, &start, 2);
+	gtk_text_buffer_get_end_iter(buffer, &end);
+	gtk_text_buffer_select_range(buffer, &start, &end);
 }
 
 void note_show_existing(Note *note)
 {	
+	GtkTextBuffer *buffer = note->ui->buffer;
 	GtkTextIter iter;
 	
 	/* iter defines where to start with inserting */
-	gtk_text_buffer_get_start_iter(note->buffer, &iter);
+	gtk_text_buffer_get_start_iter(buffer, &iter);
 	
 	/* start deserialization */
 	deserialize_note(note);
 
 	/* Set cursor possition */
-	gtk_text_buffer_get_iter_at_offset(note->buffer, &iter, note->cursor_position);
-	gtk_text_buffer_place_cursor(note->buffer, &iter);
+	gtk_text_buffer_get_iter_at_offset(buffer, &iter, note->cursor_position);
+	gtk_text_buffer_place_cursor(buffer, &iter);
 	
 	/* Scroll to cursor position */
 	/* TODO: Does not scroll. Maybe we first need to show the widget?! */
-	gtk_text_view_scroll_to_iter(note->view, &iter, 0.0, TRUE, 0.5, 0.0);
+	gtk_text_view_scroll_to_iter(note->ui->view, &iter, 0.0, TRUE, 0.5, 0.0);
 }
 
 

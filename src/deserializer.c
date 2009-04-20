@@ -310,7 +310,7 @@ GtkTextTag* get_depth_tag(ParseContext *ctx, GtkTextBuffer *buffer, gint line_nu
 void handle_text_element(ParseContext *ctx, xmlTextReader *reader, Note *note)
 {
 	gchar *text = xmlTextReaderConstValue(reader);
-	GtkTextBuffer *buffer = note->buffer;
+	GtkTextBuffer *buffer = note->ui->buffer;
 	GtkTextIter *iter = ctx->iter;
 	GtkTextIter start_iter;
 	GtkTextMark *mark;
@@ -376,7 +376,7 @@ void handle_text_element(ParseContext *ctx, xmlTextReader *reader, Note *note)
 		gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, mark);
 		
 		/* Create depth tag and apply */
-		tag = get_depth_tag(ctx, note->buffer, line_num);
+		tag = get_depth_tag(ctx, buffer, line_num);
 		gtk_text_buffer_apply_tag(buffer, tag, &start_iter, iter);
 		gtk_text_buffer_apply_tag_by_name(buffer, "list", &start_iter, iter);
 		
@@ -499,9 +499,9 @@ void deserialize_note(Note *note)
 		return;
 	}
 	
-	gtk_text_buffer_set_text(note->buffer, "", -1);
+	gtk_text_buffer_set_text(note->ui->buffer, "", -1);
 	
-	ctx = init_parse_context(note->buffer, &iter);
+	ctx = init_parse_context(note->ui->buffer, &iter);
 	
 	ret = xmlTextReaderRead(reader);
 	while (ret == 1) {
@@ -517,5 +517,4 @@ void deserialize_note(Note *note)
 	xmlCleanupParser();
 	
 	destroy_parse_context(ctx);
-	/*g_free(ctx);*/
 }

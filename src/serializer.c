@@ -95,7 +95,6 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 static void write_end_element(GtkTextTag *tag, xmlTextWriter *writer)
 {
 	gint new_depth = 0;
-	gchar **strings;
 	gchar *tag_name;
 	
 	tag_name = g_strdup(tag->name);
@@ -192,7 +191,7 @@ void write_content(xmlTextWriter *writer, Note *note)
 	/*****************************************************/
 	
 	
-	buffer = note->buffer;
+	buffer = note->ui->buffer;
 	
 	gtk_text_buffer_get_bounds(buffer, &start, &end);
 	iter = gtk_text_iter_copy(&start);

@@ -29,19 +29,10 @@
 
 #include "callbacks.h"
 
-#include "support.h"
-
 #include "serializer.h"
 #include "deserializer.h"
 #include "metadata.h"
 #include "interface.h"
-
-#define GLADE_HOOKUP_OBJECT(component,widget,name) \
-  g_object_set_data_full (G_OBJECT (component), name, \
-    gtk_widget_ref (widget), (GDestroyNotify) gtk_widget_unref)
-
-#define GLADE_HOOKUP_OBJECT_NO_REF(component,widget,name) \
-  g_object_set_data (G_OBJECT (component), name, widget)
 
 static void set_tool_button_icon_by_name(GtkToolButton *button, const gchar *icon_name)
 {
@@ -88,27 +79,6 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 	gtk_text_buffer_create_tag(buffer, "list", NULL);
 }
 
-static void register_serializer_and_deserializer(GtkTextBuffer *buffer, Note *note) {
-	
-	/*
-	GtkTextBufferDeserializeFunc deserializer;
-	GtkTextBufferSerializeFunc   serializer;
-	AppData *app_data = get_app_data();
-	*/
-	
-	/* Serializer */
-	/*
-	serializer = serialize_to_tomboy;
-	app_data->serializer = gtk_text_buffer_register_serialize_format(buffer, "text/xml", serializer, note, NULL);
-	*/
-	
-	/* Deserializer */
-	/*
-	deserializer = deserialize_from_tomboy;
-	app_data->deserializer = gtk_text_buffer_register_deserialize_format(buffer, "text/xml", deserializer, note, NULL);
-	*/
-}
-
 static
 void set_menu_item_label(GtkMenuItem *item, const gchar *text)
 {
@@ -123,6 +93,8 @@ void set_menu_item_label(GtkMenuItem *item, const gchar *text)
 }
 
 GtkWidget* create_mainwin(Note *note) {
+	
+	UserInterface *ui = note->ui;
 	
 	GtkWidget *mainwin;
 	GtkWidget *vbox1;
@@ -160,7 +132,7 @@ GtkWidget* create_mainwin(Note *note) {
 	AppData *app_data = get_app_data();
 
 	mainwin = hildon_window_new();
-	gtk_window_set_title(GTK_WINDOW(mainwin), _("Conboy"));
+	gtk_window_set_title(GTK_WINDOW(mainwin), ("Conboy"));
 
 	accel_group = gtk_accel_group_new();
 	gtk_window_add_accel_group(GTK_WINDOW(mainwin), accel_group);
@@ -271,23 +243,38 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_widget_show(textview);
 	gtk_container_add(GTK_CONTAINER (scrolledwindow1), textview);
 	
-	/* Enable support for tap and hold on the textview */
-	gtk_widget_tap_and_hold_setup(textview, NULL, NULL, 0);
-	
+	/* TEXT BUFFER */
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textview));
-	
-	initialize_tags(buffer);
-	
-	note->buffer = buffer;
-	note->window = HILDON_WINDOW(mainwin);
-	note->view = GTK_TEXT_VIEW(textview);
-	
-	register_serializer_and_deserializer(buffer, note);
 	
 	/* Font */
 	font = pango_font_description_new();
 	pango_font_description_set_size(font, app_data->font_size);
 	gtk_widget_modify_font(GTK_WIDGET(textview), font);
+
+	
+	/* Enable support for tap and hold on the textview */
+	gtk_widget_tap_and_hold_setup(textview, NULL, NULL, 0);
+	
+	/* Create basic set of tags */
+	initialize_tags(buffer);
+	
+	/* Save for later usage */
+	ui->window = HILDON_WINDOW(mainwin);
+	ui->view = GTK_TEXT_VIEW(textview);
+	ui->buffer = buffer;
+	
+	ui->button_bold = GTK_TOGGLE_TOOL_BUTTON(bold_button);
+	ui->button_bullets = GTK_TOGGLE_TOOL_BUTTON(bullets_button);
+	ui->button_highlight = GTK_TOGGLE_TOOL_BUTTON(highlight_button);
+	ui->button_italic = GTK_TOGGLE_TOOL_BUTTON(italic_button);
+	ui->button_strike = GTK_TOGGLE_TOOL_BUTTON(strike_button);
+	
+	ui->menu_bold = GTK_CHECK_MENU_ITEM(menu_bold);
+	ui->menu_bullets = GTK_CHECK_MENU_ITEM(menu_bullets);
+	ui->menu_highlight = GTK_CHECK_MENU_ITEM(menu_highlight);
+	ui->menu_italic = GTK_CHECK_MENU_ITEM(menu_italic);
+	ui->menu_strike = GTK_CHECK_MENU_ITEM(menu_strike);
+	ui->menu_fixed = GTK_CHECK_MENU_ITEM(menu_fixed);
 	
 
 	/* Window signals */
@@ -298,31 +285,31 @@ GtkWidget* create_mainwin(Note *note) {
 	/* MenuItem signals */
 	g_signal_connect ((gpointer) menu_new, "activate",
 			G_CALLBACK(on_new_button_clicked),
-			NULL);
+			ui);
 	
 	g_signal_connect ((gpointer) menu_bold, "activate",
 			G_CALLBACK(on_bold_button_clicked),
-			NULL);
+			ui);
 	
 	g_signal_connect ((gpointer) menu_italic, "activate",
 			G_CALLBACK (on_italic_button_clicked),
-			NULL);
+			ui);
 	
 	g_signal_connect ((gpointer) menu_strike, "activate",
 			G_CALLBACK (on_strike_button_clicked),
-			NULL);
+			ui);
 	
 	g_signal_connect ((gpointer) menu_highlight, "activate",
 			G_CALLBACK (on_highlight_button_clicked),
-			NULL);
+			ui);
 	
 	g_signal_connect ((gpointer) menu_fixed, "activate",
 			G_CALLBACK (on_fixed_button_clicked),
-			NULL);
+			ui);
 	
 	g_signal_connect ((gpointer) menu_bullets, "activate",
 			G_CALLBACK (on_bullets_button_clicked),
-			NULL);
+			ui);
 	
 	g_signal_connect ((gpointer) menu_quit, "activate",
 			G_CALLBACK (on_quit_button_clicked),
@@ -335,23 +322,23 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	g_signal_connect ((gpointer) bold_button, "clicked",
 			G_CALLBACK (on_bold_button_clicked),
-			NULL);
+			ui);
 	
 	g_signal_connect ((gpointer) italic_button, "clicked",
 			G_CALLBACK (on_italic_button_clicked),
-			NULL);
+			ui);
 	
 	g_signal_connect ((gpointer) strike_button, "clicked",
 			G_CALLBACK (on_strike_button_clicked),
-			NULL);
+			ui);
 	
 	g_signal_connect ((gpointer) bullets_button, "clicked",
 			G_CALLBACK(on_bullets_button_clicked),
-			NULL);
+			ui);
 	
 	g_signal_connect ((gpointer) highlight_button, "clicked",
 			G_CALLBACK (on_highlight_button_clicked),
-			NULL);
+			ui);
 	
 	g_signal_connect ((gpointer) link_button, "clicked",
 			G_CALLBACK (on_link_button_clicked),
@@ -367,7 +354,7 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	g_signal_connect ((gpointer) buffer, "mark-set",
 			G_CALLBACK (on_textview_cursor_moved),
-			textview);
+			note);
 	
 	g_signal_connect ((gpointer) buffer, "changed",
 			G_CALLBACK (on_textbuffer_changed),
@@ -390,29 +377,7 @@ GtkWidget* create_mainwin(Note *note) {
 			G_CALLBACK (on_link_internal_tag_event),
 			note);
 	
-
-	/* Store pointers to all widgets, for use by lookup_widget(). */
-	GLADE_HOOKUP_OBJECT_NO_REF (mainwin, mainwin, "mainwin");
-	GLADE_HOOKUP_OBJECT (mainwin, vbox1, "vbox1");
-	GLADE_HOOKUP_OBJECT (mainwin, toolbar, "toolbar1");
-	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(bold_button), "bold_button");
-	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(italic_button), "italic_button");
-	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(strike_button), "strike_button");
-	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(strike_button), "link_button");
-	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(highlight_button), "highlight_button");
-	GLADE_HOOKUP_OBJECT (mainwin, GTK_WIDGET(bullets_button), "bullets_button");
 	
-	GLADE_HOOKUP_OBJECT (mainwin, menu_bold, "menu_bold");
-	GLADE_HOOKUP_OBJECT (mainwin, menu_italic, "menu_italic");
-	GLADE_HOOKUP_OBJECT (mainwin, menu_strike, "menu_strike");
-	GLADE_HOOKUP_OBJECT (mainwin, menu_fixed, "menu_fixed");
-	GLADE_HOOKUP_OBJECT (mainwin, menu_highlight, "menu_highlight");
-	GLADE_HOOKUP_OBJECT (mainwin, menu_bullets, "menu_bullets");
-	
-	
-	GLADE_HOOKUP_OBJECT (mainwin, scrolledwindow1, "scrolledwindow1");
-	GLADE_HOOKUP_OBJECT (mainwin, textview, "textview");
-
 	return mainwin;
 }
 

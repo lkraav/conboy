@@ -38,9 +38,28 @@ typedef struct
 
 typedef struct
 {
-  GtkTextBuffer *buffer;
-  HildonWindow  *window;
-  GtkTextView   *view;
+	HildonWindow        *window;
+	GtkTextView         *view;
+	GtkTextBuffer       *buffer;
+	
+	GtkToggleToolButton *button_bold;
+	GtkToggleToolButton *button_italic;
+	GtkToggleToolButton *button_strike;
+	GtkToggleToolButton *button_highlight;
+	GtkToggleToolButton *button_bullets;
+	
+	GtkCheckMenuItem    *menu_bold;
+	GtkCheckMenuItem    *menu_italic;
+	GtkCheckMenuItem	*menu_fixed;
+	GtkCheckMenuItem    *menu_strike;
+	GtkCheckMenuItem    *menu_highlight;
+	GtkCheckMenuItem    *menu_bullets;
+
+} UserInterface;
+
+typedef struct
+{
+  UserInterface *ui;
   const gchar   *title;
   const gchar   *filename;
   

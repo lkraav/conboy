@@ -30,8 +30,6 @@ conboy_SOURCES = \
         src/interface.c \
         src/callbacks.h \
         src/callbacks.c \
-        src/support.h \
-        src/support.c \
         src/localisation.h \
         src/serializer.h \
         src/serializer.c \

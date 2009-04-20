@@ -40,7 +40,6 @@
 #endif
 #include <time.h>
 
-#include "support.h"
 #include "metadata.h"
 #include "interface.h"
 #include "callbacks.h"
@@ -88,7 +87,7 @@ main (int argc, char *argv[])
   if (app_data->all_notes != NULL && app_data->all_notes->data != NULL) {
 	  note = (Note*)app_data->all_notes->data;
   } else {
-	  note = g_new0(Note, 1);
+	  note = note_create_new();
   }
   
   note_show(note);

@@ -105,7 +105,7 @@ GList* create_note_list(AppData *app_data) {
 		if (g_str_has_suffix(filename, ".note")) {
 			
 			/* Create new note and append to list */
-			note = g_slice_new0(Note); /* note = malloc(sizeof(Note)); */
+			note = note_create_new(); /*g_slice_new0(Note);*/ /* note = malloc(sizeof(Note)); */
 			notes = g_list_prepend(notes, note);
 			
 			/* Save filename in note */

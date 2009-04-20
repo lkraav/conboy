@@ -33,7 +33,6 @@
 
 
 #include "callbacks.h"
-#include "support.h"
 
 #include "metadata.h"
 #include "interface.h"
@@ -42,10 +41,8 @@
 #include "serializer.h"
 #include "deserializer.h"
 
-static void change_format(const gchar* tag_name, GtkWidget *widget) {
-	
-	GtkWidget *view;
-	GtkTextBuffer *buffer;
+static void change_format(GtkTextBuffer *buffer, const gchar* tag_name, GtkWidget *widget, GtkToggleToolButton *button, GtkCheckMenuItem *item, UserInterface *ui)
+{	
 	GtkTextIter start_iter, end_iter;
 	gboolean activate;
 	
@@ -58,8 +55,18 @@ static void change_format(const gchar* tag_name, GtkWidget *widget) {
 		activate = FALSE;
 	}
 	
-	view = lookup_widget(widget, "textview");
-	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
+	/* Set state of buttons and menu items */
+	if (widget == GTK_WIDGET(button) || button == NULL) {
+		g_signal_handlers_block_matched(item, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);	
+		gtk_check_menu_item_set_active(item, activate);
+		g_signal_handlers_unblock_matched(item, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
+	} else if (widget == GTK_WIDGET(item) || item == NULL) {
+		g_signal_handlers_block_matched(button, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);	
+		gtk_toggle_tool_button_set_active(button, activate);
+		g_signal_handlers_unblock_matched(button, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
+	} else {
+		g_printerr("ERROR: change_format(): GtkToggleToolButton or GtkCheckMenuItem must be equal to GtkWidget.\n");
+	}
 	
 	if (activate) {
 		/* The button just became active, so we should enable the formatting */
@@ -117,7 +124,7 @@ void
 on_new_button_clicked					(GtkWidget		*widget,
 										 gpointer		 user_data)
 {
-	Note *note = g_new0(Note, 1);
+	Note *note = note_create_new();
 	note_show(note);
 }
 
@@ -125,35 +132,40 @@ void
 on_bold_button_clicked				   (GtkWidget		*widget,
 										gpointer		 user_data)
 {	
-	change_format("bold", widget);
+	UserInterface *ui = ((UserInterface*)user_data);
+	change_format(ui->buffer, "bold", widget, ui->button_bold, ui->menu_bold, ui);
 }
 
 void
 on_italic_button_clicked			   (GtkWidget		*widget,
 										gpointer		 user_data)
 {
-	change_format("italic", widget);
+	UserInterface *ui = ((UserInterface*)user_data);
+	change_format(ui->buffer, "italic", widget, ui->button_italic, ui->menu_italic, ui);
 }
 
 void
 on_strike_button_clicked			   (GtkWidget		*widget,
 										gpointer		 user_data)
 {
-	change_format("strikethrough", widget);
+	UserInterface *ui = ((UserInterface*)user_data);
+	change_format(ui->buffer, "strikethrough", widget, ui->button_strike, ui->menu_strike, ui);
 }
 
 void
 on_fixed_button_clicked					(GtkWidget		*widget,
 										 gpointer		 user_data)
 {
-	change_format("monospace", widget);
+	UserInterface *ui = ((UserInterface*)user_data);
+	change_format(ui->buffer, "monospace", widget, NULL, ui->menu_fixed, ui);
 }
 
 void
 on_highlight_button_clicked			   (GtkWidget		*widget,
 										gpointer		 user_data)
 {
-	change_format("highlight", widget);
+	UserInterface *ui = ((UserInterface*)user_data);
+	change_format(ui->buffer, "highlight", widget, ui->button_highlight, ui->menu_highlight, ui);
 }
 
 static void
@@ -204,8 +216,8 @@ remove_bullets(GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_
 	gtk_text_buffer_get_iter_at_line(buffer, end_iter, end_line);
 	gtk_text_iter_forward_to_line_end(end_iter);
 	
-	gtk_text_buffer_remove_tag_by_name(buffer, "list-item-A", start_iter, end_iter);
-	gtk_text_buffer_remove_tag_by_name(buffer, "list-item-B", start_iter, end_iter);
+	gtk_text_buffer_remove_tag_by_name(buffer, "list-item-A:1", start_iter, end_iter);
+	gtk_text_buffer_remove_tag_by_name(buffer, "list-item-B:1", start_iter, end_iter);
 	gtk_text_buffer_remove_tag_by_name(buffer, "list", start_iter, end_iter);
 		
 	/* Remove bullets */
@@ -221,11 +233,14 @@ void
 on_bullets_button_clicked				(GtkWidget		*widget,
 										 gpointer		 user_data)
 {
-	GtkWidget *view;
-	GtkTextBuffer *buffer;
+	UserInterface *ui = (UserInterface*)user_data;
+	GtkTextBuffer *buffer = ui->buffer;
+	GtkToggleToolButton *button = ui->button_bullets;
+	GtkCheckMenuItem *item = ui->menu_bullets;
 	GtkTextIter start_iter, end_iter;
 	gboolean activate;
 	
+	/* TODO: The first two ifs are the same as in change_format() */
 	if (GTK_IS_TOGGLE_TOOL_BUTTON(widget)) {
 		activate = gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(widget));
 	} else if (GTK_IS_CHECK_MENU_ITEM(widget)) {
@@ -235,8 +250,21 @@ on_bullets_button_clicked				(GtkWidget		*widget,
 		activate = FALSE;
 	}
 	
-	view = lookup_widget(widget, "textview");
-	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
+	
+	g_signal_handlers_block_matched(button, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
+	g_signal_handlers_block_matched(item, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
+	
+	/* Set state of buttons and menu items */
+	if (widget == GTK_WIDGET(button)) {
+		gtk_check_menu_item_set_active(item, activate);
+	} else if (widget == GTK_WIDGET(item)) {
+		gtk_toggle_tool_button_set_active(button, activate);
+	} else {
+		g_printerr("ERROR: change_format(): GtkToggleToolButton or GtkCheckMenuItem must be equal to GtkWidget.\n");
+	}
+	
+	g_signal_handlers_unblock_matched(button, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
+	g_signal_handlers_unblock_matched(item, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
 	
 	if (activate) {
 		/* The button just became active, so we should enable the formatting */
@@ -272,16 +300,17 @@ on_link_button_clicked				   (GtkButton		*button,
 										gpointer		 user_data) 
 { 	
 	Note *note = (Note*)user_data;
+	GtkTextBuffer *buffer = note->ui->buffer;
 	GtkTextIter start, end;
 	const gchar *text;
 	
-	if (!gtk_text_buffer_get_has_selection(note->buffer)) {
+	if (!gtk_text_buffer_get_has_selection(buffer)) {
 		return;
 	}
 	
-	gtk_text_buffer_get_selection_bounds(note->buffer, &start, &end);
+	gtk_text_buffer_get_selection_bounds(buffer, &start, &end);
 	text = gtk_text_iter_get_text(&start, &end);
-	gtk_text_buffer_apply_tag_by_name(note->buffer, "link:internal", &start, &end);
+	gtk_text_buffer_apply_tag_by_name(buffer, "link:internal", &start, &end);
 	
 	note_show_by_title(text);
 }
@@ -359,7 +388,6 @@ on_notes_menu_item_activated		(GtkMenuItem *menuitem,
 	note_show(note);
 }
 
-
 /* TODO: The signal "mark-set" is emitted 4 times when clicking into the text. While selecting
  * it's emitted continuesly. */
 void
@@ -368,24 +396,11 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 										GtkTextMark		*mark,
 										gpointer		 user_data)
 {
-	GtkToggleToolButton *bold_button, *italic_button, *strike_button, *highlight_button, *bullets_button;
-	GtkCheckMenuItem *menu_bold, *menu_italic, *menu_strike, *menu_highlight, *menu_fixed, *menu_bullets;
+	Note *note = (Note*)user_data;
+	UserInterface *ui = note->ui;
 	GSList *tags;
 	GtkTextTag *tag;
 	const gchar *mark_name;
-	
-	bold_button      = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "bold_button"));
-	italic_button    = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "italic_button"));
-	strike_button    = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "strike_button"));
-	highlight_button = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "highlight_button"));
-	bullets_button   = GTK_TOGGLE_TOOL_BUTTON(lookup_widget(GTK_WIDGET(user_data), "bullets_button"));
-
-	menu_bold        = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(user_data), "menu_bold"));
-	menu_italic      = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(user_data), "menu_italic"));
-	menu_strike      = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(user_data), "menu_strike"));
-	menu_highlight   = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(user_data), "menu_highlight"));
-	menu_fixed       = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(user_data), "menu_fixed"));
-	menu_bullets     = GTK_CHECK_MENU_ITEM(lookup_widget(GTK_WIDGET(user_data), "menu_bullets"));
 	
 	/* TODO: This is only workaround for problem with repeated calls. Probably gives problems with
 	 * selection. We only call this if the "insert" mark changed. */
@@ -399,72 +414,105 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	/* Blocking signals here because the ..set_active() method makes the buttons
 	 * emit the clicked signal. And because of this the formatting changes.
 	 */
-	g_signal_handlers_block_by_func(bold_button, on_bold_button_clicked, NULL);
-	g_signal_handlers_block_by_func(italic_button, on_italic_button_clicked, NULL);
-	g_signal_handlers_block_by_func(strike_button, on_strike_button_clicked, NULL);
-	g_signal_handlers_block_by_func(highlight_button, on_highlight_button_clicked, NULL);
-	g_signal_handlers_block_by_func(bullets_button, on_bullets_button_clicked, NULL);
+	/*
+	g_signal_handlers_block_matched(ui->button_bold, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_bold_button_clicked, NULL);
+	g_signal_handlers_block_matched(ui->button_italic, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_italic_button_clicked, NULL);
+	g_signal_handlers_block_matched(ui->button_strike, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_strike_button_clicked, NULL);
+	g_signal_handlers_block_matched(ui->button_highlight, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_highlight_button_clicked, NULL);
+	g_signal_handlers_block_matched(ui->button_bullets, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_bullets_button_clicked, NULL);
 	
-	g_signal_handlers_block_by_func(menu_bold, on_bold_button_clicked, NULL);
-	g_signal_handlers_block_by_func(menu_italic, on_italic_button_clicked, NULL);
-	g_signal_handlers_block_by_func(menu_strike, on_strike_button_clicked, NULL);
-	g_signal_handlers_block_by_func(menu_highlight, on_highlight_button_clicked, NULL);
-	g_signal_handlers_block_by_func(menu_fixed, on_fixed_button_clicked, NULL);
-	g_signal_handlers_block_by_func(menu_bullets, on_bullets_button_clicked, NULL);
+	g_signal_handlers_block_matched(ui->menu_bold, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_bold_button_clicked, NULL);
+	g_signal_handlers_block_matched(ui->menu_italic, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_italic_button_clicked, NULL);
+	g_signal_handlers_block_matched(ui->menu_strike, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_strike_button_clicked, NULL);
+	g_signal_handlers_block_matched(ui->menu_highlight, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_highlight_button_clicked, NULL);
+	g_signal_handlers_block_matched(ui->menu_fixed, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_fixed_button_clicked, NULL);
+	g_signal_handlers_block_matched(ui->menu_bullets, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_bullets_button_clicked, NULL);
+	*/
+	
+	
+	g_signal_handlers_block_by_func(ui->button_bold, on_bold_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->button_italic, on_italic_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->button_strike, on_strike_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->button_highlight, on_highlight_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->button_bullets, on_bullets_button_clicked, ui);
+	
+	
+	g_signal_handlers_block_by_func(ui->menu_bold, on_bold_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->menu_italic, on_italic_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->menu_strike, on_strike_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->menu_highlight, on_highlight_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->menu_fixed, on_fixed_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->menu_bullets, on_bullets_button_clicked, ui);
 	
 	/* TODO: This can be optimized: Note disable all and then enable selected, but determine state and then
 	 * set the state. */
-	gtk_toggle_tool_button_set_active(bold_button, FALSE);
-	gtk_toggle_tool_button_set_active(italic_button, FALSE);
-	gtk_toggle_tool_button_set_active(strike_button, FALSE);
-	gtk_toggle_tool_button_set_active(highlight_button, FALSE);
-	gtk_toggle_tool_button_set_active(bullets_button, FALSE);
+	gtk_toggle_tool_button_set_active(ui->button_bold, FALSE);
+	gtk_toggle_tool_button_set_active(ui->button_italic, FALSE);
+	gtk_toggle_tool_button_set_active(ui->button_strike, FALSE);
+	gtk_toggle_tool_button_set_active(ui->button_highlight, FALSE);
+	gtk_toggle_tool_button_set_active(ui->button_bullets, FALSE);
 	
-	gtk_check_menu_item_set_active(menu_bold, FALSE);
-	gtk_check_menu_item_set_active(menu_italic, FALSE);
-	gtk_check_menu_item_set_active(menu_strike, FALSE);
-	gtk_check_menu_item_set_active(menu_highlight, FALSE);
-	gtk_check_menu_item_set_active(menu_fixed, FALSE);
-	gtk_check_menu_item_set_active(menu_bullets, FALSE);
+	gtk_check_menu_item_set_active(ui->menu_bold, FALSE);
+	gtk_check_menu_item_set_active(ui->menu_italic, FALSE);
+	gtk_check_menu_item_set_active(ui->menu_strike, FALSE);
+	gtk_check_menu_item_set_active(ui->menu_highlight, FALSE);
+	gtk_check_menu_item_set_active(ui->menu_fixed, FALSE);
+	gtk_check_menu_item_set_active(ui->menu_bullets, FALSE);
 	
 	while (tags != NULL) {
 		tag = GTK_TEXT_TAG(tags->data);
 		if (strcmp(tag->name, "bold") == 0) {
-			gtk_toggle_tool_button_set_active(bold_button, TRUE);
-			gtk_check_menu_item_set_active(menu_bold, TRUE);
+			gtk_toggle_tool_button_set_active(ui->button_bold, TRUE);
+			gtk_check_menu_item_set_active(ui->menu_bold, TRUE);
 		} else if (strcmp(tag->name, "italic") == 0) {
-			gtk_toggle_tool_button_set_active(italic_button, TRUE);
-			gtk_check_menu_item_set_active(menu_italic, TRUE);
+			gtk_toggle_tool_button_set_active(ui->button_italic, TRUE);
+			gtk_check_menu_item_set_active(ui->menu_italic, TRUE);
 		} else if (strcmp(tag->name, "strikethrough") == 0) {
-			gtk_toggle_tool_button_set_active(strike_button, TRUE);
-			gtk_check_menu_item_set_active(menu_strike, TRUE);
+			gtk_toggle_tool_button_set_active(ui->button_strike, TRUE);
+			gtk_check_menu_item_set_active(ui->menu_strike, TRUE);
 		} else if (strcmp(tag->name, "highlight") == 0) {
-			gtk_toggle_tool_button_set_active(highlight_button, TRUE);
-			gtk_check_menu_item_set_active(menu_highlight, TRUE);
+			gtk_toggle_tool_button_set_active(ui->button_highlight, TRUE);
+			gtk_check_menu_item_set_active(ui->menu_highlight, TRUE);
 		} else if (strcmp(tag->name, "monospace") == 0) {
-			gtk_check_menu_item_set_active(menu_fixed, TRUE);
+			gtk_check_menu_item_set_active(ui->menu_fixed, TRUE);
 		} else if (strncmp(tag->name, "list-item", 9) == 0) {
-			gtk_toggle_tool_button_set_active(bullets_button, TRUE);
-			gtk_check_menu_item_set_active(menu_bullets, TRUE);
+			gtk_toggle_tool_button_set_active(ui->button_bullets, TRUE);
+			gtk_check_menu_item_set_active(ui->menu_bullets, TRUE);
 		}
 		tags = tags->next;
 	}
 	
 	g_slist_free(tags);
 	
-	/* unblock signals */
-	g_signal_handlers_unblock_by_func(bold_button, on_bold_button_clicked, NULL);
-	g_signal_handlers_unblock_by_func(italic_button, on_italic_button_clicked, NULL);
-	g_signal_handlers_unblock_by_func(strike_button, on_strike_button_clicked, NULL);
-	g_signal_handlers_unblock_by_func(highlight_button, on_highlight_button_clicked, NULL);
-	g_signal_handlers_unblock_by_func(bullets_button, on_bullets_button_clicked, NULL);
+	/*
+	g_signal_handlers_unblock_matched(ui->button_bold, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_bold_button_clicked, NULL);
+	g_signal_handlers_unblock_matched(ui->button_italic, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_italic_button_clicked, NULL);
+	g_signal_handlers_unblock_matched(ui->button_strike, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_strike_button_clicked, NULL);
+	g_signal_handlers_unblock_matched(ui->button_highlight, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_highlight_button_clicked, NULL);
+	g_signal_handlers_unblock_matched(ui->button_bullets, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_bullets_button_clicked, NULL);
 	
-	g_signal_handlers_unblock_by_func(menu_bold, on_bold_button_clicked, NULL);
-	g_signal_handlers_unblock_by_func(menu_italic, on_italic_button_clicked, NULL);
-	g_signal_handlers_unblock_by_func(menu_strike, on_strike_button_clicked, NULL);
-	g_signal_handlers_unblock_by_func(menu_highlight, on_highlight_button_clicked, NULL);
-	g_signal_handlers_unblock_by_func(menu_fixed, on_fixed_button_clicked, NULL);
-	g_signal_handlers_unblock_by_func(menu_bullets, on_bullets_button_clicked, NULL);
+	g_signal_handlers_unblock_matched(ui->menu_bold, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_bold_button_clicked, NULL);
+	g_signal_handlers_unblock_matched(ui->menu_italic, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_italic_button_clicked, NULL);
+	g_signal_handlers_unblock_matched(ui->menu_strike, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_strike_button_clicked, NULL);
+	g_signal_handlers_unblock_matched(ui->menu_highlight, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_highlight_button_clicked, NULL);
+	g_signal_handlers_unblock_matched(ui->menu_fixed, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_fixed_button_clicked, NULL);
+	g_signal_handlers_unblock_matched(ui->menu_bullets, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_bullets_button_clicked, NULL);
+	/*
+	/* unblock signals */
+	
+	g_signal_handlers_unblock_by_func(ui->button_bold, on_bold_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->button_italic, on_italic_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->button_strike, on_strike_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->button_highlight, on_highlight_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->button_bullets, on_bullets_button_clicked, ui);
+	
+	g_signal_handlers_unblock_by_func(ui->menu_bold, on_bold_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->menu_italic, on_italic_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->menu_strike, on_strike_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->menu_highlight, on_highlight_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->menu_fixed, on_fixed_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->menu_bullets, on_bullets_button_clicked, ui);
+	
 }
 
 void
@@ -552,7 +600,7 @@ on_delete_button_clicked			   (GtkButton		*button,
 	g_printerr("on_delete_button_clicked() called\n");
 	
 	dialog = gtk_message_dialog_new_with_markup(
-			GTK_WINDOW(note->window),
+			GTK_WINDOW(note->ui->window),
 			GTK_DIALOG_MODAL,
 			GTK_MESSAGE_QUESTION,
 			GTK_BUTTONS_YES_NO,
@@ -566,7 +614,7 @@ on_delete_button_clicked			   (GtkButton		*button,
 	}
 	
 	/* Block this signal, otherwise the destroy event of the window will trigger saving of the note */
-	g_signal_handlers_block_by_func(note->window, on_window_close_button_clicked, note);
+	g_signal_handlers_block_by_func(note->ui->window, on_window_close_button_clicked, note);
 	note_close_window(note);
 	/* Don't unblock the signal, because the window does not exist anymore */
 	
@@ -584,7 +632,7 @@ static
 gboolean note_save_callback(Note *note)
 {
 	/* Test, to see if the window is still open */
-	if (note != NULL && GTK_IS_TEXT_BUFFER(note->buffer)) {
+	if (note != NULL && GTK_IS_TEXT_BUFFER(note->ui->buffer)) {
 		note_save(note);
 	}
 	
@@ -643,7 +691,7 @@ void change_font_size_by(gint size)
 	note_list = app_data->open_notes;
 	while (note_list != NULL) {
 		note = (Note*)note_list->data;
-		gtk_widget_modify_font(GTK_WIDGET(note->view), font);
+		gtk_widget_modify_font(GTK_WIDGET(note->ui->view), font);
 		note_list = g_list_next(note_list);
 	}
 }
@@ -667,20 +715,21 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 									 gpointer           user_data)
 {
 	Note *note = (Note*)user_data;
+	GtkWidget *window = GTK_WIDGET(note->ui->window);
 	
 	switch (event->keyval) {
 	case HILDON_HARDKEY_INCREASE:
-		hildon_banner_show_information(GTK_WIDGET(note->window), NULL, "Zooming in");
+		hildon_banner_show_information(window, NULL, "Zooming in");
 		on_bigger_button_clicked(NULL, NULL);
 		return TRUE;
 	
 	case HILDON_HARDKEY_DECREASE:
-		hildon_banner_show_information(GTK_WIDGET(note->window), NULL, "Zooming out");
+		hildon_banner_show_information(window, NULL, "Zooming out");
 		on_smaller_button_clicked(NULL, NULL);
 		return TRUE;
 		
 	case HILDON_HARDKEY_ESC:
-		on_window_close_button_clicked(GTK_OBJECT(note->window), NULL, note);
+		on_window_close_button_clicked(GTK_OBJECT(window), NULL, note);
 		return TRUE;
 	
 	case HILDON_HARDKEY_FULLSCREEN:
