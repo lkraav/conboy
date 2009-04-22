@@ -206,7 +206,7 @@ add_bullets(GtkTextBuffer *buffer, gint start_line, gint end_line)
 		} else {
 			gtk_text_buffer_get_iter_at_line(buffer, &end_iter, i + 1);
 		}
-		gtk_text_buffer_apply_tag_by_name(buffer, "list-item:1", &start_iter, &end_iter);
+		gtk_text_buffer_apply_tag_by_name(buffer, "list-item", &start_iter, &end_iter);
 	}
 	
 	/* Surround everything it with "list" tags */
@@ -229,7 +229,7 @@ remove_bullets(GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_
 	gtk_text_iter_forward_to_line_end(end_iter);
 	
 	gtk_text_buffer_remove_tag_by_name(buffer, "depth:1", start_iter, end_iter);
-	gtk_text_buffer_remove_tag_by_name(buffer, "list-item:1", start_iter, end_iter);
+	gtk_text_buffer_remove_tag_by_name(buffer, "list-item", start_iter, end_iter);
 	gtk_text_buffer_remove_tag_by_name(buffer, "list", start_iter, end_iter);
 		
 	/* Remove bullets */
@@ -294,7 +294,7 @@ on_bullets_button_clicked				(GtkWidget		*widget,
 			line = gtk_text_iter_get_line(&start_iter);
 			add_bullets(buffer, line, line);
 			
-			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list-item:1");
+			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list-item");
 			note_add_active_tag(note, tag);
 			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list");
 			note_add_active_tag(note, tag);
@@ -313,7 +313,7 @@ on_bullets_button_clicked				(GtkWidget		*widget,
 			gtk_text_buffer_get_iter_at_mark(buffer, &end_iter, gtk_text_buffer_get_insert(buffer));		
 			remove_bullets(buffer, &start_iter, &end_iter);
 			
-			note_remove_active_tag_by_name(note, "list-item:1");
+			note_remove_active_tag_by_name(note, "list-item");
 			note_remove_active_tag_by_name(note, "list");
 		}
 	}
@@ -449,7 +449,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	tmp_tags = gtk_text_iter_get_tags(location);
 	if (tmp_tags != NULL) {
 		if (strncmp(GTK_TEXT_TAG(tmp_tags->data)->name, "depth", 5) == 0) {
-			note_add_active_tag_by_name(note, "list-item:1");
+			note_add_active_tag_by_name(note, "list-item");
 			note_add_active_tag_by_name(note, "list");
 		}
 	}
@@ -828,7 +828,7 @@ static gboolean add_new_line(Note *note)
 			GtkTextIter *start = gtk_text_iter_copy(&iter);
 			
 			/* Disable list and list-item tags */
-			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list-item:1");
+			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list-item");
 			note_remove_active_tag(note, tag);
 			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list");
 			note_remove_active_tag(note, tag);

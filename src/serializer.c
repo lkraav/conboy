@@ -58,6 +58,11 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 	/* If a <depth> tag, ignore */
 	if (strncmp(tag_name, "depth", 5) == 0) {
 		is_bullet = TRUE;
+		/* NEW */
+		strings = g_strsplit(tag_name, ":", 2);
+		new_depth = atoi(strings[1]);
+		g_strfreev(strings);
+		/* /NEW */
 		return;
 	}
 	
@@ -67,15 +72,9 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 		return;
 	}
 	
-	/* It is a <list-item-*> tag */
-	strings = g_strsplit(tag_name, ":", 2);
-	new_depth = atoi(strings[1]);
-	
-	/*
+	/* It is a <list-item:*> tag */
 	g_printerr("depth    : %i \n", depth);
 	g_printerr("new_depth: %i \n", new_depth);
-	*/
-	
 	
 	if (new_depth < depth) {
 		gint diff = depth - new_depth;
@@ -84,7 +83,7 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 		/* </list-item> */
 		xmlTextWriterEndElement(writer);
 		
-		while (diff > 0) { /* For each depth we need to close a <list-item> and a <list> tag.
+		while (diff > 0) { /* For each depth we need to close a <list-item> and a <list> tag. */
 			/* </list> */
 			xmlTextWriterEndElement(writer);
 			/* </list-item> */
@@ -117,7 +116,7 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 	}
 	
 	depth = new_depth;
-	g_strfreev(strings);
+	/*g_strfreev(strings);*/
 }
 
 /**

@@ -280,6 +280,11 @@ GtkTextTag* get_depth_tag(ParseContext *ctx, GtkTextBuffer *buffer, gchar* name)
 	gchar *tag_name;
 	gchar *color;
 	
+	/* TODO: This is for debugging. Remove. */
+	if (strncmp(name, "list-item", 9) == 0) {
+		g_assert_not_reached();
+	}
+	
 	g_sprintf(depth, "%i", ctx->depth);
 	tag_name = g_strconcat(name, ":", depth, NULL);
 	
@@ -365,8 +370,8 @@ void handle_text_element(ParseContext *ctx, xmlTextReader *reader, Note *note)
 		}
 		
 		/* Insert the text into the buffer with list-item tags */
-		list_item_tag = get_depth_tag(ctx, buffer, "list-item");
-		gtk_text_buffer_insert_with_tags(buffer, iter, text, -1, list_item_tag, NULL);
+		/* list_item_tag = get_depth_tag(ctx, buffer, "list-item"); */
+		gtk_text_buffer_insert_with_tags_by_name(buffer, iter, text, -1, "list-item", NULL);
 		
 		/* Apply <list> tag to the complete line, incuding the bullet */
 		gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, mark);

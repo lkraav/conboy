@@ -73,9 +73,8 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 	gtk_text_buffer_create_tag(buffer, "list-item-B:1", "indent", -20, "left-margin", 25, "foreground", "orange", NULL);
 	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
 	*/
-	gtk_text_buffer_create_tag(buffer, "green", "foreground", "green", NULL);
 	
-	gtk_text_buffer_create_tag(buffer, "list-item:1", "foreground", "orange", NULL);
+	gtk_text_buffer_create_tag(buffer, "list-item", "foreground", "orange", NULL);
 	
 	gtk_text_buffer_create_tag(buffer, "depth:1", "indent", -20, "left-margin", 25, NULL);
 	
