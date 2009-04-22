@@ -168,40 +168,44 @@ on_highlight_button_clicked			   (GtkWidget		*widget,
 	change_format(ui->buffer, "highlight", widget, ui->button_highlight, ui->menu_highlight, ui);
 }
 
+/*
+ * TODO: Change parameters to line numbers.
+ */
 static void
-add_bullets(GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_iter)
+add_bullets(GtkTextBuffer *buffer, gint start_line, gint end_line)
 {
 	gint i = 0;
-	gint start_line = gtk_text_iter_get_line(start_iter);
-	gint end_line   = gtk_text_iter_get_line(end_iter);
-	gchar *list_item[2] = {"list-item-A:1", "list-item-B:1"}; /* TODO: Replace with get_depth_tag() from deserialzer2.c */
+	GtkTextIter start_iter, end_iter;
 	
 	/* For each selected line */
 	for (i = start_line; i <= end_line; i++) {
 		
-		/* li decideds if we take list-item-A or list-item-B */
-		int li = i % 2;
-		
 		/* Insert bullet character */
-		gtk_text_buffer_get_iter_at_line(buffer, start_iter, i);
-		gtk_text_buffer_insert(buffer, start_iter, BULLET, -1);
+		gtk_text_buffer_get_iter_at_line(buffer, &start_iter, i);
+		gtk_text_buffer_insert(buffer, &start_iter, BULLET, -1);
 		
-		/* Surround line with "list-item" tags */
-		gtk_text_buffer_get_iter_at_line(buffer, start_iter, i);
+		/* Remove existing tags from the bullet and add the <depth> tag */
+		gtk_text_buffer_get_iter_at_line_offset(buffer, &start_iter, i, 0);
+		gtk_text_buffer_get_iter_at_line_offset(buffer, &end_iter, i, 2);
+		gtk_text_buffer_remove_all_tags(buffer, &start_iter, &end_iter);
+		gtk_text_buffer_apply_tag_by_name(buffer, "depth:1", &start_iter, &end_iter);
+		
+		/* Surround line (starting after BULLET) with "list-item" tags */
+		gtk_text_buffer_get_iter_at_line_offset(buffer, &start_iter, i, 2); /* Jump bullet */
 		if (i == end_line) {
-			gtk_text_buffer_get_iter_at_line(buffer, end_iter, i);
-			gtk_text_iter_forward_to_line_end(end_iter);
+			gtk_text_buffer_get_iter_at_line(buffer, &end_iter, i);
+			gtk_text_iter_forward_to_line_end(&end_iter);
 		} else {
-			gtk_text_buffer_get_iter_at_line(buffer, end_iter, i + 1);
+			gtk_text_buffer_get_iter_at_line(buffer, &end_iter, i + 1);
 		}
-		gtk_text_buffer_apply_tag_by_name(buffer, list_item[li], start_iter, end_iter);
+		gtk_text_buffer_apply_tag_by_name(buffer, "list-item:1", &start_iter, &end_iter);
 	}
 	
-	/* Surround it with "list" tags */
-	gtk_text_buffer_get_iter_at_line(buffer, start_iter, start_line);
-	gtk_text_buffer_get_iter_at_line(buffer, end_iter, end_line);
-	gtk_text_iter_forward_to_line_end(end_iter);
-	gtk_text_buffer_apply_tag_by_name(buffer, "list", start_iter, end_iter);
+	/* Surround everything it with "list" tags */
+	gtk_text_buffer_get_iter_at_line(buffer, &start_iter, start_line);
+	gtk_text_buffer_get_iter_at_line(buffer, &end_iter, end_line);
+	gtk_text_iter_forward_to_line_end(&end_iter);
+	gtk_text_buffer_apply_tag_by_name(buffer, "list", &start_iter, &end_iter);
 }
 
 static void
@@ -271,13 +275,14 @@ on_bullets_button_clicked				(GtkWidget		*widget,
 		if (gtk_text_buffer_get_has_selection(buffer)) {
 			/* Something is selected */
 			gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter);
-			add_bullets(buffer, &start_iter, &end_iter);
+			add_bullets(buffer, gtk_text_iter_get_line(&start_iter), gtk_text_iter_get_line(&end_iter));
 			
 		} else {
 			/* Nothing is selected */
+			int line;
 			gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer));
-			gtk_text_buffer_get_iter_at_mark(buffer, &end_iter, gtk_text_buffer_get_insert(buffer));
-			add_bullets(buffer, &start_iter, &end_iter);
+			line = gtk_text_iter_get_line(&start_iter);
+			add_bullets(buffer, line, line);
 		}
 	} else {
 		/* The button just became deactive, so we should remove the formatting */
@@ -497,7 +502,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	g_signal_handlers_unblock_matched(ui->menu_highlight, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_highlight_button_clicked, NULL);
 	g_signal_handlers_unblock_matched(ui->menu_fixed, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_fixed_button_clicked, NULL);
 	g_signal_handlers_unblock_matched(ui->menu_bullets, G_SIGNAL_MATCH_FUNC, 0, 0, NULL, on_bullets_button_clicked, NULL);
-	/*
+	*/
 	/* unblock signals */
 	
 	g_signal_handlers_unblock_by_func(ui->button_bold, on_bold_button_clicked, ui);
@@ -654,7 +659,7 @@ on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 	g_printerr("Buffer is dirty. Saving in 10 seconds\n");
 	
 	/* Save 10 seconds after the buffer got dirty */
-	g_timeout_add(10000, (GSourceFunc)note_save_callback, note);
+	g_timeout_add(4000, (GSourceFunc)note_save_callback, note);
 }
 
 static
@@ -757,4 +762,70 @@ on_textview_tap_and_hold(GtkWidget *widget, gpointer user_data)
 }
 
 
+static gboolean add_new_line(GtkTextBuffer *buffer)
+{
+	GtkTextIter iter;
+	GSList *tags;
+	gint line;
+	
+	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+	gtk_text_iter_set_line_offset(&iter, 0);
+	tags = gtk_text_iter_get_tags(&iter);
+	if (tags == NULL) {
+		g_printerr("Tags == NULL \n");
+		return FALSE;
+	}
+	
+	/* If we are on a bullet line and this line is not empty, start a new bullet line */
+	if (strncmp(((GtkTextTag*)tags->data)->name, "depth", 5) == 0) {
+		
+		gtk_text_iter_forward_to_line_end(&iter);
+		
+		if (gtk_text_iter_get_line_offset(&iter) > 2) {
+			/* Insert newline and bullet */
+			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
+			line = gtk_text_iter_get_line(&iter);
+			add_bullets(buffer, line, line);
+			return TRUE;
+			
+		} else {
+			/* Remove bullet and insert newline */
+			GtkTextIter *start = gtk_text_iter_copy(&iter);
+			gtk_text_iter_set_line_offset(start, 0);
+			gtk_text_buffer_delete(buffer, start, &iter);
+			return FALSE;
+		}
+	}
+	return FALSE;
+}
+
+gboolean
+on_text_view_key_pressed                      (GtkWidget   *widget,
+                                               GdkEventKey *event,
+                                               gpointer     user_data)
+{
+	GtkTextBuffer *buffer = (GtkTextBuffer*)user_data;
+	
+	switch (event->keyval) {
+		case GDK_Return:
+		case GDK_KP_Enter:
+			return add_new_line(buffer);
+		default:
+			return FALSE;
+	}
+	
+}
+
+void
+on_text_buffer_insert_text					(GtkTextBuffer *buffer,
+											 GtkTextIter   *location,
+											 gint			len,
+											 gpointer		user_data)
+{
+	
+	
+	
+	
+}
 

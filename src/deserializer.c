@@ -272,7 +272,7 @@ void handle_end_element(ParseContext *ctx, xmlTextReader *reader) {
 
 }
 
-GtkTextTag* get_depth_tag(ParseContext *ctx, GtkTextBuffer *buffer, gint line_num) {
+GtkTextTag* get_depth_tag(ParseContext *ctx, GtkTextBuffer *buffer, gchar* name) {
 	
 	GtkTextTag *tag;
 	gchar *tmp;
@@ -280,16 +280,8 @@ GtkTextTag* get_depth_tag(ParseContext *ctx, GtkTextBuffer *buffer, gint line_nu
 	gchar *tag_name;
 	gchar *color;
 	
-	if ((line_num % 2) == 1 ) {
-		tmp = g_strconcat("list-item-", "A", NULL);
-		color = "red";
-	} else {
-		tmp = g_strconcat("list-item-", "B", NULL);
-		color = "orange";
-	}
-	
 	g_sprintf(depth, "%i", ctx->depth);
-	tag_name = g_strconcat(tmp, ":", depth, NULL);
+	tag_name = g_strconcat(name, ":", depth, NULL);
 	
 	tag = gtk_text_tag_table_lookup(buffer->tag_table, tag_name); 
 	if (tag == NULL) {
@@ -300,7 +292,6 @@ GtkTextTag* get_depth_tag(ParseContext *ctx, GtkTextBuffer *buffer, gint line_nu
 		gtk_text_tag_set_priority(gtk_text_tag_table_lookup(buffer->tag_table, "list"), gtk_text_tag_table_get_size(buffer->tag_table) - 1);
 	}
 	
-	g_free(tmp);
 	g_free(tag_name);
 	
 	return tag;
@@ -315,6 +306,8 @@ void handle_text_element(ParseContext *ctx, xmlTextReader *reader, Note *note)
 	GtkTextIter start_iter;
 	GtkTextMark *mark;
 	GSList *tag_stack;
+	GtkTextTag *depth_tag;
+	GtkTextTag *list_item_tag;
 	GtkTextTag *tag;
 	gint line_num;
 	gboolean bullet_was_inserted;
@@ -365,19 +358,18 @@ void handle_text_element(ParseContext *ctx, xmlTextReader *reader, Note *note)
 		mark = gtk_text_buffer_create_mark(buffer, "insert_point", iter, TRUE);
 		
 		/* Insert bullet only if we are at the very beginning of a line */
+		depth_tag = get_depth_tag(ctx, buffer, "depth");
 		if (gtk_text_iter_get_line_offset(iter) == 0) {
-			gtk_text_buffer_insert(buffer, iter, BULLET, -1);
+			gtk_text_buffer_insert_with_tags(buffer, iter, BULLET, -1, depth_tag, NULL);
 			bullet_was_inserted = TRUE;
 		}
 		
-		/* Insert the text into the buffer */
-		gtk_text_buffer_insert(buffer, iter, text, -1);
+		/* Insert the text into the buffer with list-item tags */
+		list_item_tag = get_depth_tag(ctx, buffer, "list-item");
+		gtk_text_buffer_insert_with_tags(buffer, iter, text, -1, list_item_tag, NULL);
 		
+		/* Apply <list> tag to the complete line, incuding the bullet */
 		gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, mark);
-		
-		/* Create depth tag and apply */
-		tag = get_depth_tag(ctx, buffer, line_num);
-		gtk_text_buffer_apply_tag(buffer, tag, &start_iter, iter);
 		gtk_text_buffer_apply_tag_by_name(buffer, "list", &start_iter, iter);
 		
 		/* Now move start_iter behind BULLET character, because we don't want to format the bullet */

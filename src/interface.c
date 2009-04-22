@@ -74,9 +74,11 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
 	*/
 	
-	gtk_text_buffer_create_tag(buffer, "list-item-A:1", "indent", -20, "left-margin", 25, NULL);
-	gtk_text_buffer_create_tag(buffer, "list-item-B:1", "indent", -20, "left-margin", 25, NULL);
-	gtk_text_buffer_create_tag(buffer, "list", NULL);
+	gtk_text_buffer_create_tag(buffer, "list-item:1", "foreground", "orange", NULL);
+	
+	gtk_text_buffer_create_tag(buffer, "depth:1", "indent", -20, "left-margin", 25, NULL);
+	
+	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
 }
 
 static
@@ -371,6 +373,14 @@ GtkWidget* create_mainwin(Note *note) {
 	g_signal_connect ((gpointer)mainwin, "key_press_event",
 			G_CALLBACK(on_hardware_key_pressed),
 			note);
+	
+	g_signal_connect ((gpointer)textview, "key-press-event",
+			G_CALLBACK(on_text_view_key_pressed),
+			buffer);
+	
+	g_signal_connect ((gpointer)buffer, "insert-text",
+			G_CALLBACK(on_text_buffer_insert_text),
+			NULL);
 
 	link_internal_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	g_signal_connect ((gpointer) link_internal_tag, "event",

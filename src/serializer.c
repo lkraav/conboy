@@ -1,9 +1,15 @@
 #include <libxml/encoding.h>
 #include <libxml/xmlwriter.h>
+#include <string.h>
 
 #include "note.h"
 #include "metadata.h"
 #include "serializer.h"
+
+gint depth = 0;
+gint new_depth = 0;
+gboolean list_active = FALSE;
+gboolean is_bullet = FALSE;
 
 static
 void write_header(xmlTextWriter *writer, Note *note)
@@ -27,9 +33,7 @@ void write_header(xmlTextWriter *writer, Note *note)
 	rc = xmlTextWriterWriteElement(writer, BAD_CAST "title", BAD_CAST note->title);
 }
 
-gint depth = 0;
-gint new_depth = 0;
-gboolean list_active = FALSE;
+
 /**
  * Writes a start element.
  */
@@ -51,6 +55,12 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 		return;
 	}
 	
+	/* If a <depth> tag, ignore */
+	if (strncmp(tag_name, "depth", 5) == 0) {
+		is_bullet = TRUE;
+		return;
+	}
+	
 	/* If not a <list-item> tag, write it and return */
 	if (g_ascii_strncasecmp(tag_name, "list-item", 9) != 0) {
 		xmlTextWriterStartElement(writer, BAD_CAST tag_name);
@@ -61,13 +71,25 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 	strings = g_strsplit(tag_name, ":", 2);
 	new_depth = atoi(strings[1]);
 	
+	g_printerr("depth    : %i \n", depth);
+	g_printerr("new_depth: %i \n", new_depth);
+	
+	
 	if (new_depth < depth) {
+		gint diff = depth - new_depth;
+		g_printerr("new_depth < depth. DIFF: %i \n", depth - new_depth);
+		
 		/* </list-item> */
 		xmlTextWriterEndElement(writer);
-		/* </list> */
-		xmlTextWriterEndElement(writer);
-		/* </list-item> */
-		xmlTextWriterEndElement(writer);
+		
+		while (diff > 0) { /* For each depth we need to close a <list-item> and a <list> tag.
+			/* </list> */
+			xmlTextWriterEndElement(writer);
+			/* </list-item> */
+			xmlTextWriterEndElement(writer);
+			diff--;
+		}
+		
 		/* <list-item dir=ltr> */
 		xmlTextWriterStartElement(writer, BAD_CAST "list-item");
 		xmlTextWriterWriteAttribute(writer, BAD_CAST "dir", BAD_CAST "ltr");
@@ -76,9 +98,16 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 	
 	/* If there was an increase in depth, we need to add a <list> tag */
 	if (new_depth > depth) {
-		xmlTextWriterStartElement(writer, BAD_CAST "list");
-		xmlTextWriterStartElement(writer, BAD_CAST "list-item");
-		xmlTextWriterWriteAttribute(writer, BAD_CAST "dir", BAD_CAST "ltr");
+		gint diff = new_depth - depth;
+		g_printerr("new_depth > depth. DIFF: %i \n", new_depth - depth);
+		
+		while (diff > 0) {
+			xmlTextWriterStartElement(writer, BAD_CAST "list");
+			xmlTextWriterStartElement(writer, BAD_CAST "list-item");
+			xmlTextWriterWriteAttribute(writer, BAD_CAST "dir", BAD_CAST "ltr");
+			diff--;
+		}
+		
 	} else if (new_depth == depth) {
 		xmlTextWriterEndElement(writer); /* </list-item> */
 		xmlTextWriterStartElement(writer, BAD_CAST "list-item");
@@ -90,11 +119,10 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 }
 
 /**
- * Writes a end element.
+ * Writes an end element.
  */
 static void write_end_element(GtkTextTag *tag, xmlTextWriter *writer)
 {
-	gint new_depth = 0;
 	gchar *tag_name;
 	
 	tag_name = g_strdup(tag->name);
@@ -104,14 +132,24 @@ static void write_end_element(GtkTextTag *tag, xmlTextWriter *writer)
 		return;
 	}
 	
+	/* Ignore depth tags */
+	if (strncmp(tag_name, "depth", 5) == 0) {
+		is_bullet = FALSE;
+		return;
+	}
+	
 	/* If the list completely ends, reset the depth */
 	if (g_ascii_strncasecmp(tag_name, "list", -1) == 0) {
-		/* </list-item> */
-		xmlTextWriterEndElement(writer);
-		/* </list> */
-		xmlTextWriterEndElement(writer);
-		new_depth = 0;
-		depth = 0;
+		
+		/* Close all open <list-item> and <list> tags */
+		while (depth > 0) {
+			/* </list-item> */
+			xmlTextWriterEndElement(writer);
+			/* </list> */
+			xmlTextWriterEndElement(writer);
+			depth--;
+		}
+		
 		list_active = FALSE;
 		return;
 	}
@@ -131,18 +169,9 @@ static void write_end_element(GtkTextTag *tag, xmlTextWriter *writer)
  */
 static void write_text(const gchar *text, xmlTextWriter *writer)
 {
-	/* If the text starts with a BULLET character, we remove the BULLET character */
-	/* TODO: Maybe only do this if we are inside a <list-item>. */
-	/* TODO: I think we should add s.th. like a <bullet> tag arround the BULLET
-	 * characters. It will make it easier to jump the cursor over them and here
-	 * we can just delete what's inside this tag.*/
-	
-	if (list_active) {
-		if (g_ascii_strncasecmp(BULLET, text, 4) == 0) {
-			text = g_strdup(text + sizeof(BULLET) - 1);
-		}
-		/* Remove trailing whitespaces */
-		/*text = g_strchomp(text);*/
+	/* Don't write bullets to the output */
+	if (is_bullet) {
+		return;
 	}
 	
 	xmlTextWriterWriteString(writer, BAD_CAST text);

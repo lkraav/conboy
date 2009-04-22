@@ -129,6 +129,16 @@ void
 on_textview_tap_and_hold				(GtkWidget 			*widget,
 										 gpointer 			user_data);
 
+gboolean
+on_text_view_key_pressed                (GtkWidget   *widget,
+                                         GdkEventKey *event,
+                                         gpointer     user_data);
+
+void
+on_text_buffer_insert_text					(GtkTextBuffer *buffer,
+											 GtkTextIter   *location,
+											 gint			len,
+											 gpointer		user_data);
 
 
 #endif /* CALLBACKS_H */
