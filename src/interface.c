@@ -73,6 +73,7 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 	gtk_text_buffer_create_tag(buffer, "list-item-B:1", "indent", -20, "left-margin", 25, "foreground", "orange", NULL);
 	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
 	*/
+	gtk_text_buffer_create_tag(buffer, "green", "foreground", "green", NULL);
 	
 	gtk_text_buffer_create_tag(buffer, "list-item:1", "foreground", "orange", NULL);
 	
@@ -291,27 +292,27 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	g_signal_connect ((gpointer) menu_bold, "activate",
 			G_CALLBACK(on_bold_button_clicked),
-			ui);
+			note);
 	
 	g_signal_connect ((gpointer) menu_italic, "activate",
 			G_CALLBACK (on_italic_button_clicked),
-			ui);
+			note);
 	
 	g_signal_connect ((gpointer) menu_strike, "activate",
 			G_CALLBACK (on_strike_button_clicked),
-			ui);
+			note);
 	
 	g_signal_connect ((gpointer) menu_highlight, "activate",
 			G_CALLBACK (on_highlight_button_clicked),
-			ui);
+			note);
 	
 	g_signal_connect ((gpointer) menu_fixed, "activate",
 			G_CALLBACK (on_fixed_button_clicked),
-			ui);
+			note);
 	
 	g_signal_connect ((gpointer) menu_bullets, "activate",
 			G_CALLBACK (on_bullets_button_clicked),
-			ui);
+			note);
 	
 	g_signal_connect ((gpointer) menu_quit, "activate",
 			G_CALLBACK (on_quit_button_clicked),
@@ -324,23 +325,23 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	g_signal_connect ((gpointer) bold_button, "clicked",
 			G_CALLBACK (on_bold_button_clicked),
-			ui);
+			note);
 	
 	g_signal_connect ((gpointer) italic_button, "clicked",
 			G_CALLBACK (on_italic_button_clicked),
-			ui);
+			note);
 	
 	g_signal_connect ((gpointer) strike_button, "clicked",
 			G_CALLBACK (on_strike_button_clicked),
-			ui);
+			note);
 	
 	g_signal_connect ((gpointer) bullets_button, "clicked",
 			G_CALLBACK(on_bullets_button_clicked),
-			ui);
+			note);
 	
 	g_signal_connect ((gpointer) highlight_button, "clicked",
 			G_CALLBACK (on_highlight_button_clicked),
-			ui);
+			note);
 	
 	g_signal_connect ((gpointer) link_button, "clicked",
 			G_CALLBACK (on_link_button_clicked),
@@ -376,11 +377,11 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	g_signal_connect ((gpointer)textview, "key-press-event",
 			G_CALLBACK(on_text_view_key_pressed),
-			buffer);
+			note);
 	
-	g_signal_connect ((gpointer)buffer, "insert-text",
+	g_signal_connect_after ((gpointer)buffer, "insert-text",
 			G_CALLBACK(on_text_buffer_insert_text),
-			NULL);
+			note);
 
 	link_internal_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	g_signal_connect ((gpointer) link_internal_tag, "event",

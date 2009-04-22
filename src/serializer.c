@@ -71,13 +71,15 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 	strings = g_strsplit(tag_name, ":", 2);
 	new_depth = atoi(strings[1]);
 	
+	/*
 	g_printerr("depth    : %i \n", depth);
 	g_printerr("new_depth: %i \n", new_depth);
+	*/
 	
 	
 	if (new_depth < depth) {
 		gint diff = depth - new_depth;
-		g_printerr("new_depth < depth. DIFF: %i \n", depth - new_depth);
+		/*g_printerr("new_depth < depth. DIFF: %i \n", depth - new_depth);*/
 		
 		/* </list-item> */
 		xmlTextWriterEndElement(writer);
@@ -99,7 +101,7 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 	/* If there was an increase in depth, we need to add a <list> tag */
 	if (new_depth > depth) {
 		gint diff = new_depth - depth;
-		g_printerr("new_depth > depth. DIFF: %i \n", new_depth - depth);
+		/*g_printerr("new_depth > depth. DIFF: %i \n", new_depth - depth);*/
 		
 		while (diff > 0) {
 			xmlTextWriterStartElement(writer, BAD_CAST "list");

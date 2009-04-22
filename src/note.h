@@ -48,4 +48,12 @@ void note_set_focus(Note *note);
 
 gboolean note_exists(Note *note);
 
+void note_add_active_tag(Note *note, GtkTextTag *tag);
+
+void note_remove_active_tag(Note *note, GtkTextTag *tag);
+
+void note_add_active_tag_by_name(Note *note, const gchar *tag_name);
+
+void note_remove_active_tag_by_name(Note *note, const gchar *tag_name);
+
 #endif /* NOTE_H */

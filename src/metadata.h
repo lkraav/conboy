@@ -75,6 +75,8 @@ typedef struct
   gboolean open_on_startup;
   const gchar *version;
   
+  GSList *active_tags;
+  
 } Note;
 
 AppData* get_app_data();

@@ -136,7 +136,8 @@ on_text_view_key_pressed                (GtkWidget   *widget,
 
 void
 on_text_buffer_insert_text					(GtkTextBuffer *buffer,
-											 GtkTextIter   *location,
+											 GtkTextIter   *end_iter,
+											 gchar		   *text,
 											 gint			len,
 											 gpointer		user_data);
 

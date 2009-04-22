@@ -32,6 +32,7 @@ Note* note_create_new()
 	Note *note = g_new0(Note, 1);
 	UserInterface *ui = g_new0(UserInterface, 1);
 	note->ui = ui;
+	note->active_tags = NULL;
 	return note;
 }
 
@@ -41,6 +42,7 @@ void note_free(Note *note)
 	g_free(note->filename);
 	g_free(note->title);
 	g_free(note->version);
+	g_slist_free(note->active_tags);
 }
 
 /* Not needed right now. Maybe later again */
@@ -366,5 +368,46 @@ void note_show_existing(Note *note)
 	/* TODO: Does not scroll. Maybe we first need to show the widget?! */
 	gtk_text_view_scroll_to_iter(note->ui->view, &iter, 0.0, TRUE, 0.5, 0.0);
 }
+
+void note_add_active_tag_by_name(Note *note, const gchar *tag_name)
+{
+	note_add_active_tag(note, gtk_text_tag_table_lookup(note->ui->buffer->tag_table, tag_name));
+}
+
+void note_remove_active_tag_by_name(Note *note, const gchar *tag_name)
+{
+	note_remove_active_tag(note, gtk_text_tag_table_lookup(note->ui->buffer->tag_table, tag_name));
+}
+
+/**
+ * Add a tag to the list of active_tags, if it is not yet in the list.
+ */
+void note_add_active_tag(Note *note, GtkTextTag *tag)
+{
+	GSList *tags = note->active_tags;
+	while (tags != NULL) {
+		if (strcmp(((GtkTextTag*)tags->data)->name, tag->name) == 0) {
+			return;
+		}
+		tags = tags->next;
+	}
+	note->active_tags = g_slist_prepend(note->active_tags, tag);
+}
+
+/**
+ * Removes a tag from the list of active_tags if it is in this list.
+ */
+void note_remove_active_tag(Note *note, GtkTextTag *tag)
+{
+	GSList *tags = note->active_tags;
+	while (tags != NULL) {
+		if (strcmp(GTK_TEXT_TAG(tags->data)->name, tag->name) == 0) {
+			note->active_tags = g_slist_remove(note->active_tags, tags->data);
+			return;
+		}
+		tags = tags->next;
+	}
+}
+
 
 
