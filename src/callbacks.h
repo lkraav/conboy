@@ -141,5 +141,13 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 											 gint			len,
 											 gpointer		user_data);
 
+void
+on_inc_indent_button_clicked			   (GtkButton		*button,
+											gpointer		 user_data);
+
+void
+on_dec_indent_button_clicked			   (GtkButton		*button,
+											gpointer		 user_data);
+
 
 #endif /* CALLBACKS_H */

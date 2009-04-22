@@ -891,3 +891,169 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 	}
 }
 
+/*
+ * TODO: Put in common file. And also use in deserializer. 
+ */
+GtkTextTag* buffer_get_depth_tag(GtkTextBuffer *buffer, gint depth)
+{
+	GtkTextTag *tag;
+	gchar depth_str[5] = {0};
+	gchar *tag_name;
+	
+	if (depth < 1) {
+		g_printerr("ERROR: buffer_get_depth_tag(): depth must be at least 1. Not: %i \n", depth);
+	}
+	
+	g_sprintf(depth_str, "%i", depth);
+	tag_name = g_strconcat("depth", ":", depth_str, NULL);
+	
+	tag = gtk_text_tag_table_lookup(buffer->tag_table, tag_name);
+	
+	if (tag == NULL) {
+		tag = gtk_text_buffer_create_tag(buffer, tag_name, "indent", -20, "left-margin", depth * 25, NULL);
+		/* Set the priority of the "list" tag to the maximum. It needs a higher priority then the newly created "list-item" tag */
+		/* TODO: I think the next line is not needed anymore. Test without. */
+		gtk_text_tag_set_priority(gtk_text_tag_table_lookup(buffer->tag_table, "list"), gtk_text_tag_table_get_size(buffer->tag_table) - 1);
+	}
+	
+	g_free(tag_name);
+	
+	return tag;
+}
+
+gboolean tag_is_depth_tag(GtkTextTag *tag)
+{
+	if (tag == NULL) {
+		return FALSE;
+	}
+	return (strncmp(tag->name, "depth", 5) == 0);
+}
+
+gint tag_get_depth(GtkTextTag *tag)
+{
+	if (tag_is_depth_tag(tag)) {
+		char **strings = g_strsplit(tag->name, ":", 2);
+		int depth = atoi(strings[1]);
+		g_strfreev(strings);
+		return depth;
+	}
+	return 0;
+}
+
+GtkTextTag* iter_get_depth_tag(GtkTextIter* iter)
+{
+	GSList *tags = gtk_text_iter_get_tags(iter);
+	while (tags != NULL) {
+		if (tag_is_depth_tag(tags->data)) {
+			return tags->data;
+		}
+	}
+	return NULL;
+}
+
+void increase_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
+{
+	GtkTextIter start_iter, end_iter;
+	GtkTextTag *old_tag;
+	GtkTextTag *new_tag;
+	gint i;
+	for (i = start_line; i <= end_line; i++) {
+		
+		gtk_text_buffer_get_iter_at_line(buffer, &start_iter, i);
+		
+		old_tag = iter_get_depth_tag(&start_iter);
+		
+		if (old_tag != NULL) {
+			gint depth = tag_get_depth(old_tag);
+			depth++;
+			new_tag = buffer_get_depth_tag(buffer, depth);
+			
+			g_printerr("Increasing indent \n");
+			gtk_text_buffer_get_iter_at_line(buffer, &end_iter, i);
+			gtk_text_iter_set_line_offset(&end_iter, 2);
+			/* Remove old tag and apply new tag */
+			gtk_text_buffer_remove_tag(buffer, old_tag, &start_iter, &end_iter);
+			gtk_text_buffer_apply_tag(buffer, new_tag, &start_iter, &end_iter);
+		}
+	}
+}
+
+/* TODO: This is almost 100% copy&paste from increase_indent */
+void decrease_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
+{
+	GtkTextIter start_iter, end_iter;
+	GtkTextTag *old_tag;
+	GtkTextTag *new_tag;
+	gint i;
+	for (i = start_line; i <= end_line; i++) {
+		
+		gtk_text_buffer_get_iter_at_line(buffer, &start_iter, i);
+		
+		old_tag = iter_get_depth_tag(&start_iter);
+		
+		if (old_tag != NULL) {
+			gint depth = tag_get_depth(old_tag);
+			if (depth <= 1) {
+				return;
+			}
+			depth--;
+			new_tag = buffer_get_depth_tag(buffer, depth);
+			
+			g_printerr("Increasing indent \n");
+			gtk_text_buffer_get_iter_at_line(buffer, &end_iter, i);
+			gtk_text_iter_set_line_offset(&end_iter, 2);
+			/* Remove old tag and apply new tag */
+			gtk_text_buffer_remove_tag(buffer, old_tag, &start_iter, &end_iter);
+			gtk_text_buffer_apply_tag(buffer, new_tag, &start_iter, &end_iter);
+		}
+	}
+}
+
+void
+on_inc_indent_button_clicked			   (GtkButton		*button,
+											gpointer		 user_data)
+{
+	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(user_data);
+	GtkTextIter start_iter, end_iter;
+	gint start_line, end_line;
+	
+	if (gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter)) {
+		start_line = gtk_text_iter_get_line(&start_iter);
+		end_line = gtk_text_iter_get_line(&end_iter);
+		increase_indent(buffer, start_line, end_line);
+		
+	} else {
+		gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer));
+		start_line = gtk_text_iter_get_line(&start_iter);
+		increase_indent(buffer, start_line, start_line);
+	}
+	
+	gtk_text_buffer_set_modified(buffer, TRUE);
+}
+
+/* TODO: Increase and decrease too similar */
+void
+on_dec_indent_button_clicked			   (GtkButton		*button,
+											gpointer		 user_data)
+{
+	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(user_data);
+	GtkTextIter start_iter, end_iter;
+	gint start_line, end_line;
+	
+	if (gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter)) {
+		start_line = gtk_text_iter_get_line(&start_iter);
+		end_line = gtk_text_iter_get_line(&end_iter);
+		decrease_indent(buffer, start_line, end_line);
+		
+	} else {
+		gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer));
+		start_line = gtk_text_iter_get_line(&start_iter);
+		decrease_indent(buffer, start_line, start_line);
+	}
+	
+	gtk_text_buffer_set_modified(buffer, TRUE);
+}
+
+
+
+

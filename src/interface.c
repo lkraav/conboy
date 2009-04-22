@@ -77,6 +77,7 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 	gtk_text_buffer_create_tag(buffer, "list-item", "foreground", "orange", NULL);
 	
 	gtk_text_buffer_create_tag(buffer, "depth:1", "indent", -20, "left-margin", 25, NULL);
+	gtk_text_buffer_create_tag(buffer, "depth:2", "indent", -20, "left-margin", 50, NULL);
 	
 	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
 }
@@ -125,6 +126,9 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkToolItem *delete_button;
 	GtkToolItem *notes_button;
 	GtkToolItem *highlight_button;
+	GtkToolItem *inc_indent_button;
+	GtkToolItem *dec_indent_button;
+	
 	
 	GtkTextTag *link_internal_tag;
 	
@@ -187,6 +191,13 @@ GtkWidget* create_mainwin(Note *note) {
 
 	/* TOOLBAR */
 	toolbar = gtk_toolbar_new();
+	
+	/****/
+	inc_indent_button = gtk_tool_button_new_from_stock(GTK_STOCK_INDENT);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), inc_indent_button, -1);
+	
+	dec_indent_button = gtk_tool_button_new_from_stock(GTK_STOCK_UNINDENT);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), dec_indent_button, -1);
 	
 	new_button = gtk_tool_button_new_from_stock(GTK_STOCK_NEW);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), new_button, -1);
@@ -318,6 +329,15 @@ GtkWidget* create_mainwin(Note *note) {
 			NULL);
 
 	/* ToolButton signals */
+	
+	g_signal_connect ((gpointer) inc_indent_button, "clicked",
+			G_CALLBACK (on_inc_indent_button_clicked),
+			buffer);
+	
+	g_signal_connect ((gpointer) dec_indent_button, "clicked",
+			G_CALLBACK (on_dec_indent_button_clicked),
+			buffer);
+	
 	g_signal_connect ((gpointer) new_button, "clicked",
 			G_CALLBACK (on_new_button_clicked),
 			NULL);
