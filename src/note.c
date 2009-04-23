@@ -317,7 +317,7 @@ void note_show(Note *note)
 	note_format_title(buffer);
 	note_set_window_title_from_buffer(window, buffer); /* Replace this. And use note->title instead */
 	
-	gtk_widget_show(GTK_WIDGET(window));	
+	gtk_widget_show(GTK_WIDGET(window));
 	
 	gtk_text_buffer_set_modified(buffer, FALSE);
 	
@@ -365,8 +365,7 @@ void note_show_existing(Note *note)
 	gtk_text_buffer_place_cursor(buffer, &iter);
 	
 	/* Scroll to cursor position */
-	/* TODO: Does not scroll. Maybe we first need to show the widget?! */
-	gtk_text_view_scroll_to_iter(note->ui->view, &iter, 0.0, TRUE, 0.5, 0.0);
+	gtk_text_view_scroll_to_mark(note->ui->view, gtk_text_buffer_get_insert(buffer), 0.0, TRUE, 0.0, 0.5);
 }
 
 void note_add_active_tag_by_name(Note *note, const gchar *tag_name)
