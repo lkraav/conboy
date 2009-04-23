@@ -64,6 +64,13 @@ main (int argc, char *argv[])
   Note *note;
   osso_context_t *osso_context;
   AppData *app_data;
+  
+  
+  g_printerr("BULLET: >%s< \n", get_bullet_by_depth(1));
+  g_printerr("BULLET: >%s< \n", get_bullet_by_depth(2));
+  g_printerr("BULLET: >%s< \n", get_bullet_by_depth(3));
+  
+  
 
   /* Init GTK */
   gtk_init(&argc, &argv);

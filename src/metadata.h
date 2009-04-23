@@ -22,7 +22,8 @@
 #include <gconf/gconf-client.h>
 #include <hildon/hildon-program.h>
 
-#define BULLET "\342\200\242 "
+/*#define BULLET "\342\200\242 "*/
+/*#define BULLET "\u2022 "*/
 
 typedef struct
 {
@@ -81,7 +82,9 @@ typedef struct
 
 AppData* get_app_data();
 
-/*AppData* init_app_data(const gchar *user_path);*/
+const gchar* get_bullet_by_depth(gint depth);
+
+const gchar* get_bullet_by_depth_tag(GtkTextTag *tag);
 
 GList* create_note_list(AppData *app_data);
 

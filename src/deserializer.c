@@ -275,10 +275,8 @@ void handle_end_element(ParseContext *ctx, xmlTextReader *reader) {
 GtkTextTag* get_depth_tag(ParseContext *ctx, GtkTextBuffer *buffer, gchar* name) {
 	
 	GtkTextTag *tag;
-	gchar *tmp;
 	gchar depth[5] = {0};
 	gchar *tag_name;
-	gchar *color;
 	
 	/* TODO: This is for debugging. Remove. */
 	if (strncmp(name, "list-item", 9) == 0) {
@@ -312,7 +310,6 @@ void handle_text_element(ParseContext *ctx, xmlTextReader *reader, Note *note)
 	GtkTextMark *mark;
 	GSList *tag_stack;
 	GtkTextTag *depth_tag;
-	GtkTextTag *list_item_tag;
 	GtkTextTag *tag;
 	gint line_num;
 	gboolean bullet_was_inserted;
@@ -365,7 +362,7 @@ void handle_text_element(ParseContext *ctx, xmlTextReader *reader, Note *note)
 		/* Insert bullet only if we are at the very beginning of a line */
 		depth_tag = get_depth_tag(ctx, buffer, "depth");
 		if (gtk_text_iter_get_line_offset(iter) == 0) {
-			gtk_text_buffer_insert_with_tags(buffer, iter, BULLET, -1, depth_tag, NULL);
+			gtk_text_buffer_insert_with_tags(buffer, iter, get_bullet_by_depth(ctx->depth), -1, depth_tag, NULL);
 			bullet_was_inserted = TRUE;
 		}
 		
