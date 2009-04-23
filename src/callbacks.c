@@ -50,6 +50,9 @@ static void change_format(GtkTextBuffer *buffer, const gchar* tag_name, GtkWidge
 	UserInterface *ui = note->ui;
 	GtkTextIter start_iter, end_iter;
 	gboolean activate;
+	gint tmp;
+	
+	g_printerr("DEBUG: ____ CHANGE_FORMAT CLICKED \n");
 	
 	if (GTK_IS_TOGGLE_TOOL_BUTTON(widget)) {
 		activate = gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(widget));
@@ -62,13 +65,13 @@ static void change_format(GtkTextBuffer *buffer, const gchar* tag_name, GtkWidge
 	
 	/* Set state of buttons and menu items */
 	if (widget == GTK_WIDGET(button) || button == NULL) {
-		g_signal_handlers_block_matched(item, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);	
+		g_signal_handlers_block_matched(item, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, note);
 		gtk_check_menu_item_set_active(item, activate);
-		g_signal_handlers_unblock_matched(item, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
+		g_signal_handlers_unblock_matched(item, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, note);
 	} else if (widget == GTK_WIDGET(item) || item == NULL) {
-		g_signal_handlers_block_matched(button, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);	
+		g_signal_handlers_block_matched(button, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, note);
 		gtk_toggle_tool_button_set_active(button, activate);
-		g_signal_handlers_unblock_matched(button, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
+		g_signal_handlers_unblock_matched(button, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, note);
 	} else {
 		g_printerr("ERROR: change_format(): GtkToggleToolButton or GtkCheckMenuItem must be equal to GtkWidget.\n");
 	}
@@ -918,9 +921,7 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 											 gint			len,
 											 gpointer		user_data)
 {
-	if (len != 1) {
-		return;
-	} else {
+	if (len == 1) {
 		GSList *active_tags = ((Note*)user_data)->active_tags;
 		GtkTextIter *start_iter = gtk_text_iter_copy(end_iter);
 		gtk_text_iter_backward_char(start_iter);
@@ -931,7 +932,12 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 			gtk_text_buffer_apply_tag(buffer, active_tags->data, start_iter, end_iter);
 			active_tags = active_tags->next;
 		}
+		return;
 	}
+	
+	/* Insert from copy & past */
+	g_printerr("Multichar insert \n");
+	
 }
 
 /*
