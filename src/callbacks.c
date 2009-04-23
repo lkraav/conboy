@@ -41,6 +41,9 @@
 #include "serializer.h"
 #include "deserializer.h"
 
+/* Private. TODO: Move to some public file */
+GtkTextTag* iter_get_depth_tag(GtkTextIter* iter);
+
 static void change_format(GtkTextBuffer *buffer, const gchar* tag_name, GtkWidget *widget, GtkToggleToolButton *button, GtkCheckMenuItem *item, Note *note)
 {	
 	UserInterface *ui = note->ui;
@@ -184,6 +187,7 @@ add_bullets(GtkTextBuffer *buffer, gint start_line, gint end_line)
 {
 	gint i = 0;
 	GtkTextIter start_iter, end_iter;
+	gint total_lines = gtk_text_buffer_get_line_count(buffer);
 	
 	/* For each selected line */
 	for (i = start_line; i <= end_line; i++) {
@@ -210,9 +214,39 @@ add_bullets(GtkTextBuffer *buffer, gint start_line, gint end_line)
 	}
 	
 	/* Surround everything it with "list" tags */
+	/* Check line above and below. If one or both are bullet lines, include the newline chars at the beginning and the end */
+	/* This is done, so that there are no gaps in the <list> tag and that it really surrounds the whole list. */
+	
+	/* Set start iter TODO: This if statement is not elegant at all.*/
+	if (start_line > 0) {
+		gtk_text_buffer_get_iter_at_line(buffer, &start_iter, start_line - 1);
+		if (iter_get_depth_tag(&start_iter) != NULL) {
+			gtk_text_iter_forward_to_line_end(&start_iter);
+		} else {
+			gtk_text_buffer_get_iter_at_line(buffer, &start_iter, start_line);
+		}
+	} else {
+		gtk_text_buffer_get_iter_at_line(buffer, &start_iter, start_line);
+	}
+	
+	/* Set end iter TODO: This if statement is not elegant at all. */
+	if (end_line < total_lines - 1) {
+		gtk_text_buffer_get_iter_at_line(buffer, &end_iter, end_line + 1);
+		if (iter_get_depth_tag(&end_iter) == NULL) {
+			gtk_text_buffer_get_iter_at_line(buffer, &end_iter, end_line);
+			gtk_text_iter_forward_to_line_end(&end_iter);
+		}
+	} else {
+		gtk_text_buffer_get_iter_at_line(buffer, &end_iter, end_line);
+		gtk_text_iter_forward_to_line_end(&end_iter);
+	}
+	
+	/****/
+	/*
 	gtk_text_buffer_get_iter_at_line(buffer, &start_iter, start_line);
 	gtk_text_buffer_get_iter_at_line(buffer, &end_iter, end_line);
 	gtk_text_iter_forward_to_line_end(&end_iter);
+	*/
 	gtk_text_buffer_apply_tag_by_name(buffer, "list", &start_iter, &end_iter);
 }
 
@@ -227,8 +261,13 @@ remove_bullets(GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_
 	gtk_text_buffer_get_iter_at_line(buffer, start_iter, start_line);
 	gtk_text_buffer_get_iter_at_line(buffer, end_iter, end_line);
 	gtk_text_iter_forward_to_line_end(end_iter);
+	/***/
+	/* Include the newline char before and after this line */
+	gtk_text_iter_backward_char(start_iter);
+	gtk_text_iter_forward_char(end_iter);
+	/**/
 	
-	gtk_text_buffer_remove_tag_by_name(buffer, "depth:1", start_iter, end_iter);
+	gtk_text_buffer_remove_tag_by_name(buffer, "depth:1", start_iter, end_iter); /* TODO: Hardcoded depth:1 */
 	gtk_text_buffer_remove_tag_by_name(buffer, "list-item", start_iter, end_iter);
 	gtk_text_buffer_remove_tag_by_name(buffer, "list", start_iter, end_iter);
 		
@@ -252,8 +291,6 @@ on_bullets_button_clicked				(GtkWidget		*widget,
 	GtkCheckMenuItem *item = ui->menu_bullets;
 	GtkTextIter start_iter, end_iter;
 	gboolean activate;
-	
-	g_printerr("__________ on_bullets_button_clicked() \n");
 	
 	/* TODO: The first two ifs are the same as in change_format() */
 	if (GTK_IS_TOGGLE_TOOL_BUTTON(widget)) {
@@ -306,9 +343,11 @@ on_bullets_button_clicked				(GtkWidget		*widget,
 			gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter);
 			remove_bullets(buffer, &start_iter, &end_iter);
 			
+			note_remove_active_tag_by_name(note, "list-item");
+			note_remove_active_tag_by_name(note, "list");
+			
 		} else {
 			/* Nothing is selected */
-			GtkTextTag *tag;
 			gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer));
 			gtk_text_buffer_get_iter_at_mark(buffer, &end_iter, gtk_text_buffer_get_insert(buffer));		
 			remove_bullets(buffer, &start_iter, &end_iter);
@@ -968,7 +1007,6 @@ void increase_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 			depth++;
 			new_tag = buffer_get_depth_tag(buffer, depth);
 			
-			g_printerr("Increasing indent \n");
 			gtk_text_buffer_get_iter_at_line(buffer, &end_iter, i);
 			gtk_text_iter_set_line_offset(&end_iter, 2);
 			/* Remove old tag and apply new tag */
@@ -999,7 +1037,6 @@ void decrease_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 			depth--;
 			new_tag = buffer_get_depth_tag(buffer, depth);
 			
-			g_printerr("Increasing indent \n");
 			gtk_text_buffer_get_iter_at_line(buffer, &end_iter, i);
 			gtk_text_iter_set_line_offset(&end_iter, 2);
 			/* Remove old tag and apply new tag */

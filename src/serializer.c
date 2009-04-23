@@ -55,6 +55,7 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 		return;
 	}
 	
+	/* User tag_get_depth() here. Currently in callbacks.c */
 	/* If a <depth> tag, ignore */
 	if (strncmp(tag_name, "depth", 5) == 0) {
 		is_bullet = TRUE;
@@ -73,8 +74,10 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 	}
 	
 	/* It is a <list-item:*> tag */
+	/*
 	g_printerr("depth    : %i \n", depth);
 	g_printerr("new_depth: %i \n", new_depth);
+	*/
 	
 	if (new_depth < depth) {
 		gint diff = depth - new_depth;
@@ -256,17 +259,13 @@ void write_content(xmlTextWriter *writer, Note *note)
 		write_text(text, writer);
 	}
 	
+	/* TODO: Free this stuff */
 	/*
 	g_slist_free(start_tags);
 	g_slist_free(end_tags);
 	g_free(text);
 	*/
-	/*
-	gtk_text_iter_free(&start);
-	gtk_text_iter_free(&end);
-	gtk_text_iter_free(iter);
-	gtk_text_iter_free(old_iter);
-	*/
+	
 	
 	/**************************************************/
 	  
