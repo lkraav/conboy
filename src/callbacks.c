@@ -825,7 +825,33 @@ void print_tags(Note *note) {
 	}
 }
 */
+static
+gboolean line_needs_bullet(GtkTextBuffer *buffer, gint line_number)
+{
+	GtkTextIter iter;
+	gtk_text_buffer_get_iter_at_line(buffer, &iter, line_number);
+	
+	while (!gtk_text_iter_ends_line(&iter)) {
+		switch (gtk_text_iter_get_char(&iter))
+		{
+		case ' ':
+			gtk_text_iter_forward_char(&iter);
+			break;
+			
+		case '*':
+		case '-':
+			gtk_text_iter_forward_char(&iter);
+			return (gtk_text_iter_get_char(&iter) == ' ');
+			break;
+		
+		default:
+			return FALSE;
+		}
+	}
+	return FALSE;
+}
 
+/* TODO: This function must be cut into smaller parts */
 static gboolean add_new_line(Note *note)
 {
 	GtkTextBuffer *buffer = note->ui->buffer;
@@ -835,60 +861,114 @@ static gboolean add_new_line(Note *note)
 	
 	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
 	gtk_text_iter_set_line_offset(&iter, 0);
-	
-	/* If this line is not a bullet line, return */
 	depth_tag = iter_get_depth_tag(&iter);
-	if (depth_tag == NULL) {
-		g_printerr("Not a bullet line \n");
-		return FALSE;
-	}
 	
-	/* If this a bullet line, and not empty, add new bullet. Else remove bullet. */
-	gtk_text_iter_forward_to_line_end(&iter);		
-	if (gtk_text_iter_get_line_offset(&iter) > 2) {
-		GSList *tmp;
-		
-		/* Remove all tags but <list> from active tags */
-		tmp = g_slist_copy(note->active_tags);
-		g_slist_free(note->active_tags);
-		note->active_tags = NULL;
-		note_add_active_tag_by_name(note, "list");
-		
-		/* Insert newline and bullet */
-		gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
-		gtk_text_buffer_insert(buffer, &iter, "\n", -1);
-		line = gtk_text_iter_get_line(&iter);
-		add_bullets(buffer, line, line, depth_tag);
-		
-		/* Add all tags back to active tags */
-		note->active_tags = tmp;
-		
-		return TRUE;
+	/* If line starts with a bullet */
+	if (depth_tag != NULL) {
+	
+		/* If line is not empty, add new bullet. Else remove bullet. */
+		gtk_text_iter_forward_to_line_end(&iter);		
+		if (gtk_text_iter_get_line_offset(&iter) > 2) {
+			GSList *tmp;
+			
+			/* Remove all tags but <list> from active tags */
+			tmp = g_slist_copy(note->active_tags);
+			g_slist_free(note->active_tags);
+			note->active_tags = NULL;
+			note_add_active_tag_by_name(note, "list");
+			
+			/* Insert newline and bullet */
+			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
+			line = gtk_text_iter_get_line(&iter);
+			add_bullets(buffer, line, line, depth_tag);
+			
+			/* Add all tags back to active tags */
+			note->active_tags = tmp;
+			
+			return TRUE;
+			
+		} else {
+			/* Remove bullet and insert newline */
+			GtkTextTag *tag;
+			GtkTextIter *start = gtk_text_iter_copy(&iter);
+			
+			/* Disable list and list-item tags */
+			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list-item");
+			note_remove_active_tag(note, tag);
+			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list");
+			note_remove_active_tag(note, tag);
+			
+			/* Delete the bullet and the last newline */
+			gtk_text_iter_set_line_offset(start, 0);
+			gtk_text_iter_backward_char(start);
+			gtk_text_buffer_remove_all_tags(buffer, start, &iter);
+			gtk_text_buffer_delete(buffer, start, &iter);
+			
+			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
+			
+			/* Disable the bullet button */
+			on_textview_cursor_moved(buffer, &iter, gtk_text_buffer_get_insert(buffer) ,note);
+			
+			return TRUE;
+		}
 		
 	} else {
-		/* Remove bullet and insert newline */
-		GtkTextTag *tag;
-		GtkTextIter *start = gtk_text_iter_copy(&iter);
-		
-		/* Disable list and list-item tags */
-		tag = gtk_text_tag_table_lookup(buffer->tag_table, "list-item");
-		note_remove_active_tag(note, tag);
-		tag = gtk_text_tag_table_lookup(buffer->tag_table, "list");
-		note_remove_active_tag(note, tag);
-		
-		/* Delete the bullet and the last newline */
-		gtk_text_iter_set_line_offset(start, 0);
-		gtk_text_iter_backward_char(start);
-		gtk_text_buffer_remove_all_tags(buffer, start, &iter);
-		gtk_text_buffer_delete(buffer, start, &iter);
-		
-		gtk_text_buffer_insert(buffer, &iter, "\n", -1);
-		
-		/* Disable the bullet button */
-		on_textview_cursor_moved(buffer, &iter, gtk_text_buffer_get_insert(buffer) ,note);
-		
-		return TRUE;
+	
+		/* If line start with a "- " or "- *" */
+		if (line_needs_bullet(buffer, gtk_text_iter_get_line(&iter))) {
+			GtkTextIter *end_iter;
+			
+			gtk_text_iter_set_line_offset(&iter, 0);
+			end_iter = gtk_text_iter_copy(&iter);
+			line = gtk_text_iter_get_line(&iter);
+			
+			/* Skip trailing spaces */
+			while (gtk_text_iter_get_char(end_iter) == ' ') {
+				gtk_text_iter_forward_char(end_iter);
+			}
+			/* Skip "* " or "- " */ 
+			gtk_text_iter_forward_chars(end_iter, 2);
+			
+			/* Delete this part */
+			gtk_text_buffer_delete(buffer, &iter, end_iter);
+			
+			/* Add bullet for this line */
+			add_bullets(buffer, line, line, buffer_get_depth_tag(buffer, 1));
+			
+			
+			/* Copied from above */
+			
+			GSList *tmp;
+						
+			/* Remove all tags but <list> from active tags */
+			tmp = g_slist_copy(note->active_tags);
+			g_slist_free(note->active_tags);
+			note->active_tags = NULL;
+			note_add_active_tag_by_name(note, "list");
+			
+			/* Insert newline and bullet */
+			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
+			line = gtk_text_iter_get_line(&iter);
+			add_bullets(buffer, line, line, buffer_get_depth_tag(buffer, 1));
+			
+			/* Add all tags back to active tags */
+			note->active_tags = tmp;
+			
+			/* Turn on the list-item tag from here on */
+			note_add_active_tag_by_name(note, "list-item");
+			
+			/* Revaluate (turn on) the bullet button */
+			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+			on_textview_cursor_moved(buffer, &iter, gtk_text_buffer_get_insert(buffer), note);
+			
+			return TRUE;
+		}
+	
 	}
+	
+	return FALSE;
 	
 }
 
