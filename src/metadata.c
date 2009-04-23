@@ -69,14 +69,15 @@ AppData* get_app_data() {
 	return _app_data;
 }
 
-/*char _bullets[3][4] = {"\u2022 ", "\u2218 ", "\u2023 "};   \0xE2 \0x88 \0x98*/
-char *_bullets[] = {"\u2022 ", "\u2218 ", "\u2023 ", "\u2043 ", "\u204d ", "\u2219 ", "\u25e6 "};
+/* char *_bullets[] = {"\u2022 ", "\u2218 ", "\u2023 ", "\u2043 ", "\u204d ", "\u2219 ", "\u25e6 "}; */
+/* These 3 bullets work with diablo and standard font */
+char *_bullets[] = {"\u2022 ", "\u25e6 ", "\u2219 "};
 const gchar* get_bullet_by_depth(gint depth) {
 	if (depth <= 0) {
 		g_printerr("ERROR: get_bullets_by_depth(): depth must be at least 1.\n");
 		return "\u2022 ";
 	}
-	return _bullets[(depth - 1) % 7];
+	return _bullets[(depth - 1) % 3];
 }
 
 const gchar* get_bullet_by_depth_tag(GtkTextTag *tag) {
