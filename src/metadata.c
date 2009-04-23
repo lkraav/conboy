@@ -76,7 +76,7 @@ const gchar* get_bullet_by_depth(gint depth) {
 		g_printerr("ERROR: get_bullets_by_depth(): depth must be at least 1.\n");
 		return "\u2022 ";
 	}
-	return _bullets[depth % 7];
+	return _bullets[(depth - 1) % 7];
 }
 
 const gchar* get_bullet_by_depth_tag(GtkTextTag *tag) {

@@ -991,6 +991,7 @@ GtkTextTag* iter_get_depth_tag(GtkTextIter* iter)
 		if (tag_is_depth_tag(tags->data)) {
 			return tags->data;
 		}
+		tags = tags->next;
 	}
 	return NULL;
 }
@@ -1021,15 +1022,8 @@ void increase_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 			/* Delete old bullet */
 			gtk_text_buffer_delete(buffer, &start_iter, &end_iter);
 			
-			/* Insert new bullet with <depth> tag */
-			gtk_text_buffer_get_iter_at_line(buffer, &start_iter, i);
-			gtk_text_buffer_insert_with_tags(buffer, &start_iter, get_bullet_by_depth_tag(new_tag), -1, new_tag, NULL);
-			
-			/* Remove old tag and apply new tag */
-			/*
-			gtk_text_buffer_remove_tag(buffer, old_tag, &start_iter, &end_iter);
-			gtk_text_buffer_apply_tag(buffer, new_tag, &start_iter, &end_iter);
-			*/
+			/* Add new bullet with new tag */
+			add_bullets(buffer, i, i, new_tag);
 		}
 	}
 }
@@ -1064,15 +1058,8 @@ void decrease_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 			/* Delete old bullet */
 			gtk_text_buffer_delete(buffer, &start_iter, &end_iter);
 			
-			/* Insert new bullet with <depth> tag */
-			gtk_text_buffer_get_iter_at_line(buffer, &start_iter, i);
-			gtk_text_buffer_insert_with_tags(buffer, &start_iter, get_bullet_by_depth_tag(new_tag), -1, new_tag, NULL);
-			
-			/* Remove old tag and apply new tag */
-			/*
-			gtk_text_buffer_remove_tag(buffer, old_tag, &start_iter, &end_iter);
-			gtk_text_buffer_apply_tag(buffer, new_tag, &start_iter, &end_iter);
-			*/
+			/* Add new bullet with new tag */
+			add_bullets(buffer, i, i, new_tag);
 		}
 	}
 }
