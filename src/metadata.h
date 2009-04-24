@@ -35,6 +35,7 @@ typedef struct
 	gint           font_size;
 	GConfClient   *client;
 	HildonProgram *program;
+	gboolean	   fullscreen;
 } AppData;
 
 typedef struct

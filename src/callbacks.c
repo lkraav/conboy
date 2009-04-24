@@ -776,6 +776,8 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 {
 	Note *note = (Note*)user_data;
 	GtkWidget *window = GTK_WIDGET(note->ui->window);
+	AppData *app_data = get_app_data();
+	GList *open_notes;
 	
 	switch (event->keyval) {
 	case HILDON_HARDKEY_INCREASE:
@@ -793,14 +795,23 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 		return TRUE;
 	
 	case HILDON_HARDKEY_FULLSCREEN:
-		/* TODO: Implement full screen. */
-		/* Should this be on application level: If fullscreen, then all windows fullscreen
-		 * Or on window leve: Toggle fullscreen on/off for every window
-		 * Or can only be the window which is active be fullscreen? */
-		/*
-		gtk_window_fullscreen(note->window);
-		gtk_window_unfullscreen(note->window);
-		*/
+		/* Toggle fullscreen */
+		app_data->fullscreen = !app_data->fullscreen;
+		
+		/* Set all open windows to fullscreen or unfullscreen */
+		open_notes = app_data->open_notes;
+		while (open_notes != NULL) {
+			Note *open_note = (Note*)open_notes->data;
+			if (app_data->fullscreen) {
+				gtk_window_fullscreen(GTK_WINDOW(open_note->ui->window));
+			} else {
+				gtk_window_unfullscreen(GTK_WINDOW(open_note->ui->window));
+			}
+			open_notes = open_notes->next;
+		}
+		
+		/* Focus again on the active note */
+		note_set_focus(note);
 		return TRUE;
 	}
 	
@@ -991,27 +1002,55 @@ on_text_view_key_pressed                      (GtkWidget   *widget,
 
 void
 on_text_buffer_insert_text					(GtkTextBuffer *buffer,
-											 GtkTextIter   *end_iter,
+											 GtkTextIter   *iter,
 											 gchar		   *text,
 											 gint			len,
 											 gpointer		user_data)
 {
+	/* Finding titles to create links */
+	/*
+	GtkTextIter *start_iter = gtk_text_iter_copy(iter);
+	GtkTextIter *end_iter = gtk_text_iter_copy(iter);
+	AppData *app_data = get_app_data();
+	GList *all_notes;
+	gchar *sentence;
+	
+	gtk_text_iter_backward_sentence_start(start_iter);
+	gtk_text_iter_forward_sentence_end(end_iter);
+	
+	sentence = gtk_text_iter_get_slice(start_iter, end_iter);
+	
+	all_notes = app_data->all_notes;
+	while (all_notes != NULL) {
+		Note *note = (Note*)all_notes->data;
+		gchar *title = note->title;
+		gchar *found = g_strstr_len(sentence, -1, title);
+		
+		if (found != NULL) {
+			g_printerr("__________ H I T [%s] ____________ \n", title);
+		}
+		
+		all_notes = all_notes->next;
+	}
+
+	g_printerr("TEXT: %s \n", gtk_text_iter_get_slice(start_iter, end_iter));
+	*/
+	
+	
+	/* Applying active tags while typing */
 	if (len == 1) {
 		GSList *active_tags = ((Note*)user_data)->active_tags;
-		GtkTextIter *start_iter = gtk_text_iter_copy(end_iter);
+		GtkTextIter *start_iter = gtk_text_iter_copy(iter);
 		gtk_text_iter_backward_char(start_iter);
 		
-		gtk_text_buffer_remove_all_tags(buffer, start_iter, end_iter);
+		gtk_text_buffer_remove_all_tags(buffer, start_iter, iter);
 		
 		while (active_tags != NULL && active_tags->data != NULL) {
-			gtk_text_buffer_apply_tag(buffer, active_tags->data, start_iter, end_iter);
+			gtk_text_buffer_apply_tag(buffer, active_tags->data, start_iter, iter);
 			active_tags = active_tags->next;
 		}
 		return;
 	}
-	
-	/* Insert from copy & past */
-	g_printerr("Multichar insert \n");
 	
 }
 

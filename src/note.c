@@ -299,7 +299,16 @@ void note_show(Note *note)
 	buffer = note->ui->buffer;
 	window = GTK_WINDOW(note->ui->window);
 	
-	gtk_window_set_default_size(window, 500, 300);
+	/* Set window width/height, otherwise scroll to cursor doesn't work correctly */
+	gtk_window_set_default_size(window, 720, 420);
+	
+	/* Set to fullscreen or not */
+	if (app_data->fullscreen) {
+		gtk_window_fullscreen(GTK_WINDOW(note->ui->window));
+	} else {
+		gtk_window_unfullscreen(GTK_WINDOW(note->ui->window));
+	}
+	
 	hildon_program_add_window(app_data->program, HILDON_WINDOW(window));
 	
 	/* Block signals on TextBuffer until we are done with initializing the content. This is to prevent saves etc. */
