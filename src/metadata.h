@@ -50,12 +50,14 @@ typedef struct
 	GtkToggleToolButton *button_highlight;
 	GtkToggleToolButton *button_bullets;
 	
-	GtkCheckMenuItem    *menu_bold;
-	GtkCheckMenuItem    *menu_italic;
-	GtkCheckMenuItem	*menu_fixed;
-	GtkCheckMenuItem    *menu_strike;
-	GtkCheckMenuItem    *menu_highlight;
-	GtkCheckMenuItem    *menu_bullets;
+	GtkToggleAction     *action_bold;
+	GtkToggleAction     *action_italic;
+	GtkToggleAction	    *action_fixed;
+	GtkToggleAction     *action_strike;
+	GtkToggleAction     *action_highlight;
+	GtkToggleAction     *action_bullets;
+	GtkAction           *action_link;
+	GtkRadioAction		*action_font_small;
 
 } UserInterface;
 

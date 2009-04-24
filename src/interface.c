@@ -67,20 +67,7 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 	
 	gtk_text_buffer_create_tag(buffer, "_title", "foreground", "blue", "underline", PANGO_UNDERLINE_SINGLE, "scale", PANGO_SCALE_X_LARGE, NULL);
 	
-	/* For debugging */
-	/*
-	gtk_text_buffer_create_tag(buffer, "list-item-A:1", "indent", -20, "left-margin", 25, "foreground", "red", NULL);
-	gtk_text_buffer_create_tag(buffer, "list-item-B:1", "indent", -20, "left-margin", 25, "foreground", "orange", NULL);
-	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
-	*/
-	
 	gtk_text_buffer_create_tag(buffer, "list-item", "foreground", "orange", NULL);
-	
-	/*
-	gtk_text_buffer_create_tag(buffer, "depth:1", "indent", -20, "left-margin", 25, NULL);
-	gtk_text_buffer_create_tag(buffer, "depth:2", "indent", -20, "left-margin", 50, NULL);
-	*/
-	
 	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
 }
 
@@ -97,13 +84,67 @@ void set_menu_item_label(GtkMenuItem *item, const gchar *text)
 	gtk_label_set_markup(GTK_LABEL(children->data), text);		
 }
 
+
+
+GtkMenu* create_format_menu(UserInterface *ui, GtkAccelGroup *accel_group) {
+	
+	GtkWidget *menu;
+	GtkWidget *menu_bold;
+	GtkWidget *menu_italic;
+	GtkWidget *menu_strike;
+	GtkWidget *menu_highlight;
+	GtkWidget *menu_fixed;
+	GtkWidget *menu_bullets;
+	
+	menu = gtk_menu_new();
+		
+	menu_bold = gtk_check_menu_item_new_with_label("");
+	menu_italic = gtk_check_menu_item_new_with_label("");
+	menu_strike = gtk_check_menu_item_new_with_label("");
+	menu_highlight = gtk_check_menu_item_new_with_label("");
+	menu_fixed = gtk_check_menu_item_new_with_label("");
+	menu_bullets = gtk_check_menu_item_new_with_label("Bullets");
+	
+	set_menu_item_label(GTK_MENU_ITEM(menu_bold), "<b>Bold</b>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_italic), "<i>Italic</i>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_strike), "<s>Strikeout</s>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_highlight), "<span background=\"yellow\">Highlight</span>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_fixed), "<tt>Fixed Width</tt>");
+	
+	gtk_widget_add_accelerator(menu_bold, "activate", accel_group, GDK_b, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menu_italic, "activate", accel_group, GDK_i, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menu_strike, "activate", accel_group, GDK_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menu_highlight, "activate", accel_group, GDK_h, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	gtk_widget_add_accelerator(menu_fixed, "activate", accel_group, GDK_f, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	
+	gtk_menu_append(menu, gtk_separator_menu_item_new());
+	gtk_menu_append(menu, menu_bold);
+	gtk_menu_append(menu, menu_italic);
+	gtk_menu_append(menu, menu_strike);
+	gtk_menu_append(menu, menu_highlight);
+	gtk_menu_append(menu, menu_fixed);
+	gtk_menu_append(menu, gtk_separator_menu_item_new());
+	gtk_menu_append(menu, menu_bullets);
+	gtk_menu_append(menu, gtk_separator_menu_item_new());
+	
+	/*
+	ui->menu_bold = menu_bold;
+	ui->menu_bullets = menu_bullets;
+	ui->menu_fixed = menu_fixed;
+	ui->menu_highlight = menu_highlight;
+	ui->menu_italic = menu_italic;
+	ui->menu_strike = menu_strike;
+	*/
+}
+
 GtkWidget* create_mainwin(Note *note) {
 	
 	UserInterface *ui = note->ui;
 	
 	GtkWidget *mainwin;
 	GtkWidget *vbox1;
-	GtkWidget *menu;
+	GtkMenuShell *main_menu;
+	GtkMenuShell *text_style_menu;
 	
 	GtkWidget *menu_new;
 	GtkWidget *menu_bold;
@@ -113,26 +154,50 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkWidget *menu_fixed;
 	GtkWidget *menu_bullets;
 	GtkWidget *menu_quit;
-
+	GtkWidget *menu_text_style;
+	GtkWidget *menu_inc_indent;
+	GtkWidget *menu_dec_indent;
+	GtkWidget *menu_font_small;
+	GtkWidget *menu_font_normal;
+	GtkWidget *menu_font_large;
+	GtkWidget *menu_font_huge;
+	
 	GtkWidget *toolbar;
 	GtkWidget *scrolledwindow1;
 	GtkWidget *textview;
 	GtkTextBuffer *buffer;
 	
-	GtkToolItem *new_button;
-	GtkToolItem *bold_button;
-	GtkToolItem *italic_button;
-	GtkToolItem *strike_button;
-	GtkToolItem *bullets_button;
-	GtkToolItem *link_button;
-	GtkToolItem *delete_button;
-	GtkToolItem *notes_button;
-	GtkToolItem *highlight_button;
-	GtkToolItem *inc_indent_button;
-	GtkToolItem *dec_indent_button;
+	GtkToolItem *button_link;
+	GtkToolItem *button_delete;
+	GtkToolItem *button_notes;
+	GtkToolItem *button_inc_indent;
+	GtkToolItem *button_dec_indent;
+	GtkToolItem *button_style;
 	
+	GtkAction *action_new;
+	GtkAction *action_delete;
+	GtkAction *action_quit;
+	GtkAction *action_notes;
+	GtkAction *action_bold;
+	GtkAction *action_fixed;
+	GtkAction *action_highlight;
+	GtkAction *action_italic;
+	GtkAction *action_strike;
+	GtkAction *action_bullets;
+	GtkAction *action_link;
+	GtkAction *action_inc_indent;
+	GtkAction *action_dec_indent;
+	GtkAction *action_text_style;
+	GtkAction *action_zoom_in;
+	GtkAction *action_zoom_out;
+	GtkAction *action_font_small;
+	GtkAction *action_font_normal;
+	GtkAction *action_font_large;
+	GtkAction *action_font_huge;
 	
 	GtkTextTag *link_internal_tag;
+	
+	GSList *action_group = NULL;
 	
 	GtkAccelGroup *accel_group;
 	
@@ -149,89 +214,142 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_widget_show(vbox1);
 	gtk_container_add(GTK_CONTAINER(mainwin), vbox1);
 
+	/* ACTIONS */
+	action_bold = GTK_ACTION(gtk_toggle_action_new("bold", "Bold", NULL, GTK_STOCK_BOLD));
+	action_bullets = GTK_ACTION(gtk_toggle_action_new("bullets", "Bullets", NULL, NULL));
+	action_dec_indent = GTK_ACTION(gtk_action_new("dec_indent", "Decrease Indent", NULL, GTK_STOCK_UNINDENT));
+	action_delete = GTK_ACTION(gtk_action_new("delete", "Delete Note", NULL, GTK_STOCK_DELETE));
+	action_fixed = GTK_ACTION(gtk_toggle_action_new("monospace", "Fixed Width", NULL, NULL));
+	action_highlight = GTK_ACTION(gtk_toggle_action_new("highlight", "Highlight", NULL, NULL));
+	action_inc_indent = GTK_ACTION(gtk_action_new("inc_indent", "Increase Indent", NULL, GTK_STOCK_INDENT));
+	action_link = GTK_ACTION(gtk_action_new("link", "Link", NULL, GTK_STOCK_REDO));
+	gtk_action_set_sensitive(action_link, FALSE);
+	action_new = GTK_ACTION(gtk_action_new("new", "New Note", NULL, GTK_STOCK_NEW));
+	action_notes = GTK_ACTION(gtk_action_new("open", "Open", NULL, GTK_STOCK_OPEN));
+	action_quit = GTK_ACTION(gtk_action_new("quit", "Close All Notes", NULL, GTK_STOCK_QUIT));
+	action_italic = GTK_ACTION(gtk_toggle_action_new("italic", "Italic", NULL, GTK_STOCK_ITALIC));
+	action_strike = GTK_ACTION(gtk_toggle_action_new("strikethrough", "Strikeout", NULL, GTK_STOCK_STRIKETHROUGH));
+	action_text_style = GTK_ACTION(gtk_action_new("style", "Style", NULL, GTK_STOCK_SELECT_FONT));
+	action_zoom_in = GTK_ACTION(gtk_action_new("zoom_in", "Zoom In", NULL, GTK_STOCK_ZOOM_IN));
+	action_zoom_out = GTK_ACTION(gtk_action_new("zoom_out", "Zoom Out", NULL, GTK_STOCK_ZOOM_OUT));
 	
-	/* MENU */
-	menu = gtk_menu_new();
 	
-	menu_new = gtk_menu_item_new_with_label("Create New Note");
-	menu_bold = gtk_check_menu_item_new_with_label("");
-	menu_italic = gtk_check_menu_item_new_with_label("");
-	menu_strike = gtk_check_menu_item_new_with_label("");
-	menu_highlight = gtk_check_menu_item_new_with_label("");
-	menu_fixed = gtk_check_menu_item_new_with_label("");
-	menu_bullets = gtk_check_menu_item_new_with_label("Bullets");
-	menu_quit = gtk_menu_item_new_with_label("Close all notes");
+	action_font_small = GTK_ACTION(gtk_radio_action_new("size:small", "Small", NULL, NULL, 0));
+	action_font_normal = GTK_ACTION(gtk_radio_action_new("size:normal", "Normal", NULL, NULL, 1));
+	action_font_large = GTK_ACTION(gtk_radio_action_new("size:large", "Large", NULL, NULL, 2));
+	action_font_huge = GTK_ACTION(gtk_radio_action_new("size:huge", "Huge", NULL, NULL, 3));
+	
+	gtk_radio_action_set_group(action_font_small, action_group);
+	action_group = gtk_radio_action_get_group(action_font_small);
+	gtk_radio_action_set_group(action_font_normal, action_group);
+	action_group = gtk_radio_action_get_group(action_font_normal);
+	gtk_radio_action_set_group(action_font_large, action_group);
+	action_group = gtk_radio_action_get_group(action_font_large);
+	gtk_radio_action_set_group(action_font_huge, action_group);
+	action_group = gtk_radio_action_get_group(action_font_huge);
+	gtk_radio_action_set_current_value(action_font_normal, 1);
+	
+	
+	/* FORMAT MENU */
+	text_style_menu = GTK_MENU_SHELL(gtk_menu_new());
+	
+	menu_bold = gtk_action_create_menu_item(action_bold);
+	menu_italic = gtk_action_create_menu_item(action_italic);
+	menu_strike = gtk_action_create_menu_item(action_strike);
+	menu_highlight = gtk_action_create_menu_item(action_highlight);
+	menu_fixed = gtk_action_create_menu_item(action_fixed);
+	menu_bullets = gtk_action_create_menu_item(action_bullets);
+	menu_inc_indent = gtk_action_create_menu_item(action_inc_indent);
+	menu_dec_indent = gtk_action_create_menu_item(action_dec_indent);
+	menu_font_small = gtk_action_create_menu_item(action_font_small);
+	menu_font_normal = gtk_action_create_menu_item(action_font_normal);
+	menu_font_large = gtk_action_create_menu_item(action_font_large);
+	menu_font_huge = gtk_action_create_menu_item(action_font_huge);
 	
 	set_menu_item_label(GTK_MENU_ITEM(menu_bold), "<b>Bold</b>");
 	set_menu_item_label(GTK_MENU_ITEM(menu_italic), "<i>Italic</i>");
 	set_menu_item_label(GTK_MENU_ITEM(menu_strike), "<s>Strikeout</s>");
 	set_menu_item_label(GTK_MENU_ITEM(menu_highlight), "<span background=\"yellow\">Highlight</span>");
 	set_menu_item_label(GTK_MENU_ITEM(menu_fixed), "<tt>Fixed Width</tt>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_font_small), "<span size=\"small\">Small</span>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_font_large), "<span size=\"large\">Large</span>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_font_huge), "<span size=\"x-large\">Huge</span>");
 	
+	gtk_menu_shell_append(text_style_menu, menu_bold);
+	gtk_menu_shell_append(text_style_menu, menu_italic);
+	gtk_menu_shell_append(text_style_menu, menu_strike);
+	gtk_menu_shell_append(text_style_menu, menu_highlight);
+	gtk_menu_shell_append(text_style_menu, menu_fixed);
+	gtk_menu_shell_append(text_style_menu, gtk_separator_menu_item_new());
+	gtk_menu_shell_append(text_style_menu, menu_font_small);
+	gtk_menu_shell_append(text_style_menu, menu_font_normal);
+	gtk_menu_shell_append(text_style_menu, menu_font_large);
+	gtk_menu_shell_append(text_style_menu, menu_font_huge);
+	gtk_menu_shell_append(text_style_menu, gtk_separator_menu_item_new());
+	gtk_menu_shell_append(text_style_menu, menu_bullets);
+	gtk_menu_shell_append(text_style_menu, menu_inc_indent);
+	gtk_menu_shell_append(text_style_menu, menu_dec_indent);
+
+
+	
+	
+	
+	/* MAIN MENU */
+	main_menu = gtk_menu_new();
+	
+	menu_new = gtk_action_create_menu_item(action_new);
+	menu_text_style = gtk_menu_item_new_with_label("Text Style");
+	gtk_menu_item_set_submenu(menu_text_style, text_style_menu);
+	menu_quit = gtk_action_create_menu_item(action_quit);
+	
+	/*
 	gtk_widget_add_accelerator(menu_bold, "activate", accel_group, GDK_b, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 	gtk_widget_add_accelerator(menu_italic, "activate", accel_group, GDK_i, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 	gtk_widget_add_accelerator(menu_strike, "activate", accel_group, GDK_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 	gtk_widget_add_accelerator(menu_highlight, "activate", accel_group, GDK_h, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 	gtk_widget_add_accelerator(menu_fixed, "activate", accel_group, GDK_f, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
 	gtk_widget_add_accelerator(menu_quit, "activate", accel_group, GDK_q, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
+	*/
 	
-	gtk_menu_append(menu, menu_new);
-	gtk_menu_append(menu, gtk_separator_menu_item_new());
-	gtk_menu_append(menu, menu_bold);
-	gtk_menu_append(menu, menu_italic);
-	gtk_menu_append(menu, menu_strike);
-	gtk_menu_append(menu, menu_highlight);
-	gtk_menu_append(menu, menu_fixed);
-	gtk_menu_append(menu, gtk_separator_menu_item_new());
-	gtk_menu_append(menu, menu_bullets);
-	gtk_menu_append(menu, gtk_separator_menu_item_new());
-	gtk_menu_append(menu, menu_quit);
+	gtk_menu_shell_append(main_menu, menu_new);
+	gtk_menu_shell_append(main_menu, menu_new);
+	gtk_menu_shell_append(main_menu, gtk_separator_menu_item_new());
+	gtk_menu_shell_append(main_menu, menu_text_style);
+	gtk_menu_shell_append(main_menu, gtk_separator_menu_item_new());
+	gtk_menu_shell_append(main_menu, menu_quit);
 	
 
 	/* Must be at the end of the menu definition */
-	hildon_window_set_menu(HILDON_WINDOW(mainwin), GTK_MENU(menu));
+	hildon_window_set_menu(HILDON_WINDOW(mainwin), GTK_MENU(main_menu));
 
 	/* TOOLBAR */
 	toolbar = gtk_toolbar_new();
 	
-	/****/
-	inc_indent_button = gtk_tool_button_new_from_stock(GTK_STOCK_INDENT);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), inc_indent_button, -1);
+	/****/	
+	button_dec_indent = gtk_action_create_tool_item(action_dec_indent);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), button_dec_indent, -1);
+	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 70, -1);
 	
-	dec_indent_button = gtk_tool_button_new_from_stock(GTK_STOCK_UNINDENT);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), dec_indent_button, -1);
+	button_inc_indent = gtk_action_create_tool_item(action_inc_indent);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), button_inc_indent, -1);
 	
-	new_button = gtk_tool_button_new_from_stock(GTK_STOCK_NEW);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), new_button, -1);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
 	
-	bold_button = gtk_toggle_tool_button_new();
-	set_tool_button_icon_by_name(GTK_TOOL_BUTTON(bold_button), "qgn_list_gene_bold");
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), bold_button, -1);
-	gtk_widget_set_size_request(GTK_WIDGET(bold_button), 70, -1);
+	button_link = gtk_action_create_tool_item(action_link);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), button_link, -1);
 	
-	italic_button = gtk_toggle_tool_button_new();
-	set_tool_button_icon_by_name(GTK_TOOL_BUTTON(italic_button), "qgn_list_gene_italic");
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), italic_button, -1);
+	button_style = gtk_action_create_tool_item(action_text_style);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), button_style, -1);
 	
-	strike_button = gtk_toggle_tool_button_new_from_stock(GTK_STOCK_STRIKETHROUGH);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), strike_button, -1);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
 	
-	bullets_button = gtk_toggle_tool_button_new();
-	set_tool_button_icon_by_name(GTK_TOOL_BUTTON(bullets_button), "qgn_list_gene_bullets");
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), bullets_button, -1);
-		
-	highlight_button = gtk_toggle_tool_button_new();                 
-	set_tool_button_icon_by_name(GTK_TOOL_BUTTON(highlight_button), "highlighter");
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), highlight_button, -1);
+	button_delete = gtk_action_create_tool_item(action_delete);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), button_delete, -1);
 	
-	link_button = gtk_tool_button_new_from_stock(GTK_STOCK_REDO);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), link_button, -1);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
 	
-	delete_button = gtk_tool_button_new_from_stock(GTK_STOCK_DELETE);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), delete_button, -1);
-	
-	notes_button = gtk_tool_button_new_from_stock(GTK_STOCK_OPEN);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), notes_button, -1);
+	button_notes = gtk_action_create_tool_item(action_notes);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), button_notes, -1);
 	
 
 	gtk_widget_show_all(toolbar);
@@ -278,104 +396,101 @@ GtkWidget* create_mainwin(Note *note) {
 	ui->view = GTK_TEXT_VIEW(textview);
 	ui->buffer = buffer;
 	
-	ui->button_bold = GTK_TOGGLE_TOOL_BUTTON(bold_button);
-	ui->button_bullets = GTK_TOGGLE_TOOL_BUTTON(bullets_button);
-	ui->button_highlight = GTK_TOGGLE_TOOL_BUTTON(highlight_button);
-	ui->button_italic = GTK_TOGGLE_TOOL_BUTTON(italic_button);
-	ui->button_strike = GTK_TOGGLE_TOOL_BUTTON(strike_button);
-	
-	ui->menu_bold = GTK_CHECK_MENU_ITEM(menu_bold);
-	ui->menu_bullets = GTK_CHECK_MENU_ITEM(menu_bullets);
-	ui->menu_highlight = GTK_CHECK_MENU_ITEM(menu_highlight);
-	ui->menu_italic = GTK_CHECK_MENU_ITEM(menu_italic);
-	ui->menu_strike = GTK_CHECK_MENU_ITEM(menu_strike);
-	ui->menu_fixed = GTK_CHECK_MENU_ITEM(menu_fixed);
-	
+	ui->action_bold = GTK_TOGGLE_ACTION(action_bold);
+	ui->action_bullets = GTK_TOGGLE_ACTION(action_bullets);
+	ui->action_highlight = GTK_TOGGLE_ACTION(action_highlight);
+	ui->action_italic = GTK_TOGGLE_ACTION(action_italic);
+	ui->action_strike = GTK_TOGGLE_ACTION(action_strike);
+	ui->action_fixed = GTK_TOGGLE_ACTION(action_fixed);
+	ui->action_link = GTK_ACTION(action_link);
+	ui->action_font_small = GTK_RADIO_ACTION(action_font_small);
 
 	/* Window signals */
-	g_signal_connect (G_OBJECT(mainwin), "delete-event",
+	g_signal_connect(mainwin, "delete-event",
 	        G_CALLBACK(on_window_close_button_clicked),
 	        note);
 	
-	/* MenuItem signals */
-	g_signal_connect ((gpointer) menu_new, "activate",
+	/* Action signals */
+	g_signal_connect(action_new, "activate",
 			G_CALLBACK(on_new_button_clicked),
 			ui);
 	
-	g_signal_connect ((gpointer) menu_bold, "activate",
-			G_CALLBACK(on_bold_button_clicked),
+	g_signal_connect(action_bold, "activate",
+			G_CALLBACK(on_format_button_clicked),
 			note);
 	
-	g_signal_connect ((gpointer) menu_italic, "activate",
-			G_CALLBACK (on_italic_button_clicked),
+	g_signal_connect(action_italic, "activate",
+			G_CALLBACK(on_format_button_clicked),
 			note);
 	
-	g_signal_connect ((gpointer) menu_strike, "activate",
-			G_CALLBACK (on_strike_button_clicked),
+	g_signal_connect(action_strike, "activate",
+			G_CALLBACK(on_format_button_clicked),
 			note);
 	
-	g_signal_connect ((gpointer) menu_highlight, "activate",
-			G_CALLBACK (on_highlight_button_clicked),
+	g_signal_connect(action_highlight, "activate",
+			G_CALLBACK(on_format_button_clicked),
 			note);
 	
-	g_signal_connect ((gpointer) menu_fixed, "activate",
-			G_CALLBACK (on_fixed_button_clicked),
+	g_signal_connect(action_fixed, "activate",
+			G_CALLBACK(on_format_button_clicked),
 			note);
 	
-	g_signal_connect ((gpointer) menu_bullets, "activate",
-			G_CALLBACK (on_bullets_button_clicked),
+	/* It is enough to listen to one action of the radio group */
+	g_signal_connect(action_font_small, "changed",
+			G_CALLBACK(on_font_size_radio_group_changed),
 			note);
 	
-	g_signal_connect ((gpointer) menu_quit, "activate",
-			G_CALLBACK (on_quit_button_clicked),
-			NULL);
-
-	/* ToolButton signals */
-	
-	g_signal_connect ((gpointer) inc_indent_button, "clicked",
-			G_CALLBACK (on_inc_indent_button_clicked),
-			buffer);
-	
-	g_signal_connect ((gpointer) dec_indent_button, "clicked",
-			G_CALLBACK (on_dec_indent_button_clicked),
-			buffer);
-	
-	g_signal_connect ((gpointer) new_button, "clicked",
-			G_CALLBACK (on_new_button_clicked),
-			NULL);
-	
-	g_signal_connect ((gpointer) bold_button, "clicked",
-			G_CALLBACK (on_bold_button_clicked),
-			note);
-	
-	g_signal_connect ((gpointer) italic_button, "clicked",
-			G_CALLBACK (on_italic_button_clicked),
-			note);
-	
-	g_signal_connect ((gpointer) strike_button, "clicked",
-			G_CALLBACK (on_strike_button_clicked),
-			note);
-	
-	g_signal_connect ((gpointer) bullets_button, "clicked",
+	g_signal_connect(action_bullets, "activate",
 			G_CALLBACK(on_bullets_button_clicked),
 			note);
 	
-	g_signal_connect ((gpointer) highlight_button, "clicked",
-			G_CALLBACK (on_highlight_button_clicked),
+	g_signal_connect(action_quit, "activate",
+			G_CALLBACK(on_quit_button_clicked),
+			NULL);
+
+	g_signal_connect(action_inc_indent, "activate",
+			G_CALLBACK(on_inc_indent_button_clicked),
+			buffer);
+	
+	g_signal_connect(action_dec_indent, "activate",
+			G_CALLBACK(on_dec_indent_button_clicked),
+			buffer);
+	
+	g_signal_connect(action_link, "activate",
+			G_CALLBACK(on_link_button_clicked),
 			note);
 	
-	g_signal_connect ((gpointer) link_button, "clicked",
-			G_CALLBACK (on_link_button_clicked),
-			note);
+	g_signal_connect(action_notes, "activate",
+			G_CALLBACK(on_notes_button_clicked),
+			buffer);
 	
-	g_signal_connect ((gpointer) notes_button, "clicked",
-			G_CALLBACK (on_notes_button_clicked),
+	g_signal_connect(action_delete, "activate",
+			G_CALLBACK(on_delete_button_clicked),
+			buffer);
+	
+	g_signal_connect(action_zoom_in, "activate",
+			G_CALLBACK(on_smaller_button_clicked),
 			NULL);
 	
-	g_signal_connect((gpointer)delete_button, "clicked",
-			G_CALLBACK(on_delete_button_clicked),
-			note);
+	g_signal_connect(action_zoom_in, "activate",
+			G_CALLBACK(on_bigger_button_clicked),
+			NULL);
 	
+	g_signal_connect(action_inc_indent, "activate",
+			G_CALLBACK(on_inc_indent_button_clicked),
+			NULL);
+	
+	g_signal_connect(action_dec_indent, "activate",
+			G_CALLBACK(on_dec_indent_button_clicked),
+			NULL);
+	
+	g_signal_connect(action_text_style, "activate",
+			G_CALLBACK(on_style_button_clicked),
+			text_style_menu);
+	
+	
+	
+	/* OTHER SIGNALS */
 	g_signal_connect ((gpointer) buffer, "mark-set",
 			G_CALLBACK (on_textview_cursor_moved),
 			note);

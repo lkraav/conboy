@@ -26,11 +26,11 @@ on_window_close_button_clicked		   (GtkObject		*window,
 										gpointer		 user_data);
 
 void
-on_new_button_clicked					(GtkWidget		*widget,
+on_new_button_clicked					(GtkAction		*action,
 										 gpointer		 user_data);
 
 void
-on_quit_button_clicked                 (GtkButton       *button,
+on_quit_button_clicked                 (GtkAction       *action,
                                         gpointer         user_data);
 
 void
@@ -42,47 +42,40 @@ on_load_button_clicked                 (GtkButton       *button,
                                         gpointer         user_data);
 
 void
-on_bold_button_clicked				   (GtkWidget		*widget,
+on_link_button_clicked				   (GtkAction		*action,
 										gpointer		 user_data);
 
 void
-on_italic_button_clicked			   (GtkWidget		*widget,
+on_format_button_clicked               (GtkAction       *action,
 										gpointer		 user_data);
 
 void
-on_strike_button_clicked			   (GtkWidget		*widget,
+on_bullets_button_clicked              (GtkAction       *action,
+		                                gpointer         user_data);
+
+void
+on_delete_button_clicked			   (GtkAction		*action,
 										gpointer		 user_data);
 
 void
-on_fixed_button_clicked					(GtkWidget		*widget,
-										 gpointer		 user_data);
-
-void
-on_bullets_button_clicked				(GtkWidget		*widget,
-										 gpointer		 user_data);
-
-void
-on_highlight_button_clicked			   (GtkWidget		*widget,
+on_notes_button_clicked				   (GtkAction		*action,
 										gpointer		 user_data);
 
 void
-on_link_button_clicked				   (GtkButton		*button,
+on_smaller_button_clicked			   (GtkAction		*action,
 										gpointer		 user_data);
 
 void
-on_delete_button_clicked			   (GtkButton		*button,
-										gpointer		 user_data);
+on_style_button_clicked                (GtkAction       *action,
+		                                gpointer         user_data);
 
 void
-on_notes_button_clicked				   (GtkButton		*button,
-										gpointer		 user_data);
+on_font_size_radio_group_changed       (GtkRadioAction  *action,
+										GtkRadioAction  *current,
+		                                gpointer         user_data);
 
 void
-on_smaller_button_clicked			   (GtkButton		*button,
-										gpointer		 user_data);
-
-void
-on_bigger_button_clicked				(GtkButton		*button,
+on_bigger_button_clicked				(GtkAction		*action,
 										gpointer		 user_data);
 
 void
@@ -148,6 +141,11 @@ on_inc_indent_button_clicked			   (GtkButton		*button,
 void
 on_dec_indent_button_clicked			   (GtkButton		*button,
 											gpointer		 user_data);
+
+void
+on_bold_action_activated		(GtkAction	*action,
+								 gpointer	 user_data);
+
 
 
 #endif /* CALLBACKS_H */

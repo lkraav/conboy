@@ -392,6 +392,15 @@ void note_remove_active_tag_by_name(Note *note, const gchar *tag_name)
  */
 void note_add_active_tag(Note *note, GtkTextTag *tag)
 {
+	if (note == NULL) {
+		g_printerr("ERROR: note_add_active_tag: note is NULL\n");
+		return;
+	}
+	if (tag == NULL) {
+		g_printerr("ERROR: note_add_active_tag: tag is NULL\n");
+		return;
+	}
+	
 	GSList *tags = note->active_tags;
 	while (tags != NULL) {
 		if (strcmp(((GtkTextTag*)tags->data)->name, tag->name) == 0) {
