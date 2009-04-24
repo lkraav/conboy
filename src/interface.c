@@ -34,6 +34,17 @@
 #include "metadata.h"
 #include "interface.h"
 
+#define ACCEL_PATH_ROOT            "<NOTE_WINDOW>"
+#define ACCEL_PATH_QUIT            ACCEL_PATH_ROOT"/Quit"
+#define ACCEL_PATH_NEW             ACCEL_PATH_ROOT"/New"
+
+#define ACCEL_PATH_STYLE           ACCEL_PATH_ROOT"/Style"
+#define ACCEL_PATH_STYLE_BOLD      ACCEL_PATH_STYLE"/Bold"
+#define ACCEL_PATH_STYLE_ITALIC    ACCEL_PATH_STYLE"/Italic"
+#define ACCEL_PATH_STYLE_FIXED     ACCEL_PATH_STYLE"/Fixed"
+#define ACCEL_PATH_STYLE_STRIKE    ACCEL_PATH_STYLE"/Strike"
+#define ACCEL_PATH_STYLE_HIGHLIGHT ACCEL_PATH_STYLE"/Highlight"
+
 static void set_tool_button_icon_by_name(GtkToolButton *button, const gchar *icon_name)
 {
 	GtkWidget *image;
@@ -82,59 +93,6 @@ void set_menu_item_label(GtkMenuItem *item, const gchar *text)
 	}
 	
 	gtk_label_set_markup(GTK_LABEL(children->data), text);		
-}
-
-
-
-GtkMenu* create_format_menu(UserInterface *ui, GtkAccelGroup *accel_group) {
-	
-	GtkWidget *menu;
-	GtkWidget *menu_bold;
-	GtkWidget *menu_italic;
-	GtkWidget *menu_strike;
-	GtkWidget *menu_highlight;
-	GtkWidget *menu_fixed;
-	GtkWidget *menu_bullets;
-	
-	menu = gtk_menu_new();
-		
-	menu_bold = gtk_check_menu_item_new_with_label("");
-	menu_italic = gtk_check_menu_item_new_with_label("");
-	menu_strike = gtk_check_menu_item_new_with_label("");
-	menu_highlight = gtk_check_menu_item_new_with_label("");
-	menu_fixed = gtk_check_menu_item_new_with_label("");
-	menu_bullets = gtk_check_menu_item_new_with_label("Bullets");
-	
-	set_menu_item_label(GTK_MENU_ITEM(menu_bold), "<b>Bold</b>");
-	set_menu_item_label(GTK_MENU_ITEM(menu_italic), "<i>Italic</i>");
-	set_menu_item_label(GTK_MENU_ITEM(menu_strike), "<s>Strikeout</s>");
-	set_menu_item_label(GTK_MENU_ITEM(menu_highlight), "<span background=\"yellow\">Highlight</span>");
-	set_menu_item_label(GTK_MENU_ITEM(menu_fixed), "<tt>Fixed Width</tt>");
-	
-	gtk_widget_add_accelerator(menu_bold, "activate", accel_group, GDK_b, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-	gtk_widget_add_accelerator(menu_italic, "activate", accel_group, GDK_i, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-	gtk_widget_add_accelerator(menu_strike, "activate", accel_group, GDK_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-	gtk_widget_add_accelerator(menu_highlight, "activate", accel_group, GDK_h, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-	gtk_widget_add_accelerator(menu_fixed, "activate", accel_group, GDK_f, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-	
-	gtk_menu_append(menu, gtk_separator_menu_item_new());
-	gtk_menu_append(menu, menu_bold);
-	gtk_menu_append(menu, menu_italic);
-	gtk_menu_append(menu, menu_strike);
-	gtk_menu_append(menu, menu_highlight);
-	gtk_menu_append(menu, menu_fixed);
-	gtk_menu_append(menu, gtk_separator_menu_item_new());
-	gtk_menu_append(menu, menu_bullets);
-	gtk_menu_append(menu, gtk_separator_menu_item_new());
-	
-	/*
-	ui->menu_bold = menu_bold;
-	ui->menu_bullets = menu_bullets;
-	ui->menu_fixed = menu_fixed;
-	ui->menu_highlight = menu_highlight;
-	ui->menu_italic = menu_italic;
-	ui->menu_strike = menu_strike;
-	*/
 }
 
 GtkWidget* create_mainwin(Note *note) {
@@ -224,21 +182,21 @@ GtkWidget* create_mainwin(Note *note) {
 	action_inc_indent = GTK_ACTION(gtk_action_new("inc_indent", "Increase Indent", NULL, GTK_STOCK_INDENT));
 	action_link = GTK_ACTION(gtk_action_new("link", "Link", NULL, GTK_STOCK_REDO));
 	gtk_action_set_sensitive(action_link, FALSE);
-	action_new = GTK_ACTION(gtk_action_new("new", "New Note", NULL, GTK_STOCK_NEW));
+	action_new = GTK_ACTION(gtk_action_new("new", "New Note", NULL, NULL));
 	action_notes = GTK_ACTION(gtk_action_new("open", "Open", NULL, GTK_STOCK_OPEN));
-	action_quit = GTK_ACTION(gtk_action_new("quit", "Close All Notes", NULL, GTK_STOCK_QUIT));
+	action_quit = GTK_ACTION(gtk_action_new("quit", "Close All Notes", NULL, NULL));
 	action_italic = GTK_ACTION(gtk_toggle_action_new("italic", "Italic", NULL, GTK_STOCK_ITALIC));
 	action_strike = GTK_ACTION(gtk_toggle_action_new("strikethrough", "Strikeout", NULL, GTK_STOCK_STRIKETHROUGH));
 	action_text_style = GTK_ACTION(gtk_action_new("style", "Style", NULL, GTK_STOCK_SELECT_FONT));
 	action_zoom_in = GTK_ACTION(gtk_action_new("zoom_in", "Zoom In", NULL, GTK_STOCK_ZOOM_IN));
 	action_zoom_out = GTK_ACTION(gtk_action_new("zoom_out", "Zoom Out", NULL, GTK_STOCK_ZOOM_OUT));
-	
-	
+	/* TODO: Use an enum instead of 0 to 3 */
 	action_font_small = GTK_ACTION(gtk_radio_action_new("size:small", "Small", NULL, NULL, 0));
 	action_font_normal = GTK_ACTION(gtk_radio_action_new("size:normal", "Normal", NULL, NULL, 1));
 	action_font_large = GTK_ACTION(gtk_radio_action_new("size:large", "Large", NULL, NULL, 2));
 	action_font_huge = GTK_ACTION(gtk_radio_action_new("size:huge", "Huge", NULL, NULL, 3));
 	
+	/* Build the radio action group */
 	gtk_radio_action_set_group(action_font_small, action_group);
 	action_group = gtk_radio_action_get_group(action_font_small);
 	gtk_radio_action_set_group(action_font_normal, action_group);
@@ -248,6 +206,34 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_radio_action_set_group(action_font_huge, action_group);
 	action_group = gtk_radio_action_get_group(action_font_huge);
 	gtk_radio_action_set_current_value(action_font_normal, 1);
+	
+	/* Add actions to accelerator group */
+	gtk_action_set_accel_group(action_bold, accel_group);
+	gtk_action_set_accel_group(action_italic, accel_group);
+	gtk_action_set_accel_group(action_fixed, accel_group);
+	gtk_action_set_accel_group(action_highlight, accel_group);
+	gtk_action_set_accel_group(action_strike, accel_group);
+	gtk_action_set_accel_group(action_quit, accel_group);
+	gtk_action_set_accel_group(action_new, accel_group);
+	
+	/* Add accelerator paths to actions */
+	gtk_action_set_accel_path(action_bold,      ACCEL_PATH_STYLE_BOLD);
+	gtk_action_set_accel_path(action_italic,    ACCEL_PATH_STYLE_ITALIC);
+	gtk_action_set_accel_path(action_strike,    ACCEL_PATH_STYLE_STRIKE);
+	gtk_action_set_accel_path(action_highlight, ACCEL_PATH_STYLE_HIGHLIGHT);
+	gtk_action_set_accel_path(action_fixed,     ACCEL_PATH_STYLE_FIXED);
+	gtk_action_set_accel_path(action_quit,      ACCEL_PATH_QUIT);
+	gtk_action_set_accel_path(action_new,       ACCEL_PATH_NEW);
+	
+	/* Set keybindings for accelerator paths */
+	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_BOLD,      GDK_b, GDK_CONTROL_MASK);
+	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_ITALIC,    GDK_i, GDK_CONTROL_MASK);
+	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_STRIKE,    GDK_s, GDK_CONTROL_MASK);
+	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_HIGHLIGHT, GDK_h, GDK_CONTROL_MASK);
+	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_FIXED,     GDK_f, GDK_CONTROL_MASK);
+	gtk_accel_map_add_entry(ACCEL_PATH_QUIT,            GDK_q, GDK_CONTROL_MASK);
+	gtk_accel_map_add_entry(ACCEL_PATH_NEW,             GDK_n, GDK_CONTROL_MASK);
+	
 	
 	
 	/* FORMAT MENU */
@@ -302,14 +288,7 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_menu_item_set_submenu(menu_text_style, text_style_menu);
 	menu_quit = gtk_action_create_menu_item(action_quit);
 	
-	/*
-	gtk_widget_add_accelerator(menu_bold, "activate", accel_group, GDK_b, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-	gtk_widget_add_accelerator(menu_italic, "activate", accel_group, GDK_i, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-	gtk_widget_add_accelerator(menu_strike, "activate", accel_group, GDK_s, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-	gtk_widget_add_accelerator(menu_highlight, "activate", accel_group, GDK_h, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-	gtk_widget_add_accelerator(menu_fixed, "activate", accel_group, GDK_f, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-	gtk_widget_add_accelerator(menu_quit, "activate", accel_group, GDK_q, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-	*/
+	
 	
 	gtk_menu_shell_append(main_menu, menu_new);
 	gtk_menu_shell_append(main_menu, menu_new);
@@ -328,7 +307,7 @@ GtkWidget* create_mainwin(Note *note) {
 	/****/	
 	button_dec_indent = gtk_action_create_tool_item(action_dec_indent);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), button_dec_indent, -1);
-	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 70, -1);
+	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 100, -1);
 	
 	button_inc_indent = gtk_action_create_tool_item(action_inc_indent);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), button_inc_indent, -1);
