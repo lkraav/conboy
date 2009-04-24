@@ -48,7 +48,7 @@
 #include "localisation.h"
 
 #define APP_NAME "conboy"
-#define APP_VER "0.2.0"
+#define APP_VER "0.3.0"
 #define APP_SERVICE "de.zwong.conboy"
 #define APP_METHOD "/de/zwong/conboy"
 

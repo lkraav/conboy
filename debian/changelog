@@ -1,3 +1,15 @@
+conboy (0.3.0) stable; urgency=low
+
+  * bla
+
+ -- Cornelius Hald <hald@icandy.de>  Fri, 24 Apr 2009 11:34:02 +0200
+
+conboy (0.2.9) unstable; urgency=low
+
+  * Unstable. On the way to 0.3
+  
+ -- Cornelius Hald <hald@icandy.de>  Fri, 23 Apr 2009 14:01:00 -0100
+
 conboy (0.2.0) unstable; urgency=low
 
   * Reading, writing and displaying of all Tomboy notes is now possible
