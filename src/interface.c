@@ -181,7 +181,6 @@ GtkWidget* create_mainwin(Note *note) {
 	action_highlight = GTK_ACTION(gtk_toggle_action_new("highlight", "Highlight", NULL, NULL));
 	action_inc_indent = GTK_ACTION(gtk_action_new("inc_indent", "Increase Indent", NULL, GTK_STOCK_INDENT));
 	action_link = GTK_ACTION(gtk_action_new("link", "Link", NULL, GTK_STOCK_REDO));
-	gtk_action_set_sensitive(action_link, FALSE);
 	action_new = GTK_ACTION(gtk_action_new("new", "New Note", NULL, NULL));
 	action_notes = GTK_ACTION(gtk_action_new("open", "Open", NULL, GTK_STOCK_OPEN));
 	action_quit = GTK_ACTION(gtk_action_new("quit", "Close All Notes", NULL, NULL));
@@ -195,6 +194,10 @@ GtkWidget* create_mainwin(Note *note) {
 	action_font_normal = GTK_ACTION(gtk_radio_action_new("size:normal", "Normal", NULL, NULL, 1));
 	action_font_large = GTK_ACTION(gtk_radio_action_new("size:large", "Large", NULL, NULL, 2));
 	action_font_huge = GTK_ACTION(gtk_radio_action_new("size:huge", "Huge", NULL, NULL, 3));
+	
+	gtk_action_set_sensitive(action_link, FALSE);
+	gtk_action_set_sensitive(action_inc_indent, FALSE);
+	gtk_action_set_sensitive(action_dec_indent, FALSE);
 	
 	/* Build the radio action group */
 	gtk_radio_action_set_group(action_font_small, action_group);
@@ -383,6 +386,8 @@ GtkWidget* create_mainwin(Note *note) {
 	ui->action_fixed = GTK_TOGGLE_ACTION(action_fixed);
 	ui->action_link = GTK_ACTION(action_link);
 	ui->action_font_small = GTK_RADIO_ACTION(action_font_small);
+	ui->action_inc_indent = GTK_ACTION(action_inc_indent);
+	ui->action_dec_indent = GTK_ACTION(action_dec_indent);
 
 	/* Window signals */
 	g_signal_connect(mainwin, "delete-event",
@@ -453,14 +458,6 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	g_signal_connect(action_zoom_in, "activate",
 			G_CALLBACK(on_bigger_button_clicked),
-			NULL);
-	
-	g_signal_connect(action_inc_indent, "activate",
-			G_CALLBACK(on_inc_indent_button_clicked),
-			NULL);
-	
-	g_signal_connect(action_dec_indent, "activate",
-			G_CALLBACK(on_dec_indent_button_clicked),
 			NULL);
 	
 	g_signal_connect(action_text_style, "activate",

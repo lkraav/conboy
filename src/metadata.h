@@ -58,6 +58,8 @@ typedef struct
 	GtkToggleAction     *action_bullets;
 	GtkAction           *action_link;
 	GtkRadioAction		*action_font_small;
+	GtkAction			*action_inc_indent;
+	GtkAction			*action_dec_indent;
 
 } UserInterface;
 

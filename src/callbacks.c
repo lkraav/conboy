@@ -442,16 +442,20 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	note->active_tags = gtk_text_iter_get_tags(location);
 	
 	/* Go the beginning of line and check if there is a bullet.
-	 * If yes, add list-item and list tags */
+	 * If yes, add list-item and list tags and enable the indent actions */
 	gtk_text_iter_set_line_offset(location, 0);
-	tmp_tags = gtk_text_iter_get_tags(location);
-	if (tmp_tags != NULL) {
-		if (strncmp(GTK_TEXT_TAG(tmp_tags->data)->name, "depth", 5) == 0) {
-			note_add_active_tag_by_name(note, "list-item");
-			note_add_active_tag_by_name(note, "list");
-		}
+	if (iter_get_depth_tag(location) != NULL) {
+		/* Add tags */
+		note_add_active_tag_by_name(note, "list-item");
+		note_add_active_tag_by_name(note, "list");
+		/* Enable indent actions */
+		gtk_action_set_sensitive(ui->action_inc_indent, TRUE);
+		gtk_action_set_sensitive(ui->action_dec_indent, TRUE);
+	} else {
+		/* Disable indent actions */
+		gtk_action_set_sensitive(ui->action_inc_indent, FALSE);
+		gtk_action_set_sensitive(ui->action_dec_indent, FALSE);
 	}
-	g_slist_free(tmp_tags);
 	
 	/* Copy pointer for iteration */
 	tags = note->active_tags;
@@ -1123,7 +1127,7 @@ void decrease_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 }
 
 void
-on_inc_indent_button_clicked			   (GtkButton		*button,
+on_inc_indent_button_clicked			   (GtkAction		*action,
 											gpointer		 user_data)
 {
 	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(user_data);
@@ -1146,7 +1150,7 @@ on_inc_indent_button_clicked			   (GtkButton		*button,
 
 /* TODO: Increase and decrease too similar */
 void
-on_dec_indent_button_clicked			   (GtkButton		*button,
+on_dec_indent_button_clicked			   (GtkAction		*action,
 											gpointer		 user_data)
 {
 	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(user_data);

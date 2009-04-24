@@ -135,11 +135,11 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 											 gpointer		user_data);
 
 void
-on_inc_indent_button_clicked			   (GtkButton		*button,
+on_inc_indent_button_clicked			   (GtkAction		*action,
 											gpointer		 user_data);
 
 void
-on_dec_indent_button_clicked			   (GtkButton		*button,
+on_dec_indent_button_clicked			   (GtkAction		*action,
 											gpointer		 user_data);
 
 void
