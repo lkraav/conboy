@@ -82,6 +82,7 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
 }
 
+/* TODO: Put in util file, it's used in callbacks.c too */
 static
 void set_menu_item_label(GtkMenuItem *item, const gchar *text)
 {
@@ -450,7 +451,7 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	g_signal_connect(action_delete, "activate",
 			G_CALLBACK(on_delete_button_clicked),
-			buffer);
+			note);
 	
 	g_signal_connect(action_zoom_in, "activate",
 			G_CALLBACK(on_smaller_button_clicked),

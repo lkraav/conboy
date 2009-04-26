@@ -354,6 +354,19 @@ menu_position ( GtkMenu *menu ,
 }
 */
 
+/* TODO: Put in util file, it's used in interface.c too */
+static
+void set_menu_item_label(GtkMenuItem *item, const gchar *text)
+{
+	GList *children = gtk_container_get_children(GTK_CONTAINER(item));
+	
+	if (children == NULL) {
+		g_printerr("ERROR: set_menu_item_label() expects a GtkMenuItem, which already contains a label.\n");
+		return;
+	}
+	
+	gtk_label_set_markup(GTK_LABEL(children->data), text);		
+}
 
 void
 on_notes_button_clicked				   (GtkAction		*action,
@@ -362,6 +375,7 @@ on_notes_button_clicked				   (GtkAction		*action,
 	GtkWidget *menu = gtk_menu_new ();
 	AppData *app_data = get_app_data();
 	GList *notes;
+	GtkWidget *image_small;
 	
 	if (app_data->all_notes == NULL) {
 		return;
@@ -371,35 +385,44 @@ on_notes_button_clicked				   (GtkAction		*action,
 	/* Then we should take care of sorting when inserting and updating elements */
 	app_data->all_notes = sort_note_list_by_change_date(app_data->all_notes);
 	
+	
+	
 	notes = app_data->all_notes;
 	while(notes != NULL) {
 		GtkWidget *menu_item;
-		GtkWidget *image_small, *image_large;
+		/*GtkWidget *image_small, *image_large;*/
 		Note *note = notes->data;
 		/* TODO: When starting from Eclipse, use local paths, not from /usr/share/ */
+		image_small = gtk_image_new_from_icon_name("conboy", GTK_ICON_SIZE_SMALL_TOOLBAR);	
+		menu_item = gtk_image_menu_item_new_with_label(note->title); /*gtk_menu_item_new_with_label(note->title);*/
+		gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), image_small);
+		
+		/*set_menu_item_label(GTK_MENU_ITEM(menu_item), g_strconcat("<span size=\"large\">", note->title, "</span>", NULL));*/
+		
+		/*
 		menu_item = hildon_thumb_menu_item_new_with_labels(note->title, note->title, "Open Note...");
 		image_small = gtk_image_new_from_icon_name("conboy", GTK_ICON_SIZE_SMALL_TOOLBAR);
 		image_large = gtk_image_new_from_icon_name("conboy", GTK_ICON_SIZE_DIALOG);
 		hildon_thumb_menu_item_set_images(HILDON_THUMB_MENU_ITEM(menu_item), image_small, image_large);
+		*/
 		
-		g_signal_connect(G_OBJECT(menu_item), "activate",
+		g_signal_connect(menu_item, "activate",
 		            	 G_CALLBACK(on_notes_menu_item_activated),
 		            	 note);
-		gtk_menu_append(menu, menu_item);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
+		
+		if (notes->next != NULL) {
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu), gtk_separator_menu_item_new());
+		}
+		
 		notes = notes->next;
 	}
 	
-	hildon_menu_set_thumb_mode(GTK_MENU(menu), TRUE);
+	/*hildon_menu_set_thumb_mode(GTK_MENU(menu), TRUE);*/
 	
 	gtk_widget_show_all(menu);
 
-	gtk_menu_popup ( GTK_MENU (menu),
-	                 NULL,
-	                 NULL,
-	                 NULL,
-	                 NULL,
-	                 0,
-	                 gtk_get_current_event_time());
+	gtk_menu_popup(GTK_MENU (menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
 	
 }
 
@@ -599,8 +622,6 @@ on_delete_button_clicked			   (GtkAction		*action,
 	GtkWidget *dialog;
 	gint response;
 	AppData *app_data;
-	
-	g_printerr("on_delete_button_clicked() called\n");
 	
 	dialog = gtk_message_dialog_new_with_markup(
 			GTK_WINDOW(note->ui->window),
