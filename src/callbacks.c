@@ -1002,7 +1002,7 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 	
 	
 	/* Applying active tags while typing */
-	if (len == 1) {
+	/*if (len == 1) {*/ /* Umlauts e.g. are 2 bytes */
 		GSList *active_tags = ((Note*)user_data)->active_tags;
 		GtkTextIter *start_iter = gtk_text_iter_copy(iter);
 		gtk_text_iter_backward_char(start_iter);
@@ -1014,7 +1014,9 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 			active_tags = active_tags->next;
 		}
 		return;
-	}
+	/*}*/
+	
+	
 	
 }
 
