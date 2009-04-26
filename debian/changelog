@@ -1,8 +1,16 @@
 conboy (0.3.0) stable; urgency=low
 
-  * bla
+  * Creating nested bullet lists is now possible
+  * Increasing and decreasing the depth of bullets is working
+  * Pressing enter at the end of a list item creates a new list item on the same level
+  * There are now 3 different bullet characters for different levels
+  * When opening a note, it is automatically scrolled to the cursor position
+  * It's now possible to first select a text style and then write using this style
+  * Automatic creation of bullet lists if line starts with a dash (-) or asterix (*)
+  * Cleaned up the user interface
+  * Added text sizes "small", "normal", "large" and "huge" to the list of text styles
 
- -- Cornelius Hald <hald@icandy.de>  Fri, 24 Apr 2009 11:34:02 +0200
+ -- Cornelius Hald <hald@icandy.de>  Sun, 26 Apr 2009 11:34:02 +0200
 
 conboy (0.2.9) unstable; urgency=low
 
