@@ -45,8 +45,17 @@
 GtkTextTag* iter_get_depth_tag(GtkTextIter* iter);
 GtkTextTag* buffer_get_depth_tag(GtkTextBuffer *buffer, gint depth);
 
+GtkTextTag* get_depth_tag_at_line(GtkTextBuffer *buffer, gint line_number)
+{
+	GtkTextIter iter;
+	gtk_text_buffer_get_iter_at_line(buffer, &iter, line_number);
+	return iter_get_depth_tag(&iter);
+}
+
 static void change_format(Note *note, GtkToggleAction *action)
 {	
+	gint start_line, end_line, i;
+	GtkTextIter selection_start_iter, selection_end_iter;
 	GtkTextIter start_iter, end_iter;
 	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(note->ui->buffer);
 	
@@ -56,8 +65,39 @@ static void change_format(Note *note, GtkToggleAction *action)
 		/* The button just became active, so we should enable the formatting */
 		if (gtk_text_buffer_get_has_selection(buffer)) {
 			/* Something is selected */
-			gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter);
-			gtk_text_buffer_apply_tag_by_name(buffer, tag_name, &start_iter, &end_iter);
+			gtk_text_buffer_get_selection_bounds(buffer, &selection_start_iter, &selection_end_iter);
+			
+			start_line = gtk_text_iter_get_line(&selection_start_iter);
+			end_line = gtk_text_iter_get_line(&selection_end_iter);
+			
+			/* We go through the selection line by line, so we have a chance to skip over the bullets */
+			for (i = start_line; i <= end_line; i++) {
+				
+				if (i == start_line) {
+					start_iter = selection_start_iter;
+				} else {
+					gtk_text_buffer_get_iter_at_line(buffer, &start_iter, i);
+				}
+				
+				if (i == end_line) {
+					end_iter = selection_end_iter;
+				} else {
+					gtk_text_buffer_get_iter_at_line(buffer, &end_iter, i + 1);
+					/* If we are inside a list, don't tag the newline character at the end of the line */
+					if (get_depth_tag_at_line(buffer, i) != NULL) {
+						gtk_text_iter_backward_char(&end_iter);
+					}
+				}
+				
+				/* If we are at a bullet, jump over this bullet */
+				if (iter_get_depth_tag(&start_iter) != NULL) {
+					gtk_text_iter_set_line_offset(&start_iter, 2);
+				}
+				
+				/* Apply tag */
+				gtk_text_buffer_apply_tag_by_name(buffer, tag_name, &start_iter, &end_iter);
+			}
+
 			/* Manually set the buffer to modified, because applying tags, doesn't do this automatically */
 			gtk_text_buffer_set_modified(buffer, TRUE);	
 		} else {
@@ -69,8 +109,8 @@ static void change_format(Note *note, GtkToggleAction *action)
 		/* The button just became deactive, so we should remove the formatting */
 		if (gtk_text_buffer_get_has_selection(buffer)) {
 			/* Something is selected */
-			gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter);
-			gtk_text_buffer_remove_tag_by_name(buffer, tag_name, &start_iter, &end_iter);
+			gtk_text_buffer_get_selection_bounds(buffer, &selection_start_iter, &selection_end_iter);
+			gtk_text_buffer_remove_tag_by_name(buffer, tag_name, &selection_start_iter, &selection_end_iter);
 			/* Manually set the buffer to modified, because removing tags, doesn't do this automatically */
 			gtk_text_buffer_set_modified(buffer, TRUE);	
 		} else {
@@ -239,21 +279,15 @@ remove_bullets(GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_
 	gint start_line = gtk_text_iter_get_line(start_iter);
 	gint end_line = gtk_text_iter_get_line(end_iter);
 	
-	/* Get depth of this line */
-	/*depth_tag = iter_get_depth_tag(gtk_text_buffer_get_iter_at_line())*/
-	
 	/* Remove tags */
 	gtk_text_buffer_get_iter_at_line(buffer, start_iter, start_line);
 	gtk_text_buffer_get_iter_at_line(buffer, end_iter, end_line);
 	gtk_text_iter_forward_to_line_end(end_iter);
-	/***/
+	
 	/* Include the newline char before and after this line */
 	gtk_text_iter_backward_char(start_iter);
 	gtk_text_iter_forward_char(end_iter);
-	/**/
-	
-	/* TODO: Hardcoded depth:1 */
-	/*gtk_text_buffer_remove_tag_by_name(buffer, "depth:1", start_iter, end_iter);*/ 
+	 
 	gtk_text_buffer_remove_tag_by_name(buffer, "list-item", start_iter, end_iter);
 	gtk_text_buffer_remove_tag_by_name(buffer, "list", start_iter, end_iter);
 		
@@ -372,20 +406,24 @@ void
 on_notes_button_clicked				   (GtkAction		*action,
 										gpointer		 user_data) {
 	
-	GtkWidget *menu = gtk_menu_new ();
-	AppData *app_data = get_app_data();
+	GtkWidget *mainwin = GTK_WIDGET(user_data);
+	GtkWidget *menu;
+	AppData *app_data;
 	GList *notes;
 	GtkWidget *image_small;
-	
+
+	app_data = get_app_data();
 	if (app_data->all_notes == NULL) {
 		return;
 	}
 	
+	menu = gtk_menu_new();
+	gtk_menu_attach_to_widget(GTK_MENU(menu), mainwin, NULL);
+	
+	
 	/* TODO: This might become a perf. problem with many notes */
 	/* Then we should take care of sorting when inserting and updating elements */
 	app_data->all_notes = sort_note_list_by_change_date(app_data->all_notes);
-	
-	
 	
 	notes = app_data->all_notes;
 	while(notes != NULL) {
@@ -1014,9 +1052,6 @@ GtkTextTag* buffer_get_depth_tag(GtkTextBuffer *buffer, gint depth)
 	
 	if (tag == NULL) {
 		tag = gtk_text_buffer_create_tag(buffer, tag_name, "indent", -20, "left-margin", depth * 25, NULL);
-		/* Set the priority of the "list" tag to the maximum. It needs a higher priority then the newly created "list-item" tag */
-		/* TODO: I think the next line is not needed anymore. Test without. */
-		gtk_text_tag_set_priority(gtk_text_tag_table_lookup(buffer->tag_table, "list"), gtk_text_tag_table_get_size(buffer->tag_table) - 1);
 	}
 	
 	g_free(tag_name);
@@ -1175,11 +1210,19 @@ on_style_button_clicked                (GtkAction       *action,
 	GtkMenu *menu = GTK_MENU(user_data);
 	gboolean visible;
 	
+	if (GTK_WIDGET_VISIBLE(menu)) {
+		g_printerr("VISIBLE \n");
+	} else {
+		g_printerr("NOT VISIBLE \n");
+	}
+	
+	
 	/* TODO: Not working, visible is always FALSE */
 	g_object_get(GTK_WIDGET(menu), "visible", &visible, NULL);
 	if (visible) {
 		gtk_menu_popdown(menu);
 	} else {
+		gtk_widget_show_all(GTK_WIDGET(menu));
 		gtk_menu_popup(menu, NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
 	}
 }
