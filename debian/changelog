@@ -1,3 +1,9 @@
+conboy (0.3.1) stable; urgency=low
+
+  * Removed debug code which showed bullet lists in organge
+
+ -- Cornelius Hald <hald@icandy.de>  Sun, 26 Apr 2009 16:44:02 +0200
+
 conboy (0.3.0) stable; urgency=low
 
   * Creating nested bullet lists is now possible

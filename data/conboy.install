@@ -4,5 +4,5 @@ package = conboy
 [extras]
 name = maemo Extras
 uri = http://repository.maemo.org/extras/
-components = free non-free
+components = free
 
