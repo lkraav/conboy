@@ -247,6 +247,7 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	/* FORMAT MENU */
 	text_style_menu = GTK_MENU_SHELL(gtk_menu_new());
+	gtk_menu_attach_to_widget(GTK_MENU(text_style_menu), mainwin, NULL);
 	
 	menu_bold = gtk_action_create_menu_item(action_bold);
 	menu_italic = gtk_action_create_menu_item(action_italic);
@@ -261,14 +262,14 @@ GtkWidget* create_mainwin(Note *note) {
 	menu_font_large = gtk_action_create_menu_item(action_font_large);
 	menu_font_huge = gtk_action_create_menu_item(action_font_huge);
 	
-	set_menu_item_label(GTK_MENU_ITEM(menu_bold), "<b>Bold</b>");
-	set_menu_item_label(GTK_MENU_ITEM(menu_italic), "<i>Italic</i>");
-	set_menu_item_label(GTK_MENU_ITEM(menu_strike), "<s>Strikeout</s>");
-	set_menu_item_label(GTK_MENU_ITEM(menu_highlight), "<span background=\"yellow\">Highlight</span>");
-	set_menu_item_label(GTK_MENU_ITEM(menu_fixed), "<tt>Fixed Width</tt>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_bold),       "<b>Bold</b>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_italic),     "<i>Italic</i>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_strike),     "<s>Strikeout</s>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_highlight),  "<span background=\"yellow\">Highlight</span>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_fixed),      "<tt>Fixed Width</tt>");
 	set_menu_item_label(GTK_MENU_ITEM(menu_font_small), "<span size=\"small\">Small</span>");
 	set_menu_item_label(GTK_MENU_ITEM(menu_font_large), "<span size=\"large\">Large</span>");
-	set_menu_item_label(GTK_MENU_ITEM(menu_font_huge), "<span size=\"x-large\">Huge</span>");
+	set_menu_item_label(GTK_MENU_ITEM(menu_font_huge),  "<span size=\"x-large\">Huge</span>");
 	
 	gtk_menu_shell_append(text_style_menu, menu_bold);
 	gtk_menu_shell_append(text_style_menu, menu_italic);
@@ -291,6 +292,7 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	/* MAIN MENU */
 	main_menu = gtk_menu_new();
+	gtk_menu_attach_to_widget(main_menu, mainwin, NULL);
 	
 	menu_new = gtk_action_create_menu_item(action_new);
 	menu_text_style = gtk_menu_item_new_with_label("Text Style");
@@ -452,7 +454,7 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	g_signal_connect(action_notes, "activate",
 			G_CALLBACK(on_notes_button_clicked),
-			buffer);
+			mainwin);
 	
 	g_signal_connect(action_delete, "activate",
 			G_CALLBACK(on_delete_button_clicked),
