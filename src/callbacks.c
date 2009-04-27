@@ -971,52 +971,26 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 											 gint			len,
 											 gpointer		user_data)
 {
-	/* Finding titles to create links */
-	/*
-	GtkTextIter *start_iter = gtk_text_iter_copy(iter);
-	GtkTextIter *end_iter = gtk_text_iter_copy(iter);
-	AppData *app_data = get_app_data();
-	GList *all_notes;
-	gchar *sentence;
+	/* TODO: Finding titles to create links */
+	GSList *active_tags;
+	GtkTextIter *start_iter;
 	
-	gtk_text_iter_backward_sentence_start(start_iter);
-	gtk_text_iter_forward_sentence_end(end_iter);
-	
-	sentence = gtk_text_iter_get_slice(start_iter, end_iter);
-	
-	all_notes = app_data->all_notes;
-	while (all_notes != NULL) {
-		Note *note = (Note*)all_notes->data;
-		gchar *title = note->title;
-		gchar *found = g_strstr_len(sentence, -1, title);
-		
-		if (found != NULL) {
-			g_printerr("__________ H I T [%s] ____________ \n", title);
-		}
-		
-		all_notes = all_notes->next;
-	}
-
-	g_printerr("TEXT: %s \n", gtk_text_iter_get_slice(start_iter, end_iter));
-	*/
-	
-	
-	/* Applying active tags while typing */
-	/*if (len == 1) {*/ /* Umlauts e.g. are 2 bytes */
-		GSList *active_tags = ((Note*)user_data)->active_tags;
-		GtkTextIter *start_iter = gtk_text_iter_copy(iter);
-		gtk_text_iter_backward_char(start_iter);
-		
-		gtk_text_buffer_remove_all_tags(buffer, start_iter, iter);
-		
-		while (active_tags != NULL && active_tags->data != NULL) {
-			gtk_text_buffer_apply_tag(buffer, active_tags->data, start_iter, iter);
-			active_tags = active_tags->next;
-		}
+	/* The first line is always the title. Don't apply tags there */
+	if (gtk_text_iter_get_line(iter) == 0) {
 		return;
-	/*}*/
+	}
 	
+	active_tags = ((Note*)user_data)->active_tags;
+	start_iter = gtk_text_iter_copy(iter);
+	gtk_text_iter_backward_char(start_iter);
 	
+	gtk_text_buffer_remove_all_tags(buffer, start_iter, iter);
+	
+	while (active_tags != NULL && active_tags->data != NULL) {
+		gtk_text_buffer_apply_tag(buffer, active_tags->data, start_iter, iter);
+		active_tags = active_tags->next;
+	}
+	return;
 	
 }
 
