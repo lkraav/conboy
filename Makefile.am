@@ -19,8 +19,8 @@ INCLUDES = $(HILDON_CFLAGS) $(OSSO_CFLAGS) $(HILDONDESKTOP_CFLAGS) $(GCONF_CFLAG
 bin_PROGRAMS = \
         conboy
 		
-pluginlib_LTLIBRARIES = \
-		libconboy_applet.la
+#pluginlib_LTLIBRARIES = \
+#		libconboy_applet.la
 # /Binary
 
 # Sources
@@ -40,24 +40,24 @@ conboy_SOURCES = \
         src/note.h \
         src/note.c
 
-libconboy_applet_la_SOURCES = \
-		src/conboy_applet.c \
-		src/conboy_applet.h \
-		src/metadata.h \
-        src/metadata.cs
+#libconboy_applet_la_SOURCES = \
+#		src/conboy_applet.c \
+#		src/conboy_applet.h \
+#		src/metadata.h \
+#       src/metadata.cs
 		
 # /Sources
 
 # XXX
-libconboy_applet_la_LDFLAGS = -module -avoid-version 
+#libconboy_applet_la_LDFLAGS = -module -avoid-version 
 # /XXX
 
 # LDADD
 conboy_LDADD = \
         $(HILDON_LIBS) $(OSSO_LIBS) $(GCONF_LIBS) $(HILDONDESKTOP_LIBS) $(XML2_LIBS)
 
-libconboy_applet_la_LIBADD = \
-		$(HILDONDESKTOP_LIBS)
+#libconboy_applet_la_LIBADD = \
+#		$(HILDONDESKTOP_LIBS)
 # /LDADD
 
 deb: dist
