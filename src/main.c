@@ -47,8 +47,11 @@
 
 #include "localisation.h"
 
+#include "../config.h"
+
+
 #define APP_NAME "conboy"
-#define APP_VER "0.3.1"
+/*#define APP_VER "0.3.1"*/
 #define APP_SERVICE "de.zwong.conboy"
 #define APP_METHOD "/de/zwong/conboy"
 
@@ -72,7 +75,8 @@ main (int argc, char *argv[])
   app_data = get_app_data();
   
   /* Initialize maemo application */
-  osso_context = osso_initialize(APP_SERVICE, APP_VER, TRUE, NULL);
+  g_printerr("Starting %s, Version %s \n", APP_NAME, VERSION);
+  osso_context = osso_initialize(APP_SERVICE, VERSION, TRUE, NULL);
   
   /* Check that initialization was ok */
   if (osso_context == NULL) {

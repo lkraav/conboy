@@ -101,6 +101,20 @@ void set_menu_item_label(GtkMenuItem *item, const gchar *text)
 	gtk_label_set_markup(GTK_LABEL(children->data), text);		
 }
 
+static
+void set_button_label(GtkMenuItem *item, const gchar *text)
+{
+	GList *children = gtk_container_get_children(GTK_CONTAINER(item));
+	
+	if (children == NULL) {
+		g_printerr("ERROR: set_menu_item_label() expects a GtkMenuItem, which already contains a label.\n");
+		return;
+	}
+	
+	gtk_label_set_markup(GTK_LABEL(children->data), text);		
+}
+
+
 GtkWidget* create_mainwin(Note *note) {
 	
 	UserInterface *ui = note->ui;
@@ -288,17 +302,27 @@ GtkWidget* create_mainwin(Note *note) {
 
 	
 	
-/*#define HILDON_HAS_APP_MENU*/
 	/* MAIN MENU */
 #ifdef HILDON_HAS_APP_MENU
-	main_menu = hildon_app_menu_new();
-	
-	menu_new = gtk_action_create_tool_item(action_new);
-	menu_quit = gtk_action_create_tool_item(action_quit);
-	
-	hildon_app_menu_append(HILDON_APP_MENU(main_menu, GTK_BUTTON(menu_new)));
-	hildon_app_menu_append(HILDON_APP_MENU(main_menu, GTK_BUTTON(menu_quit)));
-	
+	 main_menu = hildon_app_menu_new();
+
+	menu_new = gtk_button_new_with_label("New"); /*gtk_action_create_tool_item(action_new);*/
+	menu_quit = gtk_button_new_with_label("Quit");  /*gtk_action_create_tool_item(action_quit);*/
+	GtkWidget *one = gtk_button_new_with_label("Something longer");
+	GtkWidget *two = gtk_button_new_with_label("Something very very long");
+	GtkWidget *copy = gtk_button_new_with_label("Highlight");
+	GtkWidget *paste = gtk_button_new_with_label("Strikethrough");
+
+	set_button_label(paste, "<b>Bold</b>");
+	set_button_label(copy, "<i>Italic</i>");
+
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_new));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_quit));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(one));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(two));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(paste));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(copy));
+
 	hildon_window_set_app_menu(HILDON_WINDOW(mainwin), HILDON_APP_MENU(main_menu));
 	
 #else

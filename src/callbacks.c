@@ -26,10 +26,12 @@
 #include <string.h>
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-banner.h>
+#include <hildon/hildon-defines.h>
 /*#include <libhildondesktop/hildon-thumb-menu-item.h>*/
 #include <glib/gstdio.h>
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
+#include <gdk/gdkkeysyms.h>
 
 
 #include "callbacks.h"
