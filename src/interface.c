@@ -247,7 +247,6 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	/* FORMAT MENU */
 	text_style_menu = GTK_MENU_SHELL(gtk_menu_new());
-	gtk_menu_attach_to_widget(GTK_MENU(text_style_menu), mainwin, NULL);
 	
 	menu_bold = gtk_action_create_menu_item(action_bold);
 	menu_italic = gtk_action_create_menu_item(action_italic);
@@ -289,17 +288,26 @@ GtkWidget* create_mainwin(Note *note) {
 
 	
 	
-	
+/*#define HILDON_HAS_APP_MENU*/
 	/* MAIN MENU */
+#ifdef HILDON_HAS_APP_MENU
+	main_menu = hildon_app_menu_new();
+	
+	menu_new = gtk_action_create_tool_item(action_new);
+	menu_quit = gtk_action_create_tool_item(action_quit);
+	
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu, GTK_BUTTON(menu_new)));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu, GTK_BUTTON(menu_quit)));
+	
+	hildon_window_set_app_menu(HILDON_WINDOW(mainwin), HILDON_APP_MENU(main_menu));
+	
+#else
 	main_menu = gtk_menu_new();
-	gtk_menu_attach_to_widget(main_menu, mainwin, NULL);
 	
 	menu_new = gtk_action_create_menu_item(action_new);
 	menu_text_style = gtk_menu_item_new_with_label("Text Style");
 	gtk_menu_item_set_submenu(menu_text_style, text_style_menu);
 	menu_quit = gtk_action_create_menu_item(action_quit);
-	
-	
 	
 	gtk_menu_shell_append(main_menu, menu_new);
 	gtk_menu_shell_append(main_menu, menu_new);
@@ -308,9 +316,13 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_menu_shell_append(main_menu, gtk_separator_menu_item_new());
 	gtk_menu_shell_append(main_menu, menu_quit);
 	
-
 	/* Must be at the end of the menu definition */
 	hildon_window_set_menu(HILDON_WINDOW(mainwin), GTK_MENU(main_menu));
+#endif
+	
+
+	
+	
 
 	/* TOOLBAR */
 	toolbar = gtk_toolbar_new();
