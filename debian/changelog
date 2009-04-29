@@ -1,3 +1,11 @@
+conboy (0.3.2) stable; urgency=low
+
+  * When removing package also remove the desktop file
+  * Fixed bug, where the formatting of the first line was wrong
+  * Fixed bug, where formatting was wrong after formatting several list items
+ 
+ -- Cornelius Hald <hald@icandy.de>  Sun, 29 Apr 2009 20:35:02 +0200
+
 conboy (0.3.1) stable; urgency=low
 
   * Removed debug code which showed bullet lists in organge
