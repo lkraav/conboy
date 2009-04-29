@@ -26,7 +26,7 @@
 #include <string.h>
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-banner.h>
-#include <libhildondesktop/hildon-thumb-menu-item.h>
+/*#include <libhildondesktop/hildon-thumb-menu-item.h>*/
 #include <glib/gstdio.h>
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
@@ -483,7 +483,6 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	Note *note = (Note*)user_data;
 	UserInterface *ui = note->ui;
 	GSList *tags;
-	GSList *tmp_tags;
 	GtkTextTag *tag;
 	const gchar *mark_name;
 	
