@@ -45,11 +45,18 @@ void note_free(Note *note)
 	g_slist_free(note->active_tags);
 }
 
-/* Not needed right now. Maybe later again */
+/**
+ * Compares the the title of a given note the the given title string in an
+ * case insensitiv manner.
+ * 
+ * a must be a note with title
+ * b must be a title string
+ */
 static gint compare_title(gconstpointer a, gconstpointer b)
 {	
-	const gchar *title1 = ((Note*)a)->title;
-	const gchar *title2 = b;
+	int result;
+	gchar *title1 = g_utf8_casefold(((Note*)a)->title, -1);
+	gchar *title2 = g_utf8_casefold(b, -1);
 	
 	if (title1 == NULL && title2 == NULL) {
 		return 0;
@@ -60,7 +67,12 @@ static gint compare_title(gconstpointer a, gconstpointer b)
 	if (title2 == NULL) {
 		return 1;
 	}
-	return strcmp(title1, title2);
+	result = strcmp(title1, title2);
+	
+	g_free(title1);
+	g_free(title2);
+	
+	return result;
 }
 
 void note_show_by_title(const char* title)
@@ -210,7 +222,7 @@ void note_save(Note *note)
 	
 	app_data = get_app_data();
 	
-	g_printerr("Saving >%s< \n", note->title);
+	/*g_printerr("Saving >%s< \n", note->title);*/
 	
 	/* Set start and end iterators for serialization */
 	gtk_text_buffer_get_bounds(buffer, &start, &end);
@@ -220,7 +232,7 @@ void note_save(Note *note)
 	
 	/* If first save, add to list of all notes */
 	if (!g_list_find(app_data->all_notes, note)) {
-		g_printerr("Note >%s< is not yet in the list. Adding.\n", note->title);
+		/*g_printerr("Note >%s< is not yet in the list. Adding.\n", note->title);*/
 		app_data->all_notes = g_list_append(app_data->all_notes, note);
 	}
 	
