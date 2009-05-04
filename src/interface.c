@@ -538,6 +538,10 @@ GtkWidget* create_mainwin(Note *note) {
 	g_signal_connect_after ((gpointer)buffer, "insert-text",
 			G_CALLBACK(on_text_buffer_insert_text),
 			note);
+	
+	g_signal_connect_after ((gpointer)buffer, "delete-range",
+			G_CALLBACK(on_text_buffer_delete_range),
+			note);
 
 	link_internal_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	g_signal_connect ((gpointer) link_internal_tag, "event",

@@ -999,7 +999,6 @@ on_text_view_key_pressed                      (GtkWidget   *widget,
                                                gpointer     user_data)
 {
 	Note *note = (Note*)user_data;
-	gboolean result;
 	
 	switch (event->keyval) {
 		case GDK_Return:
@@ -1011,7 +1010,7 @@ on_text_view_key_pressed                      (GtkWidget   *widget,
 	
 }
 
-
+/* TODO: Optimize this. We need a place where all titles are stored, info which is the longest, ... */
 static gint
 get_length_of_longest_title()
 {
@@ -1080,21 +1079,9 @@ GSList* find_titles(gchar *haystack) {
 	return result;
 }
 
-
-gboolean
-auto_highlight_links(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, Note *note)
-{
-	GtkTextTag *link_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
-	GtkTextTag *url_tag  = gtk_text_tag_table_lookup(buffer->tag_table, "link:url");
-	GtkTextIter *start_iter, *end_iter;
-	GSList *hits;
-	int max_len = get_length_of_longest_title();
-	
-	start_iter = gtk_text_iter_copy(iter);
-	end_iter = gtk_text_iter_copy(iter);
-	
-	gtk_text_iter_backward_chars(start_iter, g_utf8_strlen(input, -1));
-	
+static void
+extend_block(GtkTextIter *start_iter, GtkTextIter *end_iter, gint max_len, GtkTextTag *tag)
+{	
 	/* Set start_iter max_len chars to the left or to the start of the line */
 	if (gtk_text_iter_get_line_offset(start_iter) - max_len > 0) {
 		gtk_text_iter_backward_chars(start_iter, max_len);
@@ -1110,21 +1097,22 @@ auto_highlight_links(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *inpu
 	}
 	
 	/* Expand selection to the left, if there is a link_tag inside */
-	if (gtk_text_iter_has_tag(start_iter, link_tag)) {
-		gtk_text_iter_backward_to_tag_toggle(start_iter, link_tag);
+	if (gtk_text_iter_has_tag(start_iter, tag)) {
+		gtk_text_iter_backward_to_tag_toggle(start_iter, tag);
 	}
 	
 	/* Expand selection to the right, if there is a link_tag inside */
-	if (gtk_text_iter_has_tag(end_iter, link_tag)) {
-		gtk_text_iter_forward_to_tag_toggle(end_iter, link_tag);
+	if (gtk_text_iter_has_tag(end_iter, tag)) {
+		gtk_text_iter_forward_to_tag_toggle(end_iter, tag);
 	}
-	
-	/* Remove existing link tag */
-	gtk_text_buffer_remove_tag_by_name(buffer, "link:internal", start_iter, end_iter);
-	
-	
-	/* Very all titles look if they occure in haystack. For all matches apply tag */
-	hits = find_titles(gtk_text_buffer_get_slice(buffer, start_iter, end_iter, FALSE));
+}
+
+static void
+highlight_titles(Note *note, GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_iter)
+{
+	GtkTextTag *url_tag  = gtk_text_tag_table_lookup(buffer->tag_table, "link:url");
+	/* For all titles look if they occure in haystack. For all matches apply tag */
+	GSList *hits = find_titles(gtk_text_buffer_get_slice(buffer, start_iter, end_iter, FALSE));
 	while (hits != NULL) {
 		GtkTextIter *hit_start, *hit_end;
 		SearchHit *hit = (SearchHit*)hits->data;
@@ -1161,6 +1149,28 @@ auto_highlight_links(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *inpu
 	}
 	
 	g_slist_free(hits);
+}
+
+gboolean
+auto_highlight_links(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, Note *note)
+{
+	GtkTextIter *start_iter, *end_iter;
+	GtkTextTag *link_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
+	int max_len = get_length_of_longest_title();
+	
+	start_iter = gtk_text_iter_copy(iter);
+	end_iter = gtk_text_iter_copy(iter);
+	
+	/* Move start iter back to the position before the insert */
+	gtk_text_iter_backward_chars(start_iter, g_utf8_strlen(input, -1));
+	
+	extend_block(start_iter, end_iter, max_len, link_tag);
+	
+	/* Remove existing link tag */
+	gtk_text_buffer_remove_tag(buffer, link_tag, start_iter, end_iter);
+	
+	/* Add links */
+	highlight_titles(note, buffer, start_iter, end_iter);
 }
 
 void
@@ -1202,6 +1212,26 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 	
 	apply_active_tags(buffer, iter, text, note);
 	auto_highlight_links(buffer, iter, text, note);
+}
+
+void
+on_text_buffer_delete_range					(GtkTextBuffer *buffer,
+											 GtkTextIter   *start_iter,
+											 GtkTextIter   *end_iter,
+											 gpointer		user_data)
+{
+	Note *note = (Note*)user_data;
+	GtkTextTag *link_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
+	gint max_len = get_length_of_longest_title();
+	
+	/* This handler runs after the default handler, so we can modify the iters as we like */
+	extend_block(start_iter, end_iter, max_len, link_tag);
+	
+	/* Remove link tags */
+	gtk_text_buffer_remove_tag(buffer, link_tag, start_iter, end_iter);
+	
+	/* Add link tags */
+	highlight_titles(note, buffer, start_iter, end_iter);
 }
 
 /*
