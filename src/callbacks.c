@@ -1028,7 +1028,6 @@ get_length_of_longest_title()
 typedef struct {
 	gint   start_offset;
 	gint   end_offset;
-	gchar *needle;
 	Note  *note;
 } SearchHit;
 
@@ -1044,46 +1043,32 @@ GSList* find_titles(gchar *haystack) {
 	GSList *result = NULL;
 	AppData *app_data = get_app_data();
 	
-	/* TODO: sowohl mit casefold als auch mit downstr gibt es probleme nach umlauten.... */ 
-	
-	gchar *u_haystack = g_utf8_casefold(haystack, -1); /*g_utf8_casefold(g_utf8_normalize(haystack, -1, G_NORMALIZE_DEFAULT), -1);*/
+	gchar *u_haystack = g_utf8_casefold(haystack, -1);
 	gchar *u_needle;
+	gulong micro;
 	
 	GList *notes = app_data->all_notes;
 	while (notes != NULL) {
 		note = (Note*)notes->data;
-		u_needle = g_utf8_casefold(note->title, -1); /*g_utf8_casefold(g_utf8_normalize(note->title, -1, G_NORMALIZE_DEFAULT), -1);*/
+		u_needle = g_utf8_casefold(note->title, -1);
 		
 		found = u_haystack;
 		
 		while ( (found = strstr(found, u_needle)) != NULL ) {
 			SearchHit *hit = g_new0(SearchHit, 1);
-			hit->needle = u_needle;
 			hit->note = note;
-			/*g_printerr("Start offset s: %i \n", g_utf8_pointer_to_offset(u_haystack, found));*/
-			hit->start_offset = g_utf8_pointer_to_offset(u_haystack, found); /*found - u_haystack; */ /* start_offset one too big after word with umlaut */
+			hit->start_offset = g_utf8_pointer_to_offset(u_haystack, found);
 			hit->end_offset = hit->start_offset + g_utf8_strlen(u_needle, -1);
-			/*g_printerr("Found Pointer: >%s< \n", found);*/
-			/*g_printerr("Start: %i  End: %i \n", hit->start_offset, hit->end_offset);*/
-			
-			/*
-			g_printerr("-----\n");
-			g_printerr("Haystack: >%s< \n", u_haystack);
-			g_printerr("Needle:   >%s< \n", u_needle);
-			g_printerr("Start: %i  End: %i \n", hit->start_offset, hit->end_offset);
-			g_printerr("-----\n");
-			*/
-			
 			result = g_slist_prepend(result, hit);
 			found = found + strlen(u_needle);
-			/*g_printerr("FOUND NOW: %s \n", found);*/
 		}
 		
 		notes = notes->next;
+		
 	}
 	
 	g_timer_stop(timer);
-	gulong micro;
+	
 	g_timer_elapsed(timer, &micro);
 	g_printerr("Search took %lu microseconds \n", micro);
 	
@@ -1093,94 +1078,50 @@ GSList* find_titles(gchar *haystack) {
 }
 
 
-void
-on_text_buffer_insert_text					(GtkTextBuffer *buffer,
-											 GtkTextIter   *iter,
-											 gchar		   *text,
-											 gint			len,
-											 gpointer		user_data)
+gboolean
+auto_highlight_links(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, Note *note)
 {
-	/* TODO: Finding titles to create links */
-	GSList *active_tags;
-	GtkTextIter *start_iter, *end_iter;
-	
-	
-	
-	/* The first line is always the title. Don't apply tags there */
-	if (gtk_text_iter_get_line(iter) == 0) {
-		return;
-	}
-	
-	
-	/*
-	 * Create links to existing notes
-	 */
-	
-	/*
- * on_insert_text:
- * start_iter auf anfang des inserts und end_iter auf ende des inserts
- * dann start_iter um X nach links schieben, oder auf zeilen anfang, was zuerst erreicht wird
- * dann end_iter um X nach rechts schieben, oder auf zeilen ende, was zuerst erreicht wird.
- => Weil Keine Zeilenumbrüche in Titeln
- * X ist die Länge des längsten Titels aller Notes
-
- => start_iter und end_iter umschließen den Block in dem gehighlightet wird. D.h. nur in diesem Block wird geschaut, ob einer der Titel auftaucht.
-
- * In diesem Block also erstmal alle link_tags entfernen
- * Dann nach allen titeln in diesem text suchen und markieren
-
-Beim markieren muss man noch folgendes beachten:
- * Der such algo findet z.B. auch den Titel "aus" in der Notiz "Klaus geht aus" auch im Wort "Klaus". D.h. Nur einen Link aus der gefundenen stelle machen, wenn die start_markte auf ein Wortanfang oder einen Satzanfang zeigt und die end_marke auf eine Wortende oder Satzende zeigt. Ansonsten keinen link erzeugen.
- * Innerhalb von anderen links, also link:url z.B. dürfen keine links erzeugt werden
-*/
 	GtkTextTag *link_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	GtkTextTag *url_tag  = gtk_text_tag_table_lookup(buffer->tag_table, "link:url");
-	GtkTextIter start, end;
-	Note *note = ((Note*)user_data);
+	GtkTextIter *start_iter, *end_iter;
+	GSList *hits;
 	int max_len = get_length_of_longest_title();
-	/*g_printerr("Max length is: %i \n", max_len);*/
 	
 	start_iter = gtk_text_iter_copy(iter);
 	end_iter = gtk_text_iter_copy(iter);
 	
-	/*g_printerr("Inserted string was %i chars long \n", g_utf8_strlen(text, -1));*/
+	gtk_text_iter_backward_chars(start_iter, g_utf8_strlen(input, -1));
 	
-	gtk_text_iter_backward_chars(start_iter, strlen(text));
-	
-	
-	
-	/* Set start_iter max_len chars to the left or to the start of line */
+	/* Set start_iter max_len chars to the left or to the start of the line */
 	if (gtk_text_iter_get_line_offset(start_iter) - max_len > 0) {
 		gtk_text_iter_backward_chars(start_iter, max_len);
 	} else {
 		gtk_text_iter_set_line_offset(start_iter, 0);
 	}
 	
-	/* Set end iter */
+	/* Set end_iter max_len chars to the right or to the end of the line */
 	if (gtk_text_iter_get_line_offset(end_iter) + max_len < gtk_text_iter_get_chars_in_line(end_iter) ) {
 		gtk_text_iter_forward_chars(end_iter, max_len);
 	} else {
 		gtk_text_iter_forward_to_line_end(end_iter);
 	}
 	
-	/* Make the selection bigger, if there is a link_tag inside */
+	/* Expand selection to the left, if there is a link_tag inside */
 	if (gtk_text_iter_has_tag(start_iter, link_tag)) {
 		gtk_text_iter_backward_to_tag_toggle(start_iter, link_tag);
 	}
 	
+	/* Expand selection to the right, if there is a link_tag inside */
 	if (gtk_text_iter_has_tag(end_iter, link_tag)) {
 		gtk_text_iter_forward_to_tag_toggle(end_iter, link_tag);
 	}
 	
-	/* Remove link tags */
+	/* Remove existing link tag */
 	gtk_text_buffer_remove_tag_by_name(buffer, "link:internal", start_iter, end_iter);
 	
-	/* Add link tags */
-	gchar *haystack = gtk_text_buffer_get_slice(buffer, start_iter, end_iter, FALSE);
 	
-	
-	GSList *hits = find_titles(haystack);
-	
+	/* Very all titles look if they occure in haystack. For all matches apply tag */
+	hits = find_titles(gtk_text_buffer_get_slice(buffer, start_iter, end_iter, FALSE));
 	while (hits != NULL) {
 		GtkTextIter *hit_start, *hit_end;
 		SearchHit *hit = (SearchHit*)hits->data;
@@ -1190,8 +1131,6 @@ Beim markieren muss man noch folgendes beachten:
 		
 		hit_end = gtk_text_iter_copy(start_iter);
 		gtk_text_iter_forward_chars(hit_end, hit->end_offset);
-		
-		/*g_printerr("HILIGHT: From: %i  To: %i \n", gtk_text_iter_get_line_offset(hit_start), gtk_text_iter_get_line_offset(hit_end));*/
 		
 		/* Only link agains words or sentencens */
 		if ( (!gtk_text_iter_starts_word(hit_start) && !gtk_text_iter_starts_sentence(hit_start)) || 
@@ -1212,32 +1151,54 @@ Beim markieren muss man noch folgendes beachten:
 			continue;
 		}
 
-		
+		/* Apply the tag */
 		gtk_text_buffer_apply_tag_by_name(buffer, "link:internal", hit_start, hit_end);
 		
 		hits = hits->next;
 	}
 	
+	g_slist_free(hits);
+}
+
+void
+apply_active_tags(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, Note *note)
+{
+	GtkTextIter *start_iter;
+	GSList *active_tags = note->active_tags;
 	
-	return;
+	/* Only apply active tags on typed text, not on pasted text */
+	if (g_utf8_strlen(input, -1) > 1) {
+		return;
+	}
 	
-	
-	
-	/* TODO: This code only works if only one char was inserted 
-	   Apply tags while writing
-	 */
-	active_tags = ((Note*)user_data)->active_tags;
+	/* The first line is always the title. Don't apply tags there */
+	if (gtk_text_iter_get_line(iter) == 0) {
+		return;
+	}
+		
+	/* First remove all tags, then apply all active tags */
 	start_iter = gtk_text_iter_copy(iter);
-	gtk_text_iter_backward_char(start_iter);
-	
+	gtk_text_iter_backward_chars(start_iter, g_utf8_strlen(input, -1));
 	gtk_text_buffer_remove_all_tags(buffer, start_iter, iter);
 	
 	while (active_tags != NULL && active_tags->data != NULL) {
 		gtk_text_buffer_apply_tag(buffer, active_tags->data, start_iter, iter);
 		active_tags = active_tags->next;
 	}
-	return;
+
+}
+
+void
+on_text_buffer_insert_text					(GtkTextBuffer *buffer,
+											 GtkTextIter   *iter,
+											 gchar		   *text,
+											 gint			len,
+											 gpointer		user_data)
+{
+	Note *note = (Note*)user_data;
 	
+	apply_active_tags(buffer, iter, text, note);
+	auto_highlight_links(buffer, iter, text, note);
 }
 
 /*
