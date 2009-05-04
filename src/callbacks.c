@@ -874,6 +874,7 @@ gboolean line_needs_bullet(GtkTextBuffer *buffer, gint line_number)
 static gboolean add_new_line(Note *note)
 {
 	GtkTextBuffer *buffer = note->ui->buffer;
+	GtkTextView *view = note->ui->view;
 	GtkTextIter iter;
 	GtkTextTag *depth_tag;
 	gint line;
@@ -899,6 +900,7 @@ static gboolean add_new_line(Note *note)
 			/* Insert newline and bullet */
 			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
+			gtk_text_view_scroll_mark_onscreen(view, gtk_text_buffer_get_insert(buffer));
 			line = gtk_text_iter_get_line(&iter);
 			add_bullets(buffer, line, line, depth_tag);
 			
@@ -997,6 +999,7 @@ on_text_view_key_pressed                      (GtkWidget   *widget,
                                                gpointer     user_data)
 {
 	Note *note = (Note*)user_data;
+	gboolean result;
 	
 	switch (event->keyval) {
 		case GDK_Return:
@@ -1034,7 +1037,7 @@ typedef struct {
 static
 GSList* find_titles(gchar *haystack) {
 	/* TODO: The search algorithm needs to be optimized. Probably to use Aho-Corasick */
-	/* ATM On the device (N810) searching takes 30 to 90 microseconds with ~70 notes. */
+	/* ATM On the device (N810) searching takes around 1500 microseconds with ~70 notes. */
 	
 	GTimer *timer = g_timer_new();
 	
