@@ -42,6 +42,7 @@
 #include "note.h"
 #include "serializer.h"
 #include "deserializer.h"
+#include "search_window.h"
 
 #ifndef max
 	#define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
@@ -419,37 +420,37 @@ on_notes_button_clicked				   (GtkAction		*action,
 	GList *notes;
 	GtkWidget *image_small;
 
+	GTimer *timer;
+	gulong micro;
+	
 	app_data = get_app_data();
 	if (app_data->all_notes == NULL) {
 		return;
 	}
 	
+	/*
 	menu = gtk_menu_new();
 	gtk_menu_attach_to_widget(GTK_MENU(menu), mainwin, NULL);
+	*/
 	
+	timer = g_timer_new();
 	
-	/* TODO: This might become a perf. problem with many notes */
-	/* Then we should take care of sorting when inserting and updating elements */
+	search_window_open();
+	
+	/*
 	app_data->all_notes = sort_note_list_by_change_date(app_data->all_notes);
+	g_timer_stop(timer);
+	g_timer_elapsed(timer, &micro);
+	g_printerr("Sorting: %lu micro seconds \n", micro);
 	
+	timer = g_timer_new();
 	notes = app_data->all_notes;
 	while(notes != NULL) {
 		GtkWidget *menu_item;
-		/*GtkWidget *image_small, *image_large;*/
 		Note *note = notes->data;
-		/* TODO: When starting from Eclipse, use local paths, not from /usr/share/ */
 		image_small = gtk_image_new_from_icon_name("conboy", GTK_ICON_SIZE_SMALL_TOOLBAR);	
-		menu_item = gtk_image_menu_item_new_with_label(note->title); /*gtk_menu_item_new_with_label(note->title);*/
+		menu_item = gtk_image_menu_item_new_with_label(note->title);
 		gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), image_small);
-		
-		/*set_menu_item_label(GTK_MENU_ITEM(menu_item), g_strconcat("<span size=\"large\">", note->title, "</span>", NULL));*/
-		
-		/*
-		menu_item = hildon_thumb_menu_item_new_with_labels(note->title, note->title, "Open Note...");
-		image_small = gtk_image_new_from_icon_name("conboy", GTK_ICON_SIZE_SMALL_TOOLBAR);
-		image_large = gtk_image_new_from_icon_name("conboy", GTK_ICON_SIZE_DIALOG);
-		hildon_thumb_menu_item_set_images(HILDON_THUMB_MENU_ITEM(menu_item), image_small, image_large);
-		*/
 		
 		g_signal_connect(menu_item, "activate",
 		            	 G_CALLBACK(on_notes_menu_item_activated),
@@ -462,15 +463,21 @@ on_notes_button_clicked				   (GtkAction		*action,
 		
 		notes = notes->next;
 	}
+*/
 	
-	/*hildon_menu_set_thumb_mode(GTK_MENU(menu), TRUE);*/
+	g_timer_stop(timer);
+	g_timer_elapsed(timer, &micro);
+	g_printerr("Opening search window: %lu micro seconds \n", micro);
 	
+	/*
 	gtk_widget_show_all(menu);
 
 	gtk_menu_popup(GTK_MENU (menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
+	*/
 	
 }
 
+/*
 void
 on_notes_menu_item_activated		(GtkMenuItem *menuitem,
 									 gpointer     user_data)
@@ -478,6 +485,7 @@ on_notes_menu_item_activated		(GtkMenuItem *menuitem,
 	Note *note = (Note*)user_data;
 	note_show(note);
 }
+*/
 
 /* TODO: The signal "mark-set" is emitted 4 times when clicking into the text. While selecting
  * it's emitted continuesly. */
@@ -1046,14 +1054,13 @@ GSList* find_titles(gchar *haystack) {
 	AppData *app_data = get_app_data();
 	
 	gchar *u_haystack = g_utf8_casefold(haystack, -1);
-	gchar *u_needle;
 	gulong micro;
 	
 	GList *notes = app_data->all_notes;
 	while (notes != NULL) {
+		gchar *u_needle = g_utf8_casefold(note->title, -1);
 		note = (Note*)notes->data;
-		u_needle = g_utf8_casefold(note->title, -1);
-		
+
 		found = u_haystack;
 		
 		while ( (found = strstr(found, u_needle)) != NULL ) {
@@ -1064,9 +1071,8 @@ GSList* find_titles(gchar *haystack) {
 			result = g_slist_prepend(result, hit);
 			found = found + strlen(u_needle);
 		}
-		
+		g_free(u_needle);
 		notes = notes->next;
-		
 	}
 	
 	g_timer_stop(timer);

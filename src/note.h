@@ -32,7 +32,7 @@ void note_save(Note *note);
 
 void note_close_window(Note *note);
 
-const gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer);
+gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer);
 
 void note_show(Note *note);
 

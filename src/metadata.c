@@ -29,6 +29,7 @@
 #include <time.h>
 
 #include "metadata.h"
+#include "note.h"
 
 
 /* Global AppData only access with get_app_data() */
@@ -65,6 +66,7 @@ AppData* get_app_data() {
 		_app_data->font_size = font_size;
 		_app_data->program = hildon_program_get_instance();
 		_app_data->fullscreen = FALSE;
+		_app_data->search_window = NULL;
 	}
 	
 	return _app_data;
@@ -120,6 +122,7 @@ GList* create_note_list(AppData *app_data) {
 	
 	while ((filename = g_dir_read_name(dir)) != NULL) {
 		if (g_str_has_suffix(filename, ".note")) {
+			gchar *full_filename;
 			
 			/* Create new note and append to list */
 			note = note_create_new(); /*g_slice_new0(Note);*/ /* note = malloc(sizeof(Note)); */
@@ -129,7 +132,9 @@ GList* create_note_list(AppData *app_data) {
 			note->filename = g_strconcat(app_data->user_path, filename, NULL);
 			
 			/* Open file and read out title. Save title in note */
-			file = g_mapped_file_new(g_strconcat(app_data->user_path, filename, NULL), FALSE, NULL);
+			full_filename = g_strconcat(app_data->user_path, filename, NULL);
+			file = g_mapped_file_new(full_filename, FALSE, NULL);
+			g_free(full_filename);
 			content = g_mapped_file_get_contents(file);			
 			
 			/* TODO: Maybe use real xml parser for this. But I think this way is faster */

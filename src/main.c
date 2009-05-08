@@ -45,6 +45,8 @@
 #include "callbacks.h"
 #include "note.h"
 
+#include "search_window.h"
+
 #include "localisation.h"
 
 #include "../config.h"
@@ -70,6 +72,14 @@ main (int argc, char *argv[])
   
   /* Init GTK */
   gtk_init(&argc, &argv);
+  
+  /*
+  search_window_open();
+  gtk_main();
+  return;
+  */
+  
+  
   
   /* Call this to initialize it */
   app_data = get_app_data();

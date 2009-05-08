@@ -36,6 +36,7 @@ typedef struct
 	GConfClient   *client;
 	HildonProgram *program;
 	gboolean	   fullscreen;
+	HildonWindow  *search_window
 } AppData;
 
 typedef struct

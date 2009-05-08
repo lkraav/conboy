@@ -38,7 +38,9 @@ conboy_SOURCES = \
         src/metadata.h \
         src/metadata.c \
         src/note.h \
-        src/note.c
+        src/note.c \
+        src/search_window.h \
+        src/search_window.c
 
 #libconboy_applet_la_SOURCES = \
 #		src/conboy_applet.c \

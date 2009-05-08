@@ -114,10 +114,10 @@ void note_format_title(GtkTextBuffer *buffer)
 }
 
 
-const gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer)
+gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer)
 {	
 	GtkTextIter start, end;
-	const gchar* title;
+	gchar* title;
 	
 	/* Set end iter depending on if we have one or more lines */
 	if (gtk_text_buffer_get_line_count(buffer) == 1) {
@@ -135,7 +135,9 @@ const gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer)
 
 void note_set_window_title_from_buffer(GtkWindow *win, GtkTextBuffer *buffer)
 {
-	gtk_window_set_title(win, note_extract_title_from_buffer(buffer));
+	gchar *title = note_extract_title_from_buffer(buffer);
+	gtk_window_set_title(win, title);
+	g_free(title);
 }
 
 
