@@ -1,3 +1,11 @@
+conboy (0.4.0) stable; urgency=low
+
+  * Added automatic linking to existing notes while typing
+  * Added new window for searching and selecting notes
+  * Bugfix: After pressing enter inside a bullet list, scroll to make cursor visible
+ 
+ -- Cornelius Hald <hald@icandy.de>  Mon, 11 May 2009 20:37:09 +0200
+
 conboy (0.3.2) stable; urgency=low
 
   * When removing package also remove the desktop file
