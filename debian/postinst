@@ -6,4 +6,6 @@ gtk-update-icon-cache -f /usr/share/icons/hicolor
 ( cd /usr/share/applications/hildon/ && mv conboy.inactive conboy.desktop )
 
 # select the installation folder
-maemo-select-menu-location conboy.desktop
+if [ -f /usr/bin/X11/maemo-select-menu-location ]
+	then /usr/bin/X11/maemo-select-menu-location conboy.desktop
+fi
