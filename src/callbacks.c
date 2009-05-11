@@ -940,16 +940,13 @@ static gint
 get_length_of_longest_title()
 {
 	gint max_length = 0;
-	gchar *title;
 	AppData *app_data = get_app_data();
-	GtkTreeIter iter;
-	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
 	
-	if (gtk_tree_model_get_iter_first(model, &iter)) do {
-		gtk_tree_model_get(model, &iter, TITLE_COLUMN, &title, -1);
-		max_length = max(g_utf8_strlen(title, -1), max_length);
-		g_free(title);
-	} while (gtk_tree_model_iter_next(model, &iter));
+	GList *notes = app_data->search_list;
+	while (notes != NULL) {
+		max_length = max(g_utf8_strlen(((Note*)notes->data)->title, -1), max_length);
+		notes = notes->next;
+	}
 	
 	return max_length;
 }
@@ -973,7 +970,7 @@ GSList* find_titles(gchar *haystack) {
 	 * obvious, that we cannot work direktly on the GtkTreeModel :(
 	 */
 	
-	GTimer *timer = g_timer_new();
+	GTimer *search_timer = g_timer_new();
 	
 	Note *note;
 	gchar *found;
@@ -983,17 +980,10 @@ GSList* find_titles(gchar *haystack) {
 	gchar *u_haystack = g_utf8_casefold(haystack, -1);
 	gulong micro;
 	
-	/*
-	GtkTreeIter iter;
-	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
-	*/
-		
-	/*if (gtk_tree_model_get_iter_first(model, &iter)) do {*/
 	GList *notes = app_data->search_list;
 	while (notes != NULL) {
 		gchar *u_needle;
 		note = (Note*)notes->data;
-		/*gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);*/
 		
 		u_needle = g_utf8_casefold(note->title, -1);
 		
@@ -1010,11 +1000,10 @@ GSList* find_titles(gchar *haystack) {
 		g_free(u_needle);
 		notes = notes->next;
 	}
-	/*} while (gtk_tree_model_iter_next(model, &iter));*/
 	
-	g_timer_stop(timer);
+	g_timer_stop(search_timer);
 	
-	g_timer_elapsed(timer, &micro);
+	g_timer_elapsed(search_timer, &micro);
 	g_printerr("Search took %lu microseconds \n", micro);
 	
 	g_free(u_haystack);
@@ -1152,9 +1141,18 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 											 gpointer		user_data)
 {
 	Note *note = (Note*)user_data;
+	GTimer *timer;
+	gulong micro;
 	
 	apply_active_tags(buffer, iter, text, note);
+	
+	timer = g_timer_new();
+	
 	auto_highlight_links(buffer, iter, text, note);
+	
+	g_timer_stop(timer);
+	g_timer_elapsed(timer, &micro);
+	g_printerr("Complete insert: %lu ms \n", micro);
 }
 
 void
