@@ -424,7 +424,7 @@ on_notes_button_clicked				   (GtkAction		*action,
 	gulong micro;
 	
 	app_data = get_app_data();
-	if (app_data->all_notes == NULL) {
+	if (app_data->note_store == NULL) {
 		return;
 	}
 	
@@ -701,7 +701,8 @@ on_delete_button_clicked			   (GtkAction		*action,
 	
 	app_data = get_app_data();
 	/* TODO: Free note */
-	app_data->all_notes = g_list_remove(app_data->all_notes, note);
+	/*app_data->all_notes = g_list_remove(app_data->all_notes, note);*/
+	note_list_store_remove(app_data->note_store, note);
 }
 
 static
@@ -1023,15 +1024,17 @@ static gint
 get_length_of_longest_title()
 {
 	gint max_length = 0;
-	Note *note;
+	gchar *title;
 	AppData *app_data = get_app_data();
+	GtkTreeIter iter;
+	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
 	
-	GList *notes = app_data->all_notes;
-	while (notes != NULL) {
-		note = (Note*)notes->data;
-		max_length = max(g_utf8_strlen(note->title, -1), max_length);
-		notes = notes->next;
-	}
+	if (gtk_tree_model_get_iter_first(model, &iter)) do {
+		gtk_tree_model_get(model, &iter, TITLE_COLUMN, &title, -1);
+		max_length = max(g_utf8_strlen(title, -1), max_length);
+		g_free(title);
+	} while (gtk_tree_model_iter_next(model, &iter));
+	
 	return max_length;
 }
 
@@ -1056,11 +1059,16 @@ GSList* find_titles(gchar *haystack) {
 	gchar *u_haystack = g_utf8_casefold(haystack, -1);
 	gulong micro;
 	
-	GList *notes = app_data->all_notes;
-	while (notes != NULL) {
-		gchar *u_needle = g_utf8_casefold(note->title, -1);
-		note = (Note*)notes->data;
+	GtkTreeIter iter;
+	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
+		
+	if (gtk_tree_model_get_iter_first(model, &iter)) do {
 
+		gchar *u_needle;
+		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
+		
+		u_needle = g_utf8_casefold(note->title, -1);
+		
 		found = u_haystack;
 		
 		while ( (found = strstr(found, u_needle)) != NULL ) {
@@ -1072,8 +1080,7 @@ GSList* find_titles(gchar *haystack) {
 			found = found + strlen(u_needle);
 		}
 		g_free(u_needle);
-		notes = notes->next;
-	}
+	} while (gtk_tree_model_iter_next(model, &iter));
 	
 	g_timer_stop(timer);
 	

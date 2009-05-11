@@ -22,90 +22,48 @@
 #include <gconf/gconf-client.h>
 #include <hildon/hildon-program.h>
 
+#include "note_list_store.h"
+
 /*#define BULLET "\342\200\242 "*/
 /*#define BULLET "\u2022 "*/
 
 typedef struct
 {
 	const gchar   *user_path;
-	GList		  *all_notes;
+	/*GList		  *all_notes;*/
 	GList         *open_notes;
-	GdkAtom        serializer;
-	GdkAtom        deserializer;
 	gint           font_size;
 	GConfClient   *client;
 	HildonProgram *program;
 	gboolean	   fullscreen;
-	HildonWindow  *search_window
+	HildonWindow  *search_window;
+	NoteListStore *note_store; /* TODO: Maybe new struct for search related stuff */
 } AppData;
 
-typedef struct
-{
-	HildonWindow        *window;
-	GtkTextView         *view;
-	GtkTextBuffer       *buffer;
-	
-	GtkToggleToolButton *button_bold;
-	GtkToggleToolButton *button_italic;
-	GtkToggleToolButton *button_strike;
-	GtkToggleToolButton *button_highlight;
-	GtkToggleToolButton *button_bullets;
-	
-	GtkToggleAction     *action_bold;
-	GtkToggleAction     *action_italic;
-	GtkToggleAction	    *action_fixed;
-	GtkToggleAction     *action_strike;
-	GtkToggleAction     *action_highlight;
-	GtkToggleAction     *action_bullets;
-	GtkAction           *action_link;
-	GtkRadioAction		*action_font_small;
-	GtkAction			*action_inc_indent;
-	GtkAction			*action_dec_indent;
 
-} UserInterface;
 
-typedef struct
-{
-  UserInterface *ui;
-  const gchar   *title;
-  const gchar   *filename;
-  
-  time_t last_change_date;
-  time_t last_metadata_change_date;
-  time_t create_date;
-  
-  gint cursor_position;
-  gint width;
-  gint height;
-  gint x;
-  gint y;
-  gboolean open_on_startup;
-  const gchar *version;
-  
-  GSList *active_tags;
-  
-} Note;
 
-AppData* get_app_data();
+
+AppData* get_app_data(void);
+
+NoteListStore* create_note_list_store(const gchar *user_path);
 
 const gchar* get_bullet_by_depth(gint depth);
 
 const gchar* get_bullet_by_depth_tag(GtkTextTag *tag);
 
-GList* create_note_list(AppData *app_data);
-
-gboolean is_note_list_changed();
+gboolean is_note_list_changed(void);
 
 GList* sort_note_list_by_change_date(GList* note_list);
 
-const gchar* get_current_time_in_iso8601();
+const gchar* get_current_time_in_iso8601(void);
 
 const gchar* get_time_in_seconds_as_iso8601(time_t time_in_seconds);
 
 time_t get_iso8601_time_in_seconds(const gchar *time_string);
 
-const gchar* note_get_new_filename();
+const gchar* note_get_new_filename(void);
 
-const gchar* get_uuid();
+const gchar* get_uuid(void);
 
 #endif /* METADATA_H */

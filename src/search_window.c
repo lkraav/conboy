@@ -24,52 +24,8 @@
 #include "search_window.h"
 #include "metadata.h"
 #include "note.h"
+#include "note_list_store.h"
 
-enum
-{
-	ICON_COLUMN,
-	TITLE_COLUMN,
-	CHANGE_DATE_COLUMN,
-	NOTE_COLUMN,
-	N_COLUMNS
-};
-
-/* TODO: Should not be global */
-GdkPixbuf *note_icon = NULL;
-
-static
-void popuplate_list_model(GtkListStore* store) {
-	
-	GtkTreeIter iter;
-	AppData *app_data = get_app_data();
-	GList *all_notes = app_data->all_notes;
-	GDate *date = g_date_new();
-	gchar date_str[20];
-	
-	if (note_icon == NULL) {
-		/* TODO: Don't use absolut path here */
-		note_icon = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/26x26/hildon/conboy.png", NULL);
-		if (note_icon == NULL) {
-			/* TODO: Return some default missing image icon */ 
-		}
-	}
-	
-	while (all_notes != NULL) {
-		Note *note = (Note*)all_notes->data;
-		
-		g_date_set_time_t(date, note->last_change_date);
-		g_date_strftime(date_str, 20, "%x", date); /* time not possible with this function */
-		
-		gtk_list_store_append(store, &iter);
-		gtk_list_store_set(store, &iter, ICON_COLUMN, note_icon,
-				                         TITLE_COLUMN, note->title,
-				                         CHANGE_DATE_COLUMN, date_str,
-				                         NOTE_COLUMN, note,
-				                         -1);
-		all_notes = all_notes->next;
-	}
-	g_free(date);
-}
 
 static gboolean
 is_row_visible(GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
@@ -160,13 +116,16 @@ void on_row_activated(GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *c
 	GtkTreeModel *model;
 	
 	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
-		AppData *app_data = get_app_data();
 		Note *note = NULL;
-		
+		AppData *app_data = get_app_data();
 		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
-	
+		g_printerr("Open Note: %s \n", note->title);
+		g_printerr("Open File: %s \n", note->filename);
+		
+		
 		/* Close this window and show the selected note */
 		gtk_widget_hide(GTK_WIDGET(app_data->search_window));
+		
 		note_show(note);
 	}
 }
@@ -210,6 +169,12 @@ gboolean on_key_pressed(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 }
 
 static
+void on_row_inserted (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data)
+{
+	g_printerr("on_row_inserted() called \n");
+}
+
+static
 gint compare_titles(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
 {
 	gint result = 0;
@@ -235,7 +200,6 @@ gint compare_titles(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointe
 static
 gint compare_dates(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
 {
-	gint result = 0;
 	Note *note_a;
 	Note *note_b;
 	
@@ -248,6 +212,7 @@ gint compare_dates(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer
 static
 HildonWindow* search_window_create()
 {
+	AppData *app_data = get_app_data();
 	GtkWidget *win;
 	GtkWidget *vbox;
 	GtkWidget *hbox;
@@ -257,7 +222,7 @@ HildonWindow* search_window_create()
 	GtkWidget *scrolledwindow;
 	GtkWidget *tree;
 	GtkTreeSelection *selection;
-	GtkListStore *store;
+	NoteListStore *store;
 	GtkTreeModel *filtered_store;
 	GtkTreeModel *sorted_store;
 	GtkCellRenderer *renderer;
@@ -296,8 +261,7 @@ HildonWindow* search_window_create()
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	
 	/* LIST STORE */
-	store = gtk_list_store_new(N_COLUMNS, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_POINTER);
-	popuplate_list_model(store);
+	store = app_data->note_store;
 	/* Add filter wrapper */
 	filtered_store = gtk_tree_model_filter_new(GTK_TREE_MODEL(store), NULL);
 	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(filtered_store), is_row_visible, search_field, NULL);
@@ -305,7 +269,6 @@ HildonWindow* search_window_create()
 	sorted_store = gtk_tree_model_sort_new_with_model(filtered_store);
 	gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(sorted_store), TITLE_COLUMN, compare_titles, NULL, NULL);
 	gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(sorted_store), CHANGE_DATE_COLUMN, compare_dates, NULL, NULL);
-	
 	
 	/* TREE VIEW */
 	tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(sorted_store));
@@ -346,7 +309,9 @@ HildonWindow* search_window_create()
 	gtk_tree_view_column_set_reorderable(change_date_column, FALSE);
 	gtk_tree_view_column_set_sort_order(change_date_column, GTK_SORT_DESCENDING);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree), change_date_column);
-	
+	/* Sort the using the CHANGE_DATE column */
+	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(sorted_store), CHANGE_DATE_COLUMN, GTK_SORT_DESCENDING);
+	gtk_tree_sortable_sort_column_changed(GTK_TREE_SORTABLE(sorted_store));
 	
 	/* CONNECT SIGNALS */
 	g_signal_connect(search_field, "changed", G_CALLBACK(on_search_string_changed), filtered_store);
@@ -357,6 +322,12 @@ HildonWindow* search_window_create()
 	g_signal_connect(win, "delete-event", G_CALLBACK(gtk_widget_hide_on_delete), NULL);
 	g_signal_connect(win, "key_press_event", G_CALLBACK(on_hardware_key_pressed), win);
 	g_signal_connect(tree, "key_press_event", G_CALLBACK(on_key_pressed), search_field);
+	
+	/* TEST */
+	g_signal_connect(store, "row-inserted", G_CALLBACK(on_row_inserted), NULL);
+	
+	app_data = get_app_data();
+	app_data->note_store = store;
 	
 	return HILDON_WINDOW(win);
 }
@@ -371,4 +342,43 @@ void search_window_open()
 	
 	gtk_widget_show(GTK_WIDGET(app_data->search_window));
 	gtk_window_present(GTK_WINDOW(app_data->search_window));
+}
+
+void add_note(Note *note)
+{
+	/* TODO: How can we check if the note is already in the store??? */
+	
+	/*
+	if (app_data->search_store != NULL) {
+		GtkTreeIter iter;
+		gtk_list_store_append(app_data->search_store, &iter);
+		gtk_list_store_set(app_data->search_store, &iter, ICON_COLUMN, note_icon,
+		                                                  TITLE_COLUMN, note->title,
+		                                                  CHANGE_DATE_COLUMN, note->last_change_date,
+		                                                  NOTE_COLUMN, note,
+		                                                  -1);
+	}
+	*/
+	/*update_store();*/
+}
+
+/* TODO: This is really unefficient and only a temp hack.
+ * Do this seperatly for adding, removing and changing notes */
+/*
+void update_store()
+{
+	AppData *app_data = get_app_data();
+	if (app_data->note_store != NULL) {
+		g_printerr("Updating store \n");
+		gtk_list_store_clear(app_data->note_store);
+		popuplate_list_model(app_data->note_store);
+		
+	}
+	
+}
+*/
+
+void remove_note(Note *note)
+{
+	
 }

@@ -25,6 +25,7 @@
 #include "note.h"
 #include "serializer.h"
 #include "deserializer.h"
+#include "note_list_store.h"
 
 
 Note* note_create_new()
@@ -78,20 +79,20 @@ static gint compare_title(gconstpointer a, gconstpointer b)
 void note_show_by_title(const char* title)
 {	
 	Note *note;
-	GList *element;
+	/*GList *element;*/
 	AppData *app_data = get_app_data();
-	GList *all_notes = app_data->all_notes;
+	/*GList *all_notes = app_data->all_notes;*/
 	
-	element = g_list_find_custom(all_notes, title, compare_title);
+	/*element = g_list_find_custom(all_notes, title, compare_title);*/
+	note = note_list_store_find_by_title(app_data->note_store, title);
 	
-	if (element == NULL) {
+	if (note == NULL) {
 		note = note_create_new();
 		note->title = title;
 		note_show(note);
 		return;
 	}
 	
-	note = (Note*)element->data;
 	note_show(note);
 }
 
@@ -199,7 +200,7 @@ void note_save(Note *note)
 	title = note_extract_title_from_buffer(buffer); 
 	
 	/* Set meta data */
-	/* We don't change height, width, x and y and we don't need them */
+	/* We don't change height, width, x and y because we don't use them */
 	note->title = g_strdup(title);
 	note->last_change_date = time_in_s;
 	note->last_metadata_change_date = time_in_s;
@@ -224,8 +225,6 @@ void note_save(Note *note)
 	
 	app_data = get_app_data();
 	
-	/*g_printerr("Saving >%s< \n", note->title);*/
-	
 	/* Set start and end iterators for serialization */
 	gtk_text_buffer_get_bounds(buffer, &start, &end);
 	
@@ -233,9 +232,10 @@ void note_save(Note *note)
 	serialize_note(note);
 	
 	/* If first save, add to list of all notes */
-	if (!g_list_find(app_data->all_notes, note)) {
-		/*g_printerr("Note >%s< is not yet in the list. Adding.\n", note->title);*/
-		app_data->all_notes = g_list_append(app_data->all_notes, note);
+	if (!note_list_store_find(app_data->note_store, note)) {
+		note_list_store_add(app_data->note_store, note, NULL);
+	} else {
+		note_list_store_note_changed(app_data->note_store, note);
 	}
 	
 	gtk_text_buffer_set_modified(buffer, FALSE);
@@ -279,10 +279,13 @@ gboolean note_is_open(Note *note)
 gboolean note_exists(Note *note)
 {
 	AppData *app_data = get_app_data();
-	GList *element = g_list_find(app_data->all_notes, note);
+	/*GList *element = g_list_find(app_data->all_notes, note);*/
+	Note *element = note_list_store_find(app_data->note_store, note);
 	if (element == NULL) {
+		g_printerr("EXISTS: NO \n");
 		return FALSE;
 	} else {
+		g_printerr("EXISTS: YES \n");
 		return TRUE;
 	}
 }
@@ -359,7 +362,7 @@ void note_show_new(Note *note)
 	note->filename = note_get_new_filename();
 	
 	if (note->title == NULL) {
-		notes_count = g_list_length(app_data->all_notes);
+		notes_count = note_list_store_get_length(app_data->note_store); /*g_list_length(app_data->all_notes);*/
 		note->title = g_strdup_printf("New Note %i", notes_count);
 	}
 	

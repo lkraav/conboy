@@ -40,7 +40,9 @@ conboy_SOURCES = \
         src/note.h \
         src/note.c \
         src/search_window.h \
-        src/search_window.c
+        src/search_window.c \
+        src/note_list_store.c \
+        src/note_list_store.h
 
 #libconboy_applet_la_SOURCES = \
 #		src/conboy_applet.c \

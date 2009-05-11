@@ -30,19 +30,18 @@
 
 #include "metadata.h"
 #include "note.h"
-
+#include "note_list_store.h"
 
 /* Global AppData only access with get_app_data() */
 AppData *_app_data = NULL;
 
 AppData* get_app_data() {
 	
-	gint font_size;
-	GConfClient *client;
-	const gchar *path;
-	
 	if (_app_data == NULL) {
-		
+		gint font_size;
+		GConfClient *client;
+		const gchar *path;
+
 		client = gconf_client_get_default();
 		gconf_client_add_dir(client, "/apps/maemo/conboy", GCONF_CLIENT_PRELOAD_NONE, NULL);
 		
@@ -58,9 +57,9 @@ AppData* get_app_data() {
 			g_mkdir(path, 0700);
 		}
 		
-		_app_data = g_slice_alloc0(sizeof(AppData));
+		_app_data = g_new(AppData, 1);
 		_app_data->user_path = path;
-		_app_data->all_notes = create_note_list(_app_data);
+		_app_data->note_store = create_note_list_store(path);
 		_app_data->open_notes = NULL;
 		_app_data->client = client;
 		_app_data->font_size = font_size;
@@ -109,7 +108,7 @@ GList* sort_note_list_by_change_date(GList* note_list)
 	return g_list_sort(note_list, compare_notes_by_change_date);
 }
 
-GList* create_note_list(AppData *app_data) {
+GList* create_note_listX(AppData *app_data) {
 		
 	const gchar *filename; 
 	GList *notes = NULL;
@@ -125,7 +124,7 @@ GList* create_note_list(AppData *app_data) {
 			gchar *full_filename;
 			
 			/* Create new note and append to list */
-			note = note_create_new(); /*g_slice_new0(Note);*/ /* note = malloc(sizeof(Note)); */
+			note = note_create_new();
 			notes = g_list_prepend(notes, note);
 			
 			/* Save filename in note */
@@ -157,6 +156,68 @@ GList* create_note_list(AppData *app_data) {
 	g_dir_close(dir);
 	notes = sort_note_list_by_change_date(notes);
 	return notes;
+}
+
+NoteListStore* create_note_list_store(const gchar *user_path) {
+		
+	const gchar *filename; 
+	NoteListStore *store;
+	GDir *dir = g_dir_open(user_path, 0, NULL);
+	Note *note;
+	GMappedFile *file;
+	gchar *content;
+	gchar *start, *end;
+	gchar *tmp;
+	GtkTreeIter iter;
+	
+	store = g_object_new(NOTE_TYPE_LIST_STORE, NULL); /*note_list_store_new();*/
+	if (GTK_IS_TREE_MODEL(store))
+		g_printerr("OK after create\n");
+	
+	while ((filename = g_dir_read_name(dir)) != NULL) {
+		if (g_str_has_suffix(filename, ".note")) {
+			gchar *full_filename;
+			
+			/* Create new note and append to list store */
+			note = note_create_new();
+			note_list_store_add(store, note, &iter);
+			/*
+			gtk_list_store_append(GTK_LIST_STORE(store), &iter);
+			gtk_list_store_set(GTK_LIST_STORE(store), &iter, 0, note, -1);
+			*/
+			
+			/* Save filename in note */
+			note->filename = g_strconcat(user_path, filename, NULL);
+			
+			/* Open file and read out title. Save title in note */
+			full_filename = g_strconcat(user_path, filename, NULL);
+			file = g_mapped_file_new(full_filename, FALSE, NULL);
+			g_free(full_filename);
+			content = g_mapped_file_get_contents(file);			
+			
+			/* TODO: Maybe use real xml parser for this. But I think this way is faster */
+			start = g_strrstr(content, "<title>"); /* move pointer to begining of <title> */
+			start = start + sizeof(gchar) * 7; /* move another 7 characters to be after <title> */
+			end = g_strrstr(content, "</title>"); /* move another pointer to begining of </title> */
+			note->title = g_strndup(start, end - start); /* copy the area between start and end, which is the title */
+			
+			/* Read out last-change-date and save to note */
+			start = g_strrstr(content, "<last-change-date>");
+			start = start + sizeof(gchar) * 18;
+			end = g_strrstr(content, "</last-change-date>");
+			tmp = g_strndup(start, end - start);
+			note->last_change_date = get_iso8601_time_in_seconds(tmp);
+			g_free(tmp);
+			
+			g_mapped_file_free(file);
+		}
+	}
+	g_dir_close(dir);
+	
+	if (GTK_IS_TREE_MODEL(store))
+			g_printerr("OK before return\n");
+	
+	return store;
 }
 
 const gchar* get_uuid()

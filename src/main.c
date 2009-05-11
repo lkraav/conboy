@@ -47,6 +47,8 @@
 
 #include "search_window.h"
 
+#include "note_list_store.h"
+
 #include "localisation.h"
 
 #include "../config.h"
@@ -73,14 +75,6 @@ main (int argc, char *argv[])
   /* Init GTK */
   gtk_init(&argc, &argv);
   
-  /*
-  search_window_open();
-  gtk_main();
-  return;
-  */
-  
-  
-  
   /* Call this to initialize it */
   app_data = get_app_data();
   
@@ -98,8 +92,9 @@ main (int argc, char *argv[])
   g_set_application_name("Conboy");
  
   /* Get the most recent note. If there is none, create new. */
-  if (app_data->all_notes != NULL && app_data->all_notes->data != NULL) {
-	  note = (Note*)app_data->all_notes->data;
+  if (app_data->note_store != NULL) {
+	  note = note_list_store_get_latest(app_data->note_store);
+	  /*g_printerr("TITLE: %s \n", note->title);*/
   } else {
 	  note = note_create_new();
   }

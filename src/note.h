@@ -20,7 +20,55 @@
 #define NOTE_H
 
 #include <gtk/gtk.h>
-#include "metadata.h"
+#include <hildon/hildon-window.h>
+
+typedef struct
+{
+	HildonWindow        *window;
+	GtkTextView         *view;
+	GtkTextBuffer       *buffer;
+	
+	GtkToggleToolButton *button_bold;
+	GtkToggleToolButton *button_italic;
+	GtkToggleToolButton *button_strike;
+	GtkToggleToolButton *button_highlight;
+	GtkToggleToolButton *button_bullets;
+	
+	GtkToggleAction     *action_bold;
+	GtkToggleAction     *action_italic;
+	GtkToggleAction	    *action_fixed;
+	GtkToggleAction     *action_strike;
+	GtkToggleAction     *action_highlight;
+	GtkToggleAction     *action_bullets;
+	GtkAction           *action_link;
+	GtkRadioAction		*action_font_small;
+	GtkAction			*action_inc_indent;
+	GtkAction			*action_dec_indent;
+
+} UserInterface;
+
+typedef struct
+{
+  UserInterface *ui;
+  const gchar   *title;
+  const gchar   *filename;
+  
+  time_t last_change_date;
+  time_t last_metadata_change_date;
+  time_t create_date;
+  
+  gint cursor_position;
+  gint width;
+  gint height;
+  gint x;
+  gint y;
+  gboolean open_on_startup;
+  const gchar *version;
+  
+  GSList *active_tags;
+  
+} Note;
+
 
 Note* note_create_new();
 
