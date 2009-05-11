@@ -30,14 +30,14 @@
 typedef struct
 {
 	const gchar   *user_path;
-	/*GList		  *all_notes;*/
 	GList         *open_notes;
 	gint           font_size;
 	GConfClient   *client;
 	HildonProgram *program;
 	gboolean	   fullscreen;
 	HildonWindow  *search_window;
-	NoteListStore *note_store; /* TODO: Maybe new struct for search related stuff */
+	NoteListStore *note_store;
+	GList         *search_list;
 } AppData;
 
 

@@ -1,3 +1,21 @@
+/* This file is part of Conboy.
+ * 
+ * Copyright (C) 2009 Cornelius Hald
+ *
+ * Conboy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Conboy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <string.h>
 #include <gtk/gtk.h>
 
@@ -8,7 +26,6 @@
 /*
  * Implementation of the interface
  */
-
 static void note_list_store_tree_model_iface_init(GtkTreeModelIface *iface);
 static int note_list_store_get_n_columns(GtkTreeModel *self);
 static GType note_list_store_get_column_type(GtkTreeModel *self, int column);
@@ -65,6 +82,7 @@ void
 note_list_store_add(NoteListStore *self, Note *note, GtkTreeIter *iter)
 {
 	GtkTreeIter iter1;
+	AppData *app_data = get_app_data();
 
 	/* validate our parameters */
 	g_return_if_fail(NOTE_IS_LIST_STORE(self));
@@ -74,9 +92,15 @@ note_list_store_add(NoteListStore *self, Note *note, GtkTreeIter *iter)
 	gtk_list_store_append(GTK_LIST_STORE(self), &iter1);
 	gtk_list_store_set(GTK_LIST_STORE(self), &iter1, 0, note, -1);
 
-	/* TODO: here you would connect up signals (e.g. ::notify) to notice when your
-	 * object has changed */
+	/* TODO: If Note would be a gobject, then here we could
+	 * connect signals to recognize whenever the Note itself was
+	 * changed. If such a change would occure we could update the
+	 * coresponding row. */
 
+	/* Update the search structure. TODO: Find a way to improve,
+	 * maybe with own signals. Because there are other ways to add an item... */
+	app_data->search_list = g_list_prepend(app_data->search_list, note);
+	
 	/* return the iter if the user cares */
 	if (iter) *iter = iter1;
 }
@@ -202,42 +226,24 @@ note_list_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GVa
 /*
  * Own stuff
  */
-/*
-gboolean note_list_get_iter(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer data)
-{
-	Note *note_a = (Note*)user_data;
-	Note *note_b;
-	
-	gtk_tree_model_get(model, iter, 0, note_b, -1);
-	
-	if (note_a == note_b) {
-		return TRUE;
-	} else {
-		return FALSE;
-	}
-}
-*/
 
 NoteListStore *note_list_store_new(void)
 {
 	return g_object_new(NOTE_TYPE_LIST_STORE, NULL);	
 }
 
-/* USE _add with NULL
-void note_list_store_append(NoteListStore *self, Note *note)
-{
-	GtkTreeIter iter;
-	gtk_list_store_append(self, &iter);
-	gtk_list_store_set(self, &iter, 0, note, -1);
-}
-*/
-
 gboolean note_list_store_remove(NoteListStore *self, Note *note)
 {
 	GtkTreeIter iter;
+	AppData *app_data = get_app_data();
+	
 	if (note_list_store_get_iter(self, note, &iter)) {
 		gtk_list_store_remove(GTK_LIST_STORE(self), &iter);
-		g_printerr("Removed from list store \n");
+		
+		/* Update the search structure. TODO: Find a way to improve,
+		 * maybe with own signals because there are other ways to remove an item too */
+		app_data->search_list = g_list_remove(app_data->search_list, note);
+		
 		return TRUE;
 	}
 	return FALSE;
@@ -245,18 +251,6 @@ gboolean note_list_store_remove(NoteListStore *self, Note *note)
 
 gboolean note_list_store_get_iter(NoteListStore *self, Note *note_a, GtkTreeIter *iter)
 {
-	/*
-	gboolean result;
-	GtkTreePath *path = note_list_store_get_iter_and_path(self, note, iter);
-	if (path == NULL) {
-		result = FALSE;
-	} else {
-		result = TRUE;
-	}
-	g_free(path);
-	return result;
-	*/
-	
 	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self), iter)) do
 	{
 		Note *note_b;
@@ -268,24 +262,6 @@ gboolean note_list_store_get_iter(NoteListStore *self, Note *note_a, GtkTreeIter
 	
 	return FALSE;
 }
-
-/*
-GtkTreePath note_list_store_get_iter_and_path(NoteListStore *self, Note *note_a, GtkTreeIter *iter)
-{
-	GtkTreePath *path = NULL;
-	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self), iter)) do
-	{
-		Note *note_b;
-		gtk_tree_model_get(GTK_TREE_MODEL(self), iter, NOTE_COLUMN, &note_b, -1);
-		if (note_a == note_b) {
-			path = gtk_tree_model_get_path(GTK_TREE_MODEL(self), iter);
-			break;
-		}
-	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(self), iter));
-	
-	return path;
-}
-*/
 
 Note *note_list_store_find(NoteListStore *self, Note *note_a)
 {
@@ -336,14 +312,6 @@ Note *note_list_store_get_latest(NoteListStore *self)
 {
 	GtkTreeIter iter;
 	Note *latest_note = NULL;
-	
-	if (self == NULL) {
-		g_printerr("NULL \n");
-	}
-	
-	if (!GTK_IS_TREE_MODEL(self)) {
-		g_printerr("NO TREE MODEL\n");
-	}
 	
 	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self), &iter)) do {
 		Note *note;

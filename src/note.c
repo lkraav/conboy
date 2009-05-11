@@ -279,13 +279,10 @@ gboolean note_is_open(Note *note)
 gboolean note_exists(Note *note)
 {
 	AppData *app_data = get_app_data();
-	/*GList *element = g_list_find(app_data->all_notes, note);*/
 	Note *element = note_list_store_find(app_data->note_store, note);
 	if (element == NULL) {
-		g_printerr("EXISTS: NO \n");
 		return FALSE;
 	} else {
-		g_printerr("EXISTS: YES \n");
 		return TRUE;
 	}
 }
@@ -302,8 +299,8 @@ void note_set_focus(Note *note)
 void note_show(Note *note)
 {
 	AppData *app_data = get_app_data();
-	GtkTextBuffer *buffer; /*= note->ui->buffer;*/
-	GtkWindow *window; /* = GTK_WINDOW(note->ui->window);*/
+	GtkTextBuffer *buffer;
+	GtkWindow *window;
 	
 	/* If the note it already open, we bring this note to the foreground and return */
 	if (note_is_open(note)) {

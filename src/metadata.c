@@ -35,103 +35,31 @@
 /* Global AppData only access with get_app_data() */
 AppData *_app_data = NULL;
 
-AppData* get_app_data() {
+
+static void populate_note_list_store(NoteListStore *store, const gchar *user_path) {
 	
-	if (_app_data == NULL) {
-		gint font_size;
-		GConfClient *client;
-		const gchar *path;
-
-		client = gconf_client_get_default();
-		gconf_client_add_dir(client, "/apps/maemo/conboy", GCONF_CLIENT_PRELOAD_NONE, NULL);
-		
-		font_size = gconf_client_get_int(client, "/apps/maemo/conboy/font_size", NULL);
-		if (font_size == 0) {
-			font_size = 20000;
-		}
-		
-		path = g_strconcat(g_get_home_dir(), "/.conboy/", NULL);
-			
-		/* Create dir if needed */
-		if (!g_file_test(path, G_FILE_TEST_EXISTS)) {
-			g_mkdir(path, 0700);
-		}
-		
-		_app_data = g_new(AppData, 1);
-		_app_data->user_path = path;
-		_app_data->note_store = create_note_list_store(path);
-		_app_data->open_notes = NULL;
-		_app_data->client = client;
-		_app_data->font_size = font_size;
-		_app_data->program = hildon_program_get_instance();
-		_app_data->fullscreen = FALSE;
-		_app_data->search_window = NULL;
-	}
-	
-	return _app_data;
-}
-
-/* char *_bullets[] = {"\u2022 ", "\u2218 ", "\u2023 ", "\u2043 ", "\u204d ", "\u2219 ", "\u25e6 "}; */
-/* These 3 bullets work with diablo and standard font */
-char *_bullets[] = {"\u2022 ", "\u25e6 ", "\u2219 "};
-const gchar* get_bullet_by_depth(gint depth) {
-	if (depth <= 0) {
-		g_printerr("ERROR: get_bullets_by_depth(): depth must be at least 1.\n");
-		return "\u2022 ";
-	}
-	return _bullets[(depth - 1) % 3];
-}
-
-const gchar* get_bullet_by_depth_tag(GtkTextTag *tag) {
-	return get_bullet_by_depth(tag_get_depth(tag));
-}
-
-
-static
-gint compare_notes_by_change_date(gconstpointer a, gconstpointer b) {
-	
-	Note *n1 = (Note*)a;
-	Note *n2 = (Note*)b;
-	
-	if (n1->last_change_date > n2->last_change_date) {
-		return -1;
-	} else if (n1->last_change_date < n2->last_change_date) {
-		return 1;
-	} else {
-		return 0;
-	}
-}
-
-GList* sort_note_list_by_change_date(GList* note_list)
-{
-	/* Sort list using last-change-date */
-	return g_list_sort(note_list, compare_notes_by_change_date);
-}
-
-GList* create_note_listX(AppData *app_data) {
-		
 	const gchar *filename; 
-	GList *notes = NULL;
-	GDir *dir = g_dir_open(app_data->user_path, 0, NULL);
+	GDir *dir = g_dir_open(user_path, 0, NULL);
 	Note *note;
 	GMappedFile *file;
 	gchar *content;
 	gchar *start, *end;
 	gchar *tmp;
+	GtkTreeIter iter;
 	
 	while ((filename = g_dir_read_name(dir)) != NULL) {
 		if (g_str_has_suffix(filename, ".note")) {
 			gchar *full_filename;
 			
-			/* Create new note and append to list */
+			/* Create new note and append to list store */
 			note = note_create_new();
-			notes = g_list_prepend(notes, note);
+			note_list_store_add(store, note, &iter);
 			
 			/* Save filename in note */
-			note->filename = g_strconcat(app_data->user_path, filename, NULL);
+			note->filename = g_strconcat(user_path, filename, NULL);
 			
 			/* Open file and read out title. Save title in note */
-			full_filename = g_strconcat(app_data->user_path, filename, NULL);
+			full_filename = g_strconcat(user_path, filename, NULL);
 			file = g_mapped_file_new(full_filename, FALSE, NULL);
 			g_free(full_filename);
 			content = g_mapped_file_get_contents(file);			
@@ -154,8 +82,93 @@ GList* create_note_listX(AppData *app_data) {
 		}
 	}
 	g_dir_close(dir);
-	notes = sort_note_list_by_change_date(notes);
-	return notes;
+}
+
+/*
+static void on_row_inserted(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data)
+{
+	AppData *app_data = get_app_data();
+	Note *note;
+	gtk_tree_model_get(model, iter, NOTE_COLUMN, &note, -1);
+	if (note != NULL) {
+		g_printerr("Add note: %s to search list \n", note->title);
+		app_data->search_list = g_list_prepend(app_data->search_list, note);
+	}	
+}
+
+static void on_row_deleted(GtkTreeModel *model, GtkTreePath *path, gpointer user_data)
+{
+	AppData *app_data = get_app_data();
+	Note *note;
+	GtkTreeIter iter;
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
+	if (note != NULL) {
+		g_printerr("Remove note: %s from search list \n", note->title);
+		app_data->search_list = g_list_remove(app_data->search_list, note);
+	}
+}
+*/
+
+AppData* get_app_data() {
+	
+	if (_app_data == NULL) {
+		gint font_size;
+		GConfClient *client;
+		const gchar *path;
+		NoteListStore *store;
+
+		client = gconf_client_get_default();
+		gconf_client_add_dir(client, "/apps/maemo/conboy", GCONF_CLIENT_PRELOAD_NONE, NULL);
+		
+		font_size = gconf_client_get_int(client, "/apps/maemo/conboy/font_size", NULL);
+		if (font_size == 0) {
+			font_size = 20000;
+		}
+		
+		path = g_strconcat(g_get_home_dir(), "/.conboy/", NULL);
+			
+		/* Create dir if needed */
+		if (!g_file_test(path, G_FILE_TEST_EXISTS)) {
+			g_mkdir(path, 0700);
+		}
+		
+		store = note_list_store_new();
+		
+		_app_data = g_new(AppData, 1);
+		_app_data->user_path = path;
+		_app_data->note_store = store;
+		_app_data->open_notes = NULL;
+		_app_data->client = client;
+		_app_data->font_size = font_size;
+		_app_data->program = hildon_program_get_instance();
+		_app_data->fullscreen = FALSE;
+		_app_data->search_window = NULL;
+		_app_data->search_list = NULL;
+		
+		/*
+		g_signal_connect(store, "row-inserted", G_CALLBACK(on_row_inserted), NULL);
+		g_signal_connect(store, "row-deleted", G_CALLBACK(on_row_deleted), NULL);
+		*/
+		populate_note_list_store(store, path);
+	}
+	
+	return _app_data;
+}
+
+/* char *_bullets[] = {"\u2022 ", "\u2218 ", "\u2023 ", "\u2043 ", "\u204d ", "\u2219 ", "\u25e6 "}; */
+/* These 3 bullets work with diablo and standard font */
+char *_bullets[] = {"\u2022 ", "\u25e6 ", "\u2219 "};
+const gchar* get_bullet_by_depth(gint depth) {
+	if (depth <= 0) {
+		g_printerr("ERROR: get_bullets_by_depth(): depth must be at least 1.\n");
+		return "\u2022 ";
+	}
+	return _bullets[(depth - 1) % 3];
+}
+
+const gchar* get_bullet_by_depth_tag(GtkTextTag *tag) {
+	return get_bullet_by_depth(tag_get_depth(tag));
 }
 
 NoteListStore* create_note_list_store(const gchar *user_path) {

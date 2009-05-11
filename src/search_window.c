@@ -119,9 +119,6 @@ void on_row_activated(GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *c
 		Note *note = NULL;
 		AppData *app_data = get_app_data();
 		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
-		g_printerr("Open Note: %s \n", note->title);
-		g_printerr("Open File: %s \n", note->filename);
-		
 		
 		/* Close this window and show the selected note */
 		gtk_widget_hide(GTK_WIDGET(app_data->search_window));
@@ -203,6 +200,10 @@ gint compare_dates(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer
 	Note *note_a;
 	Note *note_b;
 	
+	if (a == NULL || b == NULL) {
+		return -1;
+	}
+	
 	gtk_tree_model_get(model, a, NOTE_COLUMN, &note_a, -1);
 	gtk_tree_model_get(model, b, NOTE_COLUMN, &note_b, -1);
 	
@@ -272,7 +273,10 @@ HildonWindow* search_window_create()
 	
 	/* TREE VIEW */
 	tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(sorted_store));
-	g_object_unref(G_OBJECT(store)); /* <<<< TODO: ???? Should I unref all stores??? */
+	g_object_unref(sorted_store);
+	g_object_unref(filtered_store);
+	g_object_unref(store);
+	
 	gtk_widget_show(tree);
 	gtk_container_add(GTK_CONTAINER(scrolledwindow), tree);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree), TRUE);

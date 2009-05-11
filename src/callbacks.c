@@ -1049,6 +1049,14 @@ GSList* find_titles(gchar *haystack) {
 	/* TODO: The search algorithm needs to be optimized. Probably to use Aho-Corasick */
 	/* ATM On the device (N810) searching takes around 1500 microseconds with ~70 notes. */
 	
+	/* After the change from keeping all notes in a simple GList to using a GtkTreeModel
+	 * search time increased dramatically to around 15000 micro seconds on the PC. Because
+	 * of this I reintroduced a simple list representation which is only for searching.
+	 * Now the time is back to around 150 micro seconds on the PC.
+	 * This simple list will probably be replaced by some Hash-Thing in the future. But it's
+	 * obvious, that we cannot work direktly on the GtkTreeModel :(
+	 */
+	
 	GTimer *timer = g_timer_new();
 	
 	Note *note;
@@ -1059,13 +1067,17 @@ GSList* find_titles(gchar *haystack) {
 	gchar *u_haystack = g_utf8_casefold(haystack, -1);
 	gulong micro;
 	
+	/*
 	GtkTreeIter iter;
 	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
+	*/
 		
-	if (gtk_tree_model_get_iter_first(model, &iter)) do {
-
+	/*if (gtk_tree_model_get_iter_first(model, &iter)) do {*/
+	GList *notes = app_data->search_list;
+	while (notes != NULL) {
 		gchar *u_needle;
-		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
+		note = (Note*)notes->data;
+		/*gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);*/
 		
 		u_needle = g_utf8_casefold(note->title, -1);
 		
@@ -1080,7 +1092,9 @@ GSList* find_titles(gchar *haystack) {
 			found = found + strlen(u_needle);
 		}
 		g_free(u_needle);
-	} while (gtk_tree_model_iter_next(model, &iter));
+		notes = notes->next;
+	}
+	/*} while (gtk_tree_model_iter_next(model, &iter));*/
 	
 	g_timer_stop(timer);
 	
