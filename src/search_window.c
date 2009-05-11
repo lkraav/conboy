@@ -163,6 +163,7 @@ gboolean on_key_pressed(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 	gtk_widget_grab_focus(GTK_WIDGET(user_data));
 	return FALSE;
 	*/
+	return FALSE; 
 }
 
 static
@@ -348,41 +349,3 @@ void search_window_open()
 	gtk_window_present(GTK_WINDOW(app_data->search_window));
 }
 
-void add_note(Note *note)
-{
-	/* TODO: How can we check if the note is already in the store??? */
-	
-	/*
-	if (app_data->search_store != NULL) {
-		GtkTreeIter iter;
-		gtk_list_store_append(app_data->search_store, &iter);
-		gtk_list_store_set(app_data->search_store, &iter, ICON_COLUMN, note_icon,
-		                                                  TITLE_COLUMN, note->title,
-		                                                  CHANGE_DATE_COLUMN, note->last_change_date,
-		                                                  NOTE_COLUMN, note,
-		                                                  -1);
-	}
-	*/
-	/*update_store();*/
-}
-
-/* TODO: This is really unefficient and only a temp hack.
- * Do this seperatly for adding, removing and changing notes */
-/*
-void update_store()
-{
-	AppData *app_data = get_app_data();
-	if (app_data->note_store != NULL) {
-		g_printerr("Updating store \n");
-		gtk_list_store_clear(app_data->note_store);
-		popuplate_list_model(app_data->note_store);
-		
-	}
-	
-}
-*/
-
-void remove_note(Note *note)
-{
-	
-}

@@ -55,7 +55,7 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 		return;
 	}
 	
-	/* User tag_get_depth() here. Currently in callbacks.c */
+	/* Use tag_get_depth() here. Currently in callbacks.c */
 	/* If a <depth> tag, ignore */
 	if (strncmp(tag_name, "depth", 5) == 0) {
 		is_bullet = TRUE;

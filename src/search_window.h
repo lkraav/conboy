@@ -19,7 +19,6 @@
 #ifndef SEARCH_WINDOW_H_
 #define SEARCH_WINDOW_H_
 
-void search_window_open();
-void update_store();
+void search_window_open(void);
 
 #endif /*SEARCH_WINDOW_H_*/

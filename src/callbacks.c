@@ -53,6 +53,7 @@
 GtkTextTag* iter_get_depth_tag(GtkTextIter* iter);
 GtkTextTag* buffer_get_depth_tag(GtkTextBuffer *buffer, gint depth);
 
+static
 GtkTextTag* get_depth_tag_at_line(GtkTextBuffer *buffer, gint line_number)
 {
 	GtkTextIter iter;
@@ -380,46 +381,11 @@ on_link_button_clicked				   (GtkAction		*action,
 	note_show_by_title(text);
 }
 
-
-/*
-static void
-menu_position ( GtkMenu *menu ,
-                gint *x,
-                gint *y,
-                gboolean *push_in ,
-                gpointer *thw)
-{
-    g_return_if_fail (thw -> button );
-    * push_in = TRUE;
-    *x = thw ->button -> allocation .x + thw ->button -> allocation . width ;
-    *y = thw ->button -> allocation .y;
-}
-*/
-
-/* TODO: Put in util file, it's used in interface.c too */
-static
-void set_menu_item_label(GtkMenuItem *item, const gchar *text)
-{
-	GList *children = gtk_container_get_children(GTK_CONTAINER(item));
-	
-	if (children == NULL) {
-		g_printerr("ERROR: set_menu_item_label() expects a GtkMenuItem, which already contains a label.\n");
-		return;
-	}
-	
-	gtk_label_set_markup(GTK_LABEL(children->data), text);		
-}
-
 void
 on_notes_button_clicked				   (GtkAction		*action,
 										gpointer		 user_data) {
 	
-	GtkWidget *mainwin = GTK_WIDGET(user_data);
-	GtkWidget *menu;
 	AppData *app_data;
-	GList *notes;
-	GtkWidget *image_small;
-
 	GTimer *timer;
 	gulong micro;
 	
@@ -428,64 +394,15 @@ on_notes_button_clicked				   (GtkAction		*action,
 		return;
 	}
 	
-	/*
-	menu = gtk_menu_new();
-	gtk_menu_attach_to_widget(GTK_MENU(menu), mainwin, NULL);
-	*/
-	
 	timer = g_timer_new();
 	
 	search_window_open();
-	
-	/*
-	app_data->all_notes = sort_note_list_by_change_date(app_data->all_notes);
-	g_timer_stop(timer);
-	g_timer_elapsed(timer, &micro);
-	g_printerr("Sorting: %lu micro seconds \n", micro);
-	
-	timer = g_timer_new();
-	notes = app_data->all_notes;
-	while(notes != NULL) {
-		GtkWidget *menu_item;
-		Note *note = notes->data;
-		image_small = gtk_image_new_from_icon_name("conboy", GTK_ICON_SIZE_SMALL_TOOLBAR);	
-		menu_item = gtk_image_menu_item_new_with_label(note->title);
-		gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_item), image_small);
-		
-		g_signal_connect(menu_item, "activate",
-		            	 G_CALLBACK(on_notes_menu_item_activated),
-		            	 note);
-		gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
-		
-		if (notes->next != NULL) {
-			gtk_menu_shell_append(GTK_MENU_SHELL(menu), gtk_separator_menu_item_new());
-		}
-		
-		notes = notes->next;
-	}
-*/
 	
 	g_timer_stop(timer);
 	g_timer_elapsed(timer, &micro);
 	g_printerr("Opening search window: %lu micro seconds \n", micro);
 	
-	/*
-	gtk_widget_show_all(menu);
-
-	gtk_menu_popup(GTK_MENU (menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
-	*/
-	
 }
-
-/*
-void
-on_notes_menu_item_activated		(GtkMenuItem *menuitem,
-									 gpointer     user_data)
-{
-	Note *note = (Note*)user_data;
-	note_show(note);
-}
-*/
 
 /* TODO: The signal "mark-set" is emitted 4 times when clicking into the text. While selecting
  * it's emitted continuesly. */
@@ -947,6 +864,7 @@ static gboolean add_new_line(Note *note)
 	
 		/* If line start with a "- " or "- *" */
 		if (line_needs_bullet(buffer, gtk_text_iter_get_line(&iter))) {
+			GSList *tmp;
 			GtkTextIter *end_iter;
 			
 			gtk_text_iter_set_line_offset(&iter, 0);
@@ -967,9 +885,7 @@ static gboolean add_new_line(Note *note)
 			add_bullets(buffer, line, line, buffer_get_depth_tag(buffer, 1));
 			
 			
-			/* Copied from above */
-			
-			GSList *tmp;
+			/* TODO: Copied from above */
 						
 			/* Remove all tags but <list> from active tags */
 			tmp = g_slist_copy(note->active_tags);
@@ -1178,7 +1094,7 @@ highlight_titles(Note *note, GtkTextBuffer *buffer, GtkTextIter *start_iter, Gtk
 	g_slist_free(hits);
 }
 
-gboolean
+static void
 auto_highlight_links(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, Note *note)
 {
 	GtkTextIter *start_iter, *end_iter;
@@ -1200,7 +1116,7 @@ auto_highlight_links(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *inpu
 	highlight_titles(note, buffer, start_iter, end_iter);
 }
 
-void
+static void
 apply_active_tags(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, Note *note)
 {
 	GtkTextIter *start_iter;
@@ -1288,6 +1204,7 @@ GtkTextTag* buffer_get_depth_tag(GtkTextBuffer *buffer, gint depth)
 	return tag;
 }
 
+static
 gboolean tag_is_depth_tag(GtkTextTag *tag)
 {
 	if (tag == NULL) {
@@ -1295,6 +1212,7 @@ gboolean tag_is_depth_tag(GtkTextTag *tag)
 	}
 	return (strncmp(tag->name, "depth", 5) == 0);
 }
+
 
 gint tag_get_depth(GtkTextTag *tag)
 {
@@ -1319,6 +1237,7 @@ GtkTextTag* iter_get_depth_tag(GtkTextIter* iter)
 	return NULL;
 }
 
+static
 void increase_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 {
 	GtkTextIter start_iter, end_iter;
@@ -1352,6 +1271,7 @@ void increase_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 }
 
 /* TODO: This is almost 100% copy&paste from increase_indent */
+static
 void decrease_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 {
 	GtkTextIter start_iter, end_iter;

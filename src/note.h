@@ -70,7 +70,7 @@ typedef struct
 } Note;
 
 
-Note* note_create_new();
+Note* note_create_new(void);
 
 void note_format_title(GtkTextBuffer *buffer);
 

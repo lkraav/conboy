@@ -40,50 +40,19 @@ Note* note_create_new()
 void note_free(Note *note)
 {
 	g_free(note->ui);
+	/*
 	g_free(note->filename);
 	g_free(note->title);
 	g_free(note->version);
+	*/
 	g_slist_free(note->active_tags);
-}
-
-/**
- * Compares the the title of a given note the the given title string in an
- * case insensitiv manner.
- * 
- * a must be a note with title
- * b must be a title string
- */
-static gint compare_title(gconstpointer a, gconstpointer b)
-{	
-	int result;
-	gchar *title1 = g_utf8_casefold(((Note*)a)->title, -1);
-	gchar *title2 = g_utf8_casefold(b, -1);
-	
-	if (title1 == NULL && title2 == NULL) {
-		return 0;
-	}
-	if (title1 == NULL) {
-		return -1;
-	}
-	if (title2 == NULL) {
-		return 1;
-	}
-	result = strcmp(title1, title2);
-	
-	g_free(title1);
-	g_free(title2);
-	
-	return result;
 }
 
 void note_show_by_title(const char* title)
 {	
 	Note *note;
-	/*GList *element;*/
 	AppData *app_data = get_app_data();
-	/*GList *all_notes = app_data->all_notes;*/
 	
-	/*element = g_list_find_custom(all_notes, title, compare_title);*/
 	note = note_list_store_find_by_title(app_data->note_store, title);
 	
 	if (note == NULL) {
@@ -95,7 +64,6 @@ void note_show_by_title(const char* title)
 	
 	note_show(note);
 }
-
 
 void note_format_title(GtkTextBuffer *buffer)
 {	
@@ -406,6 +374,8 @@ void note_remove_active_tag_by_name(Note *note, const gchar *tag_name)
  */
 void note_add_active_tag(Note *note, GtkTextTag *tag)
 {
+	GSList *tags;
+	
 	if (note == NULL) {
 		g_printerr("ERROR: note_add_active_tag: note is NULL\n");
 		return;
@@ -415,7 +385,7 @@ void note_add_active_tag(Note *note, GtkTextTag *tag)
 		return;
 	}
 	
-	GSList *tags = note->active_tags;
+	tags = note->active_tags;
 	while (tags != NULL) {
 		if (strcmp(((GtkTextTag*)tags->data)->name, tag->name) == 0) {
 			return;
