@@ -168,12 +168,16 @@ get_date_string(time_t t)
 	return g_strdup(date_str);
 }
 
+
+GdkPixbuf *_icon = NULL; /* TODO: Should not be global */
 /* this method retrieves the value for a particular column */
 static void
 note_list_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GValue *value)
 {
 	Note *note;
-	GdkPixbuf *icon = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/26x26/hildon/conboy.png", NULL);
+	if (_icon == NULL) {
+		_icon = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/26x26/hildon/conboy.png", NULL);
+	}
 
 	/* validate our parameters */
 	g_return_if_fail(NOTE_IS_LIST_STORE(self));
@@ -191,7 +195,7 @@ note_list_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GVa
 	{
 		case ICON_COLUMN:
 			/* the object itself was requested */
-			g_value_set_object(value, icon);
+			g_value_set_object(value, _icon);
 			break;
 
 		case TITLE_COLUMN:
