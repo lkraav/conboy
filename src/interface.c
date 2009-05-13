@@ -25,6 +25,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
 #include <hildon/hildon-window.h>
+#include <hildon/hildon-find-toolbar.h>
 
 
 #include "callbacks.h"
@@ -139,8 +140,10 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkWidget *menu_font_normal;
 	GtkWidget *menu_font_large;
 	GtkWidget *menu_font_huge;
+	GtkWidget *menu_find;
 	
 	GtkWidget *toolbar;
+	GtkWidget *find_bar;
 	GtkWidget *scrolledwindow1;
 	GtkWidget *textview;
 	GtkTextBuffer *buffer;
@@ -151,6 +154,7 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkToolItem *button_inc_indent;
 	GtkToolItem *button_dec_indent;
 	GtkToolItem *button_style;
+	GtkToolItem *button_find;
 	
 	GtkAction *action_new;
 	GtkAction *action_delete;
@@ -172,6 +176,7 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkAction *action_font_normal;
 	GtkAction *action_font_large;
 	GtkAction *action_font_huge;
+	GtkAction *action_find;
 	
 	GtkTextTag *link_internal_tag;
 	
@@ -209,6 +214,7 @@ GtkWidget* create_mainwin(Note *note) {
 	action_text_style = GTK_ACTION(gtk_action_new("style", "Style", NULL, GTK_STOCK_SELECT_FONT));
 	action_zoom_in = GTK_ACTION(gtk_action_new("zoom_in", "Zoom In", NULL, GTK_STOCK_ZOOM_IN));
 	action_zoom_out = GTK_ACTION(gtk_action_new("zoom_out", "Zoom Out", NULL, GTK_STOCK_ZOOM_OUT));
+	action_find = GTK_ACTION(gtk_action_new("find", "Find In Note", NULL, GTK_STOCK_FIND));
 	/* TODO: Use an enum instead of 0 to 3 */
 	action_font_small = GTK_ACTION(gtk_radio_action_new("size:small", "Small", NULL, NULL, 0));
 	action_font_normal = GTK_ACTION(gtk_radio_action_new("size:normal", "Normal", NULL, NULL, 1));
@@ -331,12 +337,15 @@ GtkWidget* create_mainwin(Note *note) {
 	menu_new = gtk_action_create_menu_item(action_new);
 	menu_text_style = gtk_menu_item_new_with_label("Text Style");
 	gtk_menu_item_set_submenu(menu_text_style, text_style_menu);
+	menu_find = gtk_action_create_menu_item(action_find);
 	menu_quit = gtk_action_create_menu_item(action_quit);
 	
 	gtk_menu_shell_append(main_menu, menu_new);
 	gtk_menu_shell_append(main_menu, menu_new);
 	gtk_menu_shell_append(main_menu, gtk_separator_menu_item_new());
 	gtk_menu_shell_append(main_menu, menu_text_style);
+	gtk_menu_shell_append(main_menu, gtk_separator_menu_item_new());
+	gtk_menu_shell_append(main_menu, menu_find);
 	gtk_menu_shell_append(main_menu, gtk_separator_menu_item_new());
 	gtk_menu_shell_append(main_menu, menu_quit);
 	
@@ -369,6 +378,11 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
 	
+	button_find = gtk_action_create_tool_item(action_find);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), button_find, -1);
+	
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
+	
 	button_delete = gtk_action_create_tool_item(action_delete);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), button_delete, -1);
 	
@@ -389,6 +403,10 @@ GtkWidget* create_mainwin(Note *note) {
 		hildon_program_set_common_toolbar(prg, toolbar);
 	}
 	*/
+	
+	/* FIND TOOL BAR */
+	find_bar = hildon_find_toolbar_new("Find");
+	hildon_window_add_toolbar(mainwin, find_bar);
 
 	/* SCROLLED WINDOW */
 	scrolledwindow1 = gtk_scrolled_window_new(NULL, NULL);
@@ -421,6 +439,8 @@ GtkWidget* create_mainwin(Note *note) {
 	ui->window = HILDON_WINDOW(mainwin);
 	ui->view = GTK_TEXT_VIEW(textview);
 	ui->buffer = buffer;
+	ui->find_bar = HILDON_FIND_TOOLBAR(find_bar);
+	ui->find_bar_is_visible = FALSE;
 	
 	ui->action_bold = GTK_TOGGLE_ACTION(action_bold);
 	ui->action_bullets = GTK_TOGGLE_ACTION(action_bullets);
@@ -508,6 +528,9 @@ GtkWidget* create_mainwin(Note *note) {
 			G_CALLBACK(on_style_button_clicked),
 			text_style_menu);
 	
+	g_signal_connect(action_find, "activate",
+			G_CALLBACK(on_find_button_clicked),
+			note);
 	
 	
 	/* OTHER SIGNALS */
@@ -542,6 +565,14 @@ GtkWidget* create_mainwin(Note *note) {
 	g_signal_connect_after ((gpointer)buffer, "delete-range",
 			G_CALLBACK(on_text_buffer_delete_range),
 			note);
+	
+	g_signal_connect((gpointer)find_bar, "search",
+			G_CALLBACK(on_find_bar_search),
+			note);
+	
+	g_signal_connect((gpointer)find_bar, "close",
+			G_CALLBACK(on_find_bar_close),
+			ui);
 
 	link_internal_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	g_signal_connect ((gpointer) link_internal_tag, "event",

@@ -1373,4 +1373,58 @@ on_style_button_clicked                (GtkAction       *action,
 	}
 }
 
+void on_find_button_clicked(GtkAction *action, gpointer user_data)
+{
+	Note *note = (Note*)user_data;
+	UserInterface *ui = note->ui;
+	
+	if (ui->find_bar_is_visible) {
+		gtk_widget_hide_all(GTK_WIDGET(ui->find_bar));
+		ui->find_bar_is_visible = FALSE;
+	} else {
+		gtk_widget_show_all(GTK_WIDGET(ui->find_bar));
+		/* TODO: Select search string for overwriting and
+		 * set focus */
+		/*gtk_widget_grab_focus(GTK_WIDGET(ui->find_bar));*/
+		ui->find_bar_is_visible = TRUE;
+	}
+}
 
+void on_find_bar_search(GtkWidget *widget, Note *note)
+{
+	GtkTextBuffer *buffer = note->ui->buffer;
+	GtkTextView *view = note->ui->view;
+	gchar *search_str;
+	GtkTextMark *mark;
+	GtkTextIter iter, match_start, match_end;
+	
+	/* Get the search string from the widget */
+	g_object_get(G_OBJECT(widget), "prefix", &search_str, NULL);
+	
+	/* The mark "search_pos" remembers the position for subsequent calls
+	 * to this method */
+	mark = gtk_text_buffer_get_mark(buffer, "search_pos");
+	
+	if (mark == NULL) {
+		gtk_text_buffer_get_start_iter(buffer, &iter);
+		mark = gtk_text_buffer_create_mark(buffer, "search_pos", &iter, FALSE);
+	}
+	
+	gtk_text_buffer_get_iter_at_mark(buffer, &iter, mark);
+	if (gtk_text_iter_forward_search(&iter, search_str, GTK_TEXT_SEARCH_TEXT_ONLY, &match_start, &match_end, NULL)) {
+		mark = gtk_text_buffer_create_mark(buffer, "search_pos", &match_end, FALSE);
+		gtk_text_view_scroll_mark_onscreen(view, mark);
+		gtk_text_buffer_select_range(buffer, &match_start, &match_end);
+	} else {
+		gtk_text_buffer_delete_mark(buffer, mark);
+		gtk_text_buffer_select_range(buffer, &iter, &iter);
+	}
+	
+	g_free(search_str);
+}
+
+void on_find_bar_close(GtkWidget *widget, UserInterface *ui)
+{
+	gtk_widget_hide_all(widget);
+	ui->find_bar_is_visible = FALSE;
+}

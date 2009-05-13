@@ -21,12 +21,15 @@
 
 #include <gtk/gtk.h>
 #include <hildon/hildon-window.h>
+#include <hildon/hildon-find-toolbar.h>
 
 typedef struct
 {
 	HildonWindow        *window;
 	GtkTextView         *view;
 	GtkTextBuffer       *buffer;
+	HildonFindToolbar	*find_bar;
+	gboolean             find_bar_is_visible;
 	
 	GtkToggleToolButton *button_bold;
 	GtkToggleToolButton *button_italic;

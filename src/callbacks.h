@@ -20,6 +20,8 @@
 #ifndef CALLBACKS_H
 #define CALLBACKS_H
 
+#include "note.h"
+
 gboolean
 on_window_close_button_clicked		   (GtkObject		*window,
 										GdkEvent		*event,
@@ -151,6 +153,12 @@ on_dec_indent_button_clicked			   (GtkAction		*action,
 void
 on_bold_action_activated		(GtkAction	*action,
 								 gpointer	 user_data);
+
+
+void on_find_button_clicked(GtkAction *action, gpointer user_data);
+void on_find_bar_search(GtkWidget *widget, Note *note);
+void on_find_bar_close(GtkWidget *widget, UserInterface *ui);
+
 
 
 
