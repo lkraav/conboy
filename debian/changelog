@@ -1,3 +1,10 @@
+conboy (0.4.2) stable; urgency=low
+
+  * Bugfix: Reduced time to show search note window from ~5 to ~1 second
+  * Bugfix: Crasher with empty .conboy directory
+ 
+ -- Cornelius Hald <hald@icandy.de>  Tue, 12 May 2009 20:55:12 +0200
+
 conboy (0.4.1) stable; urgency=low
 
   * Bugfix: Should now install in Fremantle
