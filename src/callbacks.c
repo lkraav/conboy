@@ -941,11 +941,15 @@ get_length_of_longest_title()
 {
 	gint max_length = 0;
 	AppData *app_data = get_app_data();
+	GtkTreeIter iter;
+	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
+	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
 	
-	GList *notes = app_data->search_list;
-	while (notes != NULL) {
-		max_length = max(g_utf8_strlen(((Note*)notes->data)->title, -1), max_length);
-		notes = notes->next;
+	while (valid) {
+		Note *note;
+		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
+		max_length = max(g_utf8_strlen(note->title, -1), max_length);
+		valid = gtk_tree_model_iter_next(model, &iter); /* TODO: Too much casting in this function. Maybe introduce note_list_store_iter_next() etc... */
 	}
 	
 	return max_length;
@@ -961,18 +965,10 @@ static
 GSList* find_titles(gchar *haystack) {
 	/* TODO: The search algorithm needs to be optimized. Probably to use Aho-Corasick */
 	/* ATM On the device (N810) searching takes around 1500 microseconds with ~70 notes. */
-	
-	/* After the change from keeping all notes in a simple GList to using a GtkTreeModel
-	 * search time increased dramatically to around 15000 micro seconds on the PC. Because
-	 * of this I reintroduced a simple list representation which is only for searching.
-	 * Now the time is back to around 150 micro seconds on the PC.
-	 * This simple list will probably be replaced by some Hash-Thing in the future. But it's
-	 * obvious, that we cannot work direktly on the GtkTreeModel :(
-	 */
-	
+		
 	GTimer *search_timer = g_timer_new();
 	
-	Note *note;
+	
 	gchar *found;
 	GSList *result = NULL;
 	AppData *app_data = get_app_data();
@@ -980,10 +976,13 @@ GSList* find_titles(gchar *haystack) {
 	gchar *u_haystack = g_utf8_casefold(haystack, -1);
 	gulong micro;
 	
-	GList *notes = app_data->search_list;
-	while (notes != NULL) {
+	GtkTreeIter iter;
+	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
+	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
+	while (valid) {
 		gchar *u_needle;
-		note = (Note*)notes->data;
+		Note *note;
+		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
 		
 		u_needle = g_utf8_casefold(note->title, -1);
 		
@@ -998,13 +997,13 @@ GSList* find_titles(gchar *haystack) {
 			found = found + strlen(u_needle);
 		}
 		g_free(u_needle);
-		notes = notes->next;
+		valid = gtk_tree_model_iter_next(model, &iter);
 	}
 	
 	g_timer_stop(search_timer);
 	
 	g_timer_elapsed(search_timer, &micro);
-	g_printerr("Search took %lu microseconds \n", micro);
+	/*g_printerr("Search took %lu microseconds \n", micro);*/
 	
 	g_free(u_haystack);
 	
@@ -1152,7 +1151,7 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 	
 	g_timer_stop(timer);
 	g_timer_elapsed(timer, &micro);
-	g_printerr("Complete insert: %lu ms \n", micro);
+	g_printerr("%lu\n", micro);
 }
 
 void

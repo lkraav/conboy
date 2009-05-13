@@ -37,7 +37,6 @@ typedef struct
 	gboolean	   fullscreen;
 	HildonWindow  *search_window;
 	NoteListStore *note_store;
-	GList         *search_list;
 } AppData;
 
 

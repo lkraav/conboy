@@ -92,10 +92,8 @@ main (int argc, char *argv[])
   g_set_application_name("Conboy");
  
   /* Get the most recent note. If there is none, create new. */
-  if (app_data->note_store != NULL) {
-	  note = note_list_store_get_latest(app_data->note_store);
-	  /*g_printerr("TITLE: %s \n", note->title);*/
-  } else {
+  note = note_list_store_get_latest(app_data->note_store);
+  if (note == NULL) {
 	  note = note_create_new();
   }
   

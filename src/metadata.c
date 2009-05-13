@@ -84,32 +84,6 @@ static void populate_note_list_store(NoteListStore *store, const gchar *user_pat
 	g_dir_close(dir);
 }
 
-/*
-static void on_row_inserted(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data)
-{
-	AppData *app_data = get_app_data();
-	Note *note;
-	gtk_tree_model_get(model, iter, NOTE_COLUMN, &note, -1);
-	if (note != NULL) {
-		g_printerr("Add note: %s to search list \n", note->title);
-		app_data->search_list = g_list_prepend(app_data->search_list, note);
-	}	
-}
-
-static void on_row_deleted(GtkTreeModel *model, GtkTreePath *path, gpointer user_data)
-{
-	AppData *app_data = get_app_data();
-	Note *note;
-	GtkTreeIter iter;
-	gtk_tree_model_get_iter(model, &iter, path);
-	gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
-	if (note != NULL) {
-		g_printerr("Remove note: %s from search list \n", note->title);
-		app_data->search_list = g_list_remove(app_data->search_list, note);
-	}
-}
-*/
-
 AppData* get_app_data() {
 	
 	if (_app_data == NULL) {
@@ -144,7 +118,6 @@ AppData* get_app_data() {
 		_app_data->program = hildon_program_get_instance();
 		_app_data->fullscreen = FALSE;
 		_app_data->search_window = NULL;
-		_app_data->search_list = NULL;
 		
 		/*
 		g_signal_connect(store, "row-inserted", G_CALLBACK(on_row_inserted), NULL);

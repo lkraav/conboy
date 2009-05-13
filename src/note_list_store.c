@@ -96,10 +96,6 @@ note_list_store_add(NoteListStore *self, Note *note, GtkTreeIter *iter)
 	 * connect signals to recognize whenever the Note itself was
 	 * changed. If such a change would occure we could update the
 	 * coresponding row. */
-
-	/* Update the search structure. TODO: Find a way to improve,
-	 * maybe with own signals. Because there are other ways to add an item... */
-	app_data->search_list = g_list_prepend(app_data->search_list, note);
 	
 	/* return the iter if the user cares */
 	if (iter) *iter = iter1;
@@ -243,11 +239,6 @@ gboolean note_list_store_remove(NoteListStore *self, Note *note)
 	
 	if (note_list_store_get_iter(self, note, &iter)) {
 		gtk_list_store_remove(GTK_LIST_STORE(self), &iter);
-		
-		/* Update the search structure. TODO: Find a way to improve,
-		 * maybe with own signals because there are other ways to remove an item too */
-		app_data->search_list = g_list_remove(app_data->search_list, note);
-		
 		return TRUE;
 	}
 	return FALSE;
