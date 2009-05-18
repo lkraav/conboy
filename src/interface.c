@@ -30,7 +30,6 @@
 #include <hildon/hildon-text-view.h>
 #endif
 
-
 #include "callbacks.h"
 
 #include "serializer.h"
@@ -484,7 +483,7 @@ GtkWidget* create_mainwin(Note *note) {
 	/* TEXT VIEW */
 #ifdef HILDON_HAS_APP_MENU
 	textview = hildon_text_view_new();
-	buffer = hildon_text_view_get_buffer(HILDON_TEXT_VIEW(textview));
+	buffer = hildon_text_view_get_buffer(textview);
 #else
 	textview = gtk_text_view_new();
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textview));
