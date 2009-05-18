@@ -1,3 +1,11 @@
+conboy (0.4.3) stable; urgency=low
+
+  * Added Fremantle specific code for finger friendly UI
+  * Bugfix: Removed crasher when editing the title
+  * Bugfix: Removed crasher when adding notes while the search window is open
+ 
+ -- Cornelius Hald <hald@icandy.de>  Mon, 18 May 2009 11:45:13 +0200
+
 conboy (0.4.2) stable; urgency=low
 
   * Bugfix: Reduced time to show search note window from ~5 to ~1 second
