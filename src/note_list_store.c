@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -96,7 +96,7 @@ note_list_store_add(NoteListStore *self, Note *note, GtkTreeIter *iter)
 	 * connect signals to recognize whenever the Note itself was
 	 * changed. If such a change would occure we could update the
 	 * coresponding row. */
-	
+
 	/* return the iter if the user cares */
 	if (iter) *iter = iter1;
 }
@@ -116,7 +116,7 @@ note_list_store_get_object(NoteListStore *self, GtkTreeIter *iter)
 	/* retreive the object using our parent's interface, take our own
 	 * reference to it */
 	parent_iface.get_value(GTK_TREE_MODEL(self), iter, 0, &value);
-	
+
 	note = (Note*)g_value_get_pointer(&value); /*(g_value_dup_object(&value));*/
 
 	g_value_unset(&value);
@@ -156,11 +156,11 @@ get_date_string(time_t t)
 {
 	gchar date_str[20];
 	GDate *date = g_date_new();
-	
+
 	g_date_set_time_t(date, t);
 	g_date_strftime(date_str, 20, "%x", date);
 	g_free(date);
-	
+
 	return g_strdup(date_str);
 }
 
@@ -172,7 +172,11 @@ note_list_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GVa
 {
 	Note *note;
 	if (_icon == NULL) {
+#ifdef HILDON_HAS_APP_MENU
+		_icon = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/40x40/hildon/conboy.png", NULL);
+#else
 		_icon = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/26x26/hildon/conboy.png", NULL);
+#endif
 	}
 
 	/* validate our parameters */
@@ -183,7 +187,7 @@ note_list_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GVa
 
 	/* get the object from our parent's storage */
 	note = note_list_store_get_object(NOTE_LIST_STORE(self), iter);
-	
+
 	/* initialise our GValue to the required type */
 	g_value_init(value, note_list_store_get_column_type(GTK_TREE_MODEL (self), column));
 
@@ -202,7 +206,7 @@ note_list_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GVa
 				g_value_set_string(value, "");
 			}
 			break;
-			
+
 		case CHANGE_DATE_COLUMN:
 			if (note != NULL) {
 				g_value_set_string(value, get_date_string(note->last_change_date));
@@ -210,7 +214,7 @@ note_list_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GVa
 				g_value_set_string(value, "");
 			}
 			break;
-			
+
 		case NOTE_COLUMN:
 			g_value_set_pointer(value, note);
 			break;
@@ -229,14 +233,14 @@ note_list_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GVa
 
 NoteListStore *note_list_store_new(void)
 {
-	return g_object_new(NOTE_TYPE_LIST_STORE, NULL);	
+	return g_object_new(NOTE_TYPE_LIST_STORE, NULL);
 }
 
 gboolean note_list_store_remove(NoteListStore *self, Note *note)
 {
 	GtkTreeIter iter;
 	AppData *app_data = get_app_data();
-	
+
 	if (note_list_store_get_iter(self, note, &iter)) {
 		gtk_list_store_remove(GTK_LIST_STORE(self), &iter);
 		return TRUE;
@@ -254,7 +258,7 @@ gboolean note_list_store_get_iter(NoteListStore *self, Note *note_a, GtkTreeIter
 			return TRUE;
 		}
 	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(self), iter));
-	
+
 	return FALSE;
 }
 
@@ -273,7 +277,7 @@ Note *note_list_store_find_by_title(NoteListStore *self, const gchar *title)
 {
 	GtkTreeIter iter;
 	gchar *title_a = g_utf8_casefold(title, -1);
-	
+
 	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self), &iter)) do {
 		Note *note;
 		gchar *title_b;
@@ -286,7 +290,7 @@ Note *note_list_store_find_by_title(NoteListStore *self, const gchar *title)
 		}
 		g_free(title_b);
 	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(self), &iter));
-	
+
 	g_free(title_a);
 	return NULL;
 }
@@ -295,19 +299,19 @@ gint note_list_store_get_length(NoteListStore *self)
 {
 	gint count = 0;
 	GtkTreeIter iter;
-	
+
 	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self), &iter)) do {
 		count++;
 	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(self), &iter));
-	
+
 	return count;
 }
 
-Note *note_list_store_get_latest(NoteListStore *self) 
+Note *note_list_store_get_latest(NoteListStore *self)
 {
 	GtkTreeIter iter;
 	Note *latest_note = NULL;
-	
+
 	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self), &iter)) do {
 		Note *note;
 		gtk_tree_model_get(GTK_TREE_MODEL(self), &iter, NOTE_COLUMN, &note, -1);
@@ -319,7 +323,7 @@ Note *note_list_store_get_latest(NoteListStore *self)
 			latest_note = note;
 		}
 	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(self), &iter));
-	
+
 	return latest_note;
 }
 
