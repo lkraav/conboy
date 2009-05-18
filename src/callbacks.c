@@ -1142,6 +1142,11 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 	GTimer *timer;
 	gulong micro;
 
+	/* Don't do anything when in the title line */
+	if (gtk_text_iter_get_line(iter) == 0) {
+		return;
+	}
+
 	apply_active_tags(buffer, iter, text, note);
 
 	timer = g_timer_new();
@@ -1160,8 +1165,16 @@ on_text_buffer_delete_range					(GtkTextBuffer *buffer,
 											 gpointer		user_data)
 {
 	Note *note = (Note*)user_data;
-	GtkTextTag *link_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
-	gint max_len = get_length_of_longest_title();
+	GtkTextTag *link_tag;
+	gint max_len;
+
+	/* Don't do anything when in the title line */
+	if (gtk_text_iter_get_line(start_iter) == 0 || gtk_text_iter_get_line(end_iter) == 0) {
+		return;
+	}
+
+	link_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
+	max_len = get_length_of_longest_title();
 
 	/* This handler runs after the default handler, so we can modify the iters as we like */
 	extend_block(start_iter, end_iter, max_len, link_tag);
