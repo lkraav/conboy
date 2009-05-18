@@ -15,7 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
  */
-
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
 #include <gtk/gtk.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-defines.h>
@@ -25,7 +27,6 @@
 #include "metadata.h"
 #include "note.h"
 #include "note_list_store.h"
-#include "../config.h"
 
 static gboolean
 is_row_visible(GtkTreeModel *model, GtkTreeIter *iter, gpointer data)

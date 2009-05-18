@@ -18,6 +18,9 @@
 
 
 /* Includes */
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-window.h>
 #include <gtk/gtkmain.h>
@@ -50,8 +53,6 @@
 #include "note_list_store.h"
 
 #include "localisation.h"
-
-#include "../config.h"
 
 
 #define APP_NAME "conboy"
