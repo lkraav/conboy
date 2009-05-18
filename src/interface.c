@@ -26,7 +26,9 @@
 #include <gtk/gtk.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-find-toolbar.h>
+#ifdef HILDON_HAS_APP_MENU
 #include <hildon/hildon-text-view.h>
+#endif
 
 
 #include "callbacks.h"
