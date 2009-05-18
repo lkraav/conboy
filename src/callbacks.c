@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -62,32 +62,32 @@ GtkTextTag* get_depth_tag_at_line(GtkTextBuffer *buffer, gint line_number)
 }
 
 static void change_format(Note *note, GtkToggleAction *action)
-{	
+{
 	gint start_line, end_line, i;
 	GtkTextIter selection_start_iter, selection_end_iter;
 	GtkTextIter start_iter, end_iter;
 	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(note->ui->buffer);
-	
+
 	const gchar *tag_name = gtk_action_get_name(GTK_ACTION(action));
-	
+
 	if (gtk_toggle_action_get_active(action)) {
 		/* The button just became active, so we should enable the formatting */
 		if (gtk_text_buffer_get_has_selection(buffer)) {
 			/* Something is selected */
 			gtk_text_buffer_get_selection_bounds(buffer, &selection_start_iter, &selection_end_iter);
-			
+
 			start_line = gtk_text_iter_get_line(&selection_start_iter);
 			end_line = gtk_text_iter_get_line(&selection_end_iter);
-			
+
 			/* We go through the selection line by line, so we have a chance to skip over the bullets */
 			for (i = start_line; i <= end_line; i++) {
-				
+
 				if (i == start_line) {
 					start_iter = selection_start_iter;
 				} else {
 					gtk_text_buffer_get_iter_at_line(buffer, &start_iter, i);
 				}
-				
+
 				if (i == end_line) {
 					end_iter = selection_end_iter;
 				} else {
@@ -97,18 +97,18 @@ static void change_format(Note *note, GtkToggleAction *action)
 						gtk_text_iter_backward_char(&end_iter);
 					}
 				}
-				
+
 				/* If we are at a bullet, jump over this bullet */
 				if (iter_get_depth_tag(&start_iter) != NULL) {
 					gtk_text_iter_set_line_offset(&start_iter, 2);
 				}
-				
+
 				/* Apply tag */
 				gtk_text_buffer_apply_tag_by_name(buffer, tag_name, &start_iter, &end_iter);
 			}
 
 			/* Manually set the buffer to modified, because applying tags, doesn't do this automatically */
-			gtk_text_buffer_set_modified(buffer, TRUE);	
+			gtk_text_buffer_set_modified(buffer, TRUE);
 		} else {
 			/* Nothing is selected, so this style should start from here on */
 			GtkTextTag *tag = gtk_text_tag_table_lookup(buffer->tag_table, tag_name);
@@ -121,15 +121,15 @@ static void change_format(Note *note, GtkToggleAction *action)
 			gtk_text_buffer_get_selection_bounds(buffer, &selection_start_iter, &selection_end_iter);
 			gtk_text_buffer_remove_tag_by_name(buffer, tag_name, &selection_start_iter, &selection_end_iter);
 			/* Manually set the buffer to modified, because removing tags, doesn't do this automatically */
-			gtk_text_buffer_set_modified(buffer, TRUE);	
+			gtk_text_buffer_set_modified(buffer, TRUE);
 		} else {
 			/* Nothing is selected, so this style should stop from here on */
 			GtkTextTag *tag = gtk_text_tag_table_lookup(buffer->tag_table, tag_name);
 			note_remove_active_tag(note, tag);
 		}
 	}
-	
-	
+
+
 }
 
 void
@@ -150,27 +150,27 @@ on_font_size_radio_group_changed       (GtkRadioAction  *action,
 	GtkTextIter start_iter;
 	GtkTextIter end_iter;
 	const gchar *tag_name = gtk_action_get_name(GTK_ACTION(current));
-	
-	if (gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter)) {	
+
+	if (gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter)) {
 		/* Remove all possible size tags */
 		gtk_text_buffer_remove_tag_by_name(buffer, "size:small", &start_iter, &end_iter);
 		gtk_text_buffer_remove_tag_by_name(buffer, "size:large", &start_iter, &end_iter);
 		gtk_text_buffer_remove_tag_by_name(buffer, "size:huge",  &start_iter, &end_iter);
-		
+
 		/* If not normal size, apply one size tag */
 		if (strcmp(tag_name, "size:normal") != 0) {
 			gtk_text_buffer_apply_tag_by_name(buffer, tag_name, &start_iter, &end_iter);
 		}
-		
+
 		/* Set the buffer to modified */
 		gtk_text_buffer_set_modified(buffer, TRUE);
-		
+
 	} else {
 		/* Remove all possible size tags */
 		note_remove_active_tag_by_name(note, "size:small");
 		note_remove_active_tag_by_name(note, "size:large");
 		note_remove_active_tag_by_name(note, "size:huge");
-		
+
 		/* If not normal size, add one size tag */
 		if (strcmp(tag_name, "size:normal") != 0) {
 			note_add_active_tag_by_name(note, tag_name);
@@ -184,24 +184,24 @@ on_window_close_button_clicked		   (GtkObject		*window,
 										GdkEvent		*event,
 										gpointer		 user_data)
 {
-	Note *note = (Note*)user_data;	
+	Note *note = (Note*)user_data;
 	note_save(note);
 	note_close_window(note);
 	return TRUE; /* True to stop other handler from being invoked */
 }
 
 void on_quit_button_clicked(GtkAction *action, gpointer user_data)
-{	
+{
 	Note *note;
 	GList *open_notes = get_app_data()->open_notes;
-	
+
 	while (open_notes != NULL) {
 		note = (Note*)open_notes->data;
 		note_save(note);
 		note_close_window(note);
 		open_notes = g_list_next(open_notes);
 	}
-	
+
 	gtk_main_quit();
 }
 
@@ -219,20 +219,20 @@ add_bullets(GtkTextBuffer *buffer, gint start_line, gint end_line, GtkTextTag *d
 	gint i = 0;
 	GtkTextIter start_iter, end_iter;
 	gint total_lines = gtk_text_buffer_get_line_count(buffer);
-	
+
 	/* For each selected line */
 	for (i = start_line; i <= end_line; i++) {
-		
+
 		/* Insert bullet character */
 		gtk_text_buffer_get_iter_at_line(buffer, &start_iter, i);
 		gtk_text_buffer_insert(buffer, &start_iter, get_bullet_by_depth_tag(depth_tag), -1);
-		
+
 		/* Remove existing tags from the bullet and add the <depth> tag */
 		gtk_text_buffer_get_iter_at_line_offset(buffer, &start_iter, i, 0);
 		gtk_text_buffer_get_iter_at_line_offset(buffer, &end_iter, i, 2);
 		gtk_text_buffer_remove_all_tags(buffer, &start_iter, &end_iter);
 		gtk_text_buffer_apply_tag(buffer, depth_tag, &start_iter, &end_iter);
-		
+
 		/* Surround line (starting after BULLET) with "list-item" tags */
 		gtk_text_buffer_get_iter_at_line_offset(buffer, &start_iter, i, 2); /* Jump bullet */
 		if (i == end_line) {
@@ -243,11 +243,11 @@ add_bullets(GtkTextBuffer *buffer, gint start_line, gint end_line, GtkTextTag *d
 		}
 		gtk_text_buffer_apply_tag_by_name(buffer, "list-item", &start_iter, &end_iter);
 	}
-	
+
 	/* Surround everything it with "list" tags */
 	/* Check line above and below. If one or both are bullet lines, include the newline chars at the beginning and the end */
 	/* This is done, so that there are no gaps in the <list> tag and that it really surrounds the whole list. */
-	
+
 	/* Set start iter TODO: This if statement is not elegant at all.*/
 	if (start_line > 0) {
 		gtk_text_buffer_get_iter_at_line(buffer, &start_iter, start_line - 1);
@@ -259,7 +259,7 @@ add_bullets(GtkTextBuffer *buffer, gint start_line, gint end_line, GtkTextTag *d
 	} else {
 		gtk_text_buffer_get_iter_at_line(buffer, &start_iter, start_line);
 	}
-	
+
 	/* Set end iter TODO: This if statement is not elegant at all. */
 	if (end_line < total_lines - 1) {
 		gtk_text_buffer_get_iter_at_line(buffer, &end_iter, end_line + 1);
@@ -271,7 +271,7 @@ add_bullets(GtkTextBuffer *buffer, gint start_line, gint end_line, GtkTextTag *d
 		gtk_text_buffer_get_iter_at_line(buffer, &end_iter, end_line);
 		gtk_text_iter_forward_to_line_end(&end_iter);
 	}
-	
+
 	/****/
 	/*
 	gtk_text_buffer_get_iter_at_line(buffer, &start_iter, start_line);
@@ -287,19 +287,19 @@ remove_bullets(GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_
 	gint i = 0;
 	gint start_line = gtk_text_iter_get_line(start_iter);
 	gint end_line = gtk_text_iter_get_line(end_iter);
-	
+
 	/* Remove tags */
 	gtk_text_buffer_get_iter_at_line(buffer, start_iter, start_line);
 	gtk_text_buffer_get_iter_at_line(buffer, end_iter, end_line);
 	gtk_text_iter_forward_to_line_end(end_iter);
-	
+
 	/* Include the newline char before and after this line */
 	gtk_text_iter_backward_char(start_iter);
 	gtk_text_iter_forward_char(end_iter);
-	 
+
 	gtk_text_buffer_remove_tag_by_name(buffer, "list-item", start_iter, end_iter);
 	gtk_text_buffer_remove_tag_by_name(buffer, "list", start_iter, end_iter);
-		
+
 	/* Remove bullets */
 	for (i = start_line; i <= end_line; i++) {
 		gtk_text_buffer_get_iter_at_line(buffer, start_iter, i);
@@ -317,14 +317,14 @@ on_bullets_button_clicked				(GtkAction		*action,
 	UserInterface *ui = note->ui;
 	GtkTextBuffer *buffer = ui->buffer;
 	GtkTextIter start_iter, end_iter;
-	
+
 	if (gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action))) {
 		/* The button just became active, so we should enable the formatting */
 		if (gtk_text_buffer_get_has_selection(buffer)) {
 			/* Something is selected */
 			gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter);
 			add_bullets(buffer, gtk_text_iter_get_line(&start_iter), gtk_text_iter_get_line(&end_iter), buffer_get_depth_tag(buffer, 1));
-			
+
 		} else {
 			/* Nothing is selected */
 			GtkTextTag *tag;
@@ -332,7 +332,7 @@ on_bullets_button_clicked				(GtkAction		*action,
 			gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer));
 			line = gtk_text_iter_get_line(&start_iter);
 			add_bullets(buffer, line, line, buffer_get_depth_tag(buffer, 1));
-			
+
 			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list-item");
 			note_add_active_tag(note, tag);
 			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list");
@@ -344,64 +344,64 @@ on_bullets_button_clicked				(GtkAction		*action,
 			/* Something is selected */
 			gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter);
 			remove_bullets(buffer, &start_iter, &end_iter);
-			
+
 			note_remove_active_tag_by_name(note, "list-item");
 			note_remove_active_tag_by_name(note, "list");
-			
+
 		} else {
 			/* Nothing is selected */
 			gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer));
-			gtk_text_buffer_get_iter_at_mark(buffer, &end_iter, gtk_text_buffer_get_insert(buffer));		
+			gtk_text_buffer_get_iter_at_mark(buffer, &end_iter, gtk_text_buffer_get_insert(buffer));
 			remove_bullets(buffer, &start_iter, &end_iter);
-			
+
 			note_remove_active_tag_by_name(note, "list-item");
 			note_remove_active_tag_by_name(note, "list");
 		}
 	}
-	
+
 }
 
 void
 on_link_button_clicked				   (GtkAction		*action,
-										gpointer		 user_data) 
-{ 	
+										gpointer		 user_data)
+{
 	Note *note = (Note*)user_data;
 	GtkTextBuffer *buffer = note->ui->buffer;
 	GtkTextIter start, end;
 	const gchar *text;
-	
+
 	if (!gtk_text_buffer_get_has_selection(buffer)) {
 		return;
 	}
-	
+
 	gtk_text_buffer_get_selection_bounds(buffer, &start, &end);
 	text = gtk_text_iter_get_text(&start, &end);
 	gtk_text_buffer_apply_tag_by_name(buffer, "link:internal", &start, &end);
-	
+
 	note_show_by_title(text);
 }
 
 void
 on_notes_button_clicked				   (GtkAction		*action,
 										gpointer		 user_data) {
-	
+
 	AppData *app_data;
 	GTimer *timer;
 	gulong micro;
-	
+
 	app_data = get_app_data();
 	if (app_data->note_store == NULL) {
 		return;
 	}
-	
+
 	timer = g_timer_new();
-	
+
 	search_window_open();
-	
+
 	g_timer_stop(timer);
 	g_timer_elapsed(timer, &micro);
 	g_printerr("Opening search window: %lu micro seconds \n", micro);
-	
+
 }
 
 /* TODO: The signal "mark-set" is emitted 4 times when clicking into the text. While selecting
@@ -417,10 +417,10 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	GSList *tags;
 	GtkTextTag *tag;
 	const gchar *mark_name;
-	
+
 	/* Only enable the link action, if something is selected */
-	gtk_action_set_sensitive(ui->action_link, gtk_text_buffer_get_has_selection(buffer)); 
-	
+	gtk_action_set_sensitive(ui->action_link, gtk_text_buffer_get_has_selection(buffer));
+
 	/* We only do something if the "insert" mark changed. */
 	mark_name = gtk_text_mark_get_name(mark);
 	if ((mark_name == NULL) || (strcmp(mark_name, "insert") != 0)) {
@@ -429,10 +429,10 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 
 	/* Clean the list of active tags */
 	g_slist_free(note->active_tags);
-	
+
 	/* Add tags at this location */
 	note->active_tags = gtk_text_iter_get_tags(location);
-	
+
 	/* Go the beginning of line and check if there is a bullet.
 	 * If yes, add list-item and list tags and enable the indent actions */
 	gtk_text_iter_set_line_offset(location, 0);
@@ -448,14 +448,14 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 		gtk_action_set_sensitive(ui->action_inc_indent, FALSE);
 		gtk_action_set_sensitive(ui->action_dec_indent, FALSE);
 	}
-	
+
 	/* Copy pointer for iteration */
 	tags = note->active_tags;
-	
-	
+
+
 	/* Blocking signals here because the ..set_active() method makes the buttons
 	 * emit the clicked signal. And because of this the formatting changes.
-	 */	
+	 */
 	g_signal_handlers_block_by_func(ui->action_bold, on_format_button_clicked, note);
 	g_signal_handlers_block_by_func(ui->action_italic, on_format_button_clicked, note);
 	g_signal_handlers_block_by_func(ui->action_strike, on_format_button_clicked, note);
@@ -463,7 +463,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	g_signal_handlers_block_by_func(ui->action_fixed, on_format_button_clicked, note);
 	g_signal_handlers_block_by_func(ui->action_bullets, on_bullets_button_clicked, note);
 	g_signal_handlers_block_by_func(ui->action_font_small, on_font_size_radio_group_changed, note);
-	
+
 	/* TODO: This can be optimized: Note disable all and then enable selected, but determine state and then
 	 * set the state. */
 	gtk_toggle_action_set_active(ui->action_bold, FALSE);
@@ -472,7 +472,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	gtk_toggle_action_set_active(ui->action_highlight, FALSE);
 	gtk_toggle_action_set_active(ui->action_fixed, FALSE);
 	gtk_toggle_action_set_active(ui->action_bullets, FALSE);
-	
+
 	while (tags != NULL) {
 		tag = GTK_TEXT_TAG(tags->data);
 		if (strcmp(tag->name, "bold") == 0) {
@@ -496,10 +496,10 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 		} else if (strcmp(tag->name, "size:huge") == 0) {
 			gtk_radio_action_set_current_value(ui->action_font_small, 3);
 		}
-		
+
 		tags = tags->next;
 	}
-	
+
 	/* unblock signals */
 	g_signal_handlers_unblock_by_func(ui->action_bold, on_format_button_clicked, note);
 	g_signal_handlers_unblock_by_func(ui->action_italic, on_format_button_clicked, note);
@@ -524,17 +524,17 @@ on_textbuffer_changed				(GtkTextBuffer *buffer,
 {
 	GtkTextMark *mark;
 	GtkTextIter current;
-	
+
 	/* If the cursor is in the first logical line, then format
 	 * the first line and change the window title.
 	 */
 	mark = gtk_text_buffer_get_insert(buffer);
 	gtk_text_buffer_get_iter_at_mark(buffer, &current, mark);
-	
+
 	if (gtk_text_iter_get_line(&current) != 0) {
 		return;
 	}
-	
+
 	note_format_title(buffer);
 	note_set_window_title_from_buffer(GTK_WINDOW(user_data), buffer);
 }
@@ -549,29 +549,29 @@ on_link_internal_tag_event				(GtkTextTag  *tag,
 	GdkEventType type = event->type;
 	GtkTextIter *start;
 	gchar *link_text;
-	
+
 	if (type == GDK_BUTTON_RELEASE) {
 		if (((GdkEventButton*)event)->button == 1) {
-			
+
 			g_printerr("Open Link \n");
-			
+
 			if (!gtk_text_iter_begins_tag(iter, tag)) {
 				gtk_text_iter_backward_to_tag_toggle(iter, tag);
 			}
-			
+
 			start = gtk_text_iter_copy(iter);
-			
+
 			if (!gtk_text_iter_ends_tag(iter, tag)) {
 				gtk_text_iter_forward_to_tag_toggle(iter, tag);
 			}
-			
+
 			link_text = gtk_text_iter_get_text(start, iter);
-			
+
 			g_printerr("Link: >%s< \n", link_text);
 			note_show_by_title(link_text);
-		}	
+		}
 	}
-		
+
 	return FALSE;
 }
 
@@ -591,34 +591,33 @@ on_delete_button_clicked			   (GtkAction		*action,
 	GtkWidget *dialog;
 	gint response;
 	AppData *app_data;
-	
+
 	dialog = gtk_message_dialog_new_with_markup(
 			GTK_WINDOW(note->ui->window),
 			GTK_DIALOG_MODAL,
 			GTK_MESSAGE_QUESTION,
 			GTK_BUTTONS_YES_NO,
 			message);
-	
+
 	response = gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog);
-	
+
 	if (response != GTK_RESPONSE_YES) {
 		return;
 	}
-	
+
 	/* Block this signal, otherwise the destroy event of the window will trigger saving of the note */
 	g_signal_handlers_block_by_func(note->ui->window, on_window_close_button_clicked, note);
 	note_close_window(note);
 	/* Don't unblock the signal, because the window does not exist anymore */
-	
+
 	/* Delete file */
 	if (g_unlink(note->filename) == -1) {
 		g_printerr("ERROR: The file %s could not be deleted \n", note->filename);
 	}
-	
+
 	app_data = get_app_data();
 	/* TODO: Free note */
-	/*app_data->all_notes = g_list_remove(app_data->all_notes, note);*/
 	note_list_store_remove(app_data->note_store, note);
 }
 
@@ -629,7 +628,7 @@ gboolean note_save_callback(Note *note)
 	if (note != NULL && GTK_IS_TEXT_BUFFER(note->ui->buffer)) {
 		note_save(note);
 	}
-	
+
 	/* Return FALSE to make the Timer stop */
 	return FALSE;
 }
@@ -639,14 +638,14 @@ on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 										 gpointer		user_data)
 {
 	Note *note = (Note*)user_data;
-	
+
 	if (!gtk_text_buffer_get_modified(buffer)) {
 		/*g_printerr("Buffer changed from dirty to saved \n");*/
 		return;
 	}
-	
+
 	/*g_printerr("Buffer is dirty. Saving in 10 seconds\n");*/
-	
+
 	/* Save 10 seconds after the buffer got dirty */
 	g_timeout_add(4000, (GSourceFunc)note_save_callback, note);
 }
@@ -658,11 +657,11 @@ void change_font_size_by(gint size)
 	PangoFontDescription *font;
 	Note *note;
 	GList *note_list;
-	
+
 	if (size == 0) {
 		return;
 	}
-	
+
 	if (size > 0) {
 		if (app_data->font_size + size <= 65000) {
 			app_data->font_size += size;
@@ -676,12 +675,12 @@ void change_font_size_by(gint size)
 			return;
 		}
 	}
-	
+
 	gconf_client_set_int(app_data->client, "/apps/maemo/conboy/font_size", app_data->font_size, NULL);
-	
+
 	font = pango_font_description_new();
 	pango_font_description_set_size(font, app_data->font_size);
-	
+
 	note_list = app_data->open_notes;
 	while (note_list != NULL) {
 		note = (Note*)note_list->data;
@@ -712,26 +711,26 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 	GtkWidget *window = GTK_WIDGET(note->ui->window);
 	AppData *app_data = get_app_data();
 	GList *open_notes;
-	
+
 	switch (event->keyval) {
 	case HILDON_HARDKEY_INCREASE:
 		hildon_banner_show_information(window, NULL, "Zooming in");
 		on_bigger_button_clicked(NULL, NULL);
 		return TRUE;
-	
+
 	case HILDON_HARDKEY_DECREASE:
 		hildon_banner_show_information(window, NULL, "Zooming out");
 		on_smaller_button_clicked(NULL, NULL);
 		return TRUE;
-		
+
 	case HILDON_HARDKEY_ESC:
 		on_window_close_button_clicked(GTK_OBJECT(window), NULL, note);
 		return TRUE;
-	
+
 	case HILDON_HARDKEY_FULLSCREEN:
 		/* Toggle fullscreen */
 		app_data->fullscreen = !app_data->fullscreen;
-		
+
 		/* Set all open windows to fullscreen or unfullscreen */
 		open_notes = app_data->open_notes;
 		while (open_notes != NULL) {
@@ -743,12 +742,12 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 			}
 			open_notes = open_notes->next;
 		}
-		
+
 		/* Focus again on the active note */
 		note_set_focus(note);
 		return TRUE;
 	}
-	
+
 	return FALSE;
 }
 
@@ -775,20 +774,20 @@ gboolean line_needs_bullet(GtkTextBuffer *buffer, gint line_number)
 {
 	GtkTextIter iter;
 	gtk_text_buffer_get_iter_at_line(buffer, &iter, line_number);
-	
+
 	while (!gtk_text_iter_ends_line(&iter)) {
 		switch (gtk_text_iter_get_char(&iter))
 		{
 		case ' ':
 			gtk_text_iter_forward_char(&iter);
 			break;
-			
+
 		case '*':
 		case '-':
 			gtk_text_iter_forward_char(&iter);
 			return (gtk_text_iter_get_char(&iter) == ' ');
 			break;
-		
+
 		default:
 			return FALSE;
 		}
@@ -804,118 +803,118 @@ static gboolean add_new_line(Note *note)
 	GtkTextIter iter;
 	GtkTextTag *depth_tag;
 	gint line;
-	
+
 	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
 	gtk_text_iter_set_line_offset(&iter, 0);
 	depth_tag = iter_get_depth_tag(&iter);
-	
+
 	/* If line starts with a bullet */
 	if (depth_tag != NULL) {
-	
+
 		/* If line is not empty, add new bullet. Else remove bullet. */
-		gtk_text_iter_forward_to_line_end(&iter);		
+		gtk_text_iter_forward_to_line_end(&iter);
 		if (gtk_text_iter_get_line_offset(&iter) > 2) {
 			GSList *tmp;
-			
+
 			/* Remove all tags but <list> from active tags */
 			tmp = g_slist_copy(note->active_tags);
 			g_slist_free(note->active_tags);
 			note->active_tags = NULL;
 			note_add_active_tag_by_name(note, "list");
-			
+
 			/* Insert newline and bullet */
 			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 			gtk_text_view_scroll_mark_onscreen(view, gtk_text_buffer_get_insert(buffer));
 			line = gtk_text_iter_get_line(&iter);
 			add_bullets(buffer, line, line, depth_tag);
-			
+
 			/* Add all tags back to active tags */
 			note->active_tags = tmp;
-			
+
 			return TRUE;
-			
+
 		} else {
 			/* Remove bullet and insert newline */
 			GtkTextTag *tag;
 			GtkTextIter *start = gtk_text_iter_copy(&iter);
-			
+
 			/* Disable list and list-item tags */
 			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list-item");
 			note_remove_active_tag(note, tag);
 			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list");
 			note_remove_active_tag(note, tag);
-			
+
 			/* Delete the bullet and the last newline */
 			gtk_text_iter_set_line_offset(start, 0);
 			gtk_text_iter_backward_char(start);
 			gtk_text_buffer_remove_all_tags(buffer, start, &iter);
 			gtk_text_buffer_delete(buffer, start, &iter);
-			
+
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
-			
+
 			/* Disable the bullet button */
 			on_textview_cursor_moved(buffer, &iter, gtk_text_buffer_get_insert(buffer) ,note);
-			
+
 			return TRUE;
 		}
-		
+
 	} else {
-	
+
 		/* If line start with a "- " or "- *" */
 		if (line_needs_bullet(buffer, gtk_text_iter_get_line(&iter))) {
 			GSList *tmp;
 			GtkTextIter *end_iter;
-			
+
 			gtk_text_iter_set_line_offset(&iter, 0);
 			end_iter = gtk_text_iter_copy(&iter);
 			line = gtk_text_iter_get_line(&iter);
-			
+
 			/* Skip trailing spaces */
 			while (gtk_text_iter_get_char(end_iter) == ' ') {
 				gtk_text_iter_forward_char(end_iter);
 			}
-			/* Skip "* " or "- " */ 
+			/* Skip "* " or "- " */
 			gtk_text_iter_forward_chars(end_iter, 2);
-			
+
 			/* Delete this part */
 			gtk_text_buffer_delete(buffer, &iter, end_iter);
-			
+
 			/* Add bullet for this line */
 			add_bullets(buffer, line, line, buffer_get_depth_tag(buffer, 1));
-			
-			
+
+
 			/* TODO: Copied from above */
-						
+
 			/* Remove all tags but <list> from active tags */
 			tmp = g_slist_copy(note->active_tags);
 			g_slist_free(note->active_tags);
 			note->active_tags = NULL;
 			note_add_active_tag_by_name(note, "list");
-			
+
 			/* Insert newline and bullet */
 			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 			line = gtk_text_iter_get_line(&iter);
 			add_bullets(buffer, line, line, buffer_get_depth_tag(buffer, 1));
-			
+
 			/* Add all tags back to active tags */
 			note->active_tags = tmp;
-			
+
 			/* Turn on the list-item tag from here on */
 			note_add_active_tag_by_name(note, "list-item");
-			
+
 			/* Revaluate (turn on) the bullet button */
 			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
 			on_textview_cursor_moved(buffer, &iter, gtk_text_buffer_get_insert(buffer), note);
-			
+
 			return TRUE;
 		}
-	
+
 	}
-	
+
 	return FALSE;
-	
+
 }
 
 gboolean
@@ -924,7 +923,7 @@ on_text_view_key_pressed                      (GtkWidget   *widget,
                                                gpointer     user_data)
 {
 	Note *note = (Note*)user_data;
-	
+
 	switch (event->keyval) {
 		case GDK_Return:
 		case GDK_KP_Enter:
@@ -932,7 +931,7 @@ on_text_view_key_pressed                      (GtkWidget   *widget,
 		default:
 			return FALSE;
 	}
-	
+
 }
 
 /* TODO: Optimize this. We need a place where all titles are stored, info which is the longest, ... */
@@ -944,14 +943,14 @@ get_length_of_longest_title()
 	GtkTreeIter iter;
 	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
 	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
-	
+
 	while (valid) {
 		Note *note;
 		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
 		max_length = max(g_utf8_strlen(note->title, -1), max_length);
 		valid = gtk_tree_model_iter_next(model, &iter); /* TODO: Too much casting in this function. Maybe introduce note_list_store_iter_next() etc... */
 	}
-	
+
 	return max_length;
 }
 
@@ -965,17 +964,17 @@ static
 GSList* find_titles(gchar *haystack) {
 	/* TODO: The search algorithm needs to be optimized. Probably to use Aho-Corasick */
 	/* ATM On the device (N810) searching takes around 1500 microseconds with ~70 notes. */
-		
+
 	GTimer *search_timer = g_timer_new();
-	
-	
+
+
 	gchar *found;
 	GSList *result = NULL;
 	AppData *app_data = get_app_data();
-	
+
 	gchar *u_haystack = g_utf8_casefold(haystack, -1);
 	gulong micro;
-	
+
 	GtkTreeIter iter;
 	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
 	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
@@ -983,11 +982,11 @@ GSList* find_titles(gchar *haystack) {
 		gchar *u_needle;
 		Note *note;
 		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
-		
+
 		u_needle = g_utf8_casefold(note->title, -1);
-		
+
 		found = u_haystack;
-		
+
 		while ( (found = strstr(found, u_needle)) != NULL ) {
 			SearchHit *hit = g_new0(SearchHit, 1);
 			hit->note = note;
@@ -999,39 +998,39 @@ GSList* find_titles(gchar *haystack) {
 		g_free(u_needle);
 		valid = gtk_tree_model_iter_next(model, &iter);
 	}
-	
+
 	g_timer_stop(search_timer);
-	
+
 	g_timer_elapsed(search_timer, &micro);
 	/*g_printerr("Search took %lu microseconds \n", micro);*/
-	
+
 	g_free(u_haystack);
-	
+
 	return result;
 }
 
 static void
 extend_block(GtkTextIter *start_iter, GtkTextIter *end_iter, gint max_len, GtkTextTag *tag)
-{	
+{
 	/* Set start_iter max_len chars to the left or to the start of the line */
 	if (gtk_text_iter_get_line_offset(start_iter) - max_len > 0) {
 		gtk_text_iter_backward_chars(start_iter, max_len);
 	} else {
 		gtk_text_iter_set_line_offset(start_iter, 0);
 	}
-	
+
 	/* Set end_iter max_len chars to the right or to the end of the line */
 	if (gtk_text_iter_get_line_offset(end_iter) + max_len < gtk_text_iter_get_chars_in_line(end_iter) ) {
 		gtk_text_iter_forward_chars(end_iter, max_len);
 	} else {
 		gtk_text_iter_forward_to_line_end(end_iter);
 	}
-	
+
 	/* Expand selection to the left, if there is a link_tag inside */
 	if (gtk_text_iter_has_tag(start_iter, tag)) {
 		gtk_text_iter_backward_to_tag_toggle(start_iter, tag);
 	}
-	
+
 	/* Expand selection to the right, if there is a link_tag inside */
 	if (gtk_text_iter_has_tag(end_iter, tag)) {
 		gtk_text_iter_forward_to_tag_toggle(end_iter, tag);
@@ -1047,26 +1046,26 @@ highlight_titles(Note *note, GtkTextBuffer *buffer, GtkTextIter *start_iter, Gtk
 	while (hits != NULL) {
 		GtkTextIter *hit_start, *hit_end;
 		SearchHit *hit = (SearchHit*)hits->data;
-		
+
 		hit_start = gtk_text_iter_copy(start_iter);
 		gtk_text_iter_forward_chars(hit_start, hit->start_offset);
-		
+
 		hit_end = gtk_text_iter_copy(start_iter);
 		gtk_text_iter_forward_chars(hit_end, hit->end_offset);
-		
+
 		/* Only link agains words or sentencens */
-		if ( (!gtk_text_iter_starts_word(hit_start) && !gtk_text_iter_starts_sentence(hit_start)) || 
+		if ( (!gtk_text_iter_starts_word(hit_start) && !gtk_text_iter_starts_sentence(hit_start)) ||
 				(!gtk_text_iter_ends_word(hit_end) && !gtk_text_iter_ends_sentence(hit_end))) {
 			hits = hits->next;
 			continue;
 		}
-		
+
 		/* Don´t link against the note itself */
 		if (hit->note == note) {
 			hits = hits->next;
 			continue;
 		}
-		
+
 		/* Don't create links inside external links */
 		if (gtk_text_iter_has_tag(hit_start, url_tag)) {
 			hits = hits->next;
@@ -1075,10 +1074,10 @@ highlight_titles(Note *note, GtkTextBuffer *buffer, GtkTextIter *start_iter, Gtk
 
 		/* Apply the tag */
 		gtk_text_buffer_apply_tag_by_name(buffer, "link:internal", hit_start, hit_end);
-		
+
 		hits = hits->next;
 	}
-	
+
 	g_slist_free(hits);
 }
 
@@ -1088,18 +1087,18 @@ auto_highlight_links(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *inpu
 	GtkTextIter *start_iter, *end_iter;
 	GtkTextTag *link_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	int max_len = get_length_of_longest_title();
-	
+
 	start_iter = gtk_text_iter_copy(iter);
 	end_iter = gtk_text_iter_copy(iter);
-	
+
 	/* Move start iter back to the position before the insert */
 	gtk_text_iter_backward_chars(start_iter, g_utf8_strlen(input, -1));
-	
+
 	extend_block(start_iter, end_iter, max_len, link_tag);
-	
+
 	/* Remove existing link tag */
 	gtk_text_buffer_remove_tag(buffer, link_tag, start_iter, end_iter);
-	
+
 	/* Add links */
 	highlight_titles(note, buffer, start_iter, end_iter);
 }
@@ -1109,22 +1108,22 @@ apply_active_tags(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, 
 {
 	GtkTextIter *start_iter;
 	GSList *active_tags = note->active_tags;
-	
+
 	/* Only apply active tags on typed text, not on pasted text */
 	if (g_utf8_strlen(input, -1) > 1) {
 		return;
 	}
-	
+
 	/* The first line is always the title. Don't apply tags there */
 	if (gtk_text_iter_get_line(iter) == 0) {
 		return;
 	}
-		
+
 	/* First remove all tags, then apply all active tags */
 	start_iter = gtk_text_iter_copy(iter);
 	gtk_text_iter_backward_chars(start_iter, g_utf8_strlen(input, -1));
 	gtk_text_buffer_remove_all_tags(buffer, start_iter, iter);
-	
+
 	while (active_tags != NULL && active_tags->data != NULL) {
 		gtk_text_buffer_apply_tag(buffer, active_tags->data, start_iter, iter);
 		active_tags = active_tags->next;
@@ -1142,13 +1141,13 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 	Note *note = (Note*)user_data;
 	GTimer *timer;
 	gulong micro;
-	
+
 	apply_active_tags(buffer, iter, text, note);
-	
+
 	timer = g_timer_new();
-	
+
 	auto_highlight_links(buffer, iter, text, note);
-	
+
 	g_timer_stop(timer);
 	g_timer_elapsed(timer, &micro);
 	g_printerr("%lu\n", micro);
@@ -1163,41 +1162,41 @@ on_text_buffer_delete_range					(GtkTextBuffer *buffer,
 	Note *note = (Note*)user_data;
 	GtkTextTag *link_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	gint max_len = get_length_of_longest_title();
-	
+
 	/* This handler runs after the default handler, so we can modify the iters as we like */
 	extend_block(start_iter, end_iter, max_len, link_tag);
-	
+
 	/* Remove link tags */
 	gtk_text_buffer_remove_tag(buffer, link_tag, start_iter, end_iter);
-	
+
 	/* Add link tags */
 	highlight_titles(note, buffer, start_iter, end_iter);
 }
 
 /*
- * TODO: Put in common file. And also use in deserializer. 
+ * TODO: Put in common file. And also use in deserializer.
  */
 GtkTextTag* buffer_get_depth_tag(GtkTextBuffer *buffer, gint depth)
 {
 	GtkTextTag *tag;
 	gchar depth_str[5] = {0};
 	gchar *tag_name;
-	
+
 	if (depth < 1) {
 		g_printerr("ERROR: buffer_get_depth_tag(): depth must be at least 1. Not: %i \n", depth);
 	}
-	
+
 	g_sprintf(depth_str, "%i", depth);
 	tag_name = g_strconcat("depth", ":", depth_str, NULL);
-	
+
 	tag = gtk_text_tag_table_lookup(buffer->tag_table, tag_name);
-	
+
 	if (tag == NULL) {
 		tag = gtk_text_buffer_create_tag(buffer, tag_name, "indent", -20, "left-margin", depth * 25, NULL);
 	}
-	
+
 	g_free(tag_name);
-	
+
 	return tag;
 }
 
@@ -1242,25 +1241,25 @@ void increase_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 	GtkTextTag *new_tag;
 	gint i;
 	for (i = start_line; i <= end_line; i++) {
-		
+
 		gtk_text_buffer_get_iter_at_line(buffer, &start_iter, i);
-		
+
 		old_tag = iter_get_depth_tag(&start_iter);
-		
+
 		if (old_tag != NULL) {
 			gint depth = tag_get_depth(old_tag);
 			depth++;
 			new_tag = buffer_get_depth_tag(buffer, depth);
-			
+
 			gtk_text_buffer_get_iter_at_line(buffer, &end_iter, i);
 			gtk_text_iter_set_line_offset(&end_iter, 2);
-			
+
 			/* Remove old tag */
 			gtk_text_buffer_remove_tag(buffer, old_tag, &start_iter, &end_iter);
-			
+
 			/* Delete old bullet */
 			gtk_text_buffer_delete(buffer, &start_iter, &end_iter);
-			
+
 			/* Add new bullet with new tag */
 			add_bullets(buffer, i, i, new_tag);
 		}
@@ -1276,11 +1275,11 @@ void decrease_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 	GtkTextTag *new_tag;
 	gint i;
 	for (i = start_line; i <= end_line; i++) {
-		
+
 		gtk_text_buffer_get_iter_at_line(buffer, &start_iter, i);
-		
+
 		old_tag = iter_get_depth_tag(&start_iter);
-		
+
 		if (old_tag != NULL) {
 			gint depth = tag_get_depth(old_tag);
 			if (depth <= 1) {
@@ -1288,16 +1287,16 @@ void decrease_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 			}
 			depth--;
 			new_tag = buffer_get_depth_tag(buffer, depth);
-			
+
 			gtk_text_buffer_get_iter_at_line(buffer, &end_iter, i);
 			gtk_text_iter_set_line_offset(&end_iter, 2);
-			
+
 			/* Remove old tag */
 			gtk_text_buffer_remove_tag(buffer, old_tag, &start_iter, &end_iter);
-			
+
 			/* Delete old bullet */
 			gtk_text_buffer_delete(buffer, &start_iter, &end_iter);
-			
+
 			/* Add new bullet with new tag */
 			add_bullets(buffer, i, i, new_tag);
 		}
@@ -1311,18 +1310,18 @@ on_inc_indent_button_clicked			   (GtkAction		*action,
 	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(user_data);
 	GtkTextIter start_iter, end_iter;
 	gint start_line, end_line;
-	
+
 	if (gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter)) {
 		start_line = gtk_text_iter_get_line(&start_iter);
 		end_line = gtk_text_iter_get_line(&end_iter);
 		increase_indent(buffer, start_line, end_line);
-		
+
 	} else {
 		gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer));
 		start_line = gtk_text_iter_get_line(&start_iter);
 		increase_indent(buffer, start_line, start_line);
 	}
-	
+
 	gtk_text_buffer_set_modified(buffer, TRUE);
 }
 
@@ -1334,18 +1333,18 @@ on_dec_indent_button_clicked			   (GtkAction		*action,
 	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(user_data);
 	GtkTextIter start_iter, end_iter;
 	gint start_line, end_line;
-	
+
 	if (gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter)) {
 		start_line = gtk_text_iter_get_line(&start_iter);
 		end_line = gtk_text_iter_get_line(&end_iter);
 		decrease_indent(buffer, start_line, end_line);
-		
+
 	} else {
 		gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer));
 		start_line = gtk_text_iter_get_line(&start_iter);
 		decrease_indent(buffer, start_line, start_line);
 	}
-	
+
 	gtk_text_buffer_set_modified(buffer, TRUE);
 }
 
@@ -1353,31 +1352,21 @@ void
 on_style_button_clicked                (GtkAction       *action,
 		                                gpointer         user_data)
 {
-	GtkMenu *menu = GTK_MENU(user_data);
-	gboolean visible;
-	
-	if (GTK_WIDGET_VISIBLE(menu)) {
-		g_printerr("VISIBLE \n");
-	} else {
-		g_printerr("NOT VISIBLE \n");
-	}
-	
-	
-	/* TODO: Not working, visible is always FALSE */
-	g_object_get(GTK_WIDGET(menu), "visible", &visible, NULL);
-	if (visible) {
-		gtk_menu_popdown(menu);
-	} else {
-		gtk_widget_show_all(GTK_WIDGET(menu));
-		gtk_menu_popup(menu, NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
-	}
+	UserInterface *ui = (UserInterface*)user_data;
+
+	#ifdef HILDON_HAS_APP_MENU
+	hildon_app_menu_popup(HILDON_APP_MENU(ui->style_menu), GTK_WINDOW(ui->window));
+	#else
+	gtk_widget_show_all(GTK_WIDGET(ui->style_menu));
+	gtk_menu_popup(GTK_MENU(ui->style_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
+	#endif
 }
 
 void on_find_button_clicked(GtkAction *action, gpointer user_data)
 {
 	Note *note = (Note*)user_data;
 	UserInterface *ui = note->ui;
-	
+
 	if (ui->find_bar_is_visible) {
 		gtk_widget_hide_all(GTK_WIDGET(ui->find_bar));
 		ui->find_bar_is_visible = FALSE;
@@ -1397,19 +1386,19 @@ void on_find_bar_search(GtkWidget *widget, Note *note)
 	gchar *search_str;
 	GtkTextMark *mark;
 	GtkTextIter iter, match_start, match_end;
-	
+
 	/* Get the search string from the widget */
 	g_object_get(G_OBJECT(widget), "prefix", &search_str, NULL);
-	
+
 	/* The mark "search_pos" remembers the position for subsequent calls
 	 * to this method */
 	mark = gtk_text_buffer_get_mark(buffer, "search_pos");
-	
+
 	if (mark == NULL) {
 		gtk_text_buffer_get_start_iter(buffer, &iter);
 		mark = gtk_text_buffer_create_mark(buffer, "search_pos", &iter, FALSE);
 	}
-	
+
 	gtk_text_buffer_get_iter_at_mark(buffer, &iter, mark);
 	if (gtk_text_iter_forward_search(&iter, search_str, GTK_TEXT_SEARCH_TEXT_ONLY, &match_start, &match_end, NULL)) {
 		mark = gtk_text_buffer_create_mark(buffer, "search_pos", &match_end, FALSE);
@@ -1419,7 +1408,7 @@ void on_find_bar_search(GtkWidget *widget, Note *note)
 		gtk_text_buffer_delete_mark(buffer, mark);
 		gtk_text_buffer_select_range(buffer, &iter, &iter);
 	}
-	
+
 	g_free(search_str);
 }
 

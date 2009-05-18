@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -30,13 +30,14 @@ typedef struct
 	GtkTextBuffer       *buffer;
 	HildonFindToolbar	*find_bar;
 	gboolean             find_bar_is_visible;
-	
+	GtkWidget			*style_menu;
+
 	GtkToggleToolButton *button_bold;
 	GtkToggleToolButton *button_italic;
 	GtkToggleToolButton *button_strike;
 	GtkToggleToolButton *button_highlight;
 	GtkToggleToolButton *button_bullets;
-	
+
 	GtkToggleAction     *action_bold;
 	GtkToggleAction     *action_italic;
 	GtkToggleAction	    *action_fixed;
@@ -55,11 +56,11 @@ typedef struct
   UserInterface *ui;
   const gchar   *title;
   const gchar   *filename;
-  
+
   time_t last_change_date;
   time_t last_metadata_change_date;
   time_t create_date;
-  
+
   gint cursor_position;
   gint width;
   gint height;
@@ -67,9 +68,9 @@ typedef struct
   gint y;
   gboolean open_on_startup;
   const gchar *version;
-  
+
   GSList *active_tags;
-  
+
 } Note;
 
 

@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-#include <config.h>
+#include "../config.h"
 
 GtkWidget* create_mainwin(Note *metadata);
 

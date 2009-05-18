@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -25,36 +25,36 @@
 #include "metadata.h"
 #include "note.h"
 #include "note_list_store.h"
-
+#include "../config.h"
 
 static gboolean
 is_row_visible(GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
 {
 	GtkEntry *text_box = GTK_ENTRY(data);
-	
+
 	const gchar *text;
 	gboolean visible;
 	gchar *title;
 	gchar *u_title;
 	gchar *u_text;
-	
+
 	text = gtk_entry_get_text(text_box);
-	
+
 	if (strcmp(text, "") == 0) {
 		return TRUE;
 	}
-	
+
 	gtk_tree_model_get(model, iter, TITLE_COLUMN, &title, -1);
-	
+
 	u_title = g_utf8_casefold(title, -1);
 	u_text  = g_utf8_casefold(text, -1);
-	
+
 	if (strstr(u_title, u_text) != NULL) {
 		visible = TRUE;
 	} else {
 		visible = FALSE;
 	}
-	
+
 	g_free(title);
 	g_free(u_title);
 	g_free(u_text);
@@ -74,11 +74,11 @@ guint _source_id = 0;
 static
 void on_search_string_changed(GtkEditable *entry, gpointer user_data)
 {
-	/* With every change we reset the timer to 500ms. */ 	
+	/* With every change we reset the timer to 500ms. */
 	if (_source_id != 0) { /* Trying to remove source with id == 0 creates runtime warning */
 		g_source_remove(_source_id);
 	}
-	_source_id = g_timeout_add(500, update_search_result, user_data);	
+	_source_id = g_timeout_add(500, update_search_result, user_data);
 }
 
 static
@@ -95,14 +95,16 @@ void on_selection_changed(GtkTreeSelection *selection, gpointer data)
 {
 	GtkTreeIter iter;
 	GtkTreeModel *model;
-	
+
+	g_printerr("On selection changed \n");
+
 	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
-		AppData *app_data = get_app_data();
 		Note *note = NULL;
-		
+		AppData *app_data = get_app_data();
 		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
-	
+
 		gtk_widget_hide(GTK_WIDGET(app_data->search_window));
+
 		note_show(note);
 	}
 }
@@ -111,22 +113,39 @@ void on_selection_changed(GtkTreeSelection *selection, gpointer data)
 static
 void on_row_activated(GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data)
 {
-	GtkTreeSelection *selection = gtk_tree_view_get_selection(view);
+	Note *note;
 	GtkTreeIter iter;
-	GtkTreeModel *model;
-	
-	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
-		Note *note = NULL;
-		AppData *app_data = get_app_data();
-		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
-		
-		/* Close this window and show the selected note */
-		gtk_widget_hide(GTK_WIDGET(app_data->search_window));
-		
-		note_show(note);
-	}
+	AppData *app_data = get_app_data();
+	GtkTreeModel *model = gtk_tree_view_get_model(view);
+
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
+
+	/* Close this window and show the selected note */
+	gtk_widget_hide(GTK_WIDGET(app_data->search_window));
+
+	note_show(note);
 }
 
+/*
+static
+void on_row_tapped(GtkTreeView *view, GtkTreePath *path, gpointer user_data)
+{
+	g_printerr("On row tapped \n");
+
+	Note *note;
+	GtkTreeIter iter;
+	AppData *app_data = get_app_data();
+	GtkTreeModel *model = gtk_tree_view_get_model(view);
+
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
+
+	gtk_widget_hide(GTK_WIDGET(app_data->search_window));
+
+	note_show(note);
+}
+*/
 static
 gboolean on_window_visible(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
@@ -139,9 +158,9 @@ static
 gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer user_data)
 {
 	GtkWidget *window = GTK_WIDGET(user_data);
-	
+
 	switch (event->keyval) {
-		
+
 	case HILDON_HARDKEY_ESC:
 		gtk_widget_hide(window);
 		return TRUE;
@@ -157,13 +176,13 @@ gboolean on_key_pressed(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 	 * letter is entered there. This would save the user from setting the focus
 	 * to the search field manually before he's able to search....
 	 */
-	
+
 	/* Set focus on the search_field widget */
 	/*
 	gtk_widget_grab_focus(GTK_WIDGET(user_data));
 	return FALSE;
 	*/
-	return FALSE; 
+	return FALSE;
 }
 
 static
@@ -178,20 +197,20 @@ gint compare_titles(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointe
 	gint result = 0;
 	gchar *title_a, *title_b;
 	gchar *u_title_a, *u_title_b;
-	
+
 	gtk_tree_model_get(model, a, TITLE_COLUMN, &title_a, -1);
 	gtk_tree_model_get(model, b, TITLE_COLUMN, &title_b, -1);
-	
+
 	u_title_a = g_utf8_casefold(title_a, -1);
 	u_title_b = g_utf8_casefold(title_b, -1);
-	
+
 	result = strcmp(u_title_a, u_title_b);
-	
+
 	g_free(title_a);
 	g_free(title_b);
 	g_free(u_title_a);
 	g_free(u_title_b);
-	
+
 	return result;
 }
 
@@ -200,14 +219,14 @@ gint compare_dates(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer
 {
 	Note *note_a;
 	Note *note_b;
-	
+
 	if (a == NULL || b == NULL) {
 		return -1;
 	}
-	
+
 	gtk_tree_model_get(model, a, NOTE_COLUMN, &note_a, -1);
 	gtk_tree_model_get(model, b, NOTE_COLUMN, &note_b, -1);
-	
+
 	return note_a->last_change_date - note_b->last_change_date;
 }
 
@@ -230,38 +249,45 @@ HildonWindow* search_window_create()
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *title_column;
 	GtkTreeViewColumn *change_date_column;
-	
+
 	win = hildon_window_new();
 	gtk_window_set_title(GTK_WINDOW(win), "Search All Notes");
-	
+
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(vbox);
 	gtk_container_add(GTK_CONTAINER(win), vbox);
-	
+
 	hbox = gtk_hbox_new(FALSE, 0);
 	gtk_widget_show(hbox);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 10);
-	
+
 	search_label = gtk_label_new("Search:");
 	gtk_widget_show(search_label);
 	gtk_box_pack_start(GTK_BOX(hbox), search_label, FALSE, FALSE, 0);
-	
+	#ifdef HILDON_HAS_APP_MENU
+	search_field = hildon_entry_new();
+	#else
 	search_field = gtk_entry_new();
+	#endif
 	gtk_widget_show(search_field);
 	gtk_box_pack_start(GTK_BOX(hbox), search_field, TRUE, TRUE, 0);
 	GTK_WIDGET_SET_FLAGS(search_field, GTK_CAN_DEFAULT);
 	gtk_widget_grab_default(search_field);
-	
+
 	clear_button = gtk_button_new_from_stock(GTK_STOCK_CLEAR);
 	gtk_widget_show(clear_button);
 	gtk_box_pack_start(GTK_BOX(hbox), clear_button, FALSE, FALSE, 0);
-	
+
 	/* SCROLLED WINDOW */
+	#ifdef HILDON_HAS_APP_MENU
+	scrolledwindow = hildon_pannable_area_new();
+	#else
 	scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+	#endif
 	gtk_widget_show(scrolledwindow);
 	gtk_box_pack_start(GTK_BOX(vbox), scrolledwindow, TRUE, TRUE, 0);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-	
+
 	/* LIST STORE */
 	store = app_data->note_store;
 	/* Add filter wrapper */
@@ -271,22 +297,28 @@ HildonWindow* search_window_create()
 	sorted_store = gtk_tree_model_sort_new_with_model(filtered_store);
 	gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(sorted_store), TITLE_COLUMN, compare_titles, NULL, NULL);
 	gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(sorted_store), CHANGE_DATE_COLUMN, compare_dates, NULL, NULL);
-	
+
 	/* TREE VIEW */
+#ifdef HILDON_HAS_APP_MENU
+	g_printerr("NEW code executed \n");
+	tree = hildon_gtk_tree_view_new_with_model(HILDON_UI_MODE_NORMAL, GTK_TREE_MODEL(sorted_store)); /*HILDON_UI_MODE_NORMAL, HILDON_UI_MODE_EDIT */
+#else
+	g_printerr("OLD code executed \n");
 	tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(sorted_store));
+#endif
 	g_object_unref(sorted_store);
 	g_object_unref(filtered_store);
 	g_object_unref(store);
-	
+
 	gtk_widget_show(tree);
 	gtk_container_add(GTK_CONTAINER(scrolledwindow), tree);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree), TRUE);
 	gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(tree), TRUE);
-	
+
 	/* TREE SELECTION OBJECT */
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(tree));
 	gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
-	
+
 	/* TITLE COLUMN WITH ICON */
 	title_column = gtk_tree_view_column_new();
 	gtk_tree_view_column_set_title(title_column, "Note");
@@ -305,7 +337,7 @@ HildonWindow* search_window_create()
 	gtk_tree_view_column_pack_start(title_column, renderer, TRUE);
 	gtk_tree_view_column_add_attribute(title_column, renderer, "text", TITLE_COLUMN);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree), title_column);
-	
+
 	/* CHANGE DATE COLUMN */
 	renderer = gtk_cell_renderer_text_new();
 	change_date_column = gtk_tree_view_column_new_with_attributes("Last Changed", renderer, "text", CHANGE_DATE_COLUMN, NULL);
@@ -317,34 +349,36 @@ HildonWindow* search_window_create()
 	/* Sort the using the CHANGE_DATE column */
 	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(sorted_store), CHANGE_DATE_COLUMN, GTK_SORT_DESCENDING);
 	gtk_tree_sortable_sort_column_changed(GTK_TREE_SORTABLE(sorted_store));
-	
+
 	/* CONNECT SIGNALS */
 	g_signal_connect(search_field, "changed", G_CALLBACK(on_search_string_changed), filtered_store);
 	g_signal_connect(clear_button, "clicked", G_CALLBACK(on_clear_button_clicked), search_field);
-	/*g_signal_connect(selection, "changed", G_CALLBACK(on_selection_changed), NULL);*/
+	/* g_signal_connect(selection, "changed", G_CALLBACK(on_selection_changed), NULL); */
 	g_signal_connect(tree, "row-activated", G_CALLBACK(on_row_activated), NULL);
+	/*g_signal_connect(tree, "hildon-row-tapped", G_CALLBACK(on_row_tapped), NULL);*/
+
 	g_signal_connect(win, "map-event", G_CALLBACK(on_window_visible), search_field);
 	g_signal_connect(win, "delete-event", G_CALLBACK(gtk_widget_hide_on_delete), NULL);
 	g_signal_connect(win, "key_press_event", G_CALLBACK(on_hardware_key_pressed), win);
 	g_signal_connect(tree, "key_press_event", G_CALLBACK(on_key_pressed), search_field);
-	
+
 	/* TEST */
 	g_signal_connect(store, "row-inserted", G_CALLBACK(on_row_inserted), NULL);
-	
+
 	app_data = get_app_data();
 	app_data->note_store = store;
-	
+
 	return HILDON_WINDOW(win);
 }
 
 void search_window_open()
 {
 	AppData *app_data = get_app_data();
-	
+
 	if (app_data->search_window == NULL) {
 		app_data->search_window = search_window_create();
 	}
-	
+
 	gtk_widget_show(GTK_WIDGET(app_data->search_window));
 	gtk_window_present(GTK_WINDOW(app_data->search_window));
 }

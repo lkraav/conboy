@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -71,39 +71,46 @@ main (int argc, char *argv[])
   Note *note;
   osso_context_t *osso_context;
   AppData *app_data;
-  
+
   /* Init GTK */
+  /*gtk_init(&argc, &argv);*/
+
+#ifdef HILDON_HAS_APP_MENU
+  g_printerr("HILDON INIT \n");
+  hildon_gtk_init(&argc, &argv);
+#else
   gtk_init(&argc, &argv);
-  
+#endif
+
   /* Call this to initialize it */
   app_data = get_app_data();
-  
+
   /* Initialize maemo application */
   g_printerr("Starting %s, Version %s \n", APP_NAME, VERSION);
   osso_context = osso_initialize(APP_SERVICE, VERSION, TRUE, NULL);
-  
+
   /* Check that initialization was ok */
   if (osso_context == NULL) {
       return OSSO_ERROR;
   }
-  
+
   /* Create the Hildon program and setup the title */
   program = HILDON_PROGRAM(hildon_program_get_instance());
   g_set_application_name("Conboy");
- 
+
   /* Get the most recent note. If there is none, create new. */
   note = note_list_store_get_latest(app_data->note_store);
   if (note == NULL) {
 	  note = note_create_new();
   }
-  
+
   note_show(note);
 
   gtk_main();
-  
+
   /* Deinitialize OSSO */
   osso_deinitialize(osso_context);
-  
+
   return 0;
 }
 
