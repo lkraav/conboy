@@ -48,6 +48,7 @@
 #define ACCEL_PATH_STYLE_FIXED     ACCEL_PATH_STYLE"/Fixed"
 #define ACCEL_PATH_STYLE_STRIKE    ACCEL_PATH_STYLE"/Strike"
 #define ACCEL_PATH_STYLE_HIGHLIGHT ACCEL_PATH_STYLE"/Highlight"
+#define ACCEL_PATH_FIND            ACCEL_PATH_ROOT"/Find"
 
 static void set_tool_button_icon_by_name(GtkToolButton *button, const gchar *icon_name)
 {
@@ -247,6 +248,7 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_action_set_accel_group(action_strike, accel_group);
 	gtk_action_set_accel_group(action_quit, accel_group);
 	gtk_action_set_accel_group(action_new, accel_group);
+	gtk_action_set_accel_group(action_find, accel_group);
 
 	/* Add accelerator paths to actions */
 	gtk_action_set_accel_path(action_bold,      ACCEL_PATH_STYLE_BOLD);
@@ -256,15 +258,18 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_action_set_accel_path(action_fixed,     ACCEL_PATH_STYLE_FIXED);
 	gtk_action_set_accel_path(action_quit,      ACCEL_PATH_QUIT);
 	gtk_action_set_accel_path(action_new,       ACCEL_PATH_NEW);
+	gtk_action_set_accel_path(action_find,		ACCEL_PATH_FIND);
 
 	/* Set keybindings for accelerator paths */
 	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_BOLD,      GDK_b, GDK_CONTROL_MASK);
 	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_ITALIC,    GDK_i, GDK_CONTROL_MASK);
 	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_STRIKE,    GDK_s, GDK_CONTROL_MASK);
 	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_HIGHLIGHT, GDK_h, GDK_CONTROL_MASK);
-	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_FIXED,     GDK_f, GDK_CONTROL_MASK);
+	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_FIXED,     GDK_m, GDK_CONTROL_MASK);
 	gtk_accel_map_add_entry(ACCEL_PATH_QUIT,            GDK_q, GDK_CONTROL_MASK);
 	gtk_accel_map_add_entry(ACCEL_PATH_NEW,             GDK_n, GDK_CONTROL_MASK);
+	gtk_accel_map_add_entry(ACCEL_PATH_FIND,            GDK_f, GDK_CONTROL_MASK);
+	
 
 
 
