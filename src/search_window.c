@@ -221,11 +221,15 @@ gint compare_dates(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer
 	Note *note_b;
 
 	if (a == NULL || b == NULL) {
-		return -1;
+		return 0;
 	}
 
 	gtk_tree_model_get(model, a, NOTE_COLUMN, &note_a, -1);
 	gtk_tree_model_get(model, b, NOTE_COLUMN, &note_b, -1);
+	
+	if (note_a == NULL || note_b == NULL) {
+		return 0;
+	}
 
 	return note_a->last_change_date - note_b->last_change_date;
 }

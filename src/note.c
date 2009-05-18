@@ -34,6 +34,10 @@ Note* note_create_new()
 	UserInterface *ui = g_new0(UserInterface, 1);
 	note->ui = ui;
 	note->active_tags = NULL;
+	note->create_date = 0;
+	note->last_change_date = 0;
+	note->last_metadata_change_date = 0;
+	note->cursor_position = 0;
 	return note;
 }
 
