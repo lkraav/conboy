@@ -65,18 +65,16 @@ AC_SUBST(pluginlibdir)
 
 
 # Localization-related
-dnl AC_PROG_INTLTOOL([0.23])
-dnl GETTEXT_PACKAGE=conboy
-dnl AC_SUBST( GETTEXT_PACKAGE )
-dnl AC_DEFINE_UNQUOTED( GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Name of gettext package ])
-dnl ALL_LINGUAS="de en_GB en_US es fi fr it pt_BR ru"
-dnl AC_SUBST(ALL_LINGUAS)
-dnl AM_GLIB_GNU_GETTEXT
-USE_NLS=no
-AC_SUBST(USE_NLS)
-
+AC_PROG_INTLTOOL([0.23])
+GETTEXT_PACKAGE=conboy
+AC_SUBST( GETTEXT_PACKAGE )
+AC_DEFINE_UNQUOTED( GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Name of gettext package ])
+ALL_LINGUAS="de_DE"
+AC_SUBST(ALL_LINGUAS)
+AM_GLIB_GNU_GETTEXT
 AC_SUBST(localedir)
-AC_DEFINE_UNQUOTED(localedir,"$localedir",[localedir])
+AC_DEFINE_UNQUOTED(LOCALEDIR,"$localedir",[localedir])
+
 AC_SUBST(desktopentrydir)
 AC_SUBST(hildondesktopentrydir)
 AC_SUBST(hildoncpdesktopentrydir)
@@ -89,11 +87,12 @@ AC_SUBST(icon_40x40dir)
 AC_SUBST(icon_50x50dir)
 AC_SUBST(icon_scalabledir)
 
-#    po/Makefile.in
+
 AC_OUTPUT([
     Makefile 
     src/Makefile
-    data/Makefile 
+    data/Makefile
+    po/Makefile.in 
     po/Makefile
     data/de.zwong.conboy.service
     data/conboy.desktop
