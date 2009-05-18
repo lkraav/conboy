@@ -24,4 +24,7 @@ icon_26x26_DATA = icons/26x26/conboy.png icons/26x26/highlighter.png
 icon_40x40_DATA = icons/40x40/conboy.png
 icon_scalable_DATA = icons/scalable/conboy.png
 
-EXTRA_DIST = $(dbus_DATA) $(desktop_DATA) $(icon_26x26_DATA) $(icon_40x40_DATA) $(icon_scalable_DATA)
+backupdir=/etc/osso-backup/applications
+backup_DATA = conboy.conf
+
+EXTRA_DIST = $(dbus_DATA) $(desktop_DATA) $(icon_26x26_DATA) $(icon_40x40_DATA) $(icon_scalable_DATA) $(backup_DATA)
