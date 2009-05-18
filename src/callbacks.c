@@ -586,7 +586,11 @@ on_delete_button_clicked			   (GtkAction		*action,
 	 * Free resources
 	 */
 	Note *note = (Note*)user_data;
-	const gchar *message = "<b>Really delete this note?</b>\n\n If you delete a note it is permanently lost.";
+	gchar *message = g_strconcat("<b>",
+			_("Really delete this note?"),
+			"</b>\n\n",
+			_("If you delete a note it is permanently lost."),
+			NULL);
 	GtkWidget *dialog;
 	gint response;
 	AppData *app_data;
@@ -602,6 +606,7 @@ on_delete_button_clicked			   (GtkAction		*action,
 	gtk_widget_destroy(dialog);
 
 	if (response != GTK_RESPONSE_YES) {
+		g_free(message);
 		return;
 	}
 
@@ -618,6 +623,8 @@ on_delete_button_clicked			   (GtkAction		*action,
 	app_data = get_app_data();
 	/* TODO: Free note */
 	note_list_store_remove(app_data->note_store, note);
+	
+	g_free(message);
 }
 
 static

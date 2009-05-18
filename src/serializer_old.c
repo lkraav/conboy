@@ -19,6 +19,10 @@
 /* Based on gtktextbufferserialize.c from gtk+
  */
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <gtk/gtk.h>
 #include <hildon/hildon-window.h>
 #include <string.h>

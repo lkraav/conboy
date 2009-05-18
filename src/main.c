@@ -38,6 +38,9 @@
 
 #include <stdio.h>
 
+#include <libintl.h>
+#include <locale.h>
+
 #ifndef __USE_XOPEN
 #define __USE_XOPEN
 #endif
@@ -49,14 +52,10 @@
 #include "note.h"
 
 #include "search_window.h"
-
 #include "note_list_store.h"
-
-#include "localisation.h"
 
 
 #define APP_NAME "conboy"
-/*#define APP_VER "0.3.1"*/
 #define APP_SERVICE "de.zwong.conboy"
 #define APP_METHOD "/de/zwong/conboy"
 
@@ -73,9 +72,13 @@ main (int argc, char *argv[])
   osso_context_t *osso_context;
   AppData *app_data;
 
+  /* Init i18n */
+  setlocale(LC_ALL, "");
+  bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
+  bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+  textdomain(GETTEXT_PACKAGE);
+  
   /* Init GTK */
-  /*gtk_init(&argc, &argv);*/
-
 #ifdef HILDON_HAS_APP_MENU
   g_printerr("HILDON INIT \n");
   hildon_gtk_init(&argc, &argv);

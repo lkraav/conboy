@@ -1,0 +1,3 @@
+../src/interface.c
+../src/search_window.c
+../src/callbacks.c

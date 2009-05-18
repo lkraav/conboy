@@ -1,0 +1,129 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-18 18:35+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/interface.c:201 ../src/interface.c:303 ../src/interface.c:341
+msgid "Bold"
+msgstr "Fett"
+
+#: ../src/interface.c:202
+msgid "Bullets"
+msgstr "Aufzählungszeichen"
+
+#: ../src/interface.c:203
+msgid "Decrease Indent"
+msgstr "Einzug Verkleinern"
+
+#: ../src/interface.c:204
+msgid "Delete Note"
+msgstr "Notiz Löschen"
+
+#: ../src/interface.c:205 ../src/interface.c:307 ../src/interface.c:345
+msgid "Fixed Width"
+msgstr "Feste Breite"
+
+#: ../src/interface.c:206 ../src/interface.c:306 ../src/interface.c:344
+msgid "Highlight"
+msgstr "Hervorhebung"
+
+#: ../src/interface.c:207
+msgid "Increase Indent"
+msgstr "Einzug Vergrößern"
+
+#: ../src/interface.c:208
+msgid "Link"
+msgstr "Verknüpfung"
+
+#: ../src/interface.c:209
+msgid "New Note"
+msgstr "Neue Notiz"
+
+#: ../src/interface.c:210
+msgid "Open"
+msgstr "Öffnen"
+
+#: ../src/interface.c:211
+msgid "Close All Notes"
+msgstr "Alle Notizen Schließen"
+
+#: ../src/interface.c:212 ../src/interface.c:304 ../src/interface.c:342
+msgid "Italic"
+msgstr "Kursiv"
+
+#: ../src/interface.c:213 ../src/interface.c:305 ../src/interface.c:343
+msgid "Strikeout"
+msgstr "Durchgestrichen"
+
+#: ../src/interface.c:214
+msgid "Style"
+msgstr "Stil"
+
+#: ../src/interface.c:215
+msgid "Zoom In"
+msgstr "Vergrößern"
+
+#: ../src/interface.c:216
+msgid "Zoom Out"
+msgstr "Verkleinern"
+
+#: ../src/interface.c:217
+msgid "Find In Note"
+msgstr "In Dieser Notiz Suchen"
+
+#: ../src/interface.c:219 ../src/interface.c:308 ../src/interface.c:346
+msgid "Small"
+msgstr "Klein"
+
+#: ../src/interface.c:220
+msgid "Normal"
+msgstr "Normal"
+
+#: ../src/interface.c:221 ../src/interface.c:309 ../src/interface.c:347
+msgid "Large"
+msgstr "Groß"
+
+#: ../src/interface.c:222 ../src/interface.c:310 ../src/interface.c:348
+msgid "Huge"
+msgstr "Riesig"
+
+#: ../src/interface.c:397
+msgid "Text Style"
+msgstr ""
+
+#: ../src/interface.c:466 ../src/search_window.c:274
+msgid "Search:"
+msgstr "Suchen:"
+
+#: ../src/search_window.c:264
+msgid "Search All Notes"
+msgstr "Alle Notizen Durchsuchen"
+
+#: ../src/search_window.c:334
+msgid "Note"
+msgstr "Notiz"
+
+#: ../src/search_window.c:353
+msgid "Last Changed"
+msgstr "Zuletzt geändert"
+
+#: ../src/callbacks.c:590
+msgid "Really delete this note?"
+msgstr "Diese Notiz wirklich löschen?"
+
+#: ../src/callbacks.c:592
+msgid "If you delete a note it is permanently lost."
+msgstr "Wenn sie eine Notiz löschen ist diese unwiderbringlich verloren."

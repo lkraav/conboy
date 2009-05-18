@@ -16,6 +16,10 @@
  * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <sys/stat.h>

@@ -18,15 +18,20 @@
 #ifdef HAVE_CONFIG_H
 #  include <config.h>
 #endif
+
 #include <gtk/gtk.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-defines.h>
 #include <string.h>
+#include <libintl.h>
+
 
 #include "search_window.h"
 #include "metadata.h"
 #include "note.h"
 #include "note_list_store.h"
+
+#define _(String)gettext(String)
 
 static gboolean
 is_row_visible(GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
@@ -256,7 +261,7 @@ HildonWindow* search_window_create()
 	GtkTreeViewColumn *change_date_column;
 
 	win = hildon_window_new();
-	gtk_window_set_title(GTK_WINDOW(win), "Search All Notes");
+	gtk_window_set_title(GTK_WINDOW(win), _("Search All Notes"));
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(vbox);
@@ -266,7 +271,7 @@ HildonWindow* search_window_create()
 	gtk_widget_show(hbox);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 10);
 
-	search_label = gtk_label_new("Search:");
+	search_label = gtk_label_new(_("Search:"));
 	gtk_widget_show(search_label);
 	gtk_box_pack_start(GTK_BOX(hbox), search_label, FALSE, FALSE, 0);
 	#ifdef HILDON_HAS_APP_MENU
@@ -326,7 +331,7 @@ HildonWindow* search_window_create()
 
 	/* TITLE COLUMN WITH ICON */
 	title_column = gtk_tree_view_column_new();
-	gtk_tree_view_column_set_title(title_column, "Note");
+	gtk_tree_view_column_set_title(title_column, _("Note"));
 	gtk_tree_view_column_set_sort_column_id(title_column, TITLE_COLUMN);
 	/*gtk_tree_view_column_set_sort_indicator(title_column, FALSE);*/
 	gtk_tree_view_column_set_reorderable(title_column, FALSE);
@@ -345,7 +350,7 @@ HildonWindow* search_window_create()
 
 	/* CHANGE DATE COLUMN */
 	renderer = gtk_cell_renderer_text_new();
-	change_date_column = gtk_tree_view_column_new_with_attributes("Last Changed", renderer, "text", CHANGE_DATE_COLUMN, NULL);
+	change_date_column = gtk_tree_view_column_new_with_attributes(_("Last Changed"), renderer, "text", CHANGE_DATE_COLUMN, NULL);
 	gtk_tree_view_column_set_sort_column_id(change_date_column, CHANGE_DATE_COLUMN);
 	gtk_tree_view_column_set_sort_indicator(change_date_column, TRUE);
 	gtk_tree_view_column_set_reorderable(change_date_column, FALSE);
