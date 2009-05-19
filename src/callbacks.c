@@ -24,10 +24,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libintl.h>
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-banner.h>
 #include <hildon/hildon-defines.h>
-/*#include <libhildondesktop/hildon-thumb-menu-item.h>*/
 #include <glib/gstdio.h>
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
@@ -45,7 +45,7 @@
 #include "search_window.h"
 #include "note_linker.h"
 
-
+#define _(String)gettext(String)
 
 
 /* Private. TODO: Move to some public file */
@@ -747,6 +747,14 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 				gtk_window_unfullscreen(GTK_WINDOW(open_note->ui->window));
 			}
 			open_notes = open_notes->next;
+		}
+		/* Set search window to fullscreen or unfullscreen */
+		if (app_data->search_window != NULL) {
+			if (app_data->fullscreen) {
+				gtk_window_fullscreen(GTK_WINDOW(app_data->search_window));
+			} else {
+				gtk_window_unfullscreen(GTK_WINDOW(app_data->search_window));
+			}
 		}
 
 		/* Focus again on the active note */

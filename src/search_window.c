@@ -95,27 +95,6 @@ void on_clear_button_clicked(GtkWidget *widget, gpointer user_data)
 	gtk_widget_grab_focus(GTK_WIDGET(entry));
 }
 
-/*
-static
-void on_selection_changed(GtkTreeSelection *selection, gpointer data)
-{
-	GtkTreeIter iter;
-	GtkTreeModel *model;
-
-	g_printerr("On selection changed \n");
-
-	if (gtk_tree_selection_get_selected(selection, &model, &iter)) {
-		Note *note = NULL;
-		AppData *app_data = get_app_data();
-		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
-
-		gtk_widget_hide(GTK_WIDGET(app_data->search_window));
-
-		note_show(note);
-	}
-}
-*/
-
 static
 void on_row_activated(GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data)
 {
@@ -133,25 +112,6 @@ void on_row_activated(GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *c
 	note_show(note);
 }
 
-/*
-static
-void on_row_tapped(GtkTreeView *view, GtkTreePath *path, gpointer user_data)
-{
-	g_printerr("On row tapped \n");
-
-	Note *note;
-	GtkTreeIter iter;
-	AppData *app_data = get_app_data();
-	GtkTreeModel *model = gtk_tree_view_get_model(view);
-
-	gtk_tree_model_get_iter(model, &iter, path);
-	gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
-
-	gtk_widget_hide(GTK_WIDGET(app_data->search_window));
-
-	note_show(note);
-}
-*/
 static
 gboolean on_window_visible(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
@@ -164,13 +124,45 @@ static
 gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer user_data)
 {
 	GtkWidget *window = GTK_WIDGET(user_data);
+	AppData *app_data = get_app_data();
+	GList *open_notes;
 
 	switch (event->keyval) {
 
 	case HILDON_HARDKEY_ESC:
 		gtk_widget_hide(window);
 		return TRUE;
+	
+	/* TODO: The same code (only last line differs) is used in callbacks.c */
+	case HILDON_HARDKEY_FULLSCREEN:
+		/* Toggle fullscreen */
+		app_data->fullscreen = !app_data->fullscreen;
+
+		/* Set all open windows to fullscreen or unfullscreen */
+		open_notes = app_data->open_notes;
+		while (open_notes != NULL) {
+			Note *open_note = (Note*)open_notes->data;
+			if (app_data->fullscreen) {
+				gtk_window_fullscreen(GTK_WINDOW(open_note->ui->window));
+			} else {
+				gtk_window_unfullscreen(GTK_WINDOW(open_note->ui->window));
+			}
+			open_notes = open_notes->next;
+		}
+		/* Set search window to fullscreen or unfullscreen */
+		if (app_data->search_window != NULL) {
+			if (app_data->fullscreen) {
+				gtk_window_fullscreen(GTK_WINDOW(app_data->search_window));
+			} else {
+				gtk_window_unfullscreen(GTK_WINDOW(app_data->search_window));
+			}
+		}
+
+		/* Focus again this window */
+		gtk_window_present(GTK_WINDOW(window));
+		return TRUE;
 	}
+	
 	return FALSE;
 }
 
@@ -188,6 +180,7 @@ gboolean on_key_pressed(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 	gtk_widget_grab_focus(GTK_WIDGET(user_data));
 	return FALSE;
 	*/
+	
 	return FALSE;
 }
 
@@ -387,6 +380,10 @@ void search_window_open()
 
 	if (app_data->search_window == NULL) {
 		app_data->search_window = search_window_create();
+	}
+	
+	if (app_data->fullscreen) {
+		gtk_window_fullscreen(GTK_WINDOW(app_data->search_window));
 	}
 
 	gtk_widget_show(GTK_WIDGET(app_data->search_window));
