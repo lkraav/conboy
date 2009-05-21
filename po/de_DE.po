@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Cornelius Hald <hald@icandy.de>, 2009.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-05-18 18:35+0200\n"
+"POT-Creation-Date: 2009-05-21 09:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -102,21 +102,22 @@ msgstr "Riesig"
 
 #: ../src/interface.c:397
 msgid "Text Style"
-msgstr ""
+msgstr "Textstil"
 
 #: ../src/interface.c:466 ../src/search_window.c:274
+#: ../src/search_window.c:267
 msgid "Search:"
 msgstr "Suchen:"
 
-#: ../src/search_window.c:264
+#: ../src/search_window.c:264 ../src/search_window.c:257
 msgid "Search All Notes"
 msgstr "Alle Notizen Durchsuchen"
 
-#: ../src/search_window.c:334
+#: ../src/search_window.c:334 ../src/search_window.c:327
 msgid "Note"
 msgstr "Notiz"
 
-#: ../src/search_window.c:353
+#: ../src/search_window.c:353 ../src/search_window.c:346
 msgid "Last Changed"
 msgstr "Zuletzt geändert"
 
@@ -127,3 +128,12 @@ msgstr "Diese Notiz wirklich löschen?"
 #: ../src/callbacks.c:592
 msgid "If you delete a note it is permanently lost."
 msgstr "Wenn sie eine Notiz löschen ist diese unwiderbringlich verloren."
+
+#: ../src/note.c:341
+#, c-format
+msgid "New Note %i"
+msgstr "Neue Notiz %i"
+
+#: ../src/note.c:344
+msgid "Describe your new note here."
+msgstr "Schreiben sie hier ihre neue Notiz."

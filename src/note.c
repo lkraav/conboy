@@ -23,6 +23,7 @@
 #include <gtk/gtk.h>
 #include <glib.h>
 #include <string.h>
+#include <libintl.h>
 
 #include "metadata.h"
 #include "interface.h"
@@ -31,6 +32,7 @@
 #include "deserializer.h"
 #include "note_list_store.h"
 
+#define _(String)gettext(String)
 
 Note* note_create_new()
 {
@@ -335,11 +337,11 @@ void note_show_new(Note *note)
 	note->filename = note_get_new_filename();
 	
 	if (note->title == NULL) {
-		notes_count = note_list_store_get_length(app_data->note_store); /*g_list_length(app_data->all_notes);*/
-		note->title = g_strdup_printf("New Note %i", notes_count);
+		notes_count = note_list_store_get_length(app_data->note_store);
+		note->title = g_strdup_printf(_("New Note %i"), notes_count);
 	}
 	
-	content = g_strconcat(note->title, "\n\n", "Describe your new note here.", NULL);
+	content = g_strconcat(note->title, "\n\n", _("Describe your new note here."), NULL);
 	gtk_text_buffer_set_text(buffer, content, -1);
 	
 	/* Select the text */
