@@ -228,7 +228,7 @@ void write_content(xmlTextWriter *writer, Note *note)
 	int rc = 0;
 	GtkTextBuffer *buffer;
 	GtkTextIter start, end;
-	GtkTextIter *old_iter, *iter;
+	GtkTextIter old_iter, iter;
 	gchar *text;
 	GSList *start_tags = NULL, *end_tags = NULL;
 	
@@ -249,13 +249,13 @@ void write_content(xmlTextWriter *writer, Note *note)
 	buffer = note->ui->buffer;
 	
 	gtk_text_buffer_get_bounds(buffer, &start, &end);
-	iter = gtk_text_iter_copy(&start);
-	old_iter = gtk_text_iter_copy(&start);
+	iter = start;
+	old_iter = start;
 	
-	while (gtk_text_iter_compare(iter, &end) <= 0) {
+	while (gtk_text_iter_compare(&iter, &end) <= 0) {
 		
-		start_tags = gtk_text_iter_get_toggled_tags(iter, TRUE);
-		end_tags   = gtk_text_iter_get_toggled_tags(iter, FALSE);
+		start_tags = gtk_text_iter_get_toggled_tags(&iter, TRUE);
+		end_tags   = gtk_text_iter_get_toggled_tags(&iter, FALSE);
 		
 		/* Write end tags */
 		g_slist_foreach(end_tags, (GFunc)write_end_element, writer);
@@ -268,16 +268,15 @@ void write_content(xmlTextWriter *writer, Note *note)
 		
 		/* Move iter */
 		/* Remember position and set iter to next toggle */
-		gtk_text_iter_free(old_iter);
-		old_iter = gtk_text_iter_copy(iter);
+		old_iter = iter;
 		
-		if (gtk_text_iter_compare(iter, &end) >= 0) {
+		if (gtk_text_iter_compare(&iter, &end) >= 0) {
 			break;
 		}
-		gtk_text_iter_forward_to_tag_toggle(iter, NULL);
+		gtk_text_iter_forward_to_tag_toggle(&iter, NULL);
 		
 		/* Write text */
-		text = gtk_text_iter_get_text(old_iter, iter);
+		text = gtk_text_iter_get_text(&old_iter, &iter);
 		write_text(text, writer);
 	}
 	

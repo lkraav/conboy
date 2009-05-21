@@ -557,7 +557,7 @@ on_link_internal_tag_event				(GtkTextTag  *tag,
 				gtk_text_iter_backward_to_tag_toggle(iter, tag);
 			}
 
-			start = *iter; /*gtk_text_iter_copy(iter);*/
+			start = *iter;
 
 			if (!gtk_text_iter_ends_tag(iter, tag)) {
 				gtk_text_iter_forward_to_tag_toggle(iter, tag);
@@ -830,7 +830,7 @@ static gboolean add_new_line(Note *note)
 		} else {
 			/* Remove bullet and insert newline */
 			GtkTextTag *tag;
-			GtkTextIter *start = gtk_text_iter_copy(&iter);
+			GtkTextIter start = iter;
 
 			/* Disable list and list-item tags */
 			tag = gtk_text_tag_table_lookup(buffer->tag_table, "list-item");
@@ -839,10 +839,10 @@ static gboolean add_new_line(Note *note)
 			note_remove_active_tag(note, tag);
 
 			/* Delete the bullet and the last newline */
-			gtk_text_iter_set_line_offset(start, 0);
-			gtk_text_iter_backward_char(start);
-			gtk_text_buffer_remove_all_tags(buffer, start, &iter);
-			gtk_text_buffer_delete(buffer, start, &iter);
+			gtk_text_iter_set_line_offset(&start, 0);
+			gtk_text_iter_backward_char(&start);
+			gtk_text_buffer_remove_all_tags(buffer, &start, &iter);
+			gtk_text_buffer_delete(buffer, &start, &iter);
 
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 
@@ -857,21 +857,21 @@ static gboolean add_new_line(Note *note)
 		/* If line start with a "- " or "- *" */
 		if (line_needs_bullet(buffer, gtk_text_iter_get_line(&iter))) {
 			GSList *tmp;
-			GtkTextIter *end_iter;
+			GtkTextIter end_iter;
 
 			gtk_text_iter_set_line_offset(&iter, 0);
-			end_iter = gtk_text_iter_copy(&iter);
+			end_iter = iter;
 			line = gtk_text_iter_get_line(&iter);
 
 			/* Skip trailing spaces */
-			while (gtk_text_iter_get_char(end_iter) == ' ') {
-				gtk_text_iter_forward_char(end_iter);
+			while (gtk_text_iter_get_char(&end_iter) == ' ') {
+				gtk_text_iter_forward_char(&end_iter);
 			}
 			/* Skip "* " or "- " */
-			gtk_text_iter_forward_chars(end_iter, 2);
+			gtk_text_iter_forward_chars(&end_iter, 2);
 
 			/* Delete this part */
-			gtk_text_buffer_delete(buffer, &iter, end_iter);
+			gtk_text_buffer_delete(buffer, &iter, &end_iter);
 
 			/* Add bullet for this line */
 			add_bullets(buffer, line, line, buffer_get_depth_tag(buffer, 1));
@@ -930,7 +930,7 @@ on_text_view_key_pressed                      (GtkWidget   *widget,
 static void
 apply_active_tags(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, Note *note)
 {
-	GtkTextIter *start_iter;
+	GtkTextIter start_iter;
 	GSList *active_tags = note->active_tags;
 
 	/* Only apply active tags on typed text, not on pasted text */
@@ -944,12 +944,12 @@ apply_active_tags(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, 
 	}
 
 	/* First remove all tags, then apply all active tags */
-	start_iter = gtk_text_iter_copy(iter);
-	gtk_text_iter_backward_chars(start_iter, g_utf8_strlen(input, -1));
-	gtk_text_buffer_remove_all_tags(buffer, start_iter, iter);
+	start_iter = *iter;
+	gtk_text_iter_backward_chars(&start_iter, g_utf8_strlen(input, -1));
+	gtk_text_buffer_remove_all_tags(buffer, &start_iter, iter);
 
 	while (active_tags != NULL && active_tags->data != NULL) {
-		gtk_text_buffer_apply_tag(buffer, active_tags->data, start_iter, iter);
+		gtk_text_buffer_apply_tag(buffer, active_tags->data, &start_iter, iter);
 		active_tags = active_tags->next;
 	}
 
@@ -963,7 +963,7 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 											 gpointer		user_data)
 {
 	Note *note = (Note*)user_data;
-	GtkTextIter *start_iter, *end_iter;
+	GtkTextIter start_iter, end_iter;
 	GTimer *timer;
 	gulong micro;
 
@@ -976,13 +976,13 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 
 	timer = g_timer_new();
 
-	start_iter = gtk_text_iter_copy(iter);
-	end_iter = gtk_text_iter_copy(iter);
+	start_iter = *iter;
+	end_iter = *iter;
 
 	/* Move start iter back to the position before the insert */
-	gtk_text_iter_backward_chars(start_iter, g_utf8_strlen(text, -1));
+	gtk_text_iter_backward_chars(&start_iter, g_utf8_strlen(text, -1));
 	
-	auto_highlight_links(note, start_iter, end_iter);
+	auto_highlight_links(note, &start_iter, &end_iter);
 
 	g_timer_stop(timer);
 	g_timer_elapsed(timer, &micro);

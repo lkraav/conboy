@@ -144,18 +144,18 @@ highlight_titles(Note *note, GtkTextBuffer *buffer, GtkTextIter *start_iter, Gtk
 	GSList *hits = find_titles(slice);
 	g_free(slice);
 	while (hits != NULL) {
-		GtkTextIter *hit_start, *hit_end;
+		GtkTextIter hit_start, hit_end;
 		SearchHit *hit = (SearchHit*)hits->data;
 
-		hit_start = gtk_text_iter_copy(start_iter);
-		gtk_text_iter_forward_chars(hit_start, hit->start_offset);
+		hit_start = *start_iter;
+		gtk_text_iter_forward_chars(&hit_start, hit->start_offset);
 
-		hit_end = gtk_text_iter_copy(start_iter);
-		gtk_text_iter_forward_chars(hit_end, hit->end_offset);
+		hit_end = *start_iter;
+		gtk_text_iter_forward_chars(&hit_end, hit->end_offset);
 
 		/* Only link agains words or sentencens */
-		if ( (!gtk_text_iter_starts_word(hit_start) && !gtk_text_iter_starts_sentence(hit_start)) ||
-				(!gtk_text_iter_ends_word(hit_end) && !gtk_text_iter_ends_sentence(hit_end))) {
+		if ( (!gtk_text_iter_starts_word(&hit_start) && !gtk_text_iter_starts_sentence(&hit_start)) ||
+				(!gtk_text_iter_ends_word(&hit_end) && !gtk_text_iter_ends_sentence(&hit_end))) {
 			hits = hits->next;
 			continue;
 		}
@@ -167,13 +167,13 @@ highlight_titles(Note *note, GtkTextBuffer *buffer, GtkTextIter *start_iter, Gtk
 		}
 
 		/* Don't create links inside external links */
-		if (gtk_text_iter_has_tag(hit_start, url_tag)) {
+		if (gtk_text_iter_has_tag(&hit_start, url_tag)) {
 			hits = hits->next;
 			continue;
 		}
 
 		/* Apply the tag */
-		gtk_text_buffer_apply_tag_by_name(buffer, "link:internal", hit_start, hit_end);
+		gtk_text_buffer_apply_tag_by_name(buffer, "link:internal", &hit_start, &hit_end);
 
 		hits = hits->next;
 	}
