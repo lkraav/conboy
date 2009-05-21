@@ -80,7 +80,13 @@ GSList* find_titles(gchar *haystack) {
 		gchar *u_needle;
 		Note *note;
 		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
-
+		
+		/* If title is empty, look at next note. An empty title would bring us into an infinit loop */
+		if (strcmp(note->title, "") == 0) {
+			valid = gtk_tree_model_iter_next(model, &iter);
+			continue;
+		}
+		
 		u_needle = g_utf8_casefold(note->title, -1);
 
 		found = u_haystack;
