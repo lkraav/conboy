@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?>
+
+<cproject>
+<storageModule moduleId="org.eclipse.cdt.core.settings">
+<cconfiguration id="Scratchbox 1~FREMANTLE_ARMEL.1242232299976">
+<storageModule buildSystemId="org.maemo.mica.cpp.project.core.ESboxCConfigurationDataProvider" id="Scratchbox 1~FREMANTLE_ARMEL.1242232299976" moduleId="org.eclipse.cdt.core.settings" name="FREMANTLE_ARMEL (Debug)">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule executionEnvironment="org.maemo.mica.maemosdk.core.maemo" moduleId="buildConfig" sdkName="Scratchbox 1" stockConfigurationId="org.maemo.mica.cpp.project.ui.debug" targetName="FREMANTLE_ARMEL"/>
+<storageModule moduleId="buildConfig.metaData"/>
+<storageModule environmentOp_0="CFLAGS=-O0 -g" environmentOp_1="CXXFLAGS=-O0 -g" moduleId="buildConfig.environment"/>
+<storageModule id="Scratchbox 1~FREMANTLE_ARMEL.1242232299976" moduleId="defaultConfigurationDataProvider" name="FREMANTLE_ARMEL (Debug)">
+<sourceEntries>
+<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="/conboy"/>
+</sourceEntries>
+<folderData id="Scratchbox 1~FREMANTLE_ARMEL.1242232299976.1257982183" name="" path="">
+<languageData contentTypeIds="org.eclipse.cdt.core.asmSource" id="Scratchbox 1~FREMANTLE_ARMEL.1242232299976.1257982183.1328842872" languageId="org.eclipse.cdt.core.assembly" name="Assembly" supportedEntryKinds="includePath;includeFile;macro;macroFile">
+<settingEntries>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-help"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libhildondesktop"/>
+<entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+</settingEntries>
+</languageData>
+<languageData contentTypeIds="org.eclipse.cdt.core.cxxSource;org.eclipse.cdt.core.cxxHeader" id="Scratchbox 1~FREMANTLE_ARMEL.1242232299976.1257982183.484216474" languageId="org.eclipse.cdt.core.g++" name="GNU C++" supportedEntryKinds="includePath;includeFile;macro;macroFile">
+<settingEntries>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-help"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libhildondesktop"/>
+<entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+</settingEntries>
+</languageData>
+<languageData contentTypeIds="org.eclipse.cdt.core.cSource;org.eclipse.cdt.core.cHeader" id="Scratchbox 1~FREMANTLE_ARMEL.1242232299976.1257982183.82607799" languageId="org.eclipse.cdt.core.gcc" name="GNU C" supportedEntryKinds="includePath;includeFile;macro;macroFile">
+<settingEntries>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-help"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libhildondesktop"/>
+<entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+</settingEntries>
+</languageData>
+</folderData>
+<buildData errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.VCErrorParser" id="Scratchbox 1~FREMANTLE_ARMEL.1242232299976.638889537"/>
+<targetPlatformData binaryParsers="org.eclipse.cdt.core.ELF" id="Scratchbox 1~FREMANTLE_ARMEL.1242232299976.1583425695"/>
+</storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+</cconfiguration>
+<cconfiguration id="Scratchbox 1~FREMANTLE_ARMEL.1242232300029">
+<storageModule buildSystemId="org.maemo.mica.cpp.project.core.ESboxCConfigurationDataProvider" id="Scratchbox 1~FREMANTLE_ARMEL.1242232300029" moduleId="org.eclipse.cdt.core.settings" name="FREMANTLE_ARMEL (Optimized)">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule executionEnvironment="org.maemo.mica.maemosdk.core.maemo" moduleId="buildConfig" sdkName="Scratchbox 1" stockConfigurationId="org.maemo.mica.cpp.project.ui.optimized" targetName="FREMANTLE_ARMEL"/>
+<storageModule moduleId="buildConfig.metaData"/>
+<storageModule environmentOp_0="CFLAGS=-O2 -g" environmentOp_1="CXXFLAGS=-O2 -g" moduleId="buildConfig.environment"/>
+<storageModule id="Scratchbox 1~FREMANTLE_ARMEL.1242232300029" moduleId="defaultConfigurationDataProvider" name="FREMANTLE_ARMEL (Optimized)">
+<sourceEntries>
+<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="/conboy"/>
+</sourceEntries>
+<folderData id="Scratchbox 1~FREMANTLE_ARMEL.1242232300029.647633080" name="" path="">
+<languageData contentTypeIds="org.eclipse.cdt.core.asmSource" id="Scratchbox 1~FREMANTLE_ARMEL.1242232300029.647633080.1910072523" languageId="org.eclipse.cdt.core.assembly" name="Assembly" supportedEntryKinds="includePath;includeFile;macro;macroFile">
+<settingEntries>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-help"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libhildondesktop"/>
+<entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+</settingEntries>
+</languageData>
+<languageData contentTypeIds="org.eclipse.cdt.core.cxxSource;org.eclipse.cdt.core.cxxHeader" id="Scratchbox 1~FREMANTLE_ARMEL.1242232300029.647633080.533942224" languageId="org.eclipse.cdt.core.g++" name="GNU C++" supportedEntryKinds="includePath;includeFile;macro;macroFile">
+<settingEntries>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-help"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libhildondesktop"/>
+<entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+</settingEntries>
+</languageData>
+<languageData contentTypeIds="org.eclipse.cdt.core.cSource;org.eclipse.cdt.core.cHeader" id="Scratchbox 1~FREMANTLE_ARMEL.1242232300029.647633080.2670381" languageId="org.eclipse.cdt.core.gcc" name="GNU C" supportedEntryKinds="includePath;includeFile;macro;macroFile">
+<settingEntries>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-help"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libhildondesktop"/>
+<entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+</settingEntries>
+</languageData>
+</folderData>
+<buildData errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.VCErrorParser" id="Scratchbox 1~FREMANTLE_ARMEL.1242232300029.1622917895"/>
+<targetPlatformData binaryParsers="org.eclipse.cdt.core.ELF" id="Scratchbox 1~FREMANTLE_ARMEL.1242232300029.220565928"/>
+</storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+</cconfiguration>
+<cconfiguration id="Scratchbox 1~FREMANTLE_X86.1242232300057">
+<storageModule buildSystemId="org.maemo.mica.cpp.project.core.ESboxCConfigurationDataProvider" id="Scratchbox 1~FREMANTLE_X86.1242232300057" moduleId="org.eclipse.cdt.core.settings" name="FREMANTLE_X86 (Debug)">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule executionEnvironment="org.maemo.mica.maemosdk.core.maemo" moduleId="buildConfig" sdkName="Scratchbox 1" stockConfigurationId="org.maemo.mica.cpp.project.ui.debug" targetName="FREMANTLE_X86"/>
+<storageModule moduleId="buildConfig.metaData"/>
+<storageModule environmentOp_0="CFLAGS=-O0 -g" environmentOp_1="CXXFLAGS=-O0 -g" moduleId="buildConfig.environment"/>
+<storageModule id="Scratchbox 1~FREMANTLE_X86.1242232300057" moduleId="defaultConfigurationDataProvider" name="FREMANTLE_X86 (Debug)">
+<sourceEntries>
+<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="/conboy"/>
+</sourceEntries>
+<folderData id="Scratchbox 1~FREMANTLE_X86.1242232300057.1456516661" name="" path="">
+<languageData contentTypeIds="org.eclipse.cdt.core.asmSource" id="Scratchbox 1~FREMANTLE_X86.1242232300057.1456516661.1862681681" languageId="org.eclipse.cdt.core.assembly" name="Assembly" supportedEntryKinds="includePath;includeFile;macro;macroFile">
+<settingEntries>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-help"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+</settingEntries>
+</languageData>
+<languageData contentTypeIds="org.eclipse.cdt.core.cxxSource;org.eclipse.cdt.core.cxxHeader" id="Scratchbox 1~FREMANTLE_X86.1242232300057.1456516661.1995641720" languageId="org.eclipse.cdt.core.g++" name="GNU C++" supportedEntryKinds="includePath;includeFile;macro;macroFile">
+<settingEntries>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-help"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+</settingEntries>
+</languageData>
+<languageData contentTypeIds="org.eclipse.cdt.core.cSource;org.eclipse.cdt.core.cHeader" id="Scratchbox 1~FREMANTLE_X86.1242232300057.1456516661.435034714" languageId="org.eclipse.cdt.core.gcc" name="GNU C" supportedEntryKinds="includePath;includeFile;macro;macroFile">
+<settingEntries>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-help"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+</settingEntries>
+</languageData>
+</folderData>
+<buildData errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.VCErrorParser" id="Scratchbox 1~FREMANTLE_X86.1242232300057.914569333">
+<outputEntries>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name=""/>
+</outputEntries>
+</buildData>
+<targetPlatformData binaryParsers="org.eclipse.cdt.core.ELF" id="Scratchbox 1~FREMANTLE_X86.1242232300057.171142841"/>
+</storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+</cconfiguration>
+<cconfiguration id="Scratchbox 1~FREMANTLE_X86.1242232300060">
+<storageModule buildSystemId="org.maemo.mica.cpp.project.core.ESboxCConfigurationDataProvider" id="Scratchbox 1~FREMANTLE_X86.1242232300060" moduleId="org.eclipse.cdt.core.settings" name="FREMANTLE_X86 (Optimized)">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule executionEnvironment="org.maemo.mica.maemosdk.core.maemo" moduleId="buildConfig" sdkName="Scratchbox 1" stockConfigurationId="org.maemo.mica.cpp.project.ui.optimized" targetName="FREMANTLE_X86"/>
+<storageModule moduleId="buildConfig.metaData"/>
+<storageModule environmentOp_0="CFLAGS=-O2 -g" environmentOp_1="CXXFLAGS=-O2 -g" moduleId="buildConfig.environment"/>
+<storageModule id="Scratchbox 1~FREMANTLE_X86.1242232300060" moduleId="defaultConfigurationDataProvider" name="FREMANTLE_X86 (Optimized)">
+<sourceEntries>
+<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="/conboy"/>
+</sourceEntries>
+<folderData id="Scratchbox 1~FREMANTLE_X86.1242232300060.1092559371" name="" path="">
+<languageData contentTypeIds="org.eclipse.cdt.core.asmSource" id="Scratchbox 1~FREMANTLE_X86.1242232300060.1092559371.158865217" languageId="org.eclipse.cdt.core.assembly" name="Assembly" supportedEntryKinds="includePath;includeFile;macro;macroFile">
+<settingEntries>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-help"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libhildondesktop"/>
+<entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+</settingEntries>
+</languageData>
+<languageData contentTypeIds="org.eclipse.cdt.core.cxxSource;org.eclipse.cdt.core.cxxHeader" id="Scratchbox 1~FREMANTLE_X86.1242232300060.1092559371.1716365711" languageId="org.eclipse.cdt.core.g++" name="GNU C++" supportedEntryKinds="includePath;includeFile;macro;macroFile">
+<settingEntries>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-help"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libhildondesktop"/>
+<entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+</settingEntries>
+</languageData>
+<languageData contentTypeIds="org.eclipse.cdt.core.cSource;org.eclipse.cdt.core.cHeader" id="Scratchbox 1~FREMANTLE_X86.1242232300060.1092559371.1228943409" languageId="org.eclipse.cdt.core.gcc" name="GNU C" supportedEntryKinds="includePath;includeFile;macro;macroFile">
+<settingEntries>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/hildon-help"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc2.5-i386/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/conny/targets/FREMANTLE_X86/usr/include/libhildondesktop"/>
+<entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+</settingEntries>
+</languageData>
+</folderData>
+<buildData errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.VCErrorParser" id="Scratchbox 1~FREMANTLE_X86.1242232300060.1176367097"/>
+<targetPlatformData binaryParsers="org.eclipse.cdt.core.ELF" id="Scratchbox 1~FREMANTLE_X86.1242232300060.247067775"/>
+</storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+</cconfiguration>
+</storageModule>
+</cproject>
