@@ -27,25 +27,6 @@
 /*#define BULLET "\342\200\242 "*/
 /*#define BULLET "\u2022 "*/
 
-typedef struct
-{
-	const gchar   *user_path;
-	GList         *open_notes;
-	gint           font_size;
-	GConfClient   *client;
-	HildonProgram *program;
-	gboolean	   fullscreen;
-	HildonWindow  *search_window;
-	NoteListStore *note_store;
-} AppData;
-
-
-
-
-
-AppData* get_app_data(void);
-
-NoteListStore* create_note_list_store(const gchar *user_path);
 
 const gchar* get_bullet_by_depth(gint depth);
 
@@ -64,5 +45,6 @@ time_t get_iso8601_time_in_seconds(const gchar *time_string);
 const gchar* note_get_new_filename(void);
 
 const gchar* get_uuid(void);
+
 
 #endif /* METADATA_H */

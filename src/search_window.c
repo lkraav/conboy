@@ -25,7 +25,7 @@
 #include <string.h>
 #include <libintl.h>
 
-
+#include "app_data.h"
 #include "search_window.h"
 #include "metadata.h"
 #include "note.h"
@@ -100,7 +100,7 @@ void on_row_activated(GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *c
 {
 	Note *note;
 	GtkTreeIter iter;
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 	GtkTreeModel *model = gtk_tree_view_get_model(view);
 
 	gtk_tree_model_get_iter(model, &iter, path);
@@ -124,7 +124,7 @@ static
 gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer user_data)
 {
 	GtkWidget *window = GTK_WIDGET(user_data);
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 	GList *open_notes;
 
 	switch (event->keyval) {
@@ -236,7 +236,7 @@ gint compare_dates(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer
 static
 HildonWindow* search_window_create()
 {
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 	GtkWidget *win;
 	GtkWidget *vbox;
 	GtkWidget *hbox;
@@ -368,7 +368,7 @@ HildonWindow* search_window_create()
 	/* TEST */
 	g_signal_connect(store, "row-inserted", G_CALLBACK(on_row_inserted), NULL);
 
-	app_data = get_app_data();
+	app_data = app_data_get();
 	app_data->note_store = store;
 
 	return HILDON_WINDOW(win);
@@ -376,7 +376,7 @@ HildonWindow* search_window_create()
 
 void search_window_open()
 {
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 
 	if (app_data->search_window == NULL) {
 		app_data->search_window = search_window_create();

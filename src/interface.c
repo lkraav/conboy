@@ -40,6 +40,7 @@
 #include "deserializer.h"
 #include "metadata.h"
 #include "interface.h"
+#include "app_data.h"
 
 #define _(String)gettext(String)
 
@@ -192,7 +193,7 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkAccelGroup *accel_group;
 
 	PangoFontDescription *font;
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 
 	mainwin = hildon_window_new();
 	gtk_window_set_title(GTK_WINDOW(mainwin), ("Conboy"));
@@ -529,7 +530,7 @@ GtkWidget* create_mainwin(Note *note) {
 
 	/* Window signals */
 	g_signal_connect(mainwin, "delete-event",
-	        G_CALLBACK(on_window_close_button_clicked),
+	        G_CALLBACK(on_window_delete),
 	        note);
 
 	/* Action signals */

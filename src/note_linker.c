@@ -23,6 +23,7 @@
 #include <gtk/gtk.h>
 #include <string.h>
 
+#include "app_data.h"
 #include "metadata.h"
 #include "note_list_store.h"
 #include "note_linker.h"
@@ -42,7 +43,7 @@ static gint
 get_length_of_longest_title()
 {
 	gint max_length = 0;
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 	GtkTreeIter iter;
 	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
 	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
@@ -67,7 +68,7 @@ GSList* find_titles(gchar *haystack) {
 
 	gchar *found;
 	GSList *result = NULL;
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 
 	gchar *u_haystack = g_utf8_casefold(haystack, -1);
 	gulong micro;
@@ -139,7 +140,9 @@ highlight_titles(Note *note, GtkTextBuffer *buffer, GtkTextIter *start_iter, Gtk
 {
 	GtkTextTag *url_tag  = gtk_text_tag_table_lookup(buffer->tag_table, "link:url");
 	/* For all titles look if they occure in haystack. For all matches apply tag */
-	GSList *hits = find_titles(gtk_text_buffer_get_slice(buffer, start_iter, end_iter, FALSE));
+	gchar *slice = gtk_text_buffer_get_slice(buffer, start_iter, end_iter, FALSE); 
+	GSList *hits = find_titles(slice);
+	g_free(slice);
 	while (hits != NULL) {
 		GtkTextIter *hit_start, *hit_end;
 		SearchHit *hit = (SearchHit*)hits->data;

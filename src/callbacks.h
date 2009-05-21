@@ -23,7 +23,7 @@
 #include "note.h"
 
 gboolean
-on_window_close_button_clicked		   (GtkObject		*window,
+on_window_delete		   (GtkObject		*window,
 										GdkEvent		*event,
 										gpointer		 user_data);
 

@@ -50,6 +50,7 @@
 #include "interface.h"
 #include "callbacks.h"
 #include "note.h"
+#include "app_data.h"
 
 #include "search_window.h"
 #include "note_list_store.h"
@@ -61,7 +62,22 @@
 
 #define MY_ENCODING "utf-8"
 
-
+static void cleanup()
+{
+	AppData *app_data = app_data_get();
+	GtkTreeIter iter;
+	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
+	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
+	while (valid) {
+		Note *note;
+		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
+		note_free(note);
+		valid = gtk_tree_model_iter_next(model, &iter);
+	}
+	
+	/* Free AppData */
+	app_data_free();
+}
 
 
 int
@@ -87,7 +103,7 @@ main (int argc, char *argv[])
 #endif
 
   /* Call this to initialize it */
-  app_data = get_app_data();
+  app_data = app_data_get();
 
   /* Initialize maemo application */
   g_printerr("Starting %s, Version %s \n", APP_NAME, VERSION);
@@ -112,6 +128,8 @@ main (int argc, char *argv[])
 
   gtk_main();
 
+  cleanup();
+  
   /* Deinitialize OSSO */
   osso_deinitialize(osso_context);
 

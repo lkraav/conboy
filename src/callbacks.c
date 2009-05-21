@@ -28,22 +28,20 @@
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-banner.h>
 #include <hildon/hildon-defines.h>
-#include <glib/gstdio.h>
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
 #include <gdk/gdkkeysyms.h>
 #include <math.h>
 
 #include "callbacks.h"
-
 #include "metadata.h"
 #include "interface.h"
-
 #include "note.h"
 #include "serializer.h"
 #include "deserializer.h"
 #include "search_window.h"
 #include "note_linker.h"
+#include "app_data.h"
 
 #define _(String)gettext(String)
 
@@ -179,11 +177,12 @@ on_font_size_radio_group_changed       (GtkRadioAction  *action,
 
 
 gboolean
-on_window_close_button_clicked		   (GtkObject		*window,
+on_window_delete		               (GtkObject		*window,
 										GdkEvent		*event,
 										gpointer		 user_data)
 {
 	Note *note = (Note*)user_data;
+	g_printerr("Window delete \n");
 	note_save(note);
 	note_close_window(note);
 	return TRUE; /* True to stop other handler from being invoked */
@@ -192,7 +191,7 @@ on_window_close_button_clicked		   (GtkObject		*window,
 void on_quit_button_clicked(GtkAction *action, gpointer user_data)
 {
 	Note *note;
-	GList *open_notes = get_app_data()->open_notes;
+	GList *open_notes = app_data_get()->open_notes;
 
 	while (open_notes != NULL) {
 		note = (Note*)open_notes->data;
@@ -388,7 +387,7 @@ on_notes_button_clicked				   (GtkAction		*action,
 	GTimer *timer;
 	gulong micro;
 
-	app_data = get_app_data();
+	app_data = app_data_get();
 	if (app_data->note_store == NULL) {
 		return;
 	}
@@ -546,7 +545,7 @@ on_link_internal_tag_event				(GtkTextTag  *tag,
 										 gpointer     user_data)
 {
 	GdkEventType type = event->type;
-	GtkTextIter *start;
+	GtkTextIter start;
 	gchar *link_text;
 
 	if (type == GDK_BUTTON_RELEASE) {
@@ -558,13 +557,13 @@ on_link_internal_tag_event				(GtkTextTag  *tag,
 				gtk_text_iter_backward_to_tag_toggle(iter, tag);
 			}
 
-			start = gtk_text_iter_copy(iter);
+			start = *iter; /*gtk_text_iter_copy(iter);*/
 
 			if (!gtk_text_iter_ends_tag(iter, tag)) {
 				gtk_text_iter_forward_to_tag_toggle(iter, tag);
 			}
 
-			link_text = gtk_text_iter_get_text(start, iter);
+			link_text = gtk_text_iter_get_text(&start, iter);
 
 			g_printerr("Link: >%s< \n", link_text);
 			note_show_by_title(link_text);
@@ -578,52 +577,32 @@ void
 on_delete_button_clicked			   (GtkAction		*action,
 										gpointer		 user_data)
 {
-	/* Popup Dialog ask for sure
-	 * Close window
-	 * Lower window count
-	 * Change open_windows in app_data
-	 * Delete file
-	 * Free resources
-	 */
 	Note *note = (Note*)user_data;
+
 	gchar *message = g_strconcat("<b>",
 			_("Really delete this note?"),
 			"</b>\n\n",
 			_("If you delete a note it is permanently lost."),
 			NULL);
-	GtkWidget *dialog;
-	gint response;
-	AppData *app_data;
 
-	dialog = gtk_message_dialog_new_with_markup(
+	GtkWidget *dialog = gtk_message_dialog_new_with_markup(
 			GTK_WINDOW(note->ui->window),
 			GTK_DIALOG_MODAL,
 			GTK_MESSAGE_QUESTION,
 			GTK_BUTTONS_YES_NO,
 			message);
 
-	response = gtk_dialog_run(GTK_DIALOG(dialog));
+	gint response = gtk_dialog_run(GTK_DIALOG(dialog));
+	
 	gtk_widget_destroy(dialog);
 
-	if (response != GTK_RESPONSE_YES) {
-		g_free(message);
-		return;
+	if (response == GTK_RESPONSE_YES) {
+		/* Delete note and close window */
+		note_delete(note);
+		note_close_window(note);
+		note_free(note);
 	}
 
-	/* Block this signal, otherwise the destroy event of the window will trigger saving of the note */
-	g_signal_handlers_block_by_func(note->ui->window, on_window_close_button_clicked, note);
-	note_close_window(note);
-	/* Don't unblock the signal, because the window does not exist anymore */
-
-	/* Delete file */
-	if (g_unlink(note->filename) == -1) {
-		g_printerr("ERROR: The file %s could not be deleted \n", note->filename);
-	}
-
-	app_data = get_app_data();
-	/* TODO: Free note */
-	note_list_store_remove(app_data->note_store, note);
-	
 	g_free(message);
 }
 
@@ -659,7 +638,7 @@ on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 static
 void change_font_size_by(gint size)
 {
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 	PangoFontDescription *font;
 	Note *note;
 	GList *note_list;
@@ -715,7 +694,7 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 {
 	Note *note = (Note*)user_data;
 	GtkWidget *window = GTK_WIDGET(note->ui->window);
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 	GList *open_notes;
 
 	switch (event->keyval) {
@@ -730,7 +709,7 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 		return TRUE;
 
 	case HILDON_HARDKEY_ESC:
-		on_window_close_button_clicked(GTK_OBJECT(window), NULL, note);
+		on_window_delete(GTK_OBJECT(window), NULL, note);
 		return TRUE;
 
 	case HILDON_HARDKEY_FULLSCREEN:

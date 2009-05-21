@@ -30,7 +30,9 @@ conboy_SOURCES = \
         note_list_store.c \
         note_list_store.h \
         note_linker.h \
-        note_linker.c
+        note_linker.c \
+        app_data.h \
+        app_data.c
 
 #libconboy_applet_la_SOURCES = \
 #		conboy_applet.c \

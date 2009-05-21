@@ -86,6 +86,8 @@ void note_save(Note *note);
 
 void note_close_window(Note *note);
 
+void note_delete(Note *note);
+
 gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer);
 
 void note_show(Note *note);

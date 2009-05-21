@@ -23,6 +23,7 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
+#include "app_data.h"
 #include "note.h"
 #include "metadata.h"
 #include "note_list_store.h"
@@ -86,7 +87,6 @@ void
 note_list_store_add(NoteListStore *self, Note *note, GtkTreeIter *iter)
 {
 	GtkTreeIter iter1;
-	AppData *app_data = get_app_data();
 
 	/* validate our parameters */
 	g_return_if_fail(NOTE_IS_LIST_STORE(self));
@@ -243,7 +243,6 @@ NoteListStore *note_list_store_new(void)
 gboolean note_list_store_remove(NoteListStore *self, Note *note)
 {
 	GtkTreeIter iter;
-	AppData *app_data = get_app_data();
 
 	if (note_list_store_get_iter(self, note, &iter)) {
 		gtk_list_store_remove(GTK_LIST_STORE(self), &iter);
@@ -337,7 +336,7 @@ void note_list_store_note_changed(NoteListStore *self, Note *note)
 	if (note_list_store_get_iter(self, note, &iter)) {
 		GtkTreePath *path = gtk_tree_model_get_path(GTK_TREE_MODEL(self), &iter);
 		gtk_tree_model_row_changed(GTK_TREE_MODEL(self), path, &iter);
-		g_free(path);
+		gtk_tree_path_free(path);
 	}
 }
 

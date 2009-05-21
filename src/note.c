@@ -22,9 +22,11 @@
 
 #include <gtk/gtk.h>
 #include <glib.h>
+#include <glib/gstdio.h>
 #include <string.h>
 #include <libintl.h>
 
+#include "app_data.h"
 #include "metadata.h"
 #include "interface.h"
 #include "note.h"
@@ -61,7 +63,7 @@ void note_free(Note *note)
 void note_show_by_title(const char* title)
 {	
 	Note *note;
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 	
 	note = note_list_store_find_by_title(app_data->note_store, title);
 	
@@ -158,8 +160,10 @@ void note_save(Note *note)
 	content = gtk_text_iter_get_text(&start, &end);
 	if (is_empty_str(content)) {
 		gtk_text_buffer_set_modified(buffer, FALSE);
+		g_free(content);
 		return;
 	}
+	g_free(content);
 	
 	/* If buffer is not dirty, don't save */
 	if (!gtk_text_buffer_get_modified(buffer)) {
@@ -201,7 +205,7 @@ void note_save(Note *note)
 		note->y = 1;
 	}
 	
-	app_data = get_app_data();
+	app_data = app_data_get();
 	
 	/* Set start and end iterators for serialization */
 	gtk_text_buffer_get_bounds(buffer, &start, &end);
@@ -224,26 +228,42 @@ void note_close_window(Note *note)
 {
 	HildonProgram *program = hildon_program_get_instance();
 	HildonWindow *window = note->ui->window;
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 	guint count = g_list_length(app_data->open_notes);
 	
 	if (count > 1) {
 		hildon_program_remove_window(program, window);
 		gtk_widget_destroy(GTK_WIDGET(window));
+		note->ui = NULL;
 		app_data->open_notes = g_list_remove(app_data->open_notes, note);
 		/* Don't free note, because we reuse this in the menu with the available notes and when reopening */
-		/*note_free(note);*/
-		return;
-	} 
+	} else {
+		g_printerr("####################### QUIT ###################\n");
+		gtk_main_quit();
+	}
+}
+
+
+void note_delete(Note *note)
+{
+	AppData *app_data = app_data_get();
 	
-	g_printerr("####################### QUIT ###################");
-	gtk_main_quit();
+	/* Delete file */
+	if (g_unlink(note->filename) == -1) {
+		g_printerr("ERROR: The file %s could not be deleted \n", note->filename);
+	}
+
+	/* Remove from list store */
+	note_list_store_remove(app_data->note_store, note);
+	
+	/* Free memory */
+	/*note_free(note);*/
 }
 
 
 gboolean note_is_open(Note *note)
 {	
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 	GList *element = g_list_find(app_data->open_notes, note);
 	if (element == NULL) {
 		return FALSE;
@@ -254,7 +274,7 @@ gboolean note_is_open(Note *note)
 
 gboolean note_exists(Note *note)
 {
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 	Note *element = note_list_store_find(app_data->note_store, note);
 	if (element == NULL) {
 		return FALSE;
@@ -274,7 +294,7 @@ void note_set_focus(Note *note)
 
 void note_show(Note *note)
 {
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 	GtkTextBuffer *buffer;
 	GtkWindow *window;
 	
@@ -326,7 +346,7 @@ void note_show(Note *note)
 
 void note_show_new(Note *note)
 {
-	AppData *app_data = get_app_data();
+	AppData *app_data = app_data_get();
 	GtkTextBuffer *buffer = note->ui->buffer;
 	GtkTextIter start, end;
 	const gchar *content;
