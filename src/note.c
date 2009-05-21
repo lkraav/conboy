@@ -50,12 +50,12 @@ Note* note_create_new()
 void note_free(Note *note)
 {
 	g_free(note->ui);
-	/*
 	g_free(note->filename);
 	g_free(note->title);
 	g_free(note->version);
-	*/
 	g_slist_free(note->active_tags);
+	g_free(note);
+	note = NULL;
 }
 
 void note_show_by_title(const char* title)
@@ -67,7 +67,7 @@ void note_show_by_title(const char* title)
 	
 	if (note == NULL) {
 		note = note_create_new();
-		note->title = title;
+		note->title = g_strdup(title);
 		note_show(note);
 		return;
 	}
@@ -220,7 +220,6 @@ void note_save(Note *note)
 }
 
 
-
 void note_close_window(Note *note)
 {
 	HildonProgram *program = hildon_program_get_instance();
@@ -240,7 +239,6 @@ void note_close_window(Note *note)
 	g_printerr("####################### QUIT ###################");
 	gtk_main_quit();
 }
-
 
 
 gboolean note_is_open(Note *note)
@@ -334,7 +332,7 @@ void note_show_new(Note *note)
 	const gchar *content;
 	gint notes_count;
 	
-	note->filename = note_get_new_filename();
+	note->filename = (gchar*)note_get_new_filename();
 	
 	if (note->title == NULL) {
 		notes_count = note_list_store_get_length(app_data->note_store);

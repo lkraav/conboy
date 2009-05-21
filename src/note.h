@@ -54,8 +54,8 @@ typedef struct
 typedef struct
 {
   UserInterface *ui;
-  const gchar   *title;
-  const gchar   *filename;
+  gchar   *title;
+  gchar   *filename;
 
   time_t last_change_date;
   time_t last_metadata_change_date;
@@ -67,7 +67,7 @@ typedef struct
   gint x;
   gint y;
   gboolean open_on_startup;
-  const gchar *version;
+  gchar *version;
 
   GSList *active_tags;
 
@@ -75,6 +75,8 @@ typedef struct
 
 
 Note* note_create_new(void);
+
+void note_free(Note *note);
 
 void note_format_title(GtkTextBuffer *buffer);
 
