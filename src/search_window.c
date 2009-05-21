@@ -22,6 +22,12 @@
 #include <gtk/gtk.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-defines.h>
+#ifdef HILDON_HAS_APP_MENU
+#include <hildon/hildon-pannable-area.h>
+#include <hildon/hildon-entry.h>
+#include <hildon/hildon-gtk.h>
+#include <gtk/gtkenums.h>
+#endif
 #include <string.h>
 #include <libintl.h>
 
@@ -132,7 +138,7 @@ gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer
 	case HILDON_HARDKEY_ESC:
 		gtk_widget_hide(window);
 		return TRUE;
-	
+
 	/* TODO: The same code (only last line differs) is used in callbacks.c */
 	case HILDON_HARDKEY_FULLSCREEN:
 		/* Toggle fullscreen */
@@ -162,7 +168,7 @@ gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer
 		gtk_window_present(GTK_WINDOW(window));
 		return TRUE;
 	}
-	
+
 	return FALSE;
 }
 
@@ -180,7 +186,7 @@ gboolean on_key_pressed(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 	gtk_widget_grab_focus(GTK_WIDGET(user_data));
 	return FALSE;
 	*/
-	
+
 	return FALSE;
 }
 
@@ -225,7 +231,7 @@ gint compare_dates(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer
 
 	gtk_tree_model_get(model, a, NOTE_COLUMN, &note_a, -1);
 	gtk_tree_model_get(model, b, NOTE_COLUMN, &note_b, -1);
-	
+
 	if (note_a == NULL || note_b == NULL) {
 		return 0;
 	}
@@ -268,7 +274,7 @@ HildonWindow* search_window_create()
 	gtk_widget_show(search_label);
 	gtk_box_pack_start(GTK_BOX(hbox), search_label, FALSE, FALSE, 0);
 	#ifdef HILDON_HAS_APP_MENU
-	search_field = hildon_entry_new();
+	search_field = hildon_entry_new(HILDON_SIZE_AUTO);
 	#else
 	search_field = gtk_entry_new();
 	#endif
@@ -381,7 +387,7 @@ void search_window_open()
 	if (app_data->search_window == NULL) {
 		app_data->search_window = search_window_create();
 	}
-	
+
 	if (app_data->fullscreen) {
 		gtk_window_fullscreen(GTK_WINDOW(app_data->search_window));
 	}

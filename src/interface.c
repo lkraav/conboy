@@ -32,6 +32,7 @@
 #include <hildon/hildon-find-toolbar.h>
 #ifdef HILDON_HAS_APP_MENU
 #include <hildon/hildon-text-view.h>
+#include <hildon/hildon-pannable-area.h>
 #endif
 
 #include "callbacks.h"
@@ -105,17 +106,17 @@ set_item_label(GtkContainer *item, const gchar *open_tag, const gchar *text, con
 {
 	GList *children = gtk_container_get_children(item);
 	gchar *string;
-	
+
 	if (children == NULL) {
 		g_printerr("ERROR: set_menu_item_label() expects a GtkContainer, which contains one label.\n");
 		return;
 	}
-	
+
 	string = g_strconcat(open_tag, text, end_tag, NULL);
 
 	/* TODO: Add checks, that it is really a label and the widget is really a Button or a MenuItem */
 	gtk_label_set_markup(GTK_LABEL(children->data), string);
-	
+
 	g_free(string);
 }
 
@@ -273,7 +274,7 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_accel_map_add_entry(ACCEL_PATH_QUIT,            GDK_q, GDK_CONTROL_MASK);
 	gtk_accel_map_add_entry(ACCEL_PATH_NEW,             GDK_n, GDK_CONTROL_MASK);
 	gtk_accel_map_add_entry(ACCEL_PATH_FIND,            GDK_f, GDK_CONTROL_MASK);
-	
+
 
 
 
@@ -307,28 +308,28 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_action_connect_proxy(action_font_normal, menu_font_normal);
 	gtk_action_connect_proxy(action_font_large, menu_font_large);
 	gtk_action_connect_proxy(action_font_huge, menu_font_huge);
-	
-	set_item_label(GTK_BIN(menu_bold),       "<b>", _("Bold"), "</b>");
-	set_item_label(GTK_BIN(menu_italic),     "<i>", _("Italic"), "</i>");
-	set_item_label(GTK_BIN(menu_strike),     "<s>", _("Strikeout"), "</s>");
-	set_item_label(GTK_BIN(menu_highlight),  "<span background=\"yellow\">", _("Highlight"), "</span>");
-	set_item_label(GTK_BIN(menu_fixed),      "<tt>", _("Fixed Width"), "</tt>");
-	set_item_label(GTK_BIN(menu_font_small), "<span size=\"small\">", _("Small"), "</span>");
-	set_item_label(GTK_BIN(menu_font_large), "<span size=\"large\">", _("Large"), "</span>");
-	set_item_label(GTK_BIN(menu_font_huge),  "<span size=\"x-large\">", _("Huge"), "</span>");
-	
-	hildon_app_menu_append(text_style_menu, menu_bold);
-	hildon_app_menu_append(text_style_menu, menu_italic);
-	hildon_app_menu_append(text_style_menu, menu_strike);
-	hildon_app_menu_append(text_style_menu, menu_highlight);
-	hildon_app_menu_append(text_style_menu, menu_fixed);
-	hildon_app_menu_append(text_style_menu, menu_bullets);
-	hildon_app_menu_append(text_style_menu, menu_inc_indent);
-	hildon_app_menu_append(text_style_menu, menu_dec_indent);
-	hildon_app_menu_append(text_style_menu, menu_font_normal);
-	hildon_app_menu_append(text_style_menu, menu_font_small);
-	hildon_app_menu_append(text_style_menu, menu_font_large);
-	hildon_app_menu_append(text_style_menu, menu_font_huge);
+
+	set_item_label(GTK_CONTAINER(menu_bold),       "<b>", _("Bold"), "</b>");
+	set_item_label(GTK_CONTAINER(menu_italic),     "<i>", _("Italic"), "</i>");
+	set_item_label(GTK_CONTAINER(menu_strike),     "<s>", _("Strikeout"), "</s>");
+	set_item_label(GTK_CONTAINER(menu_highlight),  "<span background=\"yellow\">", _("Highlight"), "</span>");
+	set_item_label(GTK_CONTAINER(menu_fixed),      "<tt>", _("Fixed Width"), "</tt>");
+	set_item_label(GTK_CONTAINER(menu_font_small), "<span size=\"small\">", _("Small"), "</span>");
+	set_item_label(GTK_CONTAINER(menu_font_large), "<span size=\"large\">", _("Large"), "</span>");
+	set_item_label(GTK_CONTAINER(menu_font_huge),  "<span size=\"x-large\">", _("Huge"), "</span>");
+
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_bold));
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_italic));
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_strike));
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_highlight));
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_fixed));
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_bullets));
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_inc_indent));
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_dec_indent));
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_normal));
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_small));
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_large));
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_huge));
 
 #else
 	text_style_menu = GTK_WIDGET(gtk_menu_new());
@@ -488,7 +489,7 @@ GtkWidget* create_mainwin(Note *note) {
 	/* TEXT VIEW */
 #ifdef HILDON_HAS_APP_MENU
 	textview = hildon_text_view_new();
-	buffer = hildon_text_view_get_buffer(textview);
+	buffer = hildon_text_view_get_buffer(HILDON_TEXT_VIEW(textview));
 #else
 	textview = gtk_text_view_new();
 	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textview));
