@@ -470,6 +470,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	gtk_toggle_action_set_active(ui->action_highlight, FALSE);
 	gtk_toggle_action_set_active(ui->action_fixed, FALSE);
 	gtk_toggle_action_set_active(ui->action_bullets, FALSE);
+	gtk_radio_action_set_current_value(ui->action_font_small, 1); /* Enable normal font size */
 
 	while (tags != NULL) {
 		tag = GTK_TEXT_TAG(tags->data);
@@ -487,8 +488,6 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 			gtk_toggle_action_set_active(ui->action_bullets, TRUE);
 		} else if (strcmp(tag->name, "size:small") == 0) {
 			gtk_radio_action_set_current_value(ui->action_font_small, 0);
-		} else if (strcmp(tag->name, "size:normal") == 0) {
-			gtk_radio_action_set_current_value(ui->action_font_small, 1);
 		} else if (strcmp(tag->name, "size:large") == 0) {
 			gtk_radio_action_set_current_value(ui->action_font_small, 2);
 		} else if (strcmp(tag->name, "size:huge") == 0) {
