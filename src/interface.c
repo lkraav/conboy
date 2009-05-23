@@ -44,7 +44,7 @@
 #include "app_data.h"
 
 #define _(String)gettext(String)
-
+/*
 #define ACCEL_PATH_ROOT            "<NOTE_WINDOW>"
 #define ACCEL_PATH_QUIT            ACCEL_PATH_ROOT"/Quit"
 #define ACCEL_PATH_NEW             ACCEL_PATH_ROOT"/New"
@@ -56,6 +56,7 @@
 #define ACCEL_PATH_STYLE_STRIKE    ACCEL_PATH_STYLE"/Strike"
 #define ACCEL_PATH_STYLE_HIGHLIGHT ACCEL_PATH_STYLE"/Highlight"
 #define ACCEL_PATH_FIND            ACCEL_PATH_ROOT"/Find"
+*/
 
 /*
 static void set_tool_button_icon_by_name(GtkToolButton *button, const gchar *icon_name)
@@ -187,9 +188,11 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkAction *action_font_huge;
 	GtkAction *action_find;
 
+	GtkActionGroup *action_group;
+
 	GtkTextTag *link_internal_tag;
 
-	GSList *action_group = NULL;
+	GSList *radio_group = NULL;
 
 	GtkAccelGroup *accel_group;
 
@@ -197,17 +200,18 @@ GtkWidget* create_mainwin(Note *note) {
 	AppData *app_data = app_data_get();
 
 	mainwin = hildon_window_new();
-	gtk_window_set_title(GTK_WINDOW(mainwin), ("Conboy"));
+	gtk_window_set_title(GTK_WINDOW(mainwin), "Conboy");
 
 	accel_group = gtk_accel_group_new();
 	gtk_window_add_accel_group(GTK_WINDOW(mainwin), accel_group);
+	g_object_unref(accel_group);
 
 	vbox1 = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(vbox1);
 	gtk_container_add(GTK_CONTAINER(mainwin), vbox1);
 
 	/* ACTIONS */
-	action_bold = GTK_ACTION(gtk_toggle_action_new("bold", _("Bold"), NULL, GTK_STOCK_BOLD));
+	action_bold = GTK_ACTION(gtk_toggle_action_new("bold", _("Bold"), NULL, NULL));
 	action_bullets = GTK_ACTION(gtk_toggle_action_new("bullets", _("Bullets"), NULL, NULL));
 	action_dec_indent = GTK_ACTION(gtk_action_new("dec_indent", _("Decrease Indent"), NULL, GTK_STOCK_UNINDENT));
 	action_delete = GTK_ACTION(gtk_action_new("delete", _("Delete Note"), NULL, GTK_STOCK_DELETE));
@@ -219,7 +223,7 @@ GtkWidget* create_mainwin(Note *note) {
 	action_notes = GTK_ACTION(gtk_action_new("open", _("Open"), NULL, GTK_STOCK_OPEN));
 	action_quit = GTK_ACTION(gtk_action_new("quit", _("Close All Notes"), NULL, NULL));
 	action_italic = GTK_ACTION(gtk_toggle_action_new("italic", _("Italic"), NULL, GTK_STOCK_ITALIC));
-	action_strike = GTK_ACTION(gtk_toggle_action_new("strikethrough", _("Strikeout"), NULL, GTK_STOCK_STRIKETHROUGH));
+	action_strike = GTK_ACTION(gtk_toggle_action_new("strikethrough", _("Strikeout"), NULL, NULL));
 	action_text_style = GTK_ACTION(gtk_action_new("style", _("Style"), NULL, GTK_STOCK_SELECT_FONT));
 	action_zoom_in = GTK_ACTION(gtk_action_new("zoom_in", _("Zoom In"), NULL, GTK_STOCK_ZOOM_IN));
 	action_zoom_out = GTK_ACTION(gtk_action_new("zoom_out", _("Zoom Out"), NULL, GTK_STOCK_ZOOM_OUT));
@@ -235,17 +239,30 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_action_set_sensitive(action_dec_indent, FALSE);
 
 	/* Build the radio action group */
-	gtk_radio_action_set_group(GTK_RADIO_ACTION(action_font_small), action_group);
-	action_group = gtk_radio_action_get_group(GTK_RADIO_ACTION(action_font_small));
-	gtk_radio_action_set_group(GTK_RADIO_ACTION(action_font_normal), action_group);
-	action_group = gtk_radio_action_get_group(GTK_RADIO_ACTION(action_font_normal));
-	gtk_radio_action_set_group(GTK_RADIO_ACTION(action_font_large), action_group);
-	action_group = gtk_radio_action_get_group(GTK_RADIO_ACTION(action_font_large));
-	gtk_radio_action_set_group(GTK_RADIO_ACTION(action_font_huge), action_group);
-	action_group = gtk_radio_action_get_group(GTK_RADIO_ACTION(action_font_huge));
+	gtk_radio_action_set_group(GTK_RADIO_ACTION(action_font_small), radio_group);
+	radio_group = gtk_radio_action_get_group(GTK_RADIO_ACTION(action_font_small));
+	gtk_radio_action_set_group(GTK_RADIO_ACTION(action_font_normal), radio_group);
+	radio_group = gtk_radio_action_get_group(GTK_RADIO_ACTION(action_font_normal));
+	gtk_radio_action_set_group(GTK_RADIO_ACTION(action_font_large), radio_group);
+	radio_group = gtk_radio_action_get_group(GTK_RADIO_ACTION(action_font_large));
+	gtk_radio_action_set_group(GTK_RADIO_ACTION(action_font_huge), radio_group);
+	radio_group = gtk_radio_action_get_group(GTK_RADIO_ACTION(action_font_huge));
 	gtk_radio_action_set_current_value(GTK_RADIO_ACTION(action_font_normal), 1);
 
-	/* Add actions to accelerator group */
+	action_group = gtk_action_group_new("notewin");
+	/* TODO: This 3 blocks should be one function call. Write a function which executs all three commands */
+	gtk_action_group_add_action_with_accel(action_group, action_bold,      "<Ctrl>b");
+	gtk_action_group_add_action_with_accel(action_group, action_italic,    "<Ctrl>i");
+	gtk_action_group_add_action_with_accel(action_group, action_fixed,     "<Ctrl>m");
+	gtk_action_group_add_action_with_accel(action_group, action_highlight, "<Ctrl>h");
+	gtk_action_group_add_action_with_accel(action_group, action_strike,    "<Ctrl>s");
+	gtk_action_group_add_action_with_accel(action_group, action_quit,      "<Ctrl>q");
+	gtk_action_group_add_action_with_accel(action_group, action_new,       "<Ctrl>n");
+	gtk_action_group_add_action_with_accel(action_group, action_find,      "<Ctrl>f");
+	gtk_action_group_add_action_with_accel(action_group, action_new,       "<Ctrl>n");
+	gtk_action_group_add_action_with_accel(action_group, action_quit,      "<Ctrl>q");
+
+
 	gtk_action_set_accel_group(action_bold,      accel_group);
 	gtk_action_set_accel_group(action_italic,    accel_group);
 	gtk_action_set_accel_group(action_fixed,     accel_group);
@@ -254,56 +271,63 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_action_set_accel_group(action_quit,      accel_group);
 	gtk_action_set_accel_group(action_new,       accel_group);
 	gtk_action_set_accel_group(action_find,      accel_group);
+	gtk_action_set_accel_group(action_new,       accel_group);
+	gtk_action_set_accel_group(action_quit,      accel_group);
 
-	/* Add accelerator paths to actions */
-	gtk_action_set_accel_path(action_bold,      ACCEL_PATH_STYLE_BOLD);
-	gtk_action_set_accel_path(action_italic,    ACCEL_PATH_STYLE_ITALIC);
-	gtk_action_set_accel_path(action_strike,    ACCEL_PATH_STYLE_STRIKE);
-	gtk_action_set_accel_path(action_highlight, ACCEL_PATH_STYLE_HIGHLIGHT);
-	gtk_action_set_accel_path(action_fixed,     ACCEL_PATH_STYLE_FIXED);
-	gtk_action_set_accel_path(action_quit,      ACCEL_PATH_QUIT);
-	gtk_action_set_accel_path(action_new,       ACCEL_PATH_NEW);
-	gtk_action_set_accel_path(action_find,		ACCEL_PATH_FIND);
-
-	/* Set keybindings for accelerator paths */
-	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_BOLD,      GDK_b, GDK_CONTROL_MASK);
-	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_ITALIC,    GDK_i, GDK_CONTROL_MASK);
-	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_STRIKE,    GDK_s, GDK_CONTROL_MASK);
-	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_HIGHLIGHT, GDK_h, GDK_CONTROL_MASK);
-	gtk_accel_map_add_entry(ACCEL_PATH_STYLE_FIXED,     GDK_m, GDK_CONTROL_MASK);
-	gtk_accel_map_add_entry(ACCEL_PATH_QUIT,            GDK_q, GDK_CONTROL_MASK);
-	gtk_accel_map_add_entry(ACCEL_PATH_NEW,             GDK_n, GDK_CONTROL_MASK);
-	gtk_accel_map_add_entry(ACCEL_PATH_FIND,            GDK_f, GDK_CONTROL_MASK);
-
-
+	gtk_action_connect_accelerator(action_bold);
+	gtk_action_connect_accelerator(action_italic);
+	gtk_action_connect_accelerator(action_fixed);
+	gtk_action_connect_accelerator(action_highlight);
+	gtk_action_connect_accelerator(action_strike);
+	gtk_action_connect_accelerator(action_find);
+	gtk_action_connect_accelerator(action_new);
+	gtk_action_connect_accelerator(action_quit);
 
 
 	/* FORMAT MENU */
 #ifdef HILDON_HAS_APP_MENU
 	text_style_menu = hildon_app_menu_new();
 
-	menu_bold = gtk_button_new();
-	menu_italic = gtk_button_new();
-	menu_strike = gtk_button_new();
-	menu_highlight = gtk_button_new();
-	menu_fixed = gtk_button_new();
-	menu_bullets = gtk_button_new();
+	menu_bold = gtk_toggle_button_new();
+	menu_italic = gtk_toggle_button_new();
+	menu_strike = gtk_toggle_button_new();
+	menu_highlight = gtk_toggle_button_new();
+	menu_fixed = gtk_toggle_button_new();
+	menu_bullets = gtk_toggle_button_new();
 	menu_inc_indent = gtk_button_new();
 	menu_dec_indent = gtk_button_new();
 
 	/* Correcly shown, but not reacting on gtk_radio_action_set_current_value() */
+	/*
 	menu_font_small = gtk_radio_button_new(NULL);
 	menu_font_normal = gtk_radio_button_new_from_widget(GTK_RADIO_BUTTON(menu_font_small));
 	menu_font_large = gtk_radio_button_new_from_widget(GTK_RADIO_BUTTON(menu_font_small));
 	menu_font_huge = gtk_radio_button_new_from_widget(GTK_RADIO_BUTTON(menu_font_small));
+	*/
+
+	/* Works but shows buttons as toggle buttons not as radio buttons */
+	/*
+	menu_font_small = gtk_toggle_button_new();
+	menu_font_normal = gtk_toggle_button_new();
+	menu_font_large = gtk_toggle_button_new();
+	menu_font_huge = gtk_toggle_button_new();
+	*/
+
 
 	/* All shown as active */
-	/*
-	menu_font_small = gtk_radio_button_new(NULL);
-	menu_font_normal = gtk_radio_button_new(NULL);
-	menu_font_large = gtk_radio_button_new(NULL);
-	menu_font_huge = gtk_radio_button_new(NULL);
-	*/
+	GSList *x = NULL;
+	menu_font_small = gtk_radio_button_new(x);
+	x = gtk_radio_button_get_group(menu_font_small);
+
+	menu_font_normal = gtk_radio_button_new(x);
+	x = gtk_radio_button_get_group(menu_font_small);
+
+	menu_font_large = gtk_radio_button_new(x);
+	x = gtk_radio_button_get_group(menu_font_small);
+
+	menu_font_huge = gtk_radio_button_new(x);
+	x = gtk_radio_button_get_group(menu_font_small);
+
 
 
 	/* Same effect as with NULL /*
@@ -327,7 +351,6 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_action_connect_proxy(action_font_large, menu_font_large);
 	gtk_action_connect_proxy(action_font_huge, menu_font_huge);
 
-	/* Uncommented to remove potential problems */
 	/*
 	set_item_label(GTK_CONTAINER(menu_bold),       "<b>", _("Bold"), "</b>");
 	set_item_label(GTK_CONTAINER(menu_italic),     "<i>", _("Italic"), "</i>");
@@ -351,6 +374,7 @@ GtkWidget* create_mainwin(Note *note) {
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_small));
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_large));
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_huge));
+
 
 #else
 	text_style_menu = GTK_WIDGET(gtk_menu_new());
@@ -405,16 +429,6 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_action_connect_proxy(action_new, menu_new);
 	gtk_action_connect_proxy(action_quit, menu_quit);
 
-	/*
-	GtkWidget *one = gtk_button_new_with_label("Something longer");
-	GtkWidget *two = gtk_button_new_with_label("Something very very long");
-	GtkWidget *copy = gtk_button_new_with_label("Highlight");
-	GtkWidget *paste = gtk_button_new_with_label("Strikethrough");
-
-	set_button_label(paste, "<b>Bold</b>");
-	set_button_label(copy, "<i>Italic</i>");
-	*/
-
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_new));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_quit));
 
@@ -440,9 +454,6 @@ GtkWidget* create_mainwin(Note *note) {
 	/* Must be at the end of the menu definition */
 	hildon_window_set_menu(HILDON_WINDOW(mainwin), GTK_MENU(main_menu));
 #endif
-
-
-
 
 
 	/* TOOLBAR */

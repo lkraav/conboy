@@ -244,6 +244,7 @@ HildonWindow* search_window_create()
 {
 	AppData *app_data = app_data_get();
 	GtkWidget *win;
+	GtkWidget *menu;
 	GtkWidget *vbox;
 	GtkWidget *hbox;
 	GtkWidget *search_label;
@@ -261,6 +262,38 @@ HildonWindow* search_window_create()
 
 	win = hildon_window_new();
 	gtk_window_set_title(GTK_WINDOW(win), _("Search All Notes"));
+
+	/* Window menu */
+#ifdef HILDON_HAS_APP_MENU
+	menu = hildon_app_menu_new();
+
+
+	GtkWidget *menu_item1 = gtk_radio_button_new_with_label(NULL, "Sort Alphabetically");
+	GtkWidget *menu_item2 = gtk_radio_button_new_with_label_from_widget(menu_item1, "Sort By Date");
+
+	/*
+	GtkWidget *menu_item3 = gtk_radio_button_new_with_label(NULL, "Sort By Date Descending");
+	GtkWidget *menu_item4 = gtk_radio_button_new_with_label_from_widget(menu_item3, "Sort By Date Ascending");
+	*/
+	/*
+	GtkWidget *menu_item1 = gtk_radio_button_new_with_label(NULL, "one");
+	GtkWidget *menu_item2 = gtk_radio_button_new_with_label_from_widget(menu_item1, "two");
+
+	GtkWidget *menu_item3 = gtk_radio_button_new_with_label(NULL, "three");
+	GtkWidget *menu_item4 = gtk_radio_button_new_with_label_from_widget(menu_item3, "four");
+	*/
+
+
+	hildon_app_menu_add_filter(menu, menu_item1);
+	hildon_app_menu_add_filter(menu, menu_item2);
+
+	/*
+	hildon_app_menu_add_filter(menu, menu_item3);
+	hildon_app_menu_add_filter(menu, menu_item4);
+	*/
+
+	hildon_window_set_app_menu(win, menu);
+#endif
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(vbox);
