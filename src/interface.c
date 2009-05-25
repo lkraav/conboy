@@ -294,49 +294,10 @@ GtkWidget* create_mainwin(Note *note) {
 	menu_highlight = gtk_toggle_button_new();
 	menu_fixed = gtk_toggle_button_new();
 	menu_bullets = gtk_toggle_button_new();
-	menu_inc_indent = gtk_button_new();
-	menu_dec_indent = gtk_button_new();
-
-	/* Correcly shown, but not reacting on gtk_radio_action_set_current_value() */
-	/*
-	menu_font_small = gtk_radio_button_new(NULL);
-	menu_font_normal = gtk_radio_button_new_from_widget(GTK_RADIO_BUTTON(menu_font_small));
-	menu_font_large = gtk_radio_button_new_from_widget(GTK_RADIO_BUTTON(menu_font_small));
-	menu_font_huge = gtk_radio_button_new_from_widget(GTK_RADIO_BUTTON(menu_font_small));
-	*/
-
-	/* Works but shows buttons as toggle buttons not as radio buttons */
-	/*
 	menu_font_small = gtk_toggle_button_new();
 	menu_font_normal = gtk_toggle_button_new();
 	menu_font_large = gtk_toggle_button_new();
 	menu_font_huge = gtk_toggle_button_new();
-	*/
-
-
-	/* All shown as active */
-	GSList *x = NULL;
-	menu_font_small = gtk_radio_button_new(x);
-	x = gtk_radio_button_get_group(menu_font_small);
-
-	menu_font_normal = gtk_radio_button_new(x);
-	x = gtk_radio_button_get_group(menu_font_small);
-
-	menu_font_large = gtk_radio_button_new(x);
-	x = gtk_radio_button_get_group(menu_font_small);
-
-	menu_font_huge = gtk_radio_button_new(x);
-	x = gtk_radio_button_get_group(menu_font_small);
-
-
-
-	/* Same effect as with NULL /*
-	/*
-	menu_font_small = gtk_radio_button_new(action_group);
-	menu_font_normal = gtk_radio_button_new(action_group);
-	menu_font_large = gtk_radio_button_new(action_group);
-	menu_font_huge = gtk_radio_button_new(action_group);
-	*/
 
 	gtk_action_connect_proxy(action_bold, menu_bold);
 	gtk_action_connect_proxy(action_italic, menu_italic);
@@ -344,14 +305,11 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_action_connect_proxy(action_highlight, menu_highlight);
 	gtk_action_connect_proxy(action_fixed, menu_fixed);
 	gtk_action_connect_proxy(action_bullets, menu_bullets);
-	gtk_action_connect_proxy(action_inc_indent, menu_inc_indent);
-	gtk_action_connect_proxy(action_dec_indent, menu_dec_indent);
 	gtk_action_connect_proxy(action_font_small, menu_font_small);
 	gtk_action_connect_proxy(action_font_normal, menu_font_normal);
 	gtk_action_connect_proxy(action_font_large, menu_font_large);
 	gtk_action_connect_proxy(action_font_huge, menu_font_huge);
 
-	/*
 	set_item_label(GTK_CONTAINER(menu_bold),       "<b>", _("Bold"), "</b>");
 	set_item_label(GTK_CONTAINER(menu_italic),     "<i>", _("Italic"), "</i>");
 	set_item_label(GTK_CONTAINER(menu_strike),     "<s>", _("Strikeout"), "</s>");
@@ -360,7 +318,6 @@ GtkWidget* create_mainwin(Note *note) {
 	set_item_label(GTK_CONTAINER(menu_font_small), "<span size=\"small\">", _("Small"), "</span>");
 	set_item_label(GTK_CONTAINER(menu_font_large), "<span size=\"large\">", _("Large"), "</span>");
 	set_item_label(GTK_CONTAINER(menu_font_huge),  "<span size=\"x-large\">", _("Huge"), "</span>");
-	*/
 
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_bold));
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_italic));
@@ -368,12 +325,11 @@ GtkWidget* create_mainwin(Note *note) {
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_highlight));
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_fixed));
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_bullets));
-	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_inc_indent));
-	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_dec_indent));
-	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_normal));
-	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_small));
-	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_large));
-	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_huge));
+
+	hildon_app_menu_add_filter(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_small));
+	hildon_app_menu_add_filter(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_normal));
+	hildon_app_menu_add_filter(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_large));
+	hildon_app_menu_add_filter(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_font_huge));
 
 
 #else
