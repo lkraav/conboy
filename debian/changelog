@@ -1,3 +1,14 @@
+conboy (0.4.4) stable; urgency=low
+
+  * Added support for maemo backup
+  * Added support for i18n
+  * Added german translation
+  * Fixed memory leaks
+  * Fixed bug 4121: Conboy freezes when title of a note is empty
+  * Fixed bug: That font size normal was ignored in the style menu
+  * Changed search window to be more Fremantle conform
+  * Keyboard shortcuts now working with Fremantle
+
 conboy (0.4.3) stable; urgency=low
 
   * Added Fremantle specific code for finger friendly UI
