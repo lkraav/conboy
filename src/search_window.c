@@ -281,12 +281,8 @@ HildonWindow* search_window_create()
 #ifdef HILDON_HAS_APP_MENU
 	menu = hildon_app_menu_new();
 
-	/*
 	button_sort_by_title = gtk_radio_button_new_with_label(NULL, _("Sort By Title"));
 	button_sort_by_date = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(button_sort_by_title), _("Sort By Date"));
-	*/
-	button_sort_by_title = gtk_radio_button_new_with_label(NULL, _("Nach Titel Sortieren"));
-		button_sort_by_date = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(button_sort_by_title), _("Nach Datum Sortieren"));
 
 	/* Draw them as toggle buttons, not as radio buttons */
 	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(button_sort_by_title), FALSE);
