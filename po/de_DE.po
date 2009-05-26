@@ -1,20 +1,28 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Cornelius Hald <hald@icandy.de>, 2009.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-05-21 09:24+0200\n"
+"POT-Creation-Date: 2009-05-26 16:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/callbacks.c:590
+msgid "Really delete this note?"
+msgstr "Diese Notiz wirklich löschen?"
+
+#: ../src/callbacks.c:592
+msgid "If you delete a note it is permanently lost."
+msgstr "Wenn sie eine Notiz löschen ist diese unwiderbringlich verloren."
 
 #: ../src/interface.c:201 ../src/interface.c:303 ../src/interface.c:341
 msgid "Bold"
@@ -104,30 +112,10 @@ msgstr "Riesig"
 msgid "Text Style"
 msgstr "Textstil"
 
-#: ../src/interface.c:466 ../src/search_window.c:274
-#: ../src/search_window.c:267
+#: ../src/interface.c:466 ../src/search_window.c:267
+#: ../src/search_window.c:274
 msgid "Search:"
 msgstr "Suchen:"
-
-#: ../src/search_window.c:264 ../src/search_window.c:257
-msgid "Search All Notes"
-msgstr "Alle Notizen Durchsuchen"
-
-#: ../src/search_window.c:334 ../src/search_window.c:327
-msgid "Note"
-msgstr "Notiz"
-
-#: ../src/search_window.c:353 ../src/search_window.c:346
-msgid "Last Changed"
-msgstr "Zuletzt geändert"
-
-#: ../src/callbacks.c:590
-msgid "Really delete this note?"
-msgstr "Diese Notiz wirklich löschen?"
-
-#: ../src/callbacks.c:592
-msgid "If you delete a note it is permanently lost."
-msgstr "Wenn sie eine Notiz löschen ist diese unwiderbringlich verloren."
 
 #: ../src/note.c:341
 #, c-format
@@ -137,3 +125,23 @@ msgstr "Neue Notiz %i"
 #: ../src/note.c:344
 msgid "Describe your new note here."
 msgstr "Schreiben sie hier ihre neue Notiz."
+
+#: ../src/search_window.c:257 ../src/search_window.c:264
+msgid "Search All Notes"
+msgstr "Alle Notizen Durchsuchen"
+
+#: ../src/search_window.c:327 ../src/search_window.c:334
+msgid "Note"
+msgstr "Notiz"
+
+#: ../src/search_window.c:346 ../src/search_window.c:353
+msgid "Last Changed"
+msgstr "Zuletzt geändert"
+
+#: ../src/search_window.c:284
+"Sort By Title"
+msgstr "Nach Titel Sortieren"
+
+#: ../src/search_window.c:285
+"Sort By Date"
+msgstr "Nach Datum Sortieren"
