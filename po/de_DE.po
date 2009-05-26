@@ -139,9 +139,9 @@ msgid "Last Changed"
 msgstr "Zuletzt geändert"
 
 #: ../src/search_window.c:284
-"Sort By Title"
+msgid "Sort By Title"
 msgstr "Nach Titel Sortieren"
 
 #: ../src/search_window.c:285
-"Sort By Date"
+msgid "Sort By Date"
 msgstr "Nach Datum Sortieren"

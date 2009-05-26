@@ -138,9 +138,9 @@ msgid "Describe your new note here."
 msgstr ""
 
 #: ../src/search_window.c:284
-"Sort By Title"
+msgid "Sort By Title"
 msgstr ""
 
 #: ../src/search_window.c:285
-"Sort By Date"
+msgid "Sort By Date"
 msgstr ""
