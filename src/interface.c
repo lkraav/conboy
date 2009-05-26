@@ -262,7 +262,6 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_action_group_add_action_with_accel(action_group, action_new,       "<Ctrl>n");
 	gtk_action_group_add_action_with_accel(action_group, action_quit,      "<Ctrl>q");
 
-
 	gtk_action_set_accel_group(action_bold,      accel_group);
 	gtk_action_set_accel_group(action_italic,    accel_group);
 	gtk_action_set_accel_group(action_fixed,     accel_group);
@@ -402,8 +401,10 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_new);
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_text_style);
+	/*
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_find);
+	*/
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_quit);
 
