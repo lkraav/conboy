@@ -191,9 +191,21 @@ gboolean on_key_pressed(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 }
 
 static
-void on_row_inserted (GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data)
+void on_sort_by_date_changed(GtkToggleButton *button, GtkTreeSortable *sortable)
 {
-	g_printerr("on_row_inserted() called \n");
+	if (gtk_toggle_button_get_active(button)) {
+		gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(sortable), CHANGE_DATE_COLUMN, GTK_SORT_DESCENDING);
+		/*gtk_tree_sortable_sort_column_changed(sortable);*/
+	}
+}
+
+static
+void on_sort_by_title_changed(GtkToggleButton *button, GtkTreeSortable *sortable)
+{
+	if (gtk_toggle_button_get_active(button)) {
+		gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(sortable), TITLE_COLUMN, GTK_SORT_ASCENDING);
+		/*gtk_tree_sortable_sort_column_changed(sortable);*/
+	}
 }
 
 static
@@ -252,6 +264,8 @@ HildonWindow* search_window_create()
 	GtkWidget *clear_button;
 	GtkWidget *scrolledwindow;
 	GtkWidget *tree;
+	GtkWidget *button_sort_by_title;
+	GtkWidget *button_sort_by_date;
 	GtkTreeSelection *selection;
 	NoteListStore *store;
 	GtkTreeModel *filtered_store;
@@ -267,32 +281,23 @@ HildonWindow* search_window_create()
 #ifdef HILDON_HAS_APP_MENU
 	menu = hildon_app_menu_new();
 
-
-	GtkWidget *menu_item1 = gtk_radio_button_new_with_label(NULL, "Sort Alphabetically");
-	GtkWidget *menu_item2 = gtk_radio_button_new_with_label_from_widget(menu_item1, "Sort By Date");
-
 	/*
-	GtkWidget *menu_item3 = gtk_radio_button_new_with_label(NULL, "Sort By Date Descending");
-	GtkWidget *menu_item4 = gtk_radio_button_new_with_label_from_widget(menu_item3, "Sort By Date Ascending");
+	button_sort_by_title = gtk_radio_button_new_with_label(NULL, _("Sort By Title"));
+	button_sort_by_date = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(button_sort_by_title), _("Sort By Date"));
 	*/
-	/*
-	GtkWidget *menu_item1 = gtk_radio_button_new_with_label(NULL, "one");
-	GtkWidget *menu_item2 = gtk_radio_button_new_with_label_from_widget(menu_item1, "two");
+	button_sort_by_title = gtk_radio_button_new_with_label(NULL, _("Nach Titel Sortieren"));
+		button_sort_by_date = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(button_sort_by_title), _("Nach Datum Sortieren"));
 
-	GtkWidget *menu_item3 = gtk_radio_button_new_with_label(NULL, "three");
-	GtkWidget *menu_item4 = gtk_radio_button_new_with_label_from_widget(menu_item3, "four");
-	*/
+	/* Draw them as toggle buttons, not as radio buttons */
+	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(button_sort_by_title), FALSE);
+	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(button_sort_by_date), FALSE);
 
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button_sort_by_date), TRUE);
 
-	hildon_app_menu_add_filter(menu, menu_item1);
-	hildon_app_menu_add_filter(menu, menu_item2);
+	hildon_app_menu_add_filter(HILDON_APP_MENU(menu), GTK_BUTTON(button_sort_by_title));
+	hildon_app_menu_add_filter(HILDON_APP_MENU(menu), GTK_BUTTON(button_sort_by_date));
 
-	/*
-	hildon_app_menu_add_filter(menu, menu_item3);
-	hildon_app_menu_add_filter(menu, menu_item4);
-	*/
-
-	hildon_window_set_app_menu(win, menu);
+	hildon_window_set_app_menu(HILDON_WINDOW(win), HILDON_APP_MENU(menu));
 #endif
 
 	vbox = gtk_vbox_new(FALSE, 0);
@@ -344,9 +349,11 @@ HildonWindow* search_window_create()
 #ifdef HILDON_HAS_APP_MENU
 	g_printerr("NEW code executed \n");
 	tree = hildon_gtk_tree_view_new_with_model(HILDON_UI_MODE_NORMAL, GTK_TREE_MODEL(sorted_store)); /*HILDON_UI_MODE_NORMAL, HILDON_UI_MODE_EDIT */
+	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree), FALSE);
 #else
 	g_printerr("OLD code executed \n");
 	tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(sorted_store));
+	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree), TRUE);
 #endif
 	g_object_unref(sorted_store);
 	g_object_unref(filtered_store);
@@ -354,7 +361,7 @@ HildonWindow* search_window_create()
 
 	gtk_widget_show(tree);
 	gtk_container_add(GTK_CONTAINER(scrolledwindow), tree);
-	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree), TRUE);
+
 	gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(tree), TRUE);
 
 	/* TREE SELECTION OBJECT */
@@ -390,22 +397,22 @@ HildonWindow* search_window_create()
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree), change_date_column);
 	/* Sort the using the CHANGE_DATE column */
 	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(sorted_store), CHANGE_DATE_COLUMN, GTK_SORT_DESCENDING);
-	gtk_tree_sortable_sort_column_changed(GTK_TREE_SORTABLE(sorted_store));
+	/*gtk_tree_sortable_sort_column_changed(GTK_TREE_SORTABLE(sorted_store)); */ /* TODO: Test if it's needed */
 
 	/* CONNECT SIGNALS */
 	g_signal_connect(search_field, "changed", G_CALLBACK(on_search_string_changed), filtered_store);
 	g_signal_connect(clear_button, "clicked", G_CALLBACK(on_clear_button_clicked), search_field);
-	/* g_signal_connect(selection, "changed", G_CALLBACK(on_selection_changed), NULL); */
 	g_signal_connect(tree, "row-activated", G_CALLBACK(on_row_activated), NULL);
-	/*g_signal_connect(tree, "hildon-row-tapped", G_CALLBACK(on_row_tapped), NULL);*/
 
 	g_signal_connect(win, "map-event", G_CALLBACK(on_window_visible), search_field);
 	g_signal_connect(win, "delete-event", G_CALLBACK(gtk_widget_hide_on_delete), NULL);
 	g_signal_connect(win, "key_press_event", G_CALLBACK(on_hardware_key_pressed), win);
 	g_signal_connect(tree, "key_press_event", G_CALLBACK(on_key_pressed), search_field);
 
-	/* TEST */
-	g_signal_connect(store, "row-inserted", G_CALLBACK(on_row_inserted), NULL);
+#ifdef HILDON_HAS_APP_MENU
+	g_signal_connect(button_sort_by_title, "toggled", G_CALLBACK(on_sort_by_title_changed), sorted_store);
+	g_signal_connect(button_sort_by_date, "toggled", G_CALLBACK(on_sort_by_date_changed), sorted_store);
+#endif
 
 	app_data = app_data_get();
 	app_data->note_store = store;
