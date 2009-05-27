@@ -9,6 +9,8 @@ conboy (0.4.4) stable; urgency=low
   * Changed search window to be more Fremantle conform
   * Keyboard shortcuts now working with Fremantle
 
+ -- Cornelius Hald <hald@icandy.de>  Tue, 26 May 2009 17:12:11 +0200
+
 conboy (0.4.3) stable; urgency=low
 
   * Added Fremantle specific code for finger friendly UI
