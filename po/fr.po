@@ -1,0 +1,146 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR fpp, 2009.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-21 09:24+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: fpp <talk.maemo.org>\n"
+"Language-Team: FRENCH <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/interface.c:201 ../src/interface.c:303 ../src/interface.c:341
+msgid "Bold"
+msgstr "Gras"
+
+#: ../src/interface.c:202
+msgid "Bullets"
+msgstr "Puces"
+
+#: ../src/interface.c:203
+msgid "Decrease Indent"
+msgstr "Réduire le retrait"
+
+#: ../src/interface.c:204
+msgid "Delete Note"
+msgstr "Supprimer la note"
+
+#: ../src/interface.c:205 ../src/interface.c:307 ../src/interface.c:345
+msgid "Fixed Width"
+msgstr "Largeur fixe"
+
+#: ../src/interface.c:206 ../src/interface.c:306 ../src/interface.c:344
+msgid "Highlight"
+msgstr "Surligner"
+
+#: ../src/interface.c:207
+msgid "Increase Indent"
+msgstr "Mettre en retrait"
+
+#: ../src/interface.c:208
+msgid "Link"
+msgstr "Lien"
+
+#: ../src/interface.c:209
+msgid "New Note"
+msgstr "Nouvelle note"
+
+#: ../src/interface.c:210
+msgid "Open"
+msgstr "Ouvrir"
+
+#: ../src/interface.c:211
+msgid "Close All Notes"
+msgstr "Fermer toutes les notes"
+
+#: ../src/interface.c:212 ../src/interface.c:304 ../src/interface.c:342
+msgid "Italic"
+msgstr "Italique"
+
+#: ../src/interface.c:213 ../src/interface.c:305 ../src/interface.c:343
+msgid "Strikeout"
+msgstr "Barré"
+
+#: ../src/interface.c:214
+msgid "Style"
+msgstr "Style"
+
+#: ../src/interface.c:215
+msgid "Zoom In"
+msgstr "Agrandir"
+
+#: ../src/interface.c:216
+msgid "Zoom Out"
+msgstr "Réduire"
+
+#: ../src/interface.c:217
+msgid "Find In Note"
+msgstr "Chercher dans la note"
+
+#: ../src/interface.c:219 ../src/interface.c:308 ../src/interface.c:346
+msgid "Small"
+msgstr "Petit"
+
+#: ../src/interface.c:220
+msgid "Normal"
+msgstr "Normal"
+
+#: ../src/interface.c:221 ../src/interface.c:309 ../src/interface.c:347
+msgid "Large"
+msgstr "Grand"
+
+#: ../src/interface.c:222 ../src/interface.c:310 ../src/interface.c:348
+msgid "Huge"
+msgstr "Très grand"
+
+#: ../src/interface.c:397
+msgid "Text Style"
+msgstr "Style de texte"
+
+#: ../src/interface.c:466 ../src/search_window.c:267
+msgid "Search:"
+msgstr "Recherche :"
+
+#: ../src/search_window.c:257
+msgid "Search All Notes"
+msgstr "Chercher dans toutes les notes"
+
+#: ../src/search_window.c:327
+msgid "Note"
+msgstr "Note"
+
+#: ../src/search_window.c:346
+msgid "Last Changed"
+msgstr "Dernière modification"
+
+#: ../src/callbacks.c:590
+msgid "Really delete this note?"
+msgstr "Supprimer cette note ?"
+
+#: ../src/callbacks.c:592
+msgid "If you delete a note it is permanently lost."
+msgstr "La suppression d'une note est définitive."
+
+#: ../src/note.c:341
+#, c-format
+msgid "New Note %i"
+msgstr "Nouvelle note %i"
+
+#: ../src/note.c:344
+msgid "Describe your new note here."
+msgstr "Décrivez ici la nouvelle note"
+
+#: ../src/search_window.c:284
+msgid "Sort By Title"
+msgstr "Trier par titre"
+
+#: ../src/search_window.c:285
+msgid "Sort By Date"
+msgstr "Trier par date"
