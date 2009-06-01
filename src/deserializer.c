@@ -208,7 +208,7 @@ void handle_start_element(ParseContext *ctx, xmlTextReader *reader, Note *note)
 			push_state(ctx, STATE_CONTENT);
 			note->content_version = atof(xmlTextReaderGetAttribute(reader, BAD_CAST "version"));
 		} else {
-			g_printerr("ERROR: <text> may only contain <note-content>, not <%s>.", element_name);
+			g_printerr("ERROR: <text> may only contain <note-content>, not <%s>. \n", element_name);
 		}
 		break;
 	

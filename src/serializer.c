@@ -68,15 +68,15 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 	gchar** strings;
 	gchar *tag_name;
 	
-	tag_name = g_strdup(tag->name);
+	tag_name = tag->name;
 	
 	/* Ignore tags that start with "_". They are considered internal. */
-	if (g_ascii_strncasecmp(tag_name, "_", 1) == 0) {
+	if (strncmp(tag_name, "_", 1) == 0) {
 		return;
 	}
 	
 	/* Ignore <list> tags. */
-	if (g_ascii_strncasecmp(tag_name, "list", -1) == 0) {
+	if (strncmp(tag_name, "list", -1) == 0) {
 		list_active = TRUE;
 		return;
 	}
@@ -94,7 +94,7 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 	}
 	
 	/* If not a <list-item> tag, write it and return */
-	if (g_ascii_strncasecmp(tag_name, "list-item", 9) != 0) {
+	if (strncmp(tag_name, "list-item", 9) != 0) {
 		xmlTextWriterStartElement(writer, BAD_CAST tag_name);
 		return;
 	}
@@ -145,7 +145,6 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 	}
 	
 	depth = new_depth;
-	/*g_strfreev(strings);*/
 }
 
 /**
