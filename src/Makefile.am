@@ -1,5 +1,5 @@
 # Includes
-INCLUDES = $(HILDON_CFLAGS) $(OSSO_CFLAGS) $(HILDONDESKTOP_CFLAGS) $(GCONF_CFLAGS) $(XML2_CFLAGS)
+INCLUDES = $(HILDON_CFLAGS) $(OSSO_CFLAGS) $(HILDONDESKTOP_CFLAGS) $(GCONF_CFLAGS) $(XML2_CFLAGS) $(JSON_CFLAGS)
 
 # Binary
 bin_PROGRAMS = \
@@ -32,7 +32,9 @@ conboy_SOURCES = \
         note_linker.h \
         note_linker.c \
         app_data.h \
-        app_data.c
+        app_data.c \
+        json.h \
+        json.c
 
 #libconboy_applet_la_SOURCES = \
 #		conboy_applet.c \
@@ -48,7 +50,7 @@ conboy_SOURCES = \
 
 # LDADD
 conboy_LDADD = \
-        $(HILDON_LIBS) $(OSSO_LIBS) $(GCONF_LIBS) $(HILDONDESKTOP_LIBS) $(XML2_LIBS)
+        $(HILDON_LIBS) $(OSSO_LIBS) $(GCONF_LIBS) $(HILDONDESKTOP_LIBS) $(XML2_LIBS) $(JSON_LIBS)
 
 #libconboy_applet_la_LIBADD = \
 #		$(HILDONDESKTOP_LIBS)

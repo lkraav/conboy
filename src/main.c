@@ -52,6 +52,8 @@
 #include "note.h"
 #include "app_data.h"
 
+#include "json.h"
+
 #include "search_window.h"
 #include "note_list_store.h"
 
@@ -126,6 +128,8 @@ main (int argc, char *argv[])
 
   note_show(note);
 
+  print_note_as_json(note);
+  
   gtk_main();
 
   cleanup();

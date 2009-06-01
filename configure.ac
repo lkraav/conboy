@@ -38,6 +38,10 @@ PKG_CHECK_MODULES(XML2, libxml-2.0 >= 2.6.0)
 AC_SUBST(XML2_CFLAGS)
 AC_SUBST(XML2_LIBS)
 
+PKG_CHECK_MODULES(JSON, json-glib-1.0 >= 0.6)
+AC_SUBST(JSON_CFLAGS)
+AC_SUBST(JSON_LIBS)
+
 PKG_CHECK_MODULES(OSSOSETTINGS, osso-af-settings >= 0.8.4)
 
 # Application icon install directories
