@@ -52,6 +52,7 @@ typedef struct
 	GSList *state_stack;
 	GtkTextIter *iter;
 	gint depth;
+	double version;
 } ParseContext;
 
 static
@@ -154,7 +155,7 @@ handle_meta_data(gchar* tag_name, gchar* tag_content, Note *note)
 }
 
 static
-void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
+void handle_start_element(ParseContext *ctx, xmlTextReader *reader, Note *note)
 {
 	gchar *element_name = xmlTextReaderConstName(reader);
 	
@@ -162,6 +163,7 @@ void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 	case STATE_START:
 		if (ELEMENT_IS("note")) {
 			push_state(ctx, STATE_NOTE);
+			note->version = atof(xmlTextReaderGetAttribute(reader, BAD_CAST "version"));
 		} else {
 			g_printerr("ERROR: The first element must be the <note> element.\n");
 		}
@@ -204,6 +206,7 @@ void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 	case STATE_TEXT:
 		if (ELEMENT_IS("note-content")) {
 			push_state(ctx, STATE_CONTENT);
+			note->content_version = atof(xmlTextReaderGetAttribute(reader, BAD_CAST "version"));
 		} else {
 			g_printerr("ERROR: <text> may only contain <note-content>, not <%s>.", element_name);
 		}
@@ -478,7 +481,7 @@ void process_note(ParseContext *ctx, xmlTextReader *reader, Note *note)
 	
 	switch(type) {
 	case XML_ELEMENT_NODE:
-		handle_start_element(ctx, reader);
+		handle_start_element(ctx, reader, note);
 		break;
 	
 	case XML_ELEMENT_DECL:

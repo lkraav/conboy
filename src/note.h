@@ -67,7 +67,8 @@ typedef struct
   gint x;
   gint y;
   gboolean open_on_startup;
-  gchar *version;
+  double version;
+  double content_version;
 
   gchar *guid;
   GList *tags; /* Tags aka notebooks */

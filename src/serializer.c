@@ -23,6 +23,7 @@
 #include <libxml/encoding.h>
 #include <libxml/xmlwriter.h>
 #include <string.h>
+#include <glib/gprintf.h>
 
 #include "note.h"
 #include "metadata.h"
@@ -37,6 +38,7 @@ static
 void write_header(xmlTextWriter *writer, Note *note)
 {
 	int rc;
+	gchar version[20];
 	
 	/* Enable indentation */
 	rc = xmlTextWriterSetIndent(writer, TRUE);
@@ -46,7 +48,9 @@ void write_header(xmlTextWriter *writer, Note *note)
 	  
 	/* Start note element */
 	rc = xmlTextWriterStartElement(writer, BAD_CAST "note");
-	rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "version", BAD_CAST "0.3");
+	
+	g_sprintf(version, "%.1f", note->version);
+	rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "version", BAD_CAST &version);
 	rc = xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xmlns", BAD_CAST "link", NULL, BAD_CAST "http://beatniksoftware.com/tomboy/link");
 	rc = xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xmlns", BAD_CAST "size", NULL, BAD_CAST "http://beatniksoftware.com/tomboy/size");
 	rc = xmlTextWriterWriteAttributeNS(writer, NULL, BAD_CAST "xmlns", NULL, BAD_CAST "http://beatniksoftware.com/tomboy");
@@ -230,6 +234,7 @@ void write_content(xmlTextWriter *writer, Note *note)
 	GtkTextIter old_iter, iter;
 	gchar *text;
 	GSList *start_tags = NULL, *end_tags = NULL;
+	char version[20];
 	
 	/* Start text element */
 	rc = xmlTextWriterStartElement(writer, BAD_CAST "text");
@@ -240,7 +245,8 @@ void write_content(xmlTextWriter *writer, Note *note)
 	  
 	/* Start note-content element */
 	rc = xmlTextWriterStartElement(writer, BAD_CAST "note-content");
-	rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "version", BAD_CAST "0.1");
+	g_sprintf(version, "%.1f", note->content_version);
+	rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "version", BAD_CAST &version);
 	
 	/*****************************************************/
 	

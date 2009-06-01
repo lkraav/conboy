@@ -55,7 +55,6 @@ void note_free(Note *note)
 	g_free(note->ui);
 	g_free(note->filename);
 	g_free(note->title);
-	g_free(note->version);
 	g_free(note->guid);
 	g_slist_free(note->active_tags);
 	g_free(note);
