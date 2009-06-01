@@ -28,9 +28,11 @@
 </target>
 </buildTargets>
 </storageModule>
+
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+<storageModule moduleId="scannerConfiguration"/>
 <storageModule moduleId="org.eclipse.cdt.core.pathentry">
 <pathentry kind="src" path=""/>
-<pathentry kind="out" path=""/>
 <pathentry include="/scratchbox/users/conny/targets/DIABLO_X86/usr/include/hildon-1" kind="inc" path="" system="true"/>
 <pathentry include="/scratchbox/users/conny/targets/DIABLO_X86/usr/include/gtk-2.0" kind="inc" path="" system="true"/>
 <pathentry include="/scratchbox/users/conny/targets/DIABLO_X86/usr/lib/gtk-2.0/include" kind="inc" path="" system="true"/>
@@ -41,7 +43,6 @@
 <pathentry include="/scratchbox/users/conny/targets/DIABLO_X86/usr/lib/glib-2.0/include" kind="inc" path="" system="true"/>
 <pathentry include="/scratchbox/users/conny/targets/DIABLO_X86/usr/include/freetype2" kind="inc" path="" system="true"/>
 <pathentry include="/scratchbox/users/conny/targets/DIABLO_X86/usr/include/libpng12" kind="inc" path="" system="true"/>
-<pathentry kind="mac" name="MAEMO_CHANGES" path="" value=""/>
 <pathentry include="/scratchbox/users/conny/targets/DIABLO_X86/usr/include/hildon-fm-2" kind="inc" path="" system="true"/>
 <pathentry include="/scratchbox/users/conny/targets/DIABLO_X86/usr/include/gnome-vfs-2.0" kind="inc" path="" system="true"/>
 <pathentry include="/scratchbox/users/conny/targets/DIABLO_X86/usr/lib/gnome-vfs-2.0/include" kind="inc" path="" system="true"/>
@@ -51,6 +52,8 @@
 <pathentry include="/scratchbox/users/conny/targets/DIABLO_X86/usr/include/hildon-help" kind="inc" path="" system="true"/>
 <pathentry include="/scratchbox/users/conny/targets/DIABLO_X86/usr/include" kind="inc" path="" system="true"/>
 <pathentry include="/scratchbox/users/conny/scratchbox/compilers/cs2005q3.2-glibc-i386/usr/include" kind="inc" path="" system="true"/>
+<pathentry include="/scratchbox/users/conny/targets/DIABLO_X86/usr/local/include/json-glib-1.0" kind="inc" path="" system="true"/>
+<pathentry kind="out" path=""/>
 </storageModule>
 </cconfiguration>
 </storageModule>
