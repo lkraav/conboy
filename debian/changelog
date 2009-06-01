@@ -1,3 +1,10 @@
+conboy (0.4.9) stable; urgency=low
+
+  * Added french translation. Thanks to fpp.
+  * Added support for JSON serialization
+  * Note version and note content version are no longer hardcoded
+  * 
+
 conboy (0.4.4) stable; urgency=low
 
   * Added support for maemo backup
