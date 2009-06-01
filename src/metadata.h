@@ -42,9 +42,9 @@ const gchar* get_time_in_seconds_as_iso8601(time_t time_in_seconds);
 
 time_t get_iso8601_time_in_seconds(const gchar *time_string);
 
-const gchar* note_get_new_filename(void);
+const gchar* note_get_new_filename(const gchar *uuid);
 
-const gchar* get_uuid(void);
+gchar* get_uuid(void);
 
 
 #endif /* METADATA_H */

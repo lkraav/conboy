@@ -149,12 +149,10 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
  */
 static void write_end_element(GtkTextTag *tag, xmlTextWriter *writer)
 {
-	gchar *tag_name;
-	
-	tag_name = g_strdup(tag->name);
+	gchar *tag_name = tag->name;
 	
 	/* Ignore tags that start with "_". They are considered internal. */
-	if (g_ascii_strncasecmp(tag_name, "_", 1) == 0) {
+	if (strncmp(tag_name, "_", 1) == 0) {
 		return;
 	}
 	
@@ -165,7 +163,7 @@ static void write_end_element(GtkTextTag *tag, xmlTextWriter *writer)
 	}
 	
 	/* If the list completely ends, reset the depth */
-	if (g_ascii_strncasecmp(tag_name, "list", -1) == 0) {
+	if (strncmp(tag_name, "list", -1) == 0) {
 		
 		/* Close all open <list-item> and <list> tags */
 		while (depth > 0) {
@@ -181,13 +179,11 @@ static void write_end_element(GtkTextTag *tag, xmlTextWriter *writer)
 	}
 	
 	/* If it is not a <list-item> tag, just close it and return */
-	if (g_ascii_strncasecmp(tag_name, "list-item", 9) != 0) {
+	if (strncmp(tag_name, "list-item", 9) != 0) {
 		xmlTextWriterEndElement(writer);
 		return;
 	}
 	
-	
-	/*g_free(tag_name);*/
 }
 
 /**
@@ -215,11 +211,14 @@ static gint sort_by_prio(GtkTextTag *tag1, GtkTextTag *tag2)
 	}
 	
 	/* If the priority of tag1 is higher is should be sorted to the left */
+	/*
 	if (tag1->priority > tag2->priority) {
 		return -1;
 	} else {
 		return 1;
 	}
+	*/
+	return (tag2->priority - tag1->priority);
 }
 
 static
@@ -304,6 +303,7 @@ static
 void write_footer(xmlTextWriter *writer, Note *note) 
 {
 	int rc;
+	GList *tags;
 	
 	/* Enable indentation */
 	rc = xmlTextWriterSetIndent(writer, TRUE);
@@ -317,6 +317,19 @@ void write_footer(xmlTextWriter *writer, Note *note)
 	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "height", "%i", note->height);
 	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "x", "%i", note->x);
 	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "y", "%i", note->y);
+	
+	/* Write tags */
+	tags = note->tags;
+	if (tags != NULL) {
+		rc = xmlTextWriterStartElement(writer, BAD_CAST "tags");
+		while (tags != NULL) {
+			gchar *tag = tags->data;
+			rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "tag", "%s", tag);
+			tags = tags->next;
+		}
+		rc = xmlTextWriterEndElement(writer);
+	}
+	
 	if (note->open_on_startup == TRUE) {
 		rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "open-on-startup", "True");
 	} else {

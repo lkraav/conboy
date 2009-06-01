@@ -58,7 +58,7 @@ const gchar* get_bullet_by_depth_tag(GtkTextTag *tag) {
 }
 
 
-const gchar* get_uuid()
+gchar* get_uuid()
 {	
 	gchar *content;
 	g_file_get_contents("/proc/sys/kernel/random/uuid", &content, NULL, NULL);
@@ -66,10 +66,10 @@ const gchar* get_uuid()
 	return g_strdup(content);
 }
 
-const gchar* note_get_new_filename()
+const gchar* note_get_new_filename(const gchar *uuid)
 {
 	AppData *app_data = app_data_get();
-	return g_strconcat(app_data->user_path, get_uuid(), ".note", NULL);
+	return g_strconcat(app_data->user_path, uuid, ".note", NULL);
 }
 
 

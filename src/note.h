@@ -69,7 +69,11 @@ typedef struct
   gboolean open_on_startup;
   gchar *version;
 
-  GSList *active_tags;
+  gchar *guid;
+  GList *tags; /* Tags aka notebooks */
+  
+  GSList *active_tags; /* TODO: This shouldn't really be part of this structure, more UI, because it is never written to disk */
+  
 
 } Note;
 
@@ -111,5 +115,7 @@ void note_remove_active_tag(Note *note, GtkTextTag *tag);
 void note_add_active_tag_by_name(Note *note, const gchar *tag_name);
 
 void note_remove_active_tag_by_name(Note *note, const gchar *tag_name);
+
+void note_add_tag(Note *note, gchar *tag);
 
 #endif /* NOTE_H */

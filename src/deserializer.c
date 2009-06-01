@@ -139,9 +139,21 @@ handle_meta_data(gchar* tag_name, gchar* tag_content, Note *note)
 		}
 		return;
 	}
+	
+	/*
+	if (strcmp(tag_name, "tags") == 0) {
+		g_printerr("Found <tags> tag. Txt: %s \n", tag_content);
+		push_tag(ctx, "tags");
+	}
+	*/
+	if (strcmp(tag_name, "tag") == 0) {
+		g_printerr("Found <tag> tag. Txt: %s \n", tag_content);
+		note_add_tag(note, g_strdup(tag_content));
+	}
+	
 }
 
-
+static
 void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 {
 	gchar *element_name = xmlTextReaderConstName(reader);
@@ -162,6 +174,9 @@ void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 		else if (ELEMENT_IS("text")) {
 			push_state(ctx, STATE_TEXT);
 		}
+		else if (ELEMENT_IS("tags")) {
+			/* Do nothing. The <tags> tag is only a container */
+		}
 		else if (ELEMENT_IS("last-change-date") ||
 				 ELEMENT_IS("last-metadata-change-date") ||
 				 ELEMENT_IS("create-date") ||
@@ -170,7 +185,8 @@ void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 				 ELEMENT_IS("height") ||
 				 ELEMENT_IS("x") ||
 				 ELEMENT_IS("y") ||
-				 ELEMENT_IS("open-on-startup")
+				 ELEMENT_IS("open-on-startup") ||
+				 ELEMENT_IS("tag")
 				 )
 			{
 			push_tag(ctx, element_name);
@@ -282,6 +298,8 @@ void handle_end_element(ParseContext *ctx, xmlTextReader *reader) {
 		if (ELEMENT_IS("note")) {
 			pop_state(ctx);
 			g_assert(peek_state(ctx) == STATE_START);
+		} else if (ELEMENT_IS("tags")) {
+			/* Do nothing - <tags> is only a container */
 		} else {
 			g_printerr("Error: Expecting </note>, not </%s>.", element_name);
 		}
@@ -294,6 +312,7 @@ void handle_end_element(ParseContext *ctx, xmlTextReader *reader) {
 
 }
 
+static
 GtkTextTag* get_depth_tag(ParseContext *ctx, GtkTextBuffer *buffer, gchar* name) {
 	
 	GtkTextTag *tag;
@@ -322,7 +341,7 @@ GtkTextTag* get_depth_tag(ParseContext *ctx, GtkTextBuffer *buffer, gchar* name)
 	return tag;
 }
 
-
+static
 void handle_text_element(ParseContext *ctx, xmlTextReader *reader, Note *note)
 {
 	gchar *text = xmlTextReaderConstValue(reader);
@@ -420,7 +439,7 @@ void handle_text_element(ParseContext *ctx, xmlTextReader *reader, Note *note)
 		
 		
 	case STATE_METADATA:
-		handle_meta_data(peek_tag(ctx), g_strdup(text), note);
+		handle_meta_data(peek_tag(ctx), text, note);
 		break;
 		
 	case STATE_NOTE:

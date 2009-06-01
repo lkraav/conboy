@@ -42,8 +42,6 @@ static void populate_note_store(NoteListStore *store, const gchar *user_path) {
 	
 	while ((filename = g_dir_read_name(dir)) != NULL) {
 		if (g_str_has_suffix(filename, ".note")) {
-			gchar *full_filename;
-			
 			/* Create new note and append to list store */
 			note = note_create_new();
 			note_list_store_add(store, note, &iter);
@@ -51,10 +49,11 @@ static void populate_note_store(NoteListStore *store, const gchar *user_path) {
 			/* Save filename in note */
 			note->filename = g_strconcat(user_path, filename, NULL);
 			
+			/* Save GUID */
+			note->guid = g_strndup(filename, g_utf8_strlen(filename, -1) - 5);
+			
 			/* Open file and read out title. Save title in note */
-			full_filename = g_strconcat(user_path, filename, NULL);
-			file = g_mapped_file_new(full_filename, FALSE, NULL);
-			g_free(full_filename);
+			file = g_mapped_file_new(note->filename, FALSE, NULL);
 			content = g_mapped_file_get_contents(file);			
 			
 			/* TODO: Maybe use real xml parser for this. But I think this way is faster */

@@ -42,6 +42,7 @@ Note* note_create_new()
 	UserInterface *ui = g_new0(UserInterface, 1);
 	note->ui = ui;
 	note->active_tags = NULL;
+	note->tags = NULL;
 	note->create_date = 0;
 	note->last_change_date = 0;
 	note->last_metadata_change_date = 0;
@@ -55,6 +56,7 @@ void note_free(Note *note)
 	g_free(note->filename);
 	g_free(note->title);
 	g_free(note->version);
+	g_free(note->guid);
 	g_slist_free(note->active_tags);
 	g_free(note);
 	note = NULL;
@@ -352,7 +354,10 @@ void note_show_new(Note *note)
 	const gchar *content;
 	gint notes_count;
 
-	note->filename = (gchar*)note_get_new_filename();
+	/* TODO: Creating a new note should happen in note_create_new(). Not here. */
+	/* TODO: Only save guid in note and generate filename on-the-fly when needed. */
+	note->guid = get_uuid();
+	note->filename = (gchar*)note_get_new_filename(note->guid);
 
 	if (note->title == NULL) {
 		notes_count = note_list_store_get_length(app_data->note_store);
@@ -438,5 +443,12 @@ void note_remove_active_tag(Note *note, GtkTextTag *tag)
 	}
 }
 
+/**
+ * Adds a tag (e.g. notebook) to a note
+ */
+void note_add_tag(Note *note, gchar *tag)
+{
+	note->tags = g_list_prepend(note->tags, tag);
+}
 
 
