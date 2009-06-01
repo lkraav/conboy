@@ -43,6 +43,11 @@ JsonNode* get_json_object_from_note(Note *note)
 	json_node_set_string(node, note->title);
 	json_object_add_member(obj, "title", node);
 	
+	/* TODO:
+	 * - Implement note_get_content() which returns the content XML
+	 * - It should read note->content, and if it is NULL, read it from disk
+	 * - Normal saving should update note->content
+	 */
 	/*
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_string(node, note->content);
@@ -125,6 +130,9 @@ void print_note_as_json(Note *note)
 }
 
 
+/* TODO:
+ * Deserialize from JSON.
+ */
 Note* get_note_from_json_object(JsonObject *json)
 {
 	return NULL;
