@@ -31,6 +31,7 @@
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
 #include <gdk/gdkkeysyms.h>
+#include <glib.h>
 #include <math.h>
 
 #include "callbacks.h"
@@ -1063,7 +1064,6 @@ gboolean tag_is_depth_tag(GtkTextTag *tag)
 	}
 	return (strncmp(tag->name, "depth", 5) == 0);
 }
-
 
 gint tag_get_depth(GtkTextTag *tag)
 {
