@@ -140,6 +140,7 @@ void print_note_as_json(Note *note)
 
 /* 
  * Deserialize from JSON.
+ * TODO: Save api-ref and href somewhere
  * TODO: Add error checking. The passed in JsonNode could be something
  * completly unexpected.
  * TODO: Check for memory leaks
@@ -150,6 +151,15 @@ Note* get_note_from_json_object(JsonNode *node)
 	GList *tags;
 	Note *note = note_create_new();
 	JsonObject *obj = json_node_get_object(node);
+	
+	/*
+	member = json_object_get_member(obj, "api-ref");
+	save_some_where;
+	
+	member = json_object_get_member(obj, "href");
+	save_some_where;
+	*/
+	
 	
 	member = json_object_get_member(obj, JSON_GUID);
 	note->guid = (gchar*)json_node_get_string(member);
