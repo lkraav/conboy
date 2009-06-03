@@ -2,7 +2,8 @@ Source: conboy
 Section: user/utilities
 Priority: optional
 Maintainer: Cornelius Hald <hald@icandy.de>
-Build-Depends: debhelper (>= 4.0.0), intltool, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, osso-af-settings
+Depends: libjson-glib (>= 0.6.0)
+Build-Depends: debhelper (>= 4.0.0), intltool, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings
 Standards-Version: 3.6.0
 
 Package: conboy

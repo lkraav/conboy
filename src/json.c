@@ -19,6 +19,18 @@
 #include "json.h"
 #include "metadata.h"
 
+#define JSON_GUID "guid"
+#define JSON_TITLE "title"
+#define JSON_NOTE_CONTENT "note-content"
+#define JSON_NOTE_CONTENT_VERSION "note-content-version"
+#define JSON_LAST_CHANGE_DATE "last-change-date"
+#define JSON_LAST_META_DATA_CHANGE_DATE "last-meta-data-change-date"
+#define JSON_CREATE_DATE "create-date"
+#define JSON_OPEN_ON_STARTUP "open-on-startup"
+#define JSON_PINNED "pinned"
+#define JSON_TAGS "tags"
+
+
 JsonNode* get_json_object_from_note(Note *note)
 {
 	JsonNode *root;
@@ -36,12 +48,12 @@ JsonNode* get_json_object_from_note(Note *note)
 	
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_string(node, note->guid);
-	json_object_add_member(obj, "guid", node);
+	json_object_add_member(obj, JSON_GUID, node);
 	
 	
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_string(node, note->title);
-	json_object_add_member(obj, "title", node);
+	json_object_add_member(obj, JSON_TITLE, node);
 	
 	/* TODO:
 	 * - Implement note_get_content() which returns the content XML
@@ -51,35 +63,34 @@ JsonNode* get_json_object_from_note(Note *note)
 	/*
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_string(node, note->content);
-	json_object_add_member(obj, "note-content", node);
+	json_object_add_member(obj, JSON_NOTE_CONTENT, node);
 	*/
 	
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_double(node, note->content_version);
-	json_object_add_member(obj, "note-content-version", node);
+	json_object_add_member(obj, JSON_NOTE_CONTENT_VERSION, node);
 	
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_string(node, get_time_in_seconds_as_iso8601(note->last_change_date));
-	json_object_add_member(obj, "last-change-date", node);
+	json_object_add_member(obj, JSON_LAST_CHANGE_DATE, node);
 	
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_string(node, get_time_in_seconds_as_iso8601(note->last_metadata_change_date));
-	json_object_add_member(obj, "last-meta-data-change-date", node);
+	json_object_add_member(obj, JSON_LAST_META_DATA_CHANGE_DATE, node);
 	
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_string(node, get_time_in_seconds_as_iso8601(note->create_date));
-	json_object_add_member(obj, "create-date", node);
+	json_object_add_member(obj, JSON_CREATE_DATE, node);
 	
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_boolean(node, note->open_on_startup);
-	json_object_add_member(obj, "open-on-startup", node);
+	json_object_add_member(obj, JSON_OPEN_ON_STARTUP, node);
 	
 	/*
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_boolean(node, note->pinned);
-	json_object_add_member(obj, "pinned", node);
+	json_object_add_member(obj, JSON_PINNED, node);
 	*/
-	
 	
 	if (note->tags != NULL) {
 		
@@ -98,11 +109,8 @@ JsonNode* get_json_object_from_note(Note *note)
 		
 		node = json_node_new(JSON_NODE_ARRAY);
 		json_node_take_array(node, array);
-		json_object_add_member(obj, "tags", node);
+		json_object_add_member(obj, JSON_TAGS, node);
 	}
-	
-	
-	
 	
 	json_node_take_object(root, obj);
 	
@@ -130,10 +138,64 @@ void print_note_as_json(Note *note)
 }
 
 
-/* TODO:
+/* 
  * Deserialize from JSON.
+ * TODO: Add error checking. The passed in JsonNode could be something
+ * completly unexpected.
+ * TODO: Check for memory leaks
  */
-Note* get_note_from_json_object(JsonObject *json)
+Note* get_note_from_json_object(JsonNode *node)
 {
-	return NULL;
+	JsonNode *member;
+	GList *tags;
+	Note *note = note_create_new();
+	JsonObject *obj = json_node_get_object(node);
+	
+	member = json_object_get_member(obj, JSON_GUID);
+	note->guid = (gchar*)json_node_get_string(member);
+	
+	member = json_object_get_member(obj, JSON_TITLE);
+	note->title = (gchar*)json_node_get_string(member);
+	
+	/*
+	member = json_object_get_member(obj, JSON_NOTE_CONTENT);
+	note->note_content = json_node_get_string(member);
+	*/
+	
+	member = json_object_get_member(obj, JSON_NOTE_CONTENT_VERSION);
+	note->content_version = json_node_get_double(member);
+	
+	member = json_object_get_member(obj, JSON_LAST_CHANGE_DATE);
+	note->last_change_date = get_iso8601_time_in_seconds(json_node_get_string(member));
+	
+	member = json_object_get_member(obj, JSON_LAST_META_DATA_CHANGE_DATE);
+	note->last_metadata_change_date = get_iso8601_time_in_seconds(json_node_get_string(member));
+	
+	member = json_object_get_member(obj, JSON_CREATE_DATE);
+	note->create_date = get_iso8601_time_in_seconds(json_node_get_string(member));
+	
+	member = json_object_get_member(obj, JSON_OPEN_ON_STARTUP);
+	note->open_on_startup = json_node_get_boolean(member);
+	
+	/*
+	member = json_object_get_member(obj, JSON_PINNED);
+	note->pinned = json_node_get_boolean(member);
+	*/
+	
+	member = json_object_get_member(obj, JSON_TAGS);
+	if (member != NULL) {
+		tags = json_array_get_elements(json_node_get_array(member));
+		while (tags != NULL) {
+			JsonNode *node = (JsonNode*)tags->data;
+			note_add_tag(note, (gchar*)json_node_get_string(node));
+			tags = tags->next;
+		}
+		g_list_free(tags);
+	}
+	
+	/* Currently not specified for the JSON format. So we set it here. */
+	note->version = 0.3;
+	
+	return note;
+
 }

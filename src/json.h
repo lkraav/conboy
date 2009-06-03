@@ -23,7 +23,7 @@
 #include "note.h"
 
 JsonNode* get_json_object_from_note(Note *note);
-Note* get_note_from_json_object(JsonObject *json);
+Note* get_note_from_json_object(JsonNode *node);
 void print_note_as_json(Note *note);
 
 

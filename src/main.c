@@ -127,8 +127,24 @@ main (int argc, char *argv[])
   }
 
   note_show(note);
-
+  
+  /*******/
   print_note_as_json(note);
+  JsonNode *node = get_json_object_from_note(note);
+  Note *xnote = get_note_from_json_object(node);
+  g_printerr("### %s \n", xnote->guid);
+  g_printerr("### %s \n", xnote->title);
+  g_printerr("### %f \n", xnote->content_version);
+  g_printerr("### %f \n", xnote->version);
+  g_printerr("### %i \n", xnote->last_change_date);
+  
+  GList *tags = note->tags;
+  while (tags != NULL) {
+	  g_printerr("TAG %s \n", (gchar*)tags->data);
+	  tags = tags->next;
+  }
+  
+  /*********/
   
   gtk_main();
 
