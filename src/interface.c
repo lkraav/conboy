@@ -15,9 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
+#include "localisation.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -43,29 +41,6 @@
 #include "interface.h"
 #include "app_data.h"
 
-#define _(String)gettext(String)
-/*
-#define ACCEL_PATH_ROOT            "<NOTE_WINDOW>"
-#define ACCEL_PATH_QUIT            ACCEL_PATH_ROOT"/Quit"
-#define ACCEL_PATH_NEW             ACCEL_PATH_ROOT"/New"
-
-#define ACCEL_PATH_STYLE           ACCEL_PATH_ROOT"/Style"
-#define ACCEL_PATH_STYLE_BOLD      ACCEL_PATH_STYLE"/Bold"
-#define ACCEL_PATH_STYLE_ITALIC    ACCEL_PATH_STYLE"/Italic"
-#define ACCEL_PATH_STYLE_FIXED     ACCEL_PATH_STYLE"/Fixed"
-#define ACCEL_PATH_STYLE_STRIKE    ACCEL_PATH_STYLE"/Strike"
-#define ACCEL_PATH_STYLE_HIGHLIGHT ACCEL_PATH_STYLE"/Highlight"
-#define ACCEL_PATH_FIND            ACCEL_PATH_ROOT"/Find"
-*/
-
-/*
-static void set_tool_button_icon_by_name(GtkToolButton *button, const gchar *icon_name)
-{
-	GtkWidget *image;
-	image = gtk_image_new_from_icon_name(icon_name, GTK_ICON_SIZE_SMALL_TOOLBAR);
-	gtk_tool_button_set_icon_widget(button, image);
-}
-*/
 
 static void initialize_tags(GtkTextBuffer *buffer) {
 	/*

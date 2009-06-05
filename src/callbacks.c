@@ -16,10 +16,7 @@
  * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
-
+#include "localisation.h"
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,8 +40,6 @@
 #include "search_window.h"
 #include "note_linker.h"
 #include "app_data.h"
-
-#define _(String)gettext(String)
 
 
 /* Private. TODO: Move to some public file */

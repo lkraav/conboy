@@ -1,9 +1,12 @@
-conboy (0.4.9) stable; urgency=low
+conboy (0.4.5) stable; urgency=low
 
+  * Added support for tags. Tags aka Notebooks are now preserved.
   * Added french translation. Thanks to fpp.
-  * Added support for JSON serialization
-  * Note version and note content version are no longer hardcoded
-  * 
+  * Added support for JSON serialization.
+  * Note version and note content version are no longer hardcoded.
+  * Added support for JSON deserialization.
+ 
+ -- Cornelius Hald <hald@icandy.de>  Mo, 1 Jun 2009 17:44:12 +0200 
 
 conboy (0.4.4) stable; urgency=low
 

@@ -11,6 +11,7 @@ bin_PROGRAMS = \
 
 # Sources
 conboy_SOURCES = \
+        localisation.h \
         main.c \
         interface.h \
         interface.c \
