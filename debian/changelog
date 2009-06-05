@@ -6,7 +6,7 @@ conboy (0.4.5) stable; urgency=low
   * Note version and note content version are no longer hardcoded.
   * Added support for JSON deserialization.
  
- -- Cornelius Hald <hald@icandy.de>  Mo, 1 Jun 2009 17:44:12 +0200 
+ -- Cornelius Hald <hald@icandy.de>  Mo, 5 Jun 2009 17:41:12 +0200 
 
 conboy (0.4.4) stable; urgency=low
 
