@@ -165,6 +165,7 @@ void note_save(Note *note)
 		return;
 	}
 	g_free(content);
+	
 
 	/* If buffer is not dirty, don't save */
 	if (!gtk_text_buffer_get_modified(buffer)) {
@@ -207,9 +208,6 @@ void note_save(Note *note)
 	}
 
 	app_data = app_data_get();
-
-	/* Set start and end iterators for serialization */
-	gtk_text_buffer_get_bounds(buffer, &start, &end);
 
 	/* Start serialization */
 	serialize_note(note);
