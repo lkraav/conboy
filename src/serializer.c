@@ -28,6 +28,7 @@
 #include "note.h"
 #include "metadata.h"
 #include "serializer.h"
+#include "app_data.h"
 
 gint depth = 0;
 gint new_depth = 0;
@@ -348,13 +349,10 @@ void write_footer(xmlTextWriter *writer, Note *note)
 void serialize_note(Note *note)
 {
 	xmlTextWriter *writer;
+	AppData *app_data = app_data_get();
+	gchar *filename = g_strconcat(app_data->user_path, "/", note->guid, NULL);
 	
-	if (note->filename == NULL) {
-		g_printerr("ERROR: Cannot save, filename of note is not set.\n");
-		return;
-	}
-	
-	writer = xmlNewTextWriterFilename(note->filename, FALSE);
+	writer = xmlNewTextWriterFilename(filename, FALSE);
 	xmlTextWriterSetIndentString(writer, BAD_CAST "  ");
 	
 	write_header(writer, note);

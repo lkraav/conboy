@@ -55,7 +55,8 @@ typedef struct
 {
   UserInterface *ui;
   gchar   *title;
-  gchar   *filename;
+  /*gchar   *filename;*/
+  gchar   *content;
 
   time_t last_change_date;
   time_t last_metadata_change_date;
@@ -72,6 +73,8 @@ typedef struct
 
   gchar *guid;
   GList *tags; /* Tags aka notebooks */
+  
+  
   
   GSList *active_tags; /* TODO: This shouldn't really be part of this structure, more UI, because it is never written to disk */
   

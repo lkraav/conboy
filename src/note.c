@@ -33,6 +33,8 @@
 #include "serializer.h"
 #include "deserializer.h"
 #include "note_list_store.h"
+#include "storage.h"
+#include "note_buffer.h"
 
 #define _(String)gettext(String)
 
@@ -43,6 +45,7 @@ Note* note_create_new()
 	note->ui = ui;
 	note->active_tags = NULL;
 	note->tags = NULL;
+	note->guid = get_uuid();
 	note->create_date = 0;
 	note->last_change_date = 0;
 	note->last_metadata_change_date = 0;
@@ -53,7 +56,7 @@ Note* note_create_new()
 void note_free(Note *note)
 {
 	g_free(note->ui);
-	g_free(note->filename);
+	g_free(note->content);
 	g_free(note->title);
 	g_free(note->guid);
 	g_slist_free(note->active_tags);
@@ -206,11 +209,17 @@ void note_save(Note *note)
 	if (note->y == 0) {
 		note->y = 1;
 	}
+	
+	g_free(note->content);
+	note->content = note_buffer_get_xml(buffer);
+	g_printerr("___SAVING___:\n");
+	g_printerr("%s\n", note->content);
 
 	app_data = app_data_get();
 
 	/* Start serialization */
-	serialize_note(note);
+	/*serialize_note(note);*/
+	storage_save_note(note);
 
 	/* If first save, add to list of all notes */
 	if (!note_list_store_find(app_data->note_store, note)) {
@@ -248,9 +257,15 @@ void note_delete(Note *note)
 	AppData *app_data = app_data_get();
 
 	/* Delete file */
+	if (!storage_delete_note(note->guid)) {
+		g_printerr("ERROR: The note with the guid %s could not be deleted \n", note->guid);
+	}
+		
+	/*
 	if (g_unlink(note->filename) == -1) {
 		g_printerr("ERROR: The file %s could not be deleted \n", note->filename);
 	}
+	*/
 
 	/* Remove from list store */
 	note_list_store_remove(app_data->note_store, note);
@@ -271,6 +286,9 @@ gboolean note_is_open(Note *note)
 	}
 }
 
+/** TODO: This should be a function of NoteListStore.
+ *  note_list_store_containts(note)
+ */
 gboolean note_exists(Note *note)
 {
 	AppData *app_data = app_data_get();
@@ -354,7 +372,7 @@ void note_show_new(Note *note)
 	/* TODO: Creating a new note should happen in note_create_new(). Not here. */
 	/* TODO: Only save guid in note and generate filename on-the-fly when needed. */
 	note->guid = get_uuid();
-	note->filename = (gchar*)note_get_new_filename(note->guid);
+	/*note->filename = (gchar*)note_get_new_filename(note->guid);*/
 
 	if (note->title == NULL) {
 		notes_count = note_list_store_get_length(app_data->note_store);
@@ -370,6 +388,40 @@ void note_show_new(Note *note)
 	gtk_text_buffer_select_range(buffer, &start, &end);
 }
 
+static void note_fill_text_buffer(Note *note)
+{
+	
+	/*deserialize_note(note);*/
+	
+	/** TODO: Problem: A new notes get created without UI */
+	/*note = storage_load_note(note->guid);*/
+	/*storage_load_note_content(note);*/
+	
+	g_printerr("Title: %s\n", note->title);
+	g_printerr("Content: %s\n", note->content);
+	g_printerr("Cursor: %i\n", note->cursor_position);
+	g_printerr("Create: %i\n", note->create_date);
+	g_printerr("Version: %f\n", note->version);
+	g_printerr("ContVer: %f\n", note->content_version);
+	
+	GtkTextBuffer *buffer = note->ui->buffer;
+	
+
+	/*
+	 * 
+	 * TODO: Replace with proper deserialization of the content xml
+	 * Put a big part of deserialize.c into some kind off
+	 * note_buffer.c 
+	 * 
+	 */
+	
+	note_buffer_set_xml(buffer, note->content);
+	
+	/*gtk_text_buffer_set_text(buffer, note->content, -1);*/
+	
+	
+}
+
 void note_show_existing(Note *note)
 {
 	GtkTextBuffer *buffer = note->ui->buffer;
@@ -379,7 +431,9 @@ void note_show_existing(Note *note)
 	gtk_text_buffer_get_start_iter(buffer, &iter);
 
 	/* start deserialization */
-	deserialize_note(note);
+	/*deserialize_note(note);*/
+	/* TODO: Note should not contain UI, but UI should contain note */
+	note_fill_text_buffer(note);
 
 	/* Set cursor possition */
 	gtk_text_buffer_get_iter_at_offset(buffer, &iter, note->cursor_position);

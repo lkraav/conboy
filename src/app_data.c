@@ -24,6 +24,7 @@
 #include <glib/gstdio.h>
 
 #include "app_data.h"
+#include "storage.h"
 
 /* Global AppData only access with get_app_data() */
 AppData *_app_data = NULL;
@@ -31,49 +32,19 @@ AppData *_app_data = NULL;
 
 static void populate_note_store(NoteListStore *store, const gchar *user_path) {
 	
-	const gchar *filename;
-	GDir *dir = g_dir_open(user_path, 0, NULL);
+	GList *ids = storage_get_all_note_ids();
 	Note *note;
-	GMappedFile *file;
-	gchar *content;
-	gchar *start, *end;
-	gchar *tmp;
 	GtkTreeIter iter;
 	
-	while ((filename = g_dir_read_name(dir)) != NULL) {
-		if (g_str_has_suffix(filename, ".note")) {
-			/* Create new note and append to list store */
-			note = note_create_new();
-			note_list_store_add(store, note, &iter);
-			
-			/* Save filename in note */
-			note->filename = g_strconcat(user_path, filename, NULL);
-			
-			/* Save GUID */
-			note->guid = g_strndup(filename, g_utf8_strlen(filename, -1) - 5);
-			
-			/* Open file and read out title. Save title in note */
-			file = g_mapped_file_new(note->filename, FALSE, NULL);
-			content = g_mapped_file_get_contents(file);			
-			
-			/* TODO: Maybe use real xml parser for this. But I think this way is faster */
-			start = g_strrstr(content, "<title>"); /* move pointer to begining of <title> */
-			start = start + sizeof(gchar) * 7; /* move another 7 characters to be after <title> */
-			end = g_strrstr(content, "</title>"); /* move another pointer to begining of </title> */
-			note->title = g_strndup(start, end - start); /* copy the area between start and end, which is the title */
-			
-			/* Read out last-change-date and save to note */
-			start = g_strrstr(content, "<last-change-date>");
-			start = start + sizeof(gchar) * 18;
-			end = g_strrstr(content, "</last-change-date>");
-			tmp = g_strndup(start, end - start);
-			note->last_change_date = get_iso8601_time_in_seconds(tmp);
-			g_free(tmp);
-			
-			g_mapped_file_free(file);
-		}
+	while (ids != NULL) {
+		/*note = storage_load_note_partial((gchar*)ids->data);*/
+		note = storage_load_note((gchar*)ids->data);
+		g_free(ids->data);
+		note_list_store_add(store, note, &iter);
+		ids = ids->next;
 	}
-	g_dir_close(dir);
+	
+	g_list_free(ids);
 }
 
 
@@ -111,6 +82,7 @@ AppData* app_data_get() {
 		_app_data->program = hildon_program_get_instance();
 		_app_data->fullscreen = FALSE;
 		_app_data->search_window = NULL;
+		_app_data->reader = NULL;
 		
 		populate_note_store(store, path);
 	}
@@ -127,6 +99,10 @@ void app_data_free()
 	g_free((gchar*)app_data->user_path);
 	if (app_data->search_window != NULL) {
 		gtk_widget_destroy(GTK_WIDGET(app_data->search_window));
+	}
+	if (app_data->reader != NULL) {
+		xmlFreeTextReader(app_data->reader);
+		xmlCleanupParser();
 	}
 	g_free(app_data);
 }

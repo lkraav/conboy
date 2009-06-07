@@ -3,6 +3,7 @@
 
 #include <gconf/gconf-client.h>
 #include <hildon/hildon-program.h>
+#include <libxml/xmlreader.h>
 
 #include "note_list_store.h"
 
@@ -16,6 +17,7 @@ typedef struct
 	gboolean	   fullscreen;
 	HildonWindow  *search_window;
 	NoteListStore *note_store;
+	xmlTextReader *reader;
 } AppData;
 
 AppData* app_data_get(void);

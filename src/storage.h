@@ -28,13 +28,13 @@ Note* storage_load_note(const gchar *guid);
  * Should at least load "title" and "last-change-date" that how
  * it works ATM.
  */
-Note* storage_load_note_partial(const gchar *guid);
+/*Note* storage_load_note_partial(const gchar *guid);*/
 
 /**
  * Adds the content to a existing partial note. 
  * Returns TRUE if successfull.
  */
-gboolean storage_load_note_content(Note *note);
+/*gboolean storage_load_note_content(Note *note);*/
 
 /**
  * Saves a note into the storage backend. The containing GUID is used
@@ -48,7 +48,7 @@ gboolean storage_save_note(Note *note);
  * to load a note.
  * Free the list and the containing strings if you're done.
  */
-GList* storage_get_all_note_ids();
+GList* storage_get_all_note_ids(void);
 
 /**
  * Deletes a note with the identifier "guid" from the storage backend.
@@ -61,7 +61,7 @@ gboolean storage_delete_note(const gchar *guid);
  * actual saving.
  * Note: Tomboy uses 4 seconds with its xml backend.
  */ 
-gint storage_get_save_interval(); 
+gint storage_get_save_interval(void); 
 
 
 #endif /*STORAGE_H_*/

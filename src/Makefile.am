@@ -19,9 +19,7 @@ conboy_SOURCES = \
         callbacks.c \
         localisation.h \
         serializer.h \
-        serializer.c \
         deserializer.h \
-        deserializer.c \
         metadata.h \
         metadata.c \
         note.h \
@@ -35,7 +33,13 @@ conboy_SOURCES = \
         app_data.h \
         app_data.c \
         json.h \
-        json.c
+        json.c \
+        storage.h \
+        xml_storage.c \
+        serializer.h \
+        serializer.c \
+        note_buffer.h \
+        note_buffer.c
 
 #libconboy_applet_la_SOURCES = \
 #		conboy_applet.c \

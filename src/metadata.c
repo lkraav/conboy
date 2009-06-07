@@ -63,7 +63,7 @@ gchar* get_uuid()
 	gchar *content;
 	g_file_get_contents("/proc/sys/kernel/random/uuid", &content, NULL, NULL);
 	g_strchomp(content);
-	return g_strdup(content);
+	return g_strconcat(content, "\0", NULL);  /*g_strdup(content);*/
 }
 
 const gchar* note_get_new_filename(const gchar *uuid)
