@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -46,5 +46,6 @@ const gchar* note_get_new_filename(const gchar *uuid);
 
 gchar* get_uuid(void);
 
+gboolean is_portrait_mode(void);
 
 #endif /* METADATA_H */

@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -31,11 +31,11 @@ AppData *_app_data = NULL;
 
 
 static void populate_note_store(NoteListStore *store, const gchar *user_path) {
-	
+
 	GList *ids = storage_get_all_note_ids();
 	Note *note;
 	GtkTreeIter iter;
-	
+
 	while (ids != NULL) {
 		/*note = storage_load_note_partial((gchar*)ids->data);*/
 		note = storage_load_note((gchar*)ids->data);
@@ -43,13 +43,13 @@ static void populate_note_store(NoteListStore *store, const gchar *user_path) {
 		note_list_store_add(store, note, &iter);
 		ids = ids->next;
 	}
-	
+
 	g_list_free(ids);
 }
 
 
 AppData* app_data_get() {
-	
+
 	if (_app_data == NULL) {
 		gint font_size;
 		GConfClient *client;
@@ -58,21 +58,21 @@ AppData* app_data_get() {
 
 		client = gconf_client_get_default();
 		gconf_client_add_dir(client, "/apps/maemo/conboy", GCONF_CLIENT_PRELOAD_NONE, NULL);
-		
+
 		font_size = gconf_client_get_int(client, "/apps/maemo/conboy/font_size", NULL);
 		if (font_size == 0) {
 			font_size = 20000;
 		}
-		
+
 		path = g_strconcat(g_get_home_dir(), "/.conboy/", NULL);
-			
+
 		/* Create dir if needed */
 		if (!g_file_test(path, G_FILE_TEST_EXISTS)) {
 			g_mkdir(path, 0700);
 		}
-		
+
 		store = note_list_store_new();
-		
+
 		_app_data = g_new(AppData, 1);
 		_app_data->user_path = path;
 		_app_data->note_store = store;
@@ -81,19 +81,20 @@ AppData* app_data_get() {
 		_app_data->font_size = font_size;
 		_app_data->program = hildon_program_get_instance();
 		_app_data->fullscreen = FALSE;
+		_app_data->portrait = is_portrait_mode();
 		_app_data->search_window = NULL;
 		_app_data->reader = NULL;
-		
+
 		populate_note_store(store, path);
 	}
-	
+
 	return _app_data;
 }
 
 void app_data_free()
 {
 	AppData *app_data = app_data_get();
-	
+
 	g_object_unref(app_data->client);
 	g_list_free(app_data->open_notes);
 	g_free((gchar*)app_data->user_path);

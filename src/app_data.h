@@ -15,6 +15,7 @@ typedef struct
 	GConfClient   *client;
 	HildonProgram *program;
 	gboolean	   fullscreen;
+	gboolean       portrait;
 	HildonWindow  *search_window;
 	NoteListStore *note_store;
 	xmlTextReader *reader;

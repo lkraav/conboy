@@ -27,7 +27,6 @@
 #include <gtk/gtkenums.h>
 #endif
 #include <string.h>
-#include <libintl.h>
 
 #include "app_data.h"
 #include "search_window.h"
@@ -205,6 +204,28 @@ void on_sort_by_title_changed(GtkToggleButton *button, GtkTreeSortable *sortable
 }
 
 static
+void on_orientation_changed(GdkScreen *screen, GHashTable *user_data)
+{
+	GtkTreeViewColumn *column;
+	GtkWidget *hbox;
+	AppData *app_data = app_data_get();
+
+	column = GTK_TREE_VIEW_COLUMN(g_hash_table_lookup(user_data, "column"));
+	hbox = GTK_WIDGET(g_hash_table_lookup(user_data, "hbox"));
+
+	app_data->portrait = is_portrait_mode();
+
+	if (app_data->portrait) {
+		gtk_tree_view_column_set_visible(column, FALSE);
+		gtk_widget_hide(hbox);
+	} else {
+		gtk_tree_view_column_set_visible(column, TRUE);
+		gtk_widget_show(hbox);
+	}
+
+}
+
+static
 gint compare_titles(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
 {
 	gint result = 0;
@@ -269,9 +290,12 @@ HildonWindow* search_window_create()
 	GtkCellRenderer *renderer;
 	GtkTreeViewColumn *title_column;
 	GtkTreeViewColumn *change_date_column;
+	GdkScreen *screen;
+	GHashTable *hash;
 
 	win = hildon_window_new();
 	gtk_window_set_title(GTK_WINDOW(win), _("Search All Notes"));
+	screen = gdk_screen_get_default();
 
 	/* Window menu */
 #ifdef HILDON_HAS_APP_MENU
@@ -297,7 +321,7 @@ HildonWindow* search_window_create()
 	gtk_container_add(GTK_CONTAINER(win), vbox);
 
 	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_widget_show(hbox);
+	/*gtk_widget_show(hbox);*/
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 10);
 
 	search_label = gtk_label_new(_("Search:"));
@@ -316,6 +340,12 @@ HildonWindow* search_window_create()
 	clear_button = gtk_button_new_from_stock(GTK_STOCK_CLEAR);
 	gtk_widget_show(clear_button);
 	gtk_box_pack_start(GTK_BOX(hbox), clear_button, FALSE, FALSE, 0);
+
+	if (app_data->portrait) {
+		gtk_widget_hide(hbox);
+	} else {
+		gtk_widget_show(hbox);
+	}
 
 	/* SCROLLED WINDOW */
 	#ifdef HILDON_HAS_APP_MENU
@@ -379,7 +409,7 @@ HildonWindow* search_window_create()
 	gtk_tree_view_column_add_attribute(title_column, renderer, "text", TITLE_COLUMN);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree), title_column);
 
-	/* CHANGE DATE COLUMN */
+	/* CHANGE_DATE COLUMN */
 	renderer = gtk_cell_renderer_text_new();
 	change_date_column = gtk_tree_view_column_new_with_attributes(_("Last Changed"), renderer, "text", CHANGE_DATE_COLUMN, NULL);
 	gtk_tree_view_column_set_sort_column_id(change_date_column, CHANGE_DATE_COLUMN);
@@ -391,11 +421,13 @@ HildonWindow* search_window_create()
 	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(sorted_store), CHANGE_DATE_COLUMN, GTK_SORT_DESCENDING);
 	/*gtk_tree_sortable_sort_column_changed(GTK_TREE_SORTABLE(sorted_store)); */ /* TODO: Test if it's needed */
 
+	/* Don't show column if we are in portrait mode */
+	gtk_tree_view_column_set_visible(change_date_column, !app_data->portrait);
+
 	/* CONNECT SIGNALS */
 	g_signal_connect(search_field, "changed", G_CALLBACK(on_search_string_changed), filtered_store);
 	g_signal_connect(clear_button, "clicked", G_CALLBACK(on_clear_button_clicked), search_field);
 	g_signal_connect(tree, "row-activated", G_CALLBACK(on_row_activated), NULL);
-
 	g_signal_connect(win, "map-event", G_CALLBACK(on_window_visible), search_field);
 	g_signal_connect(win, "delete-event", G_CALLBACK(gtk_widget_hide_on_delete), NULL);
 	g_signal_connect(win, "key_press_event", G_CALLBACK(on_hardware_key_pressed), win);
@@ -405,6 +437,14 @@ HildonWindow* search_window_create()
 	g_signal_connect(button_sort_by_title, "toggled", G_CALLBACK(on_sort_by_title_changed), sorted_store);
 	g_signal_connect(button_sort_by_date, "toggled", G_CALLBACK(on_sort_by_date_changed), sorted_store);
 #endif
+
+	/* Connect screen orientation changed signal */
+	/* TODO: When restructuring UI, get rid of this hashmap */
+	hash = g_hash_table_new(g_str_hash, g_str_equal);
+	g_hash_table_insert(hash, "column", change_date_column);
+	g_hash_table_insert(hash, "hbox", hbox);
+	g_signal_connect(screen, "size-changed", G_CALLBACK(on_orientation_changed), hash);
+
 
 	app_data = app_data_get();
 	app_data->note_store = store;
