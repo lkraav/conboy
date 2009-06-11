@@ -96,6 +96,28 @@ set_item_label(GtkContainer *item, const gchar *open_tag, const gchar *text, con
 	g_free(string);
 }
 
+static void
+on_orientation_changed(GdkScreen *screen, GHashTable *hash)
+{
+	AppData *app_data = app_data_get();
+
+	GtkWidget *toolbar = g_hash_table_lookup(hash, "toolbar");
+	GtkWidget *menu_new = g_hash_table_lookup(hash, "menu_new");
+	GtkWidget *menu_open = g_hash_table_lookup(hash, "menu_open");
+
+	app_data->portrait = is_portrait_mode();
+
+	if (app_data->portrait) {
+		gtk_widget_hide(toolbar);
+		/*gtk_widget_hide(menu_new);*/
+		gtk_widget_show(menu_open);
+	} else {
+		gtk_widget_show(toolbar);
+		/*gtk_widget_show(menu_new);*/
+		gtk_widget_hide(menu_open);
+	}
+}
+
 /*
  * I'm not sure what is better:
  * 1) Declaring all as GtkWidget, so that Fremantle and Diablo code can share these.
@@ -109,6 +131,7 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkWidget *vbox1;
 	GtkWidget *main_menu;
 	GtkWidget *text_style_menu;
+	GdkScreen *screen;
 
 	GtkWidget *menu_new;
 	GtkWidget *menu_bold;
@@ -126,6 +149,7 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkWidget *menu_font_large;
 	GtkWidget *menu_font_huge;
 	GtkWidget *menu_find;
+	GtkWidget *menu_open;
 
 	GtkWidget *toolbar;
 	GtkWidget *find_bar;
@@ -177,6 +201,8 @@ GtkWidget* create_mainwin(Note *note) {
 	mainwin = hildon_window_new();
 	gtk_window_set_title(GTK_WINDOW(mainwin), "Conboy");
 
+	screen = gdk_screen_get_default();
+
 	accel_group = gtk_accel_group_new();
 	gtk_window_add_accel_group(GTK_WINDOW(mainwin), accel_group);
 	g_object_unref(accel_group);
@@ -195,7 +221,7 @@ GtkWidget* create_mainwin(Note *note) {
 	action_inc_indent = GTK_ACTION(gtk_action_new("inc_indent", _("Increase Indent"), NULL, GTK_STOCK_INDENT));
 	action_link = GTK_ACTION(gtk_action_new("link", _("Link"), NULL, GTK_STOCK_REDO));
 	action_new = GTK_ACTION(gtk_action_new("new", _("New Note"), NULL, NULL));
-	action_notes = GTK_ACTION(gtk_action_new("open", _("Open"), NULL, GTK_STOCK_OPEN));
+	action_notes = GTK_ACTION(gtk_action_new("open", _("Open Note"), NULL, GTK_STOCK_OPEN));
 	action_quit = GTK_ACTION(gtk_action_new("quit", _("Close All Notes"), NULL, NULL));
 	action_italic = GTK_ACTION(gtk_toggle_action_new("italic", _("Italic"), NULL, GTK_STOCK_ITALIC));
 	action_strike = GTK_ACTION(gtk_toggle_action_new("strikethrough", _("Strikeout"), NULL, NULL));
@@ -353,14 +379,21 @@ GtkWidget* create_mainwin(Note *note) {
 #ifdef HILDON_HAS_APP_MENU
 	main_menu = hildon_app_menu_new();
 
-	menu_quit = gtk_button_new();
 	menu_new = gtk_button_new();
+	menu_open = gtk_button_new();
+	menu_quit = gtk_button_new();
 
 	gtk_action_connect_proxy(action_new, menu_new);
+	gtk_action_connect_proxy(action_notes, menu_open);
 	gtk_action_connect_proxy(action_quit, menu_quit);
 
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_new));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_open));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_quit));
+
+	if (!app_data->portrait) {
+		gtk_widget_hide(menu_open);
+	}
 
 	hildon_window_set_app_menu(HILDON_WINDOW(mainwin), HILDON_APP_MENU(main_menu));
 
@@ -422,8 +455,11 @@ GtkWidget* create_mainwin(Note *note) {
 	button_notes = gtk_action_create_tool_item(action_notes);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_notes), -1);
 
-
 	gtk_widget_show_all(toolbar);
+
+	if (app_data->portrait) {
+		gtk_widget_hide(toolbar);
+	}
 
 	hildon_window_add_toolbar(HILDON_WINDOW(mainwin), GTK_TOOLBAR(toolbar));
 	/* TODO: Maybe we can use one intance of the toolbar for all windows. */
@@ -613,6 +649,15 @@ GtkWidget* create_mainwin(Note *note) {
 	g_signal_connect((gpointer)find_bar, "close",
 			G_CALLBACK(on_find_bar_close),
 			ui);
+
+	/* TODO: When restructuring the UI, don't use the hash map anymore */
+	GHashTable *hash = g_hash_table_new(g_str_hash, g_str_equal);
+	g_hash_table_insert(hash, "toolbar", toolbar);
+	g_hash_table_insert(hash, "menu_new", menu_new);
+	g_hash_table_insert(hash, "menu_open", menu_open);
+	g_signal_connect((gpointer)screen, "size-changed",
+			G_CALLBACK(on_orientation_changed),
+			hash);
 
 	link_internal_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	g_signal_connect ((gpointer) link_internal_tag, "event",
