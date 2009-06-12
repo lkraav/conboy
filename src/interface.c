@@ -35,8 +35,6 @@
 
 #include "callbacks.h"
 
-#include "serializer.h"
-#include "deserializer.h"
 #include "metadata.h"
 #include "interface.h"
 #include "app_data.h"

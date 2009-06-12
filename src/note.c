@@ -30,8 +30,6 @@
 #include "metadata.h"
 #include "interface.h"
 #include "note.h"
-#include "serializer.h"
-#include "deserializer.h"
 #include "note_list_store.h"
 #include "storage.h"
 #include "note_buffer.h"

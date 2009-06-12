@@ -35,8 +35,6 @@
 #include "metadata.h"
 #include "interface.h"
 #include "note.h"
-#include "serializer.h"
-#include "deserializer.h"
 #include "search_window.h"
 #include "note_linker.h"
 #include "app_data.h"
