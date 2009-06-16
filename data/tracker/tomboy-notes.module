@@ -1,9 +1,9 @@
 [General]
-Description=Conboy Notes
+Description=Tomboy Notes
 Enabled=true
 
 [Monitors]
-Directories=$HOME/.conboy;
+Directories=$HOME/.conboy;$HOME/.tomboy;
 RecurseDirectories=
 
 [Ignored]
@@ -12,11 +12,11 @@ Files=
 DirectoriesWithContent=
 
 [Index]
-Service=Tomboy
+Service=TomboyNotes
 MimeTypes=
 Files=*.note
-ScanTimeout=0
-CacheTimeout=0
+ScanTimeout=6000
+CacheTimeout=120
 
 [Specific]
 # Options specific to this module

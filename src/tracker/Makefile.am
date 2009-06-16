@@ -1,5 +1,5 @@
 # Includes
-INCLUDES = $(TRACKER_CFLAGS)
+INCLUDES = $(TRACKER_CFLAGS) -DG_LOG_DOMAIN=\"Tracker\"
 
 # Binary
 pluginlib_LTLIBRARIES = \
@@ -8,12 +8,17 @@ pluginlib_LTLIBRARIES = \
 
 # Sources
 libtracker_module_tomboy_notes_la_SOURCES = \
+    tracker-module.h \
+    tracker-module-file.h \
+    tracker-module-iterable.h \
+    tracker-module-metadata.h \
+    tracker-module-metadata-utils.h \
     tomboy-notes.c
 # /Sources
 
-# XXX
-#libtracker_module_tomboy_notes_la_LDFLAGS = -module -avoid-version 
-# /XXX
+# LDFLAGS
+libtracker_module_tomboy_notes_la_LDFLAGS = -module -avoid-version -no-undefined 
+# /LDFLAGS
 
 # LDADD
 libtracker_module_tomboy_notes_la_LIBADD = \

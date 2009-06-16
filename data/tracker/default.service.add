@@ -1,13 +1,10 @@
-[Notes]
-DisplayName=Notes
-Description=Notes
+[TomboyNotes]
+DisplayName=Tomboy Notes
+Description=Tomboy Notes
+Parent=Files
 UIVisible=true
 Icon=x-office-document
-KeyMetadata1=Note:Title
-KeyMetadata2=Note:ChangeDate
 ShowServiceFiles=true
 HasMetadata=true
 HasFullText=true
 HasThumbs=false
-
-

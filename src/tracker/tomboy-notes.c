@@ -1,9 +1,11 @@
 
-#ifdef HILDON_HAS_APP_MENU
-
 #include "config.h"
 
-#include <tracker-indexer/tracker-module.h>
+#ifdef HILDON_HAS_APP_MENU
+
+
+
+#include "tracker-module.h"
 
 #define METADATA_FILE_NAME         "File:Name"
 #define METADATA_NOTE_TITLE        "Note:Title"
@@ -42,19 +44,23 @@ G_DEFINE_DYNAMIC_TYPE (TrackerTomboyFile, tracker_tomboy_file, TRACKER_TYPE_MODU
 static void
 tracker_tomboy_file_class_init(TrackerTomboyFileClass *klass)
 {
+	g_debug("Conboy: Init class \n");
+
 	TrackerModuleFileClass *file_class = TRACKER_MODULE_FILE_CLASS (klass);
 	file_class->get_metadata = tracker_tomboy_file_get_metadata;
 	file_class->get_text = tracker_tomboy_file_get_text;
 }
 
 static void
-tracker_tomboy_file_class_finalize(TrackerApplicationFileClass *klass)
+tracker_tomboy_file_class_finalize(TrackerTomboyFileClass *klass)
 {
+	g_debug("Conboy: Finalize class \n");
 }
 
 static void
-tracker_application_file_init(TrackerApplicationFile *file)
+tracker_tomboy_file_init(TrackerTomboyFile *file)
 {
+	g_debug("Conboy: Init file \n");
 }
 
 /**
@@ -63,7 +69,8 @@ tracker_application_file_init(TrackerApplicationFile *file)
 static gchar*
 tracker_tomboy_file_get_text(TrackerModuleFile *file)
 {
-	
+	g_debug("Conboy: get text \n");
+	return "Hallo Conboy";
 }
 
 /**
@@ -72,25 +79,35 @@ tracker_tomboy_file_get_text(TrackerModuleFile *file)
 static TrackerModuleMetadata*
 tracker_tomboy_file_get_metadata(TrackerModuleFile *file)
 {
-	
+	g_debug("Conboy: get metadata \n");
+
+	TrackerModuleMetadata *metadata;
+	metadata = tracker_module_metadata_new();
+	tracker_module_metadata_add_string(metadata, METADATA_NOTE_TITLE, "Conboy Rules");
+
+	return metadata;
 }
 
 /* Boiler plate */
 void
 indexer_module_initialize(GTypeModule *module)
 {
-        tracker_tomboy_file_register_type(module);
+	g_debug("Conboy: init module \n");
+	tracker_tomboy_file_register_type(module);
 }
 
 void
 indexer_module_shutdown (void)
 {
+	g_debug("Conboy: shutdown module \n");
 }
 
 /* Boiler plate */
 TrackerModuleFile *
 indexer_module_create_file(GFile *file)
 {
+	g_debug("Conboy: create file \n");
+
 	return g_object_new(TRACKER_TYPE_TOMBOY_FILE,
                         "file", file,
                         NULL);
