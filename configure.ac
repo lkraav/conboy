@@ -65,7 +65,18 @@ AC_PROG_LIBTOOL
 pluginlibdir=`pkg-config osso-af-settings --variable=hildondesktoplibdir`
 AC_SUBST(pluginlibdir)
 
+dnl
+dnl Tracker dirs
+dnl
 
+trackerlibdir=/usr/lib/tracker/indexer-modules
+AC_SUBST(trackerlibdir)
+
+trackermoduledir=/usr/share/tracker/modules
+AC_SUBST(trackermoduledir)
+
+trackerservicedir=/usr/share/tracker/services
+AC_SUBST(trackerservicedir)
 
 
 # Localization-related
@@ -95,6 +106,7 @@ AC_SUBST(icon_scalabledir)
 AC_OUTPUT([
     Makefile 
     src/Makefile
+    src/tracker/Makefile
     data/Makefile
     po/Makefile.in 
     po/Makefile

@@ -1,3 +1,6 @@
+# Sub directories
+SUBDIRS = tracker
+
 # Includes
 INCLUDES = $(HILDON_CFLAGS) $(OSSO_CFLAGS) $(HILDONDESKTOP_CFLAGS) $(GCONF_CFLAGS) $(XML2_CFLAGS) $(JSON_CFLAGS)
 
@@ -56,3 +59,6 @@ conboy_LDADD = \
 #libconboy_applet_la_LIBADD = \
 #		$(HILDONDESKTOP_LIBS)
 # /LDADD
+
+
+
