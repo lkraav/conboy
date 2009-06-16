@@ -1,0 +1,35 @@
+[Note:Title]
+DisplayName=Title
+Description=Note title
+DataType=index
+Parent=DC:Title
+Weight=20
+Filtered=false 
+
+[Note:Text]
+DisplayName=Text
+Description=Note text
+DataType=fulltext
+Weight=5
+
+[Note:Tags]
+DisplayName=Tags
+Description=Tags attached to the note
+DataType=keyword
+Parent=DC:Keywords
+Weight=20
+Filtered=false 
+Delimited=true 
+
+[Note:CreateDate]
+DisplayName=Create date
+Description=The date the note was created
+DataType=date
+Parent=DC:Date
+
+[Note:ChangeDate]
+DisplayName=Change date
+Description=The date the note was last changed
+DateType=date
+Parent=DC:Date
+
