@@ -328,7 +328,7 @@ HildonWindow* search_window_create()
 	gtk_widget_show(search_label);
 	gtk_box_pack_start(GTK_BOX(hbox), search_label, FALSE, FALSE, 0);
 	#ifdef HILDON_HAS_APP_MENU
-	search_field = hildon_entry_new(HILDON_SIZE_AUTO);
+	search_field = hildon_entry_new(HILDON_SIZE_FINGER_HEIGHT);
 	#else
 	search_field = gtk_entry_new();
 	#endif
@@ -338,6 +338,9 @@ HildonWindow* search_window_create()
 	gtk_widget_grab_default(search_field);
 
 	clear_button = gtk_button_new_from_stock(GTK_STOCK_CLEAR);
+	#ifdef HILDON_HAS_APP_MENU
+	hildon_gtk_widget_set_theme_size(clear_button, HILDON_SIZE_FINGER_HEIGHT);
+	#endif
 	gtk_widget_show(clear_button);
 	gtk_box_pack_start(GTK_BOX(hbox), clear_button, FALSE, FALSE, 0);
 
