@@ -22,19 +22,18 @@
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-color-button.h>
 
-#include "config_window.h"
+#include "settings_window.h"
 #include "settings.h"
 #include "app_data.h"
 
 static void
 on_scroll_but_toggled(GtkToggleButton *button, gpointer user_data)
 {
-	AppData *app_data = app_data_get();
 	if (gtk_toggle_button_get_active(button)) {
-		gconf_client_set_int(app_data->client, SETTINGS_SCROLLBAR_SIZE, SETTINGS_SCROLLBAR_SIZE_SMALL, NULL);
+		settings_save_scrollbar_size(SETTINGS_SCROLLBAR_SIZE_SMALL);
 		g_printerr("SMALL \n");
 	} else {
-		gconf_client_set_int(app_data->client, SETTINGS_SCROLLBAR_SIZE, SETTINGS_SCROLLBAR_SIZE_BIG, NULL);
+		settings_save_scrollbar_size(SETTINGS_SCROLLBAR_SIZE_BIG);
 		g_printerr("LARGE \n");
 	}
 }
@@ -42,57 +41,67 @@ on_scroll_but_toggled(GtkToggleButton *button, gpointer user_data)
 static void
 on_view_but_toggled(GtkToggleButton *button, gpointer user_data)
 {
-	AppData *app_data = app_data_get();
+	
 	if (gtk_toggle_button_get_active(button)) {
-		gconf_client_set_int(app_data->client, SETTINGS_STARTUP_WINDOW, SETTINGS_STARTUP_WINDOW_NOTE, NULL);
+		settings_save_startup_window(SETTINGS_STARTUP_WINDOW_NOTE);
 		g_printerr("NOTE \n");
 	} else {
-		gconf_client_set_int(app_data->client, SETTINGS_STARTUP_WINDOW, SETTINGS_STARTUP_WINDOW_SEARCH, NULL);
+		settings_save_startup_window(SETTINGS_STARTUP_WINDOW_SEARCH);
 		g_printerr("SEARCH \n");
 	}
 }
 
-/**
- * You have to free the gchar after using.
- */
-static gchar
-*gdk_color_to_string(GdkColor *color)
+static void
+on_use_colors_but_toggled(GtkToggleButton *button, GtkWidget *color_box)
 {
-	PangoColor pColor;
+	gboolean active = gtk_toggle_button_get_active(button);
 	
-	pColor.red = color->red;
-	pColor.green = color->green;
-	pColor.blue = color->blue;
+	/* Change activate/deactivate the UI */
+	gtk_widget_set_sensitive(color_box, active);
+	settings_save_use_custom_colors(active);
 	
-	return pango_color_to_string(&pColor);
+	
+	/* This is a hack. Because don't have access to all required widgets,
+		 * we call gconf to emit a "changed" signal. This way all colors get
+		 * updated at once */
+	/*
+	if (active) {
+	
+		AppData *app_data = app_data_get();
+		gconf_client_notify(app_data->client, SETTINGS_BACKGROUND_COLOR);
+		gconf_client_notify(app_data->client, SETTINGS_TEXT_COLOR);
+		gconf_client_notify(app_data->client, SETTINGS_LINK_COLOR);
+	} else {
+		// Make UI normal colored again	
+	}
+	 */
+	
 }
 
 
+
+
 static void
-on_color_but_changed(HildonColorButton *button, gchar *gconf_path)
+on_color_but_changed(HildonColorButton *button, SettingsColorType *type)
 {
-	AppData *app_data = app_data_get();
 	GdkColor color;
-	gchar *hex_color;
-	hildon_color_button_get_color(button, &color);	
-	hex_color = gdk_color_to_string(&color);
-	g_printerr("Change to: %s \n", hex_color);
-	gconf_client_set_string(app_data->client, gconf_path, hex_color, NULL);
-	g_free(hex_color);
+	hildon_color_button_get_color(button, &color);
+	settings_save_color(&color, GPOINTER_TO_INT(type));
 }
 
 
 static
-GtkWidget *config_widget_create()
+GtkWidget *settings_widget_create()
 {
 	GtkWidget *config_vbox;
 	GtkWidget *hbox;
 	GtkWidget *scroll_vbox, *scroll_label, *scroll_but1, *scroll_but2;
 	GtkWidget *view_vbox, *view_label, *view_but1, *view_but2;
-	GtkWidget *color_vbox, *color_label;
+	GtkWidget *color_vbox, *color_but;
 	GtkWidget *text_color_hbox, *text_color_but, *text_color_label;
 	GtkWidget *back_color_hbox, *back_color_but, *back_color_label;
 	GtkWidget *link_color_hbox, *link_color_but, *link_color_label;
+	GdkColor color;
 	
 	/* Config vbox */
 	config_vbox = gtk_vbox_new(FALSE, 20);
@@ -146,11 +155,10 @@ GtkWidget *config_widget_create()
 	gtk_widget_show(color_vbox);
 	gtk_box_pack_start(GTK_BOX(config_vbox), color_vbox, FALSE, FALSE, 0);
 	
-	color_label = gtk_label_new("");
-	gtk_label_set_markup(GTK_LABEL(color_label), "<b>Colors</b>");
-	gtk_misc_set_alignment(GTK_MISC(color_label), 0, 0.5);
-	gtk_widget_show(color_label);
-	gtk_box_pack_start(GTK_BOX(color_vbox), color_label, TRUE, TRUE, 0);
+	color_but = gtk_check_button_new_with_label("Use Costum Colors");
+	/*gtk_misc_set_alignment(GTK_MISC(color_but), 0, 0.5);*/
+	gtk_widget_show(color_but);
+	gtk_box_pack_start(GTK_BOX(color_vbox), color_but, TRUE, TRUE, 0);
 	
 	/* Text Color */
 	text_color_hbox = gtk_hbox_new(FALSE, 0);
@@ -193,20 +201,60 @@ GtkWidget *config_widget_create()
 	gtk_misc_set_alignment(GTK_MISC(link_color_label), 0, 0.5);
 	gtk_widget_show(link_color_label);
 	gtk_box_pack_start(GTK_BOX(text_color_hbox), link_color_label, TRUE, TRUE, 10);
+	
+	
+	/* Set initial values from gconf */
+	
+	/* Scrollbars */
+	if (settings_load_scrollbar_size() == SETTINGS_SCROLLBAR_SIZE_SMALL) {
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(scroll_but1), TRUE);
+	} else {
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(scroll_but2), TRUE);
+	}
+	
+	/* On Startup */
+	if (settings_load_startup_window() == SETTINGS_STARTUP_WINDOW_NOTE) {
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(view_but1), TRUE);
+	} else {
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(view_but2), TRUE);
+	}
+	
+	/* Use costum colors */
+	if (settings_load_use_costum_colors()) {
+		gtk_widget_set_sensitive(text_color_hbox, TRUE);
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(color_but), TRUE);
+	} else {
+		gtk_widget_set_sensitive(text_color_hbox, FALSE);
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(color_but), FALSE);
+	}
+	
+	/* Background color */
+	settings_load_color(&color, SETTINGS_COLOR_TYPE_BACKGROUND);
+	hildon_color_button_set_color(HILDON_COLOR_BUTTON(back_color_but), &color);
+	
+	/* Text color */
+	settings_load_color(&color, SETTINGS_COLOR_TYPE_TEXT);
+	hildon_color_button_set_color(HILDON_COLOR_BUTTON(text_color_but), &color);
 		
+	/* Link color */
+	settings_load_color(&color, SETTINGS_COLOR_TYPE_LINKS);
+	hildon_color_button_set_color(HILDON_COLOR_BUTTON(link_color_but), &color);
+	
 	
 	/* Connect signals */
 	g_signal_connect(scroll_but1, "toggled", G_CALLBACK(on_scroll_but_toggled), NULL);
 	g_signal_connect(view_but1, "toggled", G_CALLBACK(on_view_but_toggled), NULL);
-	g_signal_connect(text_color_but, "released", G_CALLBACK(on_color_but_changed), SETTINGS_TEXT_COLOR);
-	g_signal_connect(link_color_but, "released", G_CALLBACK(on_color_but_changed), SETTINGS_LINK_COLOR);
-	g_signal_connect(back_color_but, "released", G_CALLBACK(on_color_but_changed), SETTINGS_BACKGROUND_COLOR);
+	g_signal_connect(color_but, "toggled", G_CALLBACK(on_use_colors_but_toggled), text_color_hbox);
+	g_signal_connect(text_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_TEXT));
+	g_signal_connect(link_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_LINKS));
+	g_signal_connect(back_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_BACKGROUND));
+	
 	
 	return config_vbox;
 }
 
 
-void config_window_open(GtkWindow *parent)
+void settings_window_open(GtkWindow *parent)
 {
 	GtkDialog *dialog = gtk_dialog_new_with_buttons("Configuration",
 			parent,
@@ -216,7 +264,7 @@ void config_window_open(GtkWindow *parent)
 			NULL);
 	
 	GtkWidget *content_area = dialog->vbox;
-	GtkWidget *content_widget = config_widget_create();
+	GtkWidget *content_widget = settings_widget_create();
 	
 	/* Add the widget to the dialog */
 	gtk_box_pack_start(GTK_BOX(content_area), content_widget, TRUE, TRUE, 10);

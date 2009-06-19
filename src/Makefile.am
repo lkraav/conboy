@@ -38,7 +38,11 @@ conboy_SOURCES = \
         storage.h \
         xml_storage.c \
         note_buffer.h \
-        note_buffer.c
+        note_buffer.c \
+        settings.h \
+        settings.c \
+        settings_window.h \
+        settings_window.c
 
 #libconboy_applet_la_SOURCES = \
 #		conboy_applet.c \

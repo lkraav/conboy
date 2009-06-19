@@ -38,6 +38,7 @@
 #include "search_window.h"
 #include "note_linker.h"
 #include "app_data.h"
+#include "settings_window.h"
 
 
 /* Private. TODO: Move to some public file */
@@ -195,6 +196,12 @@ void on_quit_button_clicked(GtkAction *action, gpointer user_data)
 	}
 
 	gtk_main_quit();
+}
+
+void on_settings_button_clicked(GtkAction *action, gpointer user_data)
+{
+	GtkWindow *parent = GTK_WINDOW(user_data);
+	settings_window_open(parent);
 }
 
 void

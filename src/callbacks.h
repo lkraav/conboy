@@ -36,6 +36,10 @@ on_quit_button_clicked                 (GtkAction       *action,
                                         gpointer         user_data);
 
 void
+on_settings_button_clicked             (GtkAction       *action, 
+		                                gpointer         user_data);
+
+void
 on_save_button_clicked                 (GtkButton       *button,
                                         gpointer         user_data);
 
