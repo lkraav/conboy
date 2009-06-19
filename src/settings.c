@@ -1,13 +1,41 @@
-
+/* This file is part of Conboy.
+ *
+ * Copyright (C) 2009 Cornelius Hald
+ *
+ * Conboy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Conboy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "settings.h"
 #include "app_data.h"
 
+void
+settings_save_font_size(gint size)
+{
+	AppData *app_data = app_data_get();
+	gconf_client_set_int(app_data->client, SETTINGS_FONT_SIZE, size, NULL);
+}
 
-        
-
-
-
+gint
+settings_load_font_size()
+{
+	AppData *app_data = app_data_get();
+	gint size = gconf_client_get_int(app_data->client, SETTINGS_FONT_SIZE, NULL);
+	if (size == 0) {
+		size = 20000; /* Default size */
+	}
+	return size;
+}
 
 void
 settings_save_scrollbar_size(SettingsScrollbarSize size)
@@ -51,8 +79,6 @@ settings_load_startup_window()
 	}
 }
 
-
-
 void
 settings_save_use_custom_colors(gboolean use)
 {
@@ -69,8 +95,6 @@ settings_load_use_costum_colors()
 	g_printerr("Load custom colors: %i \n", use);
 	return use;
 }
-
-
 
 /**
  * You have to free the gchar after using.

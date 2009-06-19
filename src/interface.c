@@ -192,7 +192,16 @@ on_use_custom_colors_changed(GConfClient *client, guint cnxn_id, GConfEntry *ent
 		gtk_widget_modify_base(GTK_WIDGET(view), GTK_STATE_NORMAL, NULL);
 		gtk_widget_modify_text(GTK_WIDGET(view), GTK_STATE_NORMAL, NULL);
 	}
-	
+}
+
+static void
+on_font_size_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpointer user_data)
+{
+	GtkWidget *textview = GTK_WIDGET(user_data); 
+	PangoFontDescription *font = pango_font_description_new();
+	pango_font_description_set_size(font, gconf_value_get_int(entry->value));
+	gtk_widget_modify_font(GTK_WIDGET(textview), font);
+	pango_font_description_free(font);
 }
 
 /*
@@ -582,8 +591,9 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	/* Set initial font size */
 	font = pango_font_description_new();
-	pango_font_description_set_size(font, app_data->font_size);
+	pango_font_description_set_size(font, settings_load_font_size());
 	gtk_widget_modify_font(GTK_WIDGET(textview), font);
+	pango_font_description_free(font);
 
 	/* Set initial scrollbar size */
 	if (settings_load_scrollbar_size() == SETTINGS_SCROLLBAR_SIZE_BIG) {
@@ -758,17 +768,13 @@ GtkWidget* create_mainwin(Note *note) {
 			G_CALLBACK(on_find_bar_close),
 			ui);
 	
-	/* Listen to changes in the settings regarding the scrollbars */
+	/* Listen to changes in the settings */
 	gconf_client_notify_add(app_data->client, SETTINGS_SCROLLBAR_SIZE, on_scrollbar_settings_changed, scrolledwindow1, NULL, NULL);
-	
-	/* Listen to changes in the settings regarding the background color */
 	gconf_client_notify_add(app_data->client, SETTINGS_BACKGROUND_COLOR, on_background_color_changed, textview, NULL, NULL);
-	
 	gconf_client_notify_add(app_data->client, SETTINGS_TEXT_COLOR, on_text_color_changed, textview, NULL, NULL);
-	
 	gconf_client_notify_add(app_data->client, SETTINGS_LINK_COLOR, on_link_color_changed, textview, NULL, NULL);
-	
 	gconf_client_notify_add(app_data->client, SETTINGS_USE_CUSTOM_COLORS, on_use_custom_colors_changed, textview, NULL, NULL);
+	gconf_client_notify_add(app_data->client, SETTINGS_FONT_SIZE, on_font_size_changed, textview, NULL, NULL);
 	
 
 	/* TODO: When restructuring the UI, don't use the hash map anymore */

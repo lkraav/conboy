@@ -58,28 +58,8 @@ on_use_colors_but_toggled(GtkToggleButton *button, GtkWidget *color_box)
 	
 	/* Change activate/deactivate the UI */
 	gtk_widget_set_sensitive(color_box, active);
-	settings_save_use_custom_colors(active);
-	
-	
-	/* This is a hack. Because don't have access to all required widgets,
-		 * we call gconf to emit a "changed" signal. This way all colors get
-		 * updated at once */
-	/*
-	if (active) {
-	
-		AppData *app_data = app_data_get();
-		gconf_client_notify(app_data->client, SETTINGS_BACKGROUND_COLOR);
-		gconf_client_notify(app_data->client, SETTINGS_TEXT_COLOR);
-		gconf_client_notify(app_data->client, SETTINGS_LINK_COLOR);
-	} else {
-		// Make UI normal colored again	
-	}
-	 */
-	
+	settings_save_use_custom_colors(active);	
 }
-
-
-
 
 static void
 on_color_but_changed(HildonColorButton *button, SettingsColorType *type)
@@ -88,7 +68,6 @@ on_color_but_changed(HildonColorButton *button, SettingsColorType *type)
 	hildon_color_button_get_color(button, &color);
 	settings_save_color(&color, GPOINTER_TO_INT(type));
 }
-
 
 static
 GtkWidget *settings_widget_create()

@@ -38,7 +38,9 @@
 #include "search_window.h"
 #include "note_linker.h"
 #include "app_data.h"
+#include "settings.h"
 #include "settings_window.h"
+
 
 
 /* Private. TODO: Move to some public file */
@@ -636,42 +638,31 @@ on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 }
 
 static
-void change_font_size_by(gint size)
+void change_font_size_by(gint change)
 {
-	AppData *app_data = app_data_get();
-	PangoFontDescription *font;
-	Note *note;
-	GList *note_list;
-
-	if (size == 0) {
+	gint size;
+	
+	if (change == 0) {
 		return;
 	}
+	
+	size = settings_load_font_size();
 
-	if (size > 0) {
-		if (app_data->font_size + size <= 65000) {
-			app_data->font_size += size;
+	if (change > 0) {
+		if (size + change <= 65000) {
+			size += change;
 		} else {
 			return;
 		}
 	} else {
-		if (app_data->font_size + size >= 5000) {
-			app_data->font_size += size;
+		if (size + change >= 5000) {
+			size += change;
 		} else {
 			return;
 		}
 	}
-
-	gconf_client_set_int(app_data->client, "/apps/maemo/conboy/font_size", app_data->font_size, NULL);
-
-	font = pango_font_description_new();
-	pango_font_description_set_size(font, app_data->font_size);
-
-	note_list = app_data->open_notes;
-	while (note_list != NULL) {
-		note = (Note*)note_list->data;
-		gtk_widget_modify_font(GTK_WIDGET(note->ui->view), font);
-		note_list = g_list_next(note_list);
-	}
+	
+	settings_save_font_size(size);
 }
 
 void
