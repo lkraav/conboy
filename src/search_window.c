@@ -20,6 +20,7 @@
 #include <gtk/gtk.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-defines.h>
+#include <hildon/hildon-helper.h>
 #ifdef HILDON_HAS_APP_MENU
 #include <hildon/hildon-pannable-area.h>
 #include <hildon/hildon-entry.h>
@@ -33,6 +34,7 @@
 #include "metadata.h"
 #include "note.h"
 #include "note_list_store.h"
+#include "settings.h"
 
 static gboolean
 is_row_visible(GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
@@ -147,7 +149,7 @@ gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer
 		gtk_widget_hide(window);
 		return TRUE;
 
-	/* TODO: The same code (only last line differs) is used in callbacks.c */
+	/* TODO: Duplicated code The same code (only last line differs) is used in callbacks.c */
 	case HILDON_HARDKEY_FULLSCREEN:
 		/* Toggle fullscreen */
 		app_data->fullscreen = !app_data->fullscreen;
@@ -235,7 +237,20 @@ void on_orientation_changed(GdkScreen *screen, GHashTable *user_data)
 		gtk_tree_view_column_set_visible(column, TRUE);
 		gtk_widget_show(hbox);
 	}
+}
 
+/* TODO: Duplicated code. It's also in interface.c */
+static void
+on_scrollbar_settings_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpointer user_data)
+{	
+	GtkScrolledWindow *win = GTK_SCROLLED_WINDOW(user_data);
+	
+	SettingsScrollbarSize size = gconf_value_get_int(entry->value);
+	if (size == SETTINGS_SCROLLBAR_SIZE_BIG) {
+		hildon_helper_set_thumb_scrollbar(win, TRUE);
+	} else {
+		hildon_helper_set_thumb_scrollbar(win, FALSE);
+	}		
 }
 
 static
@@ -369,6 +384,9 @@ HildonWindow* search_window_create()
 	#else
 	scrolledwindow = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolledwindow), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+	if (settings_load_scrollbar_size() == SETTINGS_SCROLLBAR_SIZE_BIG) {
+		hildon_helper_set_thumb_scrollbar(GTK_SCROLLED_WINDOW(scrolledwindow), TRUE);
+	}
 	#endif
 	gtk_widget_show(scrolledwindow);
 	gtk_box_pack_start(GTK_BOX(vbox), scrolledwindow, TRUE, TRUE, 0);
@@ -448,6 +466,8 @@ HildonWindow* search_window_create()
 	g_signal_connect(win, "delete-event", G_CALLBACK(on_delete_event), NULL);
 	g_signal_connect(win, "key_press_event", G_CALLBACK(on_hardware_key_pressed), win);
 	g_signal_connect(tree, "key_press_event", G_CALLBACK(on_key_pressed), search_field);
+	
+	gconf_client_notify_add(app_data->client, SETTINGS_SCROLLBAR_SIZE, on_scrollbar_settings_changed, scrolledwindow, NULL, NULL);
 
 #ifdef HILDON_HAS_APP_MENU
 	g_signal_connect(button_sort_by_title, "toggled", G_CALLBACK(on_sort_by_title_changed), sorted_store);
