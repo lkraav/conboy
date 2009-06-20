@@ -11,7 +11,6 @@ typedef struct
 {
 	const gchar   *user_path;
 	GList         *open_notes;
-	gint           font_size;
 	GConfClient   *client;
 	HildonProgram *program;
 	gboolean	   fullscreen;

@@ -78,7 +78,6 @@ AppData* app_data_get() {
 		_app_data->note_store = store;
 		_app_data->open_notes = NULL;
 		_app_data->client = client;
-		_app_data->font_size = font_size;
 		_app_data->program = hildon_program_get_instance();
 		_app_data->fullscreen = FALSE;
 		_app_data->portrait = is_portrait_mode();
