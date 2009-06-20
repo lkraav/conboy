@@ -25,6 +25,7 @@
 
 #include "app_data.h"
 #include "storage.h"
+#include "settings.h"
 
 /* Global AppData only access with get_app_data() */
 AppData *_app_data = NULL;
@@ -57,9 +58,9 @@ AppData* app_data_get() {
 		NoteListStore *store;
 
 		client = gconf_client_get_default();
-		gconf_client_add_dir(client, "/apps/maemo/conboy", GCONF_CLIENT_PRELOAD_NONE, NULL);
+		gconf_client_add_dir(client, SETTINGS_ROOT, GCONF_CLIENT_PRELOAD_NONE, NULL);
 
-		font_size = gconf_client_get_int(client, "/apps/maemo/conboy/font_size", NULL);
+		font_size = gconf_client_get_int(client, SETTINGS_FONT_SIZE, NULL);
 		if (font_size == 0) {
 			font_size = 20000;
 		}

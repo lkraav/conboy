@@ -121,6 +121,19 @@ gboolean on_window_visible(GtkWidget *widget, GdkEvent *event, gpointer user_dat
 	return FALSE;
 }
 
+static gboolean
+on_delete_event(GtkWidget *window, GdkEvent *event, gpointer user_data)
+{
+	/* If no notes are open and the search window is closed, exit Conboy. */
+	AppData *app_data = app_data_get();
+	if (g_list_length(app_data->open_notes) == 0) {
+		gtk_main_quit();
+	} else {
+		gtk_widget_hide(window);
+	}
+	return TRUE;
+}
+
 static
 gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer user_data)
 {
@@ -432,7 +445,7 @@ HildonWindow* search_window_create()
 	g_signal_connect(clear_button, "clicked", G_CALLBACK(on_clear_button_clicked), search_field);
 	g_signal_connect(tree, "row-activated", G_CALLBACK(on_row_activated), NULL);
 	g_signal_connect(win, "map-event", G_CALLBACK(on_window_visible), search_field);
-	g_signal_connect(win, "delete-event", G_CALLBACK(gtk_widget_hide_on_delete), NULL);
+	g_signal_connect(win, "delete-event", G_CALLBACK(on_delete_event), NULL);
 	g_signal_connect(win, "key_press_event", G_CALLBACK(on_hardware_key_pressed), win);
 	g_signal_connect(tree, "key_press_event", G_CALLBACK(on_key_pressed), search_field);
 

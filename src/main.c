@@ -23,6 +23,8 @@
 #include <libosso.h>
 
 #include "app_data.h"
+#include "settings.h"
+#include "search_window.h"
 /*#include "json.h"*/
 
 
@@ -84,13 +86,18 @@ main (int argc, char *argv[])
   program = HILDON_PROGRAM(hildon_program_get_instance());
   g_set_application_name("Conboy");
 
-  /* Get the most recent note. If there is none, create new. */
-  note = note_list_store_get_latest(app_data->note_store);
-  if (note == NULL) {
-	  note = note_create_new();
+  if (settings_load_startup_window() == SETTINGS_STARTUP_WINDOW_NOTE) {
+	  /* Get the most recent note. If there is none, create new. */
+	  note = note_list_store_get_latest(app_data->note_store);
+	  if (note == NULL) {
+		  note = note_create_new();
+	  }
+	  note_show(note);
+  } else {
+	  search_window_open();
   }
 
-  note_show(note);
+  
   
   /*******/
   /*
