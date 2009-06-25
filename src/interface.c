@@ -622,7 +622,9 @@ GtkWidget* create_mainwin(Note *note) {
 	
 
 	/* Enable support for tap and hold on the textview */
-	gtk_widget_tap_and_hold_setup(textview, NULL, NULL, 0);
+	/* TODO: This is deactivated for now, because it's not included in upstream Gtk
+	 * and therefore does not work on exist in ubuntu */
+	/*gtk_widget_tap_and_hold_setup(textview, NULL, NULL, 0);*/
 
 	/* Save for later usage */
 	ui->window = HILDON_WINDOW(mainwin);
