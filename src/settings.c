@@ -100,7 +100,7 @@ settings_load_use_costum_colors()
  * You have to free the gchar after using.
  */
 static gchar*
-gdk_color_to_string(GdkColor *color)
+conboy_gdk_color_to_string(GdkColor *color)
 {
 	PangoColor pColor;
 	
@@ -144,7 +144,7 @@ void
 settings_save_color(GdkColor *color, SettingsColorType type)
 {
 	AppData *app_data = app_data_get();
-	gchar *hex_color = gdk_color_to_string(color);
+	gchar *hex_color = conboy_gdk_color_to_string(color);
 	
 	gconf_client_set_string(app_data->client, settings_color_enum_to_key(type), hex_color, NULL);
 	
