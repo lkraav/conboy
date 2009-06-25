@@ -403,11 +403,9 @@ HildonWindow* search_window_create()
 
 	/* TREE VIEW */
 #ifdef HILDON_HAS_APP_MENU
-	g_printerr("NEW code executed \n");
 	tree = hildon_gtk_tree_view_new_with_model(HILDON_UI_MODE_NORMAL, GTK_TREE_MODEL(sorted_store)); /*HILDON_UI_MODE_NORMAL, HILDON_UI_MODE_EDIT */
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree), FALSE);
 #else
-	g_printerr("OLD code executed \n");
 	tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(sorted_store));
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tree), TRUE);
 #endif

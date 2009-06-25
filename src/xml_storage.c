@@ -20,6 +20,7 @@
 #include <libxml/xmlreader.h>
 #include <libxml/xmlwriter.h>
 #include <string.h>
+#include <glib/gprintf.h>
 
 #include "storage.h"
 #include "app_data.h"
@@ -98,7 +99,7 @@ void storage_destroy(void)
 void handle_start_element(xmlTextReader *reader, Note *note)
 {
 	/* TODO: Whats the official way to convert xmlChar to gchar? */
-	gchar *name = xmlTextReaderConstName(reader);
+	const gchar *name = xmlTextReaderConstName(reader);
 	gchar *value = xmlTextReaderReadString(reader);
 	gchar *attr_value = NULL;
 	XmlTag tag = string_to_enum(name);
@@ -253,25 +254,19 @@ Note* storage_load_note(const gchar *guid)
 	filename = g_strconcat(app_data->user_path, guid, ".note", NULL);
 	
 	/* We try to reuse the existing xml parser. If none exists yet, we create a new one. */
-	if (app_data->reader != NULL) {
-		
-		int stat = xmlReaderNewFile(app_data->reader, filename, "UTF-8", 0);
-		if (stat == 0) {
-			g_printerr("INFO: Reusing xml parser. \n");
-		} else {
-			g_printerr("ERROR: Cannot reuse xml parser. \n");
-			g_assert_not_reached();
-		}
-	} else {
-		g_printerr("INFO: Create new xml parser. \n");
+	if (app_data->reader == NULL) {
 		app_data->reader = xmlReaderForFile(filename, "UTF-8", 0);
+	}
+	
+	if (xmlReaderNewFile(app_data->reader, filename, "UTF-8", 0) != 0) {
+		g_printerr("ERROR: Cannot reuse xml parser. \n");
+		g_assert_not_reached();
 	}
 	
 	if (app_data->reader == NULL) {
 		g_printerr("ERROR: Cannot open file: %s\n", filename);
 		g_assert_not_reached();
 	}
-	
 	
 	note = note_create_new();
 	note->guid = g_strdup(guid);
@@ -386,8 +381,8 @@ gboolean storage_save_note(Note *note)
 	
 	writer = xmlNewTextWriterFilename(filename, 0);
 	if (writer == NULL) {
-		g_printerr("Writer is NULL \n");
-		g_assert_not_reached();
+		g_printerr("ERROR: XmlWriter is NULL \n");
+		return FALSE;
 	}
 	
 	write_header(writer, note);
@@ -396,6 +391,8 @@ gboolean storage_save_note(Note *note)
 	
 	xmlFreeTextWriter(writer);
 	g_free(filename);
+	
+	return TRUE;
 }
 
 /**

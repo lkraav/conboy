@@ -386,40 +386,6 @@ void note_show_new(Note *note)
 	gtk_text_buffer_select_range(buffer, &start, &end);
 }
 
-static void note_fill_text_buffer(Note *note)
-{
-	
-	/*deserialize_note(note);*/
-	
-	/** TODO: Problem: A new notes get created without UI */
-	/*note = storage_load_note(note->guid);*/
-	/*storage_load_note_content(note);*/
-	
-	g_printerr("Title: %s\n", note->title);
-	g_printerr("Content: %s\n", note->content);
-	g_printerr("Cursor: %i\n", note->cursor_position);
-	g_printerr("Create: %i\n", note->create_date);
-	g_printerr("Version: %f\n", note->version);
-	g_printerr("ContVer: %f\n", note->content_version);
-	
-	GtkTextBuffer *buffer = note->ui->buffer;
-	
-
-	/*
-	 * 
-	 * TODO: Replace with proper deserialization of the content xml
-	 * Put a big part of deserialize.c into some kind off
-	 * note_buffer.c 
-	 * 
-	 */
-	
-	note_buffer_set_xml(buffer, note->content);
-	
-	/*gtk_text_buffer_set_text(buffer, note->content, -1);*/
-	
-	
-}
-
 void note_show_existing(Note *note)
 {
 	GtkTextBuffer *buffer = note->ui->buffer;
@@ -428,10 +394,8 @@ void note_show_existing(Note *note)
 	/* iter defines where to start with inserting */
 	gtk_text_buffer_get_start_iter(buffer, &iter);
 
-	/* start deserialization */
-	/*deserialize_note(note);*/
-	/* TODO: Note should not contain UI, but UI should contain note */
-	note_fill_text_buffer(note);
+	/* Insert the content of a note into the text buffer */
+	note_buffer_set_xml(buffer, note->content);
 
 	/* Set cursor possition */
 	gtk_text_buffer_get_iter_at_offset(buffer, &iter, note->cursor_position);

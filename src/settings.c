@@ -41,7 +41,6 @@ void
 settings_save_scrollbar_size(SettingsScrollbarSize size)
 {
 	AppData *app_data = app_data_get();
-	g_printerr("Save scrollbar: %i \n", size);
 	gconf_client_set_int(app_data->client, SETTINGS_SCROLLBAR_SIZE, size, NULL);
 }
 
@@ -54,7 +53,6 @@ settings_load_scrollbar_size()
 		g_printerr("ERROR: Unknown scrollbar size. Size: %i \n", size);
 		return SETTINGS_SCROLLBAR_SIZE_SMALL;
 	} else {
-		g_printerr("Load scrollbar: %i \n", size);
 		return size;
 	}
 }
@@ -83,7 +81,6 @@ void
 settings_save_use_custom_colors(gboolean use)
 {
 	AppData *app_data = app_data_get();
-	g_printerr("Save custom colors: %i \n", use);
 	gconf_client_set_bool(app_data->client, SETTINGS_USE_CUSTOM_COLORS, use, NULL);
 }
 
@@ -92,7 +89,6 @@ settings_load_use_costum_colors()
 {
 	AppData *app_data = app_data_get();
 	gboolean use = gconf_client_get_bool(app_data->client, SETTINGS_USE_CUSTOM_COLORS, NULL);
-	g_printerr("Load custom colors: %i \n", use);
 	return use;
 }
 

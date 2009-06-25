@@ -96,9 +96,7 @@ gchar* peek_tag(ParseContext *ctx)
 static
 void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 {
-	gchar *element_name = xmlTextReaderConstName(reader);
-	
-	g_printerr("<%s>\n", element_name);
+	const gchar *element_name = xmlTextReaderConstName(reader);
 	
 	switch (peek_state(ctx)) {
 	case STATE_START:
@@ -135,7 +133,7 @@ void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 static
 void handle_end_element(ParseContext *ctx, xmlTextReader *reader) {
 	
-	gchar *element_name = xmlTextReaderConstName(reader);
+	const gchar *element_name = xmlTextReaderConstName(reader);
 	
 	switch (peek_state(ctx)) {
 	  	
@@ -209,7 +207,7 @@ void apply_tags(GSList *tags, GtkTextBuffer *buffer, GtkTextIter *start_iter, Gt
 static
 void handle_text_element(ParseContext *ctx, xmlTextReader *reader, GtkTextBuffer *buffer)
 {
-	gchar *text = xmlTextReaderConstValue(reader);
+	const gchar *text = xmlTextReaderConstValue(reader);
 	GtkTextIter *iter = ctx->iter;
 	GtkTextIter start_iter;
 	GtkTextMark *mark;
@@ -337,17 +335,13 @@ void note_buffer_set_xml(GtkTextBuffer *buffer, const gchar *xmlString)
 	AppData *app_data = app_data_get();
 	
 	/* We try to reuse the existing xml parser. If none exists yet, we create a new one. */
-	if (app_data->reader != NULL) {
-		int state = xmlReaderNewMemory(app_data->reader, xmlString, strlen(xmlString), "", "UTF-8", 0);
-		if (state == 0) {
-			g_printerr("INFO: Reusing xml parser. \n");
-		} else {
-			g_printerr("ERROR: Cannot reuse xml parser. \n");
-			g_assert_not_reached();
-		}
-	} else {
-		g_printerr("INFO: Creating new xml parser. \n");
+	if (app_data->reader == NULL) {
 		app_data->reader = xmlReaderForMemory(xmlString, strlen(xmlString), "", "UTF-8", 0);
+	}
+	
+	if (xmlReaderNewMemory(app_data->reader, xmlString, strlen(xmlString), "", "UTF-8", 0) != 0) {
+		g_printerr("ERROR: Cannot reuse xml parser. \n");
+		g_assert_not_reached();
 	}
 	
 	if (app_data->reader == NULL) {
