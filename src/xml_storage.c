@@ -178,6 +178,7 @@ void handle_start_element(xmlTextReader *reader, Note *note)
 	}
 	
 	g_free(value);
+	g_free(attr_value);
 }
 
 
