@@ -52,6 +52,7 @@ static void populate_note_store(NoteListStore *store, const gchar *user_path) {
 	
 	g_timer_stop(timer);
 	g_timer_elapsed(timer, &micro);
+	g_timer_destroy(timer);
 	g_printerr("Loading %i notes took %i micro seconds \n", count, micro);
 
 	g_list_free(ids);

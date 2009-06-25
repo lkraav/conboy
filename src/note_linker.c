@@ -107,7 +107,8 @@ GSList* find_titles(gchar *haystack) {
 
 	g_timer_elapsed(search_timer, &micro);
 	/*g_printerr("Search took %lu microseconds \n", micro);*/
-
+	g_timer_destroy(search_timer);
+	
 	g_free(u_haystack);
 
 	return result;

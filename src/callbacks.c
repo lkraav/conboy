@@ -401,6 +401,7 @@ on_notes_button_clicked				   (GtkAction		*action,
 
 	g_timer_stop(timer);
 	g_timer_elapsed(timer, &micro);
+	g_timer_destroy(timer);
 	g_printerr("Opening search window: %lu micro seconds \n", micro);
 
 }
@@ -977,7 +978,8 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 
 	g_timer_stop(timer);
 	g_timer_elapsed(timer, &micro);
-	g_printerr("%lu\n", micro);
+	g_timer_destroy(timer);
+	g_printerr("Insert text: %lu micro seconds. \n", micro);
 }
 
 void

@@ -31,10 +31,8 @@ on_scroll_but_toggled(GtkToggleButton *button, gpointer user_data)
 {
 	if (gtk_toggle_button_get_active(button)) {
 		settings_save_scrollbar_size(SETTINGS_SCROLLBAR_SIZE_SMALL);
-		g_printerr("SMALL \n");
 	} else {
 		settings_save_scrollbar_size(SETTINGS_SCROLLBAR_SIZE_BIG);
-		g_printerr("LARGE \n");
 	}
 }
 
@@ -44,10 +42,8 @@ on_view_but_toggled(GtkToggleButton *button, gpointer user_data)
 	
 	if (gtk_toggle_button_get_active(button)) {
 		settings_save_startup_window(SETTINGS_STARTUP_WINDOW_NOTE);
-		g_printerr("NOTE \n");
 	} else {
 		settings_save_startup_window(SETTINGS_STARTUP_WINDOW_SEARCH);
-		g_printerr("SEARCH \n");
 	}
 }
 
