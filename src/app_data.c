@@ -36,6 +36,10 @@ static void populate_note_store(NoteListStore *store, const gchar *user_path) {
 	GList *ids = storage_get_all_note_ids();
 	Note *note;
 	GtkTreeIter iter;
+	gulong micro;
+	gint count = 0;
+	GTimer *timer = g_timer_new();
+	g_timer_start(timer);
 
 	while (ids != NULL) {
 		/*note = storage_load_note_partial((gchar*)ids->data);*/
@@ -43,7 +47,12 @@ static void populate_note_store(NoteListStore *store, const gchar *user_path) {
 		g_free(ids->data);
 		note_list_store_add(store, note, &iter);
 		ids = ids->next;
+		count++;
 	}
+	
+	g_timer_stop(timer);
+	g_timer_elapsed(timer, &micro);
+	g_printerr("Loading %i notes took %i micro seconds \n", count, micro);
 
 	g_list_free(ids);
 }

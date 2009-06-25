@@ -166,7 +166,6 @@ void note_save(Note *note)
 		return;
 	}
 	g_free(content);
-	
 
 	/* If buffer is not dirty, don't save */
 	if (!gtk_text_buffer_get_modified(buffer)) {
@@ -208,17 +207,14 @@ void note_save(Note *note)
 		note->y = 1;
 	}
 	
+	/* Clear note content, then set it with fresh data from the text buffer */
 	g_free(note->content);
 	note->content = note_buffer_get_xml(buffer);
-	g_printerr("___SAVING___:\n");
-	g_printerr("%s\n", note->content);
 
-	app_data = app_data_get();
-
-	/* Start serialization */
-	/*serialize_note(note);*/
+	/* Save the complete note */
 	storage_save_note(note);
 
+	app_data = app_data_get();	
 	/* If first save, add to list of all notes */
 	if (!note_list_store_find(app_data->note_store, note)) {
 		note_list_store_add(app_data->note_store, note, NULL);
