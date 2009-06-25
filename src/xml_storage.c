@@ -248,17 +248,19 @@ Note* storage_load_note(const gchar *guid)
 	int ret;
 	Note *note;
 	gchar *filename;
+	xmlTextReader *reader;
 	
 	g_assert(guid != NULL);
 	
 	filename = g_strconcat(app_data->user_path, guid, ".note", NULL);
 	
 	/* We try to reuse the existing xml parser. If none exists yet, we create a new one. */
+	/*
 	if (app_data->reader == NULL) {
-		app_data->reader = xmlReaderForFile(filename, "UTF-8", 0);
+		app_data->reader = xmlReaderForFile(filename, NULL, 0);
 	}
 	
-	if (xmlReaderNewFile(app_data->reader, filename, "UTF-8", 0) != 0) {
+	if (xmlReaderNewFile(app_data->reader, filename, NULL, 0) != 0) {
 		g_printerr("ERROR: Cannot reuse xml parser. \n");
 		g_assert_not_reached();
 	}
@@ -267,20 +269,25 @@ Note* storage_load_note(const gchar *guid)
 		g_printerr("ERROR: Cannot open file: %s\n", filename);
 		g_assert_not_reached();
 	}
+	*/
+	/* Reusing the xml parser does not work here. TODO: File a bug for libxml2 */
+	reader = xmlReaderForFile(filename, NULL, 0);
+	/*xmlReaderNewFile(reader, filename, NULL, 0);*/ /* To reproduce uncomment this line */
 	
 	note = note_create_new();
 	note->guid = g_strdup(guid);
 	
-	ret = xmlTextReaderRead(app_data->reader);
+	ret = xmlTextReaderRead(reader);
 	while (ret == 1) {
-		process_note(app_data->reader, note);
-		ret = xmlTextReaderRead(app_data->reader);
+		process_note(reader, note);
+		ret = xmlTextReaderRead(reader);
 	}
 		
 	if (ret != 0) {
 		g_printerr("ERROR: Failed to parse file: %s\n", filename);
 	}
 	
+	xmlFreeTextReader(reader);
 	g_free(filename);
 	
 	return note;
