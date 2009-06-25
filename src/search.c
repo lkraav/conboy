@@ -5,35 +5,80 @@
 #include "search.h"
 #include "app_data.h"
 
+
+
+/**
+ * Returns a new gchar* which contains only the text, but no xml tags anymore.
+ * Free the return value when not needed anymore.
+ */
+static gchar*
+strip_tags(const gchar *xml_string)
+{
+	int ret;
+	AppData *app_data = app_data_get();
+	xmlTextReader *reader = app_data->reader;
+	GString *result = g_string_new("");
+	
+	xmlReaderNewMemory(reader, xml_string, strlen(xml_string), NULL, NULL, 0);
+	ret = xmlTextReaderRead(reader);
+	while (ret == 1) {
+		int type = xmlTextReaderNodeType(reader);
+		const xmlChar *value = xmlTextReaderConstValue(reader);
+		 
+		if (type == XML_TEXT_NODE || type == XML_DTD_NODE) { 
+			g_string_append(result, value);
+		}
+		
+		ret = xmlTextReaderRead(reader);
+	}
+	
+	if (ret != 0) {
+		g_printerr("ERROR: Failed to strip tags from xml string.\n");
+	}
+	
+	/* Returns the gchar array and frees the rest */
+	return g_string_free(result, FALSE);
+}
+
+/* TODO: Clean up the g_free() mess */
 static gint
-find_match_count(gchar *xml_string, gchar **words)
+find_match_count(const gchar *xml_string, gchar **words)
 {
 	gint matches = 0;
-	/* TODO: Strip xml tags */
 	gint i;
+	gchar *note_content = strip_tags(xml_string);
+	gchar *u_note_content = g_utf8_casefold(note_content, -1);
+	g_free(note_content);
 	
 	for (i = 0; words[i] != NULL; i++) {
 		
-		gchar *word = words[i];
-		gchar *found = xml_string;
+		gchar *u_word = g_utf8_casefold(words[i], -1);
+		gchar *u_found = u_note_content;
+		
 		gboolean current_word_found = FALSE;	
 		
-		if (strcmp("", word) == 0) {
+		if (strcmp("", u_word) == 0) {
+			g_free(u_word);
 			continue;
 		}
 		
 		/* Find all occurences of word */
-		while((found = strstr(found, word)) != NULL) {
+		while((u_found = strstr(u_found, u_word)) != NULL) {
 			matches++;
 			current_word_found = TRUE;
-			found = found + strlen(word);
+			u_found = u_found + strlen(u_word);
 		}
 		
 		/* If we didn't have at least one hit for all words, we return 0 hits, because we want "AND" search, not "OR". */
 		if (current_word_found == FALSE) {
+			g_free(u_note_content);
+			g_free(u_word);
 			return 0;
 		}
+		g_free(u_word);
 	}
+	
+	g_free(u_note_content);
 	
 	return matches;
 }
