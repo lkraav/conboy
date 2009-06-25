@@ -61,9 +61,12 @@ const gchar* get_bullet_by_depth_tag(GtkTextTag *tag) {
 gchar* get_uuid()
 {
 	gchar *content;
+	gchar *result;
 	g_file_get_contents("/proc/sys/kernel/random/uuid", &content, NULL, NULL);
 	g_strchomp(content);
-	return g_strconcat(content, "\0", NULL);  /*g_strdup(content);*/
+	result = g_strconcat(content, "\0", NULL);
+	g_free(content);
+	return result;
 }
 
 const gchar* note_get_new_filename(const gchar *uuid)
