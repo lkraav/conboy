@@ -14,7 +14,7 @@ AC_PROG_INSTALL
 dnl AC_PREFIX_DEFAULT(/var/lib/install/usr)
 AC_PREFIX_DEFAULT(/usr)
 
-CFLAGS="$CFLAGS -Wall -ansi -pedantic -Wmissing-prototypes -Wmissing-declarations"
+CFLAGS="$CFLAGS -Wall -ansi -Wmissing-prototypes -Wmissing-declarations"
 
 PKG_CHECK_MODULES(HILDON, hildon-1 >= 0.8.4)  
 AC_SUBST(HILDON_LIBS)
