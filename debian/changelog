@@ -1,3 +1,9 @@
+conboy (0.4.6) stable; urgency=low
+
+  * Placeholder
+  
+ -- Cornelius Hald <hald@icandy.de>  Mat, 20 Jun 2009 17:41:12 +0200  
+
 conboy (0.4.5) stable; urgency=low
 
   * Added support for tags. Tags aka Notebooks are now preserved.
