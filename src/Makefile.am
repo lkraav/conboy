@@ -42,7 +42,9 @@ conboy_SOURCES = \
         settings.h \
         settings.c \
         settings_window.h \
-        settings_window.c
+        settings_window.c \
+        search.h \
+        search.c
 
 #libconboy_applet_la_SOURCES = \
 #		conboy_applet.c \

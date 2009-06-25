@@ -35,59 +35,75 @@
 #include "note.h"
 #include "note_list_store.h"
 #include "settings.h"
+#include "search.h"
 
+typedef struct {
+	GtkWidget          *search_field;
+	GtkWidget          *hbox;
+	GtkTreeViewColumn  *change_date_column;
+	GHashTable         *search_result;
+	GtkTreeModelFilter *filtered_model;
+} SearchWindowData;
+
+/**
+ * This is the filter function for the tree view.
+ */
 static gboolean
-is_row_visible(GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
+is_row_visible(GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data)
 {
-	GtkEntry *text_box = GTK_ENTRY(data);
-
-	const gchar *text;
-	gboolean visible;
-	gchar *title;
-	gchar *u_title;
-	gchar *u_text;
-
-	text = gtk_entry_get_text(text_box);
-
-	if (strcmp(text, "") == 0) {
+	SearchWindowData *data = (SearchWindowData*)user_data;
+	GHashTable *search_result = data->search_result;
+	Note *note;
+	
+	/* In case the search field does not exist yet, or containts no text, show all */
+	if (data->search_field == NULL) {
 		return TRUE;
 	}
-
-	gtk_tree_model_get(model, iter, TITLE_COLUMN, &title, -1);
-
-	u_title = g_utf8_casefold(title, -1);
-	u_text  = g_utf8_casefold(text, -1);
-
-	if (strstr(u_title, u_text) != NULL) {
-		visible = TRUE;
-	} else {
-		visible = FALSE;
+	
+	if (strcmp(gtk_entry_get_text(GTK_ENTRY(data->search_field)), "") == 0) {
+		return TRUE;
 	}
-
-	g_free(title);
-	g_free(u_title);
-	g_free(u_text);
-	return visible;
+	
+	gtk_tree_model_get(model, iter, NOTE_COLUMN, &note, -1);
+	
+	if (note == NULL) {
+		return FALSE;
+	}
+	
+	if (search_result == NULL) {
+		return TRUE;
+	}
+	
+	if (g_hash_table_lookup(search_result, note)) {
+		return TRUE;
+	} else {
+		return FALSE;
+	}
 }
 
 static
 gboolean update_search_result(gpointer user_data)
 {
-	gtk_tree_model_filter_refilter(GTK_TREE_MODEL_FILTER(user_data));
-	/* Don't call this function over and over again */
-	return FALSE;
+	SearchWindowData *data = (SearchWindowData*) user_data;
+	const gchar *query = gtk_entry_get_text(GTK_ENTRY(data->search_field));
+	
+	search(query, data->search_result);
+	
+	gtk_tree_model_filter_refilter(data->filtered_model);
+	
+	return FALSE; /* Don't call this function over and over again */
 }
 
 guint _source_id = 0;
 
 static
-void on_search_string_changed(GtkEditable *entry, gpointer user_data)
+void on_search_string_changed(GtkEditable *entry, SearchWindowData *data)
 {
 	/* With every change we reset the timer to 500ms. */
 	if (_source_id != 0) { /* Trying to remove source with id == 0 creates runtime warning */
 		g_source_remove(_source_id);
 	}
-	_source_id = g_timeout_add(500, update_search_result, user_data);
+	_source_id = g_timeout_add(500, update_search_result, data);
 }
 
 static
@@ -205,7 +221,6 @@ void on_sort_by_date_changed(GtkToggleButton *button, GtkTreeSortable *sortable)
 {
 	if (gtk_toggle_button_get_active(button)) {
 		gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(sortable), CHANGE_DATE_COLUMN, GTK_SORT_DESCENDING);
-		/*gtk_tree_sortable_sort_column_changed(sortable);*/
 	}
 }
 
@@ -214,19 +229,18 @@ void on_sort_by_title_changed(GtkToggleButton *button, GtkTreeSortable *sortable
 {
 	if (gtk_toggle_button_get_active(button)) {
 		gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(sortable), TITLE_COLUMN, GTK_SORT_ASCENDING);
-		/*gtk_tree_sortable_sort_column_changed(sortable);*/
 	}
 }
 
 static
-void on_orientation_changed(GdkScreen *screen, GHashTable *user_data)
+void on_orientation_changed(GdkScreen *screen, SearchWindowData *data)
 {
 	GtkTreeViewColumn *column;
 	GtkWidget *hbox;
 	AppData *app_data = app_data_get();
 
-	column = GTK_TREE_VIEW_COLUMN(g_hash_table_lookup(user_data, "column"));
-	hbox = GTK_WIDGET(g_hash_table_lookup(user_data, "hbox"));
+	column = data->change_date_column;
+	hbox = data->hbox;
 
 	app_data->portrait = is_portrait_mode();
 
@@ -297,7 +311,7 @@ gint compare_dates(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer
 }
 
 static
-HildonWindow* search_window_create()
+HildonWindow* search_window_create(SearchWindowData *window_data)
 {
 	AppData *app_data = app_data_get();
 	GtkWidget *win;
@@ -319,11 +333,12 @@ HildonWindow* search_window_create()
 	GtkTreeViewColumn *title_column;
 	GtkTreeViewColumn *change_date_column;
 	GdkScreen *screen;
-	GHashTable *hash;
+	GHashTable *search_result;
 
 	win = hildon_window_new();
 	gtk_window_set_title(GTK_WINDOW(win), _("Search All Notes"));
 	screen = gdk_screen_get_default();
+	search_result = g_hash_table_new(NULL, NULL);
 
 	/* Window menu */
 #ifdef HILDON_HAS_APP_MENU
@@ -391,11 +406,15 @@ HildonWindow* search_window_create()
 	gtk_widget_show(scrolledwindow);
 	gtk_box_pack_start(GTK_BOX(vbox), scrolledwindow, TRUE, TRUE, 0);
 
+	
+	
+	window_data->search_result = search_result;
+	
 	/* LIST STORE */
 	store = app_data->note_store;
 	/* Add filter wrapper */
 	filtered_store = gtk_tree_model_filter_new(GTK_TREE_MODEL(store), NULL);
-	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(filtered_store), is_row_visible, search_field, NULL);
+	gtk_tree_model_filter_set_visible_func(GTK_TREE_MODEL_FILTER(filtered_store), is_row_visible, window_data, NULL);
 	/* Add sort wrapper */
 	sorted_store = gtk_tree_model_sort_new_with_model(filtered_store);
 	gtk_tree_sortable_set_sort_func(GTK_TREE_SORTABLE(sorted_store), TITLE_COLUMN, compare_titles, NULL, NULL);
@@ -426,9 +445,7 @@ HildonWindow* search_window_create()
 	title_column = gtk_tree_view_column_new();
 	gtk_tree_view_column_set_title(title_column, _("Note"));
 	gtk_tree_view_column_set_sort_column_id(title_column, TITLE_COLUMN);
-	/*gtk_tree_view_column_set_sort_indicator(title_column, FALSE);*/
 	gtk_tree_view_column_set_reorderable(title_column, FALSE);
-	/*gtk_tree_view_column_set_sort_order(title_column, GTK_SORT_ASCENDING);*/
 	gtk_tree_view_column_set_sizing(title_column, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
 	gtk_tree_view_column_set_expand(title_column, TRUE);
 	/* Add icon to column */
@@ -451,19 +468,26 @@ HildonWindow* search_window_create()
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree), change_date_column);
 	/* Sort the using the CHANGE_DATE column */
 	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(sorted_store), CHANGE_DATE_COLUMN, GTK_SORT_DESCENDING);
-	/*gtk_tree_sortable_sort_column_changed(GTK_TREE_SORTABLE(sorted_store)); */ /* TODO: Test if it's needed */
 
 	/* Don't show column if we are in portrait mode */
 	gtk_tree_view_column_set_visible(change_date_column, !app_data->portrait);
 
+	/* Fill window_data */
+	window_data->change_date_column = change_date_column;
+	window_data->hbox = hbox;
+	window_data->search_field = search_field;
+	window_data->filtered_model = GTK_TREE_MODEL_FILTER(filtered_store);
+	
+	
 	/* CONNECT SIGNALS */
-	g_signal_connect(search_field, "changed", G_CALLBACK(on_search_string_changed), filtered_store);
+	g_signal_connect(search_field, "changed", G_CALLBACK(on_search_string_changed), window_data);
 	g_signal_connect(clear_button, "clicked", G_CALLBACK(on_clear_button_clicked), search_field);
 	g_signal_connect(tree, "row-activated", G_CALLBACK(on_row_activated), NULL);
 	g_signal_connect(win, "map-event", G_CALLBACK(on_window_visible), search_field);
 	g_signal_connect(win, "delete-event", G_CALLBACK(on_delete_event), NULL);
 	g_signal_connect(win, "key_press_event", G_CALLBACK(on_hardware_key_pressed), win);
 	g_signal_connect(tree, "key_press_event", G_CALLBACK(on_key_pressed), search_field);
+	g_signal_connect(screen, "size-changed", G_CALLBACK(on_orientation_changed), window_data);
 	
 	gconf_client_notify_add(app_data->client, SETTINGS_SCROLLBAR_SIZE, on_scrollbar_settings_changed, scrolledwindow, NULL, NULL);
 
@@ -471,14 +495,6 @@ HildonWindow* search_window_create()
 	g_signal_connect(button_sort_by_title, "toggled", G_CALLBACK(on_sort_by_title_changed), sorted_store);
 	g_signal_connect(button_sort_by_date, "toggled", G_CALLBACK(on_sort_by_date_changed), sorted_store);
 #endif
-
-	/* Connect screen orientation changed signal */
-	/* TODO: When restructuring UI, get rid of this hashmap */
-	hash = g_hash_table_new(g_str_hash, g_str_equal);
-	g_hash_table_insert(hash, "column", change_date_column);
-	g_hash_table_insert(hash, "hbox", hbox);
-	g_signal_connect(screen, "size-changed", G_CALLBACK(on_orientation_changed), hash);
-
 
 	app_data = app_data_get();
 	app_data->note_store = store;
@@ -489,9 +505,11 @@ HildonWindow* search_window_create()
 void search_window_open()
 {
 	AppData *app_data = app_data_get();
+	SearchWindowData *window_data;
 
 	if (app_data->search_window == NULL) {
-		app_data->search_window = search_window_create();
+		window_data = g_new0(SearchWindowData, 1);
+		app_data->search_window = search_window_create(window_data);
 	}
 
 	if (app_data->fullscreen) {
