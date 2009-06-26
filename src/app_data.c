@@ -42,10 +42,11 @@ static void populate_note_store(NoteListStore *store, const gchar *user_path) {
 	g_timer_start(timer);
 
 	while (ids != NULL) {
-		/*note = storage_load_note_partial((gchar*)ids->data);*/
 		note = storage_load_note((gchar*)ids->data);
 		g_free(ids->data);
-		note_list_store_add(store, note, &iter);
+		if (note != NULL) {
+			note_list_store_add(store, note, &iter);
+		}
 		ids = ids->next;
 		count++;
 	}
@@ -53,7 +54,7 @@ static void populate_note_store(NoteListStore *store, const gchar *user_path) {
 	g_timer_stop(timer);
 	g_timer_elapsed(timer, &micro);
 	g_timer_destroy(timer);
-	g_printerr("Loading %i notes took %i micro seconds \n", count, micro);
+	g_printerr("Loading %i notes took %ld micro seconds \n", count, micro);
 
 	g_list_free(ids);
 }
