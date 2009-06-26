@@ -236,7 +236,8 @@ void note_close_window(Note *note)
 	if (count > 1) {
 		hildon_program_remove_window(program, window);
 		gtk_widget_destroy(GTK_WIDGET(window));
-		note->ui = NULL;
+		g_free(note->ui);
+		note->ui = g_new0(UserInterface, 1);
 		app_data->open_notes = g_list_remove(app_data->open_notes, note);
 		/* Don't free note, because we reuse this in the menu with the available notes and when reopening */
 	} else {
