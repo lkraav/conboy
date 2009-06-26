@@ -519,7 +519,11 @@ GtkWidget* create_mainwin(Note *note) {
 	/****/
 	button_dec_indent = gtk_action_create_tool_item(action_dec_indent);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_dec_indent), -1);
+#ifdef HILDON_HAS_APP_MENU
+	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 105, -1);
+#else
 	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 85, -1);
+#endif
 
 	button_inc_indent = gtk_action_create_tool_item(action_inc_indent);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_inc_indent), -1);
