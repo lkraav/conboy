@@ -99,11 +99,11 @@ static gchar*
 conboy_gdk_color_to_string(GdkColor *color)
 {
 	PangoColor pColor;
-	
+
 	pColor.red = color->red;
 	pColor.green = color->green;
 	pColor.blue = color->blue;
-	
+
 	return pango_color_to_string(&pColor);
 }
 
@@ -132,7 +132,7 @@ save_default_color(SettingsColorType type)
 	case SETTINGS_COLOR_TYPE_LINKS: gdk_color_parse("blue", &color); break;
 	default: g_assert_not_reached();
 	}
-	
+
 	settings_save_color(&color, type);
 }
 
@@ -141,9 +141,8 @@ settings_save_color(GdkColor *color, SettingsColorType type)
 {
 	AppData *app_data = app_data_get();
 	gchar *hex_color = conboy_gdk_color_to_string(color);
-	
 	gconf_client_set_string(app_data->client, settings_color_enum_to_key(type), hex_color, NULL);
-	
+
 	g_free(hex_color);
 }
 
@@ -152,7 +151,7 @@ void settings_load_color(GdkColor *color, SettingsColorType type)
 	AppData *app_data = app_data_get();
 	GError *error;
 	gchar *hex_color = gconf_client_get_string(app_data->client, settings_color_enum_to_key(type), &error);
-	if (error != NULL || hex_color == NULL) {
+	if (hex_color == NULL) {
 		/* GConf key or value does not exist. Create key with default value. Then read again. */
 		save_default_color(type);
 		hex_color = gconf_client_get_string(app_data->client, settings_color_enum_to_key(type), NULL);
