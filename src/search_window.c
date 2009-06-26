@@ -54,26 +54,26 @@ is_row_visible(GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data)
 	SearchWindowData *data = (SearchWindowData*)user_data;
 	GHashTable *search_result = data->search_result;
 	Note *note;
-	
+
 	/* In case the search field does not exist yet, or containts no text, show all */
 	if (data->search_field == NULL) {
 		return TRUE;
 	}
-	
+
 	if (strcmp(gtk_entry_get_text(GTK_ENTRY(data->search_field)), "") == 0) {
 		return TRUE;
 	}
-	
+
 	gtk_tree_model_get(model, iter, NOTE_COLUMN, &note, -1);
-	
+
 	if (note == NULL) {
 		return FALSE;
 	}
-	
+
 	if (search_result == NULL) {
 		return TRUE;
 	}
-	
+
 	if (g_hash_table_lookup(search_result, note)) {
 		return TRUE;
 	} else {
@@ -86,11 +86,11 @@ gboolean update_search_result(gpointer user_data)
 {
 	SearchWindowData *data = (SearchWindowData*) user_data;
 	const gchar *query = gtk_entry_get_text(GTK_ENTRY(data->search_field));
-	
+
 	search(query, data->search_result);
-	
+
 	gtk_tree_model_filter_refilter(data->filtered_model);
-	
+
 	return FALSE; /* Don't call this function over and over again */
 }
 
@@ -256,15 +256,15 @@ void on_orientation_changed(GdkScreen *screen, SearchWindowData *data)
 /* TODO: Duplicated code. It's also in interface.c */
 static void
 on_scrollbar_settings_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpointer user_data)
-{	
+{
 	GtkScrolledWindow *win = GTK_SCROLLED_WINDOW(user_data);
-	
+
 	SettingsScrollbarSize size = gconf_value_get_int(entry->value);
 	if (size == SETTINGS_SCROLLBAR_SIZE_BIG) {
 		hildon_helper_set_thumb_scrollbar(win, TRUE);
 	} else {
 		hildon_helper_set_thumb_scrollbar(win, FALSE);
-	}		
+	}
 }
 
 static
@@ -323,8 +323,10 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	GtkWidget *clear_button;
 	GtkWidget *scrolledwindow;
 	GtkWidget *tree;
+#ifdef HILDON_HAS_APP_MENU
 	GtkWidget *button_sort_by_title;
 	GtkWidget *button_sort_by_date;
+#endif
 	GtkTreeSelection *selection;
 	NoteListStore *store;
 	GtkTreeModel *filtered_store;
@@ -364,15 +366,14 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	gtk_container_add(GTK_CONTAINER(win), vbox);
 
 	hbox = gtk_hbox_new(FALSE, 0);
-	/*gtk_widget_show(hbox);*/
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 10);
 
-	search_label = gtk_label_new(_("Search:"));
-	gtk_widget_show(search_label);
-	gtk_box_pack_start(GTK_BOX(hbox), search_label, FALSE, FALSE, 0);
 	#ifdef HILDON_HAS_APP_MENU
 	search_field = hildon_entry_new(HILDON_SIZE_FINGER_HEIGHT);
 	#else
+	search_label = gtk_label_new(_("Search:"));
+	gtk_widget_show(search_label);
+	gtk_box_pack_start(GTK_BOX(hbox), search_label, FALSE, FALSE, 0);
 	search_field = gtk_entry_new();
 	#endif
 	gtk_widget_show(search_field);
@@ -406,10 +407,10 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	gtk_widget_show(scrolledwindow);
 	gtk_box_pack_start(GTK_BOX(vbox), scrolledwindow, TRUE, TRUE, 0);
 
-	
-	
+
+
 	window_data->search_result = search_result;
-	
+
 	/* LIST STORE */
 	store = app_data->note_store;
 	/* Add filter wrapper */
@@ -477,8 +478,8 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	window_data->hbox = hbox;
 	window_data->search_field = search_field;
 	window_data->filtered_model = GTK_TREE_MODEL_FILTER(filtered_store);
-	
-	
+
+
 	/* CONNECT SIGNALS */
 	g_signal_connect(search_field, "changed", G_CALLBACK(on_search_string_changed), window_data);
 	g_signal_connect(clear_button, "clicked", G_CALLBACK(on_clear_button_clicked), search_field);
@@ -488,7 +489,7 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	g_signal_connect(win, "key_press_event", G_CALLBACK(on_hardware_key_pressed), win);
 	g_signal_connect(tree, "key_press_event", G_CALLBACK(on_key_pressed), search_field);
 	g_signal_connect(screen, "size-changed", G_CALLBACK(on_orientation_changed), window_data);
-	
+
 	gconf_client_notify_add(app_data->client, SETTINGS_SCROLLBAR_SIZE, on_scrollbar_settings_changed, scrolledwindow, NULL, NULL);
 
 #ifdef HILDON_HAS_APP_MENU

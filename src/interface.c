@@ -116,15 +116,15 @@ on_orientation_changed(GdkScreen *screen, GHashTable *hash)
 
 static void
 on_scrollbar_settings_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpointer user_data)
-{	
+{
 	GtkScrolledWindow *win = GTK_SCROLLED_WINDOW(user_data);
-	
+
 	SettingsScrollbarSize size = gconf_value_get_int(entry->value);
 	if (size == SETTINGS_SCROLLBAR_SIZE_BIG) {
 		hildon_helper_set_thumb_scrollbar(win, TRUE);
 	} else {
 		hildon_helper_set_thumb_scrollbar(win, FALSE);
-	}		
+	}
 }
 
 static void
@@ -132,12 +132,12 @@ on_background_color_changed(GConfClient *client, guint cnxn_id, GConfEntry *entr
 {
 	GtkWidget *view = GTK_WIDGET(user_data);
 	GdkColor color;
-	
+
 	const gchar *hex_color = gconf_value_get_string(entry->value);
 	gdk_color_parse(hex_color, &color);
 
 	gtk_widget_modify_base(GTK_WIDGET(view), GTK_STATE_NORMAL, &color);
-	
+
 	/* Small stripe on the right side only */
 	/*gtk_widget_modify_bg(GTK_WIDGET(window), GTK_STATE_NORMAL, &color);*/
 }
@@ -147,12 +147,12 @@ on_text_color_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpo
 {
 	GtkWidget *view = GTK_WIDGET(user_data);
 	GdkColor color;
-		
+
 	const gchar *hex_color = gconf_value_get_string(entry->value);
 	gdk_color_parse(hex_color, &color);
 
 	g_printerr("Text color changed \n");
-	
+
 	gtk_widget_modify_text(GTK_WIDGET(view), GTK_STATE_NORMAL, &color);
 }
 
@@ -164,7 +164,7 @@ on_link_color_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpo
 	GtkTextTag *title = gtk_text_tag_table_lookup(buffer->tag_table, "_title");
 	GtkTextTag *link = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	const gchar *hex_color = gconf_value_get_string(entry->value);
-	
+
 	g_object_set(title, "foreground", hex_color, NULL);
 	g_object_set(link, "foreground", hex_color, NULL);
 }
@@ -173,14 +173,14 @@ static void
 on_use_custom_colors_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpointer user_data)
 {
 	GtkTextView *view = GTK_TEXT_VIEW(user_data);
-	
+
 	if (gconf_value_get_bool(entry->value)) {
 		/* We just emmit the changed signal on gconf, so the UI will update itself */
 		AppData *app_data = app_data_get();
 		gconf_client_notify(app_data->client, SETTINGS_BACKGROUND_COLOR);
 		gconf_client_notify(app_data->client, SETTINGS_TEXT_COLOR);
 		gconf_client_notify(app_data->client, SETTINGS_LINK_COLOR);
-		
+
 	} else {
 		/* Reset to default colors */
 		GtkTextBuffer *buffer = gtk_text_view_get_buffer(view);
@@ -188,7 +188,7 @@ on_use_custom_colors_changed(GConfClient *client, guint cnxn_id, GConfEntry *ent
 		GtkTextTag *link = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 		g_object_set(title, "foreground", "blue", NULL);
 		g_object_set(link, "foreground", "blue", NULL);
-		
+
 		gtk_widget_modify_base(GTK_WIDGET(view), GTK_STATE_NORMAL, NULL);
 		gtk_widget_modify_text(GTK_WIDGET(view), GTK_STATE_NORMAL, NULL);
 	}
@@ -197,7 +197,7 @@ on_use_custom_colors_changed(GConfClient *client, guint cnxn_id, GConfEntry *ent
 static void
 on_font_size_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpointer user_data)
 {
-	GtkWidget *textview = GTK_WIDGET(user_data); 
+	GtkWidget *textview = GTK_WIDGET(user_data);
 	PangoFontDescription *font = pango_font_description_new();
 	pango_font_description_set_size(font, gconf_value_get_int(entry->value));
 	gtk_widget_modify_font(GTK_WIDGET(textview), font);
@@ -470,17 +470,22 @@ GtkWidget* create_mainwin(Note *note) {
 
 	menu_new = gtk_button_new();
 	menu_open = gtk_button_new();
+	menu_settings = gtk_button_new();
 	menu_quit = gtk_button_new();
 
 	gtk_action_connect_proxy(action_new, menu_new);
 	gtk_action_connect_proxy(action_notes, menu_open);
+	gtk_action_connect_proxy(action_settings, menu_settings);
 	gtk_action_connect_proxy(action_quit, menu_quit);
 
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_new));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_open));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_settings));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_quit));
 
-	if (!app_data->portrait) {
+	if (app_data->portrait) {
+		gtk_widget_hide(menu_settings);
+	} else {
 		gtk_widget_hide(menu_open);
 	}
 
@@ -585,10 +590,10 @@ GtkWidget* create_mainwin(Note *note) {
 	gtk_widget_show(textview);
 	gtk_container_add(GTK_CONTAINER (scrolledwindow1), textview);
 
-	
+
 	/* Create basic set of tags */
 	initialize_tags(buffer);
-	
+
 	/* Set initial font size */
 	font = pango_font_description_new();
 	pango_font_description_set_size(font, settings_load_font_size());
@@ -599,27 +604,27 @@ GtkWidget* create_mainwin(Note *note) {
 	if (settings_load_scrollbar_size() == SETTINGS_SCROLLBAR_SIZE_BIG) {
 		hildon_helper_set_thumb_scrollbar(GTK_SCROLLED_WINDOW(scrolledwindow1), TRUE);
 	}
-	
+
 	/* Set initial colors */
 	if (settings_load_use_costum_colors()) {
 		GdkColor color;
 		GtkTextTag *title = gtk_text_tag_table_lookup(buffer->tag_table, "_title");
 		GtkTextTag *link = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
-	
+
 		/* Background color */
 		settings_load_color(&color, SETTINGS_COLOR_TYPE_BACKGROUND);
 		gtk_widget_modify_base(textview, GTK_STATE_NORMAL, &color);
-		
+
 		/* Text color */
 		settings_load_color(&color, SETTINGS_COLOR_TYPE_TEXT);
 		gtk_widget_modify_text(textview, GTK_STATE_NORMAL, &color);
-		
+
 		/* Link color */
 		settings_load_color(&color, SETTINGS_COLOR_TYPE_LINKS);
 		g_object_set(title, "foreground-gdk", &color, NULL);
 		g_object_set(link, "foreground-gdk", &color, NULL);
 	}
-	
+
 
 	/* Enable support for tap and hold on the textview */
 	/* TODO: This is deactivated for now, because it's not included in upstream Gtk
@@ -687,7 +692,7 @@ GtkWidget* create_mainwin(Note *note) {
 	g_signal_connect(action_quit, "activate",
 			G_CALLBACK(on_quit_button_clicked),
 			NULL);
-	
+
 	g_signal_connect(action_settings, "activate",
 			G_CALLBACK(on_settings_button_clicked),
 			mainwin);
@@ -769,7 +774,7 @@ GtkWidget* create_mainwin(Note *note) {
 	g_signal_connect((gpointer)find_bar, "close",
 			G_CALLBACK(on_find_bar_close),
 			ui);
-	
+
 	/* Listen to changes in the settings */
 	gconf_client_notify_add(app_data->client, SETTINGS_SCROLLBAR_SIZE, on_scrollbar_settings_changed, scrolledwindow1, NULL, NULL);
 	gconf_client_notify_add(app_data->client, SETTINGS_BACKGROUND_COLOR, on_background_color_changed, textview, NULL, NULL);
@@ -777,7 +782,7 @@ GtkWidget* create_mainwin(Note *note) {
 	gconf_client_notify_add(app_data->client, SETTINGS_LINK_COLOR, on_link_color_changed, textview, NULL, NULL);
 	gconf_client_notify_add(app_data->client, SETTINGS_USE_CUSTOM_COLORS, on_use_custom_colors_changed, textview, NULL, NULL);
 	gconf_client_notify_add(app_data->client, SETTINGS_FONT_SIZE, on_font_size_changed, textview, NULL, NULL);
-	
+
 
 	/* TODO: When restructuring the UI, don't use the hash map anymore */
 	GHashTable *hash = g_hash_table_new(g_str_hash, g_str_equal);
