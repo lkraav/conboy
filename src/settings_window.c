@@ -130,9 +130,9 @@ GtkWidget *settings_widget_create()
 
 	/* Box for the view toggle buttons */
 #ifdef HILDON_HAS_APP_MENU
-	view_button_box = gtk_vbox_new(FALSE, 0);
-#else
 	view_button_box = gtk_hbox_new(FALSE, 0);
+#else
+	view_button_box = gtk_vbox_new(FALSE, 0);
 #endif
 	gtk_widget_show(GTK_WIDGET(view_button_box));
 	gtk_container_add(GTK_CONTAINER(view_box), view_button_box);
