@@ -103,16 +103,16 @@ GtkWidget *settings_widget_create()
 	gtk_box_pack_start(GTK_BOX(hbox), scroll_vbox, TRUE, TRUE, 0);
 
 	scroll_label = gtk_label_new("");
-	gtk_label_set_markup(GTK_LABEL(scroll_label), "<b>Scrollbar Size</b>");
+	gtk_label_set_markup(GTK_LABEL(scroll_label), _("Scrollbar Size"));
 	gtk_misc_set_alignment(GTK_MISC(scroll_label), 0, 0.5);
 	gtk_widget_show(scroll_label);
 	gtk_container_add(GTK_CONTAINER(scroll_vbox), scroll_label);
 
-	scroll_but1 = gtk_radio_button_new_with_label(NULL, "Small");
+	scroll_but1 = gtk_radio_button_new_with_label(NULL, _("Small"));
 	gtk_widget_show(scroll_but1);
 	gtk_container_add(GTK_CONTAINER(scroll_vbox), scroll_but1);
 
-	scroll_but2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(scroll_but1), "Big");
+	scroll_but2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(scroll_but1), _("Large"));
 	gtk_widget_show(scroll_but2);
 	gtk_container_add(GTK_CONTAINER(scroll_vbox), scroll_but2);
 #endif
@@ -123,13 +123,17 @@ GtkWidget *settings_widget_create()
 	gtk_container_add(GTK_CONTAINER(hbox), view_box);
 
 	view_label = gtk_label_new("");
-	gtk_label_set_markup(GTK_LABEL(view_label), "On Startup");
+	gtk_label_set_markup(GTK_LABEL(view_label), _("On Startup"));
 	gtk_misc_set_alignment(GTK_MISC(view_label), 0, 0.5);
 	gtk_widget_show(view_label);
 	gtk_container_add(GTK_CONTAINER(view_box), view_label);
 
 	/* Box for the view toggle buttons */
+#ifdef HILDON_HAS_APP_MENU
+	view_button_box = gtk_vbox_new(FALSE, 0);
+#else
 	view_button_box = gtk_hbox_new(FALSE, 0);
+#endif
 	gtk_widget_show(GTK_WIDGET(view_button_box));
 	gtk_container_add(GTK_CONTAINER(view_box), view_button_box);
 
@@ -137,13 +141,13 @@ GtkWidget *settings_widget_create()
 	/* TODO: Write a bug report. This should be only 2 lines instaed of 6 */
 	view_but1 = hildon_gtk_radio_button_new(HILDON_SIZE_FINGER_HEIGHT, NULL);
 	view_but2 = hildon_gtk_radio_button_new_from_widget(HILDON_SIZE_FINGER_HEIGHT, GTK_RADIO_BUTTON(view_but1));
-	gtk_button_set_label(GTK_BUTTON(view_but1), "Show Note");
-	gtk_button_set_label(GTK_BUTTON(view_but2), "Show Search");
+	gtk_button_set_label(GTK_BUTTON(view_but1), _("Show Note"));
+	gtk_button_set_label(GTK_BUTTON(view_but2), _("Show Search"));
 	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(view_but1), FALSE);
 	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(view_but2), FALSE);
 #else
-	view_but1 = gtk_radio_button_new_with_label(NULL, "Show Note");
-	view_but2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(view_but1), "Show Search");
+	view_but1 = gtk_radio_button_new_with_label(NULL, _("Show Note"));
+	view_but2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(view_but1), _("Show Search"));
 #endif
 
 	gtk_widget_show(view_but1);
@@ -161,9 +165,9 @@ GtkWidget *settings_widget_create()
 
 #ifdef HILDON_HAS_APP_MENU
 	color_but = hildon_check_button_new(HILDON_SIZE_FINGER_HEIGHT);
-	gtk_button_set_label(GTK_BUTTON(color_but), "Use Custum Colors");
+	gtk_button_set_label(GTK_BUTTON(color_but), _("Use Custom Colors"));
 #else
-	color_but = gtk_check_button_new_with_label("Use Custum Colors");
+	color_but = gtk_check_button_new_with_label(_("Use Custom Colors"));
 #endif
 	gtk_widget_show(color_but);
 	gtk_box_pack_start(GTK_BOX(color_vbox), color_but, TRUE, TRUE, 0);
@@ -177,7 +181,7 @@ GtkWidget *settings_widget_create()
 	gtk_widget_show(text_color_but);
 	gtk_box_pack_start(GTK_BOX(text_color_hbox), text_color_but, FALSE, FALSE, 0);
 
-	text_color_label = gtk_label_new("Text");
+	text_color_label = gtk_label_new(_("Text"));
 	gtk_misc_set_alignment(GTK_MISC(text_color_label), 0, 0.5);
 	gtk_widget_show(text_color_label);
 	gtk_box_pack_start(GTK_BOX(text_color_hbox), text_color_label, TRUE, TRUE, 10);
@@ -191,7 +195,7 @@ GtkWidget *settings_widget_create()
 	gtk_widget_show(back_color_but);
 	gtk_box_pack_start(GTK_BOX(text_color_hbox), back_color_but, FALSE, FALSE, 0);
 
-	back_color_label = gtk_label_new("Background");
+	back_color_label = gtk_label_new(_("Background"));
 	gtk_misc_set_alignment(GTK_MISC(back_color_label), 0, 0.5);
 	gtk_widget_show(back_color_label);
 	gtk_box_pack_start(GTK_BOX(text_color_hbox), back_color_label, TRUE, TRUE, 10);
@@ -205,7 +209,7 @@ GtkWidget *settings_widget_create()
 	gtk_widget_show(link_color_but);
 	gtk_box_pack_start(GTK_BOX(text_color_hbox), link_color_but, FALSE, FALSE, 0);
 
-	link_color_label = gtk_label_new("Links");
+	link_color_label = gtk_label_new(_("Links"));
 	gtk_misc_set_alignment(GTK_MISC(link_color_label), 0, 0.5);
 	gtk_widget_show(link_color_label);
 	gtk_box_pack_start(GTK_BOX(text_color_hbox), link_color_label, TRUE, TRUE, 10);
@@ -274,21 +278,20 @@ GtkWidget *settings_widget_create()
 	g_signal_connect(link_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_LINKS));
 	g_signal_connect(back_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_BACKGROUND));
 
-
 	return config_vbox;
 }
 
 
 void settings_window_open(GtkWindow *parent)
 {
-	GtkDialog *dialog = gtk_dialog_new_with_buttons("Configuration",
+	GtkWidget *dialog = gtk_dialog_new_with_buttons("Configuration",
 			parent,
 			GTK_DIALOG_MODAL,
 			GTK_STOCK_OK,
 			GTK_RESPONSE_OK,
 			NULL);
 
-	GtkWidget *content_area = dialog->vbox;
+	GtkWidget *content_area = GTK_DIALOG(dialog)->vbox;
 	GtkWidget *content_widget = settings_widget_create();
 
 	/* Add the widget to the dialog */
@@ -297,5 +300,5 @@ void settings_window_open(GtkWindow *parent)
 	/* When a button (ok/cancel/etc.) is clicked or the dialog is closed - destroy it */
 	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 
-	gtk_dialog_run(dialog);
+	gtk_dialog_run(GTK_DIALOG(dialog));
 }
