@@ -16,10 +16,28 @@ strip_tags(const gchar *xml_string)
 {
 	int ret;
 	AppData *app_data = app_data_get();
-	xmlTextReader *reader = app_data->reader;
+	xmlTextReader *reader;
 	GString *result = g_string_new("");
 	
-	xmlReaderNewMemory(reader, xml_string, strlen(xml_string), NULL, NULL, 0);
+	/* TODO: Duplicated code. Almose the same code is in note_buffer.c */
+	/* We try to reuse the existing xml parser. If none exists yet, we create a new one. */
+	if (app_data->reader == NULL) {
+		app_data->reader = xmlReaderForMemory(xml_string, strlen(xml_string), NULL, "UTF-8", 0);
+	}
+	
+	if (xmlReaderNewMemory(app_data->reader, xml_string, strlen(xml_string), NULL, "UTF-8", 0) != 0) {
+		g_printerr("ERROR: Cannot reuse xml parser. \n");
+		g_assert_not_reached();
+	}
+	
+	if (app_data->reader == NULL) {
+		g_printerr("ERROR: Couldn't init xml parser.\n");
+		g_assert_not_reached();
+	}
+	
+	reader = app_data->reader;
+	
+	/*xmlReaderNewMemory(reader, xml_string, strlen(xml_string), NULL, NULL, 0);*/
 	ret = xmlTextReaderRead(reader);
 	while (ret == 1) {
 		int type = xmlTextReaderNodeType(reader);
