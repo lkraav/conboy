@@ -242,6 +242,7 @@ void process_note(xmlTextReader *reader, Note *note)
 /**
  * Loads a complete note from the storage backend. The note must be freed
  * when you're done with it.
+ * If an error occurs NULL is returned.
  */
 Note* storage_load_note(const gchar *guid)
 {
@@ -291,7 +292,11 @@ Note* storage_load_note(const gchar *guid)
 	xmlFreeTextReader(reader);
 	g_free(filename);
 	
-	return note;
+	if (ret != 0) {
+		return NULL;
+	} else {
+		return note;
+	}
 }
 
 
