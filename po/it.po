@@ -144,3 +144,44 @@ msgstr "Ordina per titolo"
 #: ../src/search_window.c:285
 msgid "Sort By Date"
 msgstr "Ordina per data"
+
+#: ../src/interface.c:312
+msgid "Open Note"
+msgstr "Apri nota"
+
+#: ../src/interface.c:313
+msgid "Settings"
+msgstr "Opzioni"
+
+#: ../src/settings_window.c:106
+msgid "Scrollbar Size"
+msgstr "Barra di scorrimento"
+
+#: ../src/settings_window.c:126
+msgid "On Startup"
+msgstr "Alla partenza"
+
+#: ../src/settings_window.c:144 ../src/settings_window.c:149
+msgid "Show Note"
+msgstr "Mostra la nota"
+
+#: ../src/settings_window.c:145 ../src/settings_window.c:150
+msgid "Show Search"
+msgstr "Mostra la ricerca"
+
+#: ../src/settings_window.c:168 ../src/settings_window.c:170
+msgid "Use Custom Colors"
+msgstr "Usa colori predefiniti"
+
+#: ../src/settings_window.c:184
+msgid "Text"
+msgstr "Testo"
+
+#: ../src/settings_window.c:198
+msgid "Background"
+msgstr "Sfondo"
+
+#: ../src/settings_window.c:212
+msgid "Links"
+msgstr "Links"
+

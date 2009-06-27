@@ -2,3 +2,4 @@
 ../src/search_window.c
 ../src/callbacks.c
 ../src/note.c
+../src/settings_window.c
