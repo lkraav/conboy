@@ -284,7 +284,7 @@ GtkWidget *settings_widget_create()
 
 void settings_window_open(GtkWindow *parent)
 {
-	GtkWidget *dialog = gtk_dialog_new_with_buttons("_(Settings)",
+	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Settings"),
 			parent,
 			GTK_DIALOG_MODAL,
 			GTK_STOCK_OK,
