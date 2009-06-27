@@ -86,7 +86,7 @@ msgstr "Cerca nella nota"
 
 #: ../src/interface.c:219 ../src/interface.c:308 ../src/interface.c:346
 msgid "Small"
-msgstr "Piccolo"
+msgstr "Piccola"
 
 #: ../src/interface.c:220
 msgid "Normal"
