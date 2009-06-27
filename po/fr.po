@@ -144,3 +144,49 @@ msgstr "Trier par titre"
 #: ../src/search_window.c:285
 msgid "Sort By Date"
 msgstr "Trier par date"
+
+#: ../src/interface.c:312
+msgid "Open Note"
+msgstr "Ouvrir note"
+
+#: ../src/interface.c:313
+msgid "Settings"
+msgstr "Paramètres"
+
+#: ../src/settings_window.c:106
+msgid "Scrollbar Size"
+msgstr "Ascenseur :"
+
+#: ../src/settings_window.c:126
+msgid "On Startup"
+msgstr "Au démarrage :"
+
+#: ../src/settings_window.c:144 ../src/settings_window.c:149
+msgid "Show Note"
+msgstr "Afficher note"
+
+#: ../src/settings_window.c:145 ../src/settings_window.c:150
+msgid "Show Search"
+msgstr "Afficher la recherche"
+
+#: ../src/settings_window.c:168 ../src/settings_window.c:170
+msgid "Use Custom Colors"
+msgstr "Utiliser des couleurs personnalisées"
+
+#: ../src/settings_window.c:184
+msgid "Text"
+msgstr "Texte"
+
+#: ../src/settings_window.c:198
+msgid "Background"
+msgstr "Arrière-plan"
+
+#: ../src/settings_window.c:212
+msgid "Links"
+msgstr "Liens"
+
+msgid "Thick"
+msgstr "Grand"
+
+msgid "Thin"
+msgstr "Petit"

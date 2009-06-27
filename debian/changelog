@@ -1,8 +1,17 @@
-conboy (0.4.6) stable; urgency=low
+conboy (0.5.0) stable; urgency=low
 
-  * Placeholder
+  * Added full text search
+  * Added settings dialog
+  * Added setting to switch between small and large scroll bars
+  * Added setting to show note window or search window on startup
+  * Added settings to change colors
+  * Added support for portrait mode in Fremantle
+  * Added italian translation (Thanks to debernardis)
+  * Updated the UI for Fremantle
+  * Updated french translation (Thanks to fpp) 
+  * Bug fixes
   
- -- Cornelius Hald <hald@icandy.de>  Mat, 20 Jun 2009 17:41:12 +0200  
+ -- Cornelius Hald <hald@icandy.de>  Sat, 27 Jun 2009 20:13:14 +0200  
 
 conboy (0.4.5) stable; urgency=low
 

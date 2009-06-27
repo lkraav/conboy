@@ -145,3 +145,49 @@ msgstr "Nach Titel Sortieren"
 #: ../src/search_window.c:285
 msgid "Sort By Date"
 msgstr "Nach Datum Sortieren"
+
+#: ../src/interface.c:312
+msgid "Open Note"
+msgstr "Notiz Öffnen"
+
+#: ../src/interface.c:313
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: ../src/settings_window.c:106
+msgid "Scrollbar Size"
+msgstr "Größe Der Bildlaufleiste"
+
+#: ../src/settings_window.c:126
+msgid "On Startup"
+msgstr "Beim Starten"
+
+#: ../src/settings_window.c:144 ../src/settings_window.c:149
+msgid "Show Note"
+msgstr "Notiz Zeigen"
+
+#: ../src/settings_window.c:145 ../src/settings_window.c:150
+msgid "Show Search"
+msgstr "Suche Zeigen"
+
+#: ../src/settings_window.c:168 ../src/settings_window.c:170
+msgid "Use Custom Colors"
+msgstr "Eigene Farben Verwenden"
+
+#: ../src/settings_window.c:184
+msgid "Text"
+msgstr "Text"
+
+#: ../src/settings_window.c:198
+msgid "Background"
+msgstr "Hintergrund"
+
+#: ../src/settings_window.c:212
+msgid "Links"
+msgstr "Links"
+
+msgid "Thick"
+msgstr "Groß"
+
+msgid "Thin"
+msgstr "Klein"

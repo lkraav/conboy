@@ -185,3 +185,8 @@ msgstr "Sfondo"
 msgid "Links"
 msgstr "Links"
 
+msgid "Thick"
+msgstr "Larga"
+
+msgid "Thin"
+msgstr "Stretta"

@@ -108,11 +108,11 @@ GtkWidget *settings_widget_create()
 	gtk_widget_show(scroll_label);
 	gtk_container_add(GTK_CONTAINER(scroll_vbox), scroll_label);
 
-	scroll_but1 = gtk_radio_button_new_with_label(NULL, _("Small"));
+	scroll_but1 = gtk_radio_button_new_with_label(NULL, _("Thin"));
 	gtk_widget_show(scroll_but1);
 	gtk_container_add(GTK_CONTAINER(scroll_vbox), scroll_but1);
 
-	scroll_but2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(scroll_but1), _("Large"));
+	scroll_but2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(scroll_but1), _("Thick"));
 	gtk_widget_show(scroll_but2);
 	gtk_container_add(GTK_CONTAINER(scroll_vbox), scroll_but2);
 #endif
