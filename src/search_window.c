@@ -354,16 +354,16 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	search_result = g_hash_table_new(NULL, NULL);
 
 	new_note_action = GTK_ACTION(gtk_action_new("new", _("New Note"), NULL, NULL));
-	
+
 	/* Window menu */
 #ifdef HILDON_HAS_APP_MENU
 	menu = hildon_app_menu_new();
 
 	/* Add New Note item */
 	menu_new_note = gtk_button_new();
-	gtk_action_proxy_connect(new_note_action, menu_new_note);
-	hildon_app_menu_add(menu_new_note);
-	
+	gtk_action_connect_proxy(new_note_action, menu_new_note);
+	hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
+
 	/* Add sort filters */
 	button_sort_by_title = gtk_radio_button_new_with_label(NULL, _("Sort By Title"));
 	button_sort_by_date = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(button_sort_by_title), _("Sort By Date"));
