@@ -159,6 +159,10 @@ on_text_color_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpo
 static void
 on_link_color_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpointer user_data)
 {
+	if (user_data == NULL || !GTK_IS_TEXT_VIEW(user_data)) {
+		g_printerr("ERROR: on_link_color_changed(): user_data is not a GtkTextView.");
+		return;
+	}
 	GtkTextView *view = GTK_TEXT_VIEW(user_data);
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer(view);
 	GtkTextTag *title = gtk_text_tag_table_lookup(buffer->tag_table, "_title");
@@ -235,7 +239,6 @@ GtkWidget* create_mainwin(Note *note) {
 	GtkWidget *menu_font_normal;
 	GtkWidget *menu_font_large;
 	GtkWidget *menu_font_huge;
-	GtkWidget *menu_find;
 	GtkWidget *menu_open;
 
 	GtkWidget *toolbar;
@@ -780,12 +783,13 @@ GtkWidget* create_mainwin(Note *note) {
 			ui);
 
 	/* Listen to changes in the settings */
-	gconf_client_notify_add(app_data->client, SETTINGS_SCROLLBAR_SIZE, on_scrollbar_settings_changed, scrolledwindow1, NULL, NULL);
-	gconf_client_notify_add(app_data->client, SETTINGS_BACKGROUND_COLOR, on_background_color_changed, textview, NULL, NULL);
-	gconf_client_notify_add(app_data->client, SETTINGS_TEXT_COLOR, on_text_color_changed, textview, NULL, NULL);
-	gconf_client_notify_add(app_data->client, SETTINGS_LINK_COLOR, on_link_color_changed, textview, NULL, NULL);
-	gconf_client_notify_add(app_data->client, SETTINGS_USE_CUSTOM_COLORS, on_use_custom_colors_changed, textview, NULL, NULL);
-	gconf_client_notify_add(app_data->client, SETTINGS_FONT_SIZE, on_font_size_changed, textview, NULL, NULL);
+	/* TODO: Use an array instead of the list */
+	ui->listeners = g_list_prepend(ui->listeners, GINT_TO_POINTER(gconf_client_notify_add(app_data->client, SETTINGS_SCROLLBAR_SIZE, on_scrollbar_settings_changed, scrolledwindow1, NULL, NULL)));
+	ui->listeners = g_list_prepend(ui->listeners, GINT_TO_POINTER(gconf_client_notify_add(app_data->client, SETTINGS_BACKGROUND_COLOR, on_background_color_changed, textview, NULL, NULL)));
+	ui->listeners = g_list_prepend(ui->listeners, GINT_TO_POINTER(gconf_client_notify_add(app_data->client, SETTINGS_TEXT_COLOR, on_text_color_changed, textview, NULL, NULL)));
+	ui->listeners = g_list_prepend(ui->listeners, GINT_TO_POINTER(gconf_client_notify_add(app_data->client, SETTINGS_LINK_COLOR, on_link_color_changed, textview, NULL, NULL)));
+	ui->listeners = g_list_prepend(ui->listeners, GINT_TO_POINTER(gconf_client_notify_add(app_data->client, SETTINGS_USE_CUSTOM_COLORS, on_use_custom_colors_changed, textview, NULL, NULL)));
+	ui->listeners = g_list_prepend(ui->listeners, GINT_TO_POINTER(gconf_client_notify_add(app_data->client, SETTINGS_FONT_SIZE, on_font_size_changed, textview, NULL, NULL)));
 
 
 	/* TODO: When restructuring the UI, don't use the hash map anymore */

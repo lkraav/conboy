@@ -232,10 +232,19 @@ void note_close_window(Note *note)
 	HildonWindow *window = note->ui->window;
 	AppData *app_data = app_data_get();
 	guint count = g_list_length(app_data->open_notes);
-
+	GList  *listeners = note->ui->listeners;
+	
 	if (count > 1) {
 		hildon_program_remove_window(program, window);
+		
+		/* Remove the listeners */
+		while (listeners != NULL) {
+			gconf_client_notify_remove(app_data->client, GPOINTER_TO_INT(listeners->data));
+			listeners = listeners->next;
+		}
+		
 		gtk_widget_destroy(GTK_WIDGET(window));
+		g_list_free(note->ui->listeners);
 		g_free(note->ui);
 		note->ui = g_new0(UserInterface, 1);
 		app_data->open_notes = g_list_remove(app_data->open_notes, note);
