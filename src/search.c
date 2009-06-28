@@ -104,6 +104,7 @@ find_match_count(const gchar *xml_string, gchar **words)
 /**
  * Returns only TRUE if all words appear in the content.
  */
+/*
 static gboolean
 has_match(gchar *content, gchar **words)
 {
@@ -116,6 +117,7 @@ has_match(gchar *content, gchar **words)
 	}
 	return TRUE;
 }
+*/
 
 /**
  * Returns a hashtable with pointers to notes as keys and an int as value.
@@ -166,5 +168,5 @@ search(const gchar *query, GHashTable *result)
 	g_printerr("Search took %lu micro seconds \n", micro);
 	g_timer_destroy(timer);
 	
-	return result;
+	return;
 }

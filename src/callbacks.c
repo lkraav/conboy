@@ -29,6 +29,7 @@
 #include <gconf/gconf-client.h>
 #include <gdk/gdkkeysyms.h>
 #include <glib.h>
+#include <glib/gprintf.h>
 #include <math.h>
 
 #include "callbacks.h"

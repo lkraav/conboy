@@ -437,7 +437,7 @@ GList* storage_get_all_note_ids() {
  * Returns: TRUE when successfull, FALSE otherwise.
  */
 gboolean storage_delete_note(const gchar *guid) {
-	
+	return FALSE;
 }
 
 /**

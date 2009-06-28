@@ -382,7 +382,7 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	menu = gtk_menu_new();
 	menu_new_note = gtk_action_create_menu_item(new_note_action);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_new_note);
-	hildon_window_set_main_menu(HILDON_WINDOW(win), GTK_MENU(menu));
+	hildon_window_set_menu(HILDON_WINDOW(win), GTK_MENU(menu));
 #endif
 
 	vbox = gtk_vbox_new(FALSE, 0);
