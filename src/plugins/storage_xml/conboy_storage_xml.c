@@ -17,82 +17,87 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "conboy_note.h"
-#include "conboy_storage.h"
+#include "../../conboy_note.h"
+#include "../../conboy_storage.h"
+#include "conboy_storage_xml.h"
 
 static GObjectClass *parent_class = NULL;
 
-ConboyNote*
-conboy_storage_note_load (ConboyStorage *self, const gchar *uuid)
+static ConboyNote*
+_conboy_storage_xml_note_load (ConboyStorage *self, gchar *uuid)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(uuid != NULL, FALSE);
 	
-	g_return_val_if_fail(CONBOY_IS_STORAGE(self), FALSE);
+	g_return_val_if_fail(CONBOY_IS_STORAGE_XML(self), FALSE);
 	
-	ConboyStorageClass *klass = CONBOY_STORAGE_GET_CLASS(self);
-
-	return klass->load(self, uuid);	
+	/* TODO: Read note from xml */
+	
+	return NULL;
 }
 
-gboolean
-conboy_storage_note_save (ConboyStorage *self, ConboyNote *note)
+static gboolean
+_conboy_storage_xml_note_save (ConboyStorage *self, ConboyNote *note)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(note != NULL, FALSE);
 
-	g_return_val_if_fail(CONBOY_IS_STORAGE(self), FALSE);
+	g_return_val_if_fail(CONBOY_IS_STORAGE_XML(self), FALSE);
 	g_return_val_if_fail(CONBOY_IS_NOTE(note), FALSE);
 
-	ConboyStorageClass *klass = CONBOY_STORAGE_GET_CLASS(self);
+	/* TODO */
+	/* Write note to xml file */
 
-	return klass->save(self, note);
+	return FALSE;
 }
 
-gboolean 
-conboy_storage_note_delete (ConboyStorage *self, ConboyNote *note)
+static gboolean 
+_conboy_storage_xml_note_delete (ConboyStorage *self, ConboyNote *note)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(note != NULL, FALSE);
 
-	g_return_val_if_fail(CONBOY_IS_STORAGE(self), FALSE);
+	g_return_val_if_fail(CONBOY_IS_STORAGE_XML(self), FALSE);
 	g_return_val_if_fail(CONBOY_IS_NOTE(note), FALSE);
 
-	ConboyStorageClass *klass = CONBOY_STORAGE_GET_CLASS(self);
+	/* TODO */
+	/* Delete xml file */
 
-	return klass->delete(self, note);
+	return FALSE;
 }
 
-ConboyNote**
-conboy_storage_note_list (ConboyStorage *self, guint *n_notes)
+static ConboyNote**
+_conboy_storage_xml_note_list (ConboyStorage *self, guint *n_notes)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(n_notes != NULL, FALSE);
 
-	g_return_val_if_fail(CONBOY_IS_STORAGE(self), FALSE);	
-	
-	ConboyStorageClass *klass = CONBOY_STORAGE_GET_CLASS(self);
+	g_return_val_if_fail(CONBOY_IS_STORAGE_XML(self), FALSE);	
 
-	return klass->list(self, n_notes);
+	/* TODO */
+	/* Return notes */	
+
+	return NULL;
 }
 
-gchar**
-conboy_storage_note_list_ids (ConboyStorage *self, guint *n_notes)
+static gchar**
+_conboy_storage_xml_note_list_ids (ConboyStorage *self, guint *n_notes)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(n_notes != NULL, FALSE);
 
-	g_return_val_if_fail(CONBOY_IS_STORAGE(self), FALSE);	
-	
-	ConboyStorageClass *klass = CONBOY_STORAGE_GET_CLASS(self);
+	g_return_val_if_fail(CONBOY_IS_STORAGE_XML(self), FALSE);	
 
-	return klass->list_ids(self, n_notes);
+	/* TODO */
+	/* Return notes' IDS */
+
+	return NULL;
 }
 
 /* GOBJECT ROUTINES */
 
 static GObject *
-_conboy_storage_constructor (GType type,
+_conboy_storage_xml_constructor (GType type,
 		guint n_construct_properties,
 		GObjectConstructParam *construct_properties) 
 {
@@ -100,54 +105,59 @@ _conboy_storage_constructor (GType type,
 		G_OBJECT_CLASS (parent_class)->constructor (type,
 				n_construct_properties,
 				construct_properties);
-	
+
+	CONBOY_STORAGE_XML(object)->path = NULL;
+
 	return G_OBJECT(object);
 }
 
-
 static void
-_conboy_storage_class_dispose(GObject *object)
+_conboy_storage_xml_dispose(GObject *object)
 {
-	ConboyStorage *self = CONBOY_STORAGE(object);
+	ConboyStorageXml *self = CONBOY_STORAGE_XML(object);
+	
+	g_free((gchar *)self->path);
+	self->path = NULL;
+
 	parent_class->dispose(object);
 }
 
 static void
-_conboy_storage_class_init (ConboyStorageClass *klass, gpointer g_class_data)
+_conboy_storage_xml_class_init (ConboyStorageXmlClass *klass, gpointer g_class_data)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	parent_class = g_type_class_peek_parent (klass);
 
-	object_class->constructor = _conboy_storage_constructor;
-	object_class->dispose = _conboy_storage_class_dispose;
+	object_class->constructor = _conboy_storage_xml_constructor;
+	object_class->dispose     = _conboy_storage_xml_dispose;
 
-	klass->load = NULL;
-	klass->save = NULL;
-	klass->delete = NULL;
-	klass->list = NULL;
-	klass->list_ids = NULL;
+	klass->load     = _conboy_storage_xml_note_load;
+	klass->save     = _conboy_storage_xml_note_save;
+	klass->remove   = _conboy_storage_xml_note_delete;
+	klass->list     = _conboy_storage_xml_note_list;
+	klass->list_ids = _conboy_storage_xml_note_list_ids;
 }
 
 GType
-conboy_storage_get_type (void)
+conboy_storage_xml_get_type (void)
 {
 	static GType type = 0;
 	if (type == 0) {
 
 		static const GTypeInfo info = {
-			sizeof (ConboyStorageClass),
+			sizeof (ConboyStorageXmlClass),
 			NULL,           /* base_init */
 			NULL,           /* base_finalize */
-			(GClassInitFunc) _conboy_storage_class_init,
+			(GClassInitFunc) _conboy_storage_xml_class_init,
 			NULL,           /* class_finalize */
 			NULL,           /* class_data */
- 			sizeof (ConboyStorage),
+ 			sizeof (ConboyStorageXml),
 			0,              /* n_preallocs */
 			NULL
 		};
 
-		type = g_type_register_static (G_TYPE_OBJECT,
-				"ConboyStorage", &info, G_TYPE_FLAG_ABSTRACT);
+		type = g_type_register_static (CONBOY_TYPE_STORAGE,
+				"ConboyStorageXml", &info, 0);
 	}
 
 	return type;

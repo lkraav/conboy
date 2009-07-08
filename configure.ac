@@ -66,8 +66,8 @@ dnl For the navigation bar plug-in
 
 AC_PROG_LIBTOOL
 
-pluginlibdir=`pkg-config osso-af-settings --variable=hildondesktoplibdir`
-AC_SUBST(pluginlibdir)
+#pluginlibdir=`pkg-config osso-af-settings --variable=hildondesktoplibdir`
+#AC_SUBST(pluginlibdir)
 
 dnl
 dnl Tracker dirs
@@ -82,6 +82,12 @@ AC_SUBST(trackermoduledir)
 trackerservicedir=/usr/share/tracker/services
 AC_SUBST(trackerservicedir)
 
+# Plugin dirs (TODO: should not be hardcoded to /usr/)
+pluginslibdir=/usr/lib/conboy
+AC_SUBST(pluginslibdir)
+
+pluginsdatadir=/usr/share/conboy
+AC_SUBST(plugindatadir)
 
 # Localization-related
 AC_PROG_INTLTOOL([0.23])
@@ -116,4 +122,7 @@ AC_OUTPUT([
     po/Makefile
     data/de.zwong.conboy.service
     data/conboy.desktop
+    src/plugins/Makefile
+    src/plugins/storage_xml/Makefile
+    src/plugins/storage_midgard/Makefile
 ])

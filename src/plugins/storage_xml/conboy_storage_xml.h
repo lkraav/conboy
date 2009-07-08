@@ -33,20 +33,21 @@
 typedef struct _ConboyStorageXml ConboyStorageXml;
 typedef struct _ConboyStorageXmlClass ConboyStorageXmlClass;
 
-struct _ConboyStorageXml{
+struct _ConboyStorageXml {
 	GObject parent;
 
 	/* <private> */
 	const gchar *path;
 };
 
-struct _ConboyStorageXmlClass{
+struct _ConboyStorageXmlClass {
 	GObjectClass parent;
 	
-	gboolean	(*save)		(ConboyStorage *self, ConboyNote *note);
-	gboolean	(*remove)	(ConboyStorage *self, ConboyNote *note);
-	ConboyNote	**(*list)	(ConboyStorage *self, guint *n_notes);
-	gchar 		**(*list_ids)	(ConboyStorage *self, guint *n_notes);	
+	ConboyNote*  (*load)     (ConboyStorage *self, gchar *uuid);
+	gboolean	 (*save)     (ConboyStorage *self, ConboyNote *note);
+	gboolean	 (*remove)   (ConboyStorage *self, ConboyNote *note);
+	ConboyNote** (*list)     (ConboyStorage *self, guint *n_notes);
+	gchar**      (*list_ids) (ConboyStorage *self, guint *n_notes);	
 };
 
 GType		conboy_storage_xml_get_type			(void);

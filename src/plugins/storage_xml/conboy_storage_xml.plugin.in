@@ -1,0 +1,7 @@
+[Conboy Plugin]
+Module=storage_xml
+_Name=XML Storage Backend
+_Description=Loads and saves notes from the local filesystem.
+Version=0.1
+Authors=Cornelius Hald <hald@icandy.de>
+Copyright=Copyright (C) 2009 Cornelius Hald

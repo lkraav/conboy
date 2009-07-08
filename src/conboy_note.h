@@ -21,6 +21,7 @@
 #define CONBOY_NOTE_H
 
 #include <glib-object.h>
+#include <glib/gtypes.h>
 
 /* convention macros */
 #define CONBOY_TYPE_NOTE (conboy_note_get_type())
@@ -33,34 +34,36 @@
 typedef struct _ConboyNote ConboyNote;
 typedef struct _ConboyNoteClass ConboyNoteClass;
 
-struct _ConboyNote{
+struct _ConboyNote {
 	GObject parent;
 	
 	/* <private> */
 	/* identifiers */
 	gchar *guid;
-	gchar *path;
 	
 	/* note */
 	gchar *content;
 	gchar *title;
 
 	/* metadata */
-	gboolean open_on_startup;	
-	time_t changed;
-	time_t created;
+	time_t last_change_date;
+	time_t last_metadata_change_date;
+	time_t create_date;
 
-	/* ui ? */	
+	/* ui */
+	gboolean open_on_startup;
 	gint cursor_position;
 	gint width;
 	gint height;
 	gint x;
 	gint y;
 	
-	const gchar *version;
+	/* version */
+	double note_version;
+	double content_version;
 };
 
-struct _ConboyNoteClass{
+struct _ConboyNoteClass {
 	GObjectClass parent;
 	
 	/* signals */

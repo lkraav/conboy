@@ -33,9 +33,10 @@ _conboy_note_constructor (GType type,
 				n_construct_properties,
 				construct_properties);
 
-	CONBOY_NOTE(object)->guid = NULL;
-	CONBOY_NOTE(object)->title = NULL;
-	CONBOY_NOTE(object)->content = NULL;
+	ConboyNote *note = CONBOY_NOTE(object);
+	note->guid = NULL;
+	note->content = NULL;
+	note->title = NULL;
 	
 	return G_OBJECT(object);
 }

@@ -2,7 +2,7 @@
 INCLUDES = $(TRACKER_CFLAGS) -DG_LOG_DOMAIN=\"Tracker\"
 
 # Binary
-pluginlib_LTLIBRARIES = \
+trackerlib_LTLIBRARIES = \
     libtracker-module-tomboy-notes.la
 # /Binary
 

@@ -41,19 +41,21 @@ struct _ConboyStorageClass{
 	GObjectClass parent;
 	
 	/* virtual methods */
-	gboolean	(*save)		(ConboyStorage *self, ConboyNote *note);
-	gboolean	(*remove)	(ConboyStorage *self, ConboyNote *note);
-	ConboyNote	**(*list)	(ConboyStorage *self, guint *n_notes);
-	gchar 		**(*list_ids)	(ConboyStorage *self, guint *n_notes);	
+	ConboyNote*		(*load)		(ConboyStorage *self, const gchar *uuid);
+	gboolean		(*save)		(ConboyStorage *self, ConboyNote *note);
+	gboolean		(*delete)	(ConboyStorage *self, ConboyNote *note);
+	ConboyNote**	(*list)		(ConboyStorage *self, guint *n_notes);
+	gchar**			(*list_ids)	(ConboyStorage *self, guint *n_notes);	
 
 	/* signals */
 };
 
-GType		conboy_storage_get_type			(void);
-ConboyNote 	*conboy_storage_note_new		(const gchar *guid);
-gboolean	conboy_storage_note_save		(ConboyStorage *self, ConboyNote *note);
-gboolean	conboy_storage_note_delete		(ConboyStorage *self, ConboyNote *note);
-ConboyNote	**conboy_storage_note_list		(ConboyStorage *self, guint *n_notes);
-gchar 		**conboy_storage_note_list_ids		(ConboyStorage *self, guint *n_notes);	
+GType			conboy_storage_get_type			(void);
+ConboyNote*		conboy_storage_note_new			(void);
+ConboyNote*		conboy_storage_note_load		(ConboyStorage *self, const gchar *uuid);
+gboolean		conboy_storage_note_save		(ConboyStorage *self, ConboyNote *note);
+gboolean		conboy_storage_note_delete		(ConboyStorage *self, ConboyNote *note);
+ConboyNote**	conboy_storage_note_list		(ConboyStorage *self, guint *n_notes);
+gchar**			conboy_storage_note_list_ids	(ConboyStorage *self, guint *n_notes);	
 
 #endif /* CONBOY_STORAGE_H */
