@@ -20,6 +20,34 @@
 #include "app_data.h"
 
 void
+settings_save_oauth_access_token(gchar *token)
+{
+	AppData *app_data = app_data_get();
+	gconf_client_set_string(app_data->client, SETTINGS_OAUTH_ACCESS_TOKEN, token, NULL);
+}
+
+gchar*
+settings_load_oauth_access_token(void)
+{
+	AppData *app_data = app_data_get();
+	return gconf_client_get_string(app_data->client, SETTINGS_OAUTH_ACCESS_TOKEN, NULL);
+}
+
+void
+settings_save_oauth_access_secret(gchar *secret)
+{
+	AppData *app_data = app_data_get();
+	gconf_client_set_string(app_data->client, SETTINGS_OAUTH_ACCESS_SECRET, secret, NULL);
+}
+
+gchar*
+settings_load_oauth_access_secret(void)
+{
+	AppData *app_data = app_data_get();
+	return gconf_client_get_string(app_data->client, SETTINGS_OAUTH_ACCESS_SECRET, NULL);
+}
+
+void
 settings_save_font_size(gint size)
 {
 	AppData *app_data = app_data_get();

@@ -26,14 +26,16 @@
  * but therefor settings.c must be able to send "changed signals. Those are
  * ATM handled using direct gconf and not the wrappers in settings.c.
  */
-#define SETTINGS_ROOT              "/apps/maemo/conboy"
-#define SETTINGS_FONT_SIZE         SETTINGS_ROOT"/font_size"
-#define SETTINGS_SCROLLBAR_SIZE    SETTINGS_ROOT"/scrollbar_size"
-#define SETTINGS_STARTUP_WINDOW    SETTINGS_ROOT"/startup_window"
-#define SETTINGS_USE_CUSTOM_COLORS SETTINGS_ROOT"/use_custom_colors"
-#define SETTINGS_BACKGROUND_COLOR  SETTINGS_ROOT"/background_color"
-#define SETTINGS_TEXT_COLOR        SETTINGS_ROOT"/text_color"
-#define SETTINGS_LINK_COLOR        SETTINGS_ROOT"/link_color"
+#define SETTINGS_ROOT                "/apps/maemo/conboy"
+#define SETTINGS_FONT_SIZE           SETTINGS_ROOT"/font_size"
+#define SETTINGS_SCROLLBAR_SIZE      SETTINGS_ROOT"/scrollbar_size"
+#define SETTINGS_STARTUP_WINDOW      SETTINGS_ROOT"/startup_window"
+#define SETTINGS_USE_CUSTOM_COLORS   SETTINGS_ROOT"/use_custom_colors"
+#define SETTINGS_BACKGROUND_COLOR    SETTINGS_ROOT"/background_color"
+#define SETTINGS_TEXT_COLOR          SETTINGS_ROOT"/text_color"
+#define SETTINGS_LINK_COLOR          SETTINGS_ROOT"/link_color"
+#define SETTINGS_OAUTH_ACCESS_TOKEN  SETTINGS_ROOT"/oauth_access_token"
+#define SETTINGS_OAUTH_ACCESS_SECRET SETTINGS_ROOT"/oauth_access_secret"
 
 
 typedef enum {
@@ -52,6 +54,12 @@ typedef enum {
 	SETTINGS_COLOR_TYPE_LINKS
 } SettingsColorType;
 
+
+void settings_save_oauth_access_token(gchar *token);
+gchar* settings_load_oauth_access_token(void);
+
+void settings_save_oauth_access_secret(gchar *secret);
+gchar* settings_load_oauth_access_secret(void);
 
 void settings_save_font_size(gint size);
 gint settings_load_font_size(void);
