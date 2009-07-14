@@ -22,9 +22,14 @@
 #include <json-glib/json-glib.h>
 #include "note.h"
 
-JsonNode* get_json_object_from_note(Note *note);
-Note* get_note_from_json_object(JsonNode *node);
-void print_note_as_json(Note *note);
+JsonNode* json_get_node_from_note(Note *note);
+Note* json_get_note_from_node(JsonNode *node);
+Note* json_get_note_from_string(const gchar *json_string);
+void json_print_note(Note *note);
+
+GSList *json_get_notes_from_string(const gchar *json_string);
+
+void json_test(void);
 
 
 #endif /* JSON_H */
