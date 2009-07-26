@@ -48,6 +48,19 @@ AC_SUBST(TRACKER_LIBS)
 
 PKG_CHECK_MODULES(OSSOSETTINGS, osso-af-settings >= 0.8.4)
 
+AC_MSG_CHECKING([whether to build Midgard storage plugin])
+AC_ARG_WITH([midgard],[AS_HELP_STRING([--without-midgard], [disable Midgard storage])],
+            [], [with_midgard=yes])
+AS_IF(
+        [test "$with_midgard" = yes],
+        [
+        AC_MSG_RESULT([yes])
+        PKG_CHECK_MODULES(MIDGARD, midgard-2.0 >= 9.03)
+        ],
+        AC_MSG_RESULT([no])
+)
+AM_CONDITIONAL([WITH_MIDGARD], [test x$with_midgard = xyes])
+
 # Application icon install directories
 icon_26x26dir=$datadir/icons/hicolor/26x26/hildon
 icon_34x34dir=$datadir/icons/hicolor/34x34/hildon
@@ -92,11 +105,11 @@ AC_SUBST(plugindatadir)
 # Localization-related
 AC_PROG_INTLTOOL([0.23])
 GETTEXT_PACKAGE=conboy
-AC_SUBST( GETTEXT_PACKAGE )
+AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED( GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Name of gettext package ])
 ALL_LINGUAS="de fr it"
-AC_SUBST(ALL_LINGUAS)
 AM_GLIB_GNU_GETTEXT
+AC_SUBST(ALL_LINGUAS)
 AC_SUBST(localedir)
 AC_DEFINE_UNQUOTED(LOCALEDIR,"$localedir",[localedir])
 

@@ -21,6 +21,12 @@ conboy_SOURCES = \
         interface.c \
         callbacks.h \
         callbacks.c \
+	conboy_module.c \
+	conboy_module.h \
+	conboy_note.c \
+	conboy_note.h \
+	conboy_storage.c \
+	conboy_storage.h \
         localisation.h \
         metadata.h \
         metadata.c \
