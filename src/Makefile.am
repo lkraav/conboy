@@ -53,7 +53,9 @@ conboy_SOURCES = \
         conboy_module.h \
         conboy_module.c \
         conboy_oauth.h \
-        conboy_oauth.c
+        conboy_oauth.c \
+        conboy_plugin_info.h \
+        conboy_plugin_info.c
 
 #libconboy_applet_la_SOURCES = \
 #		conboy_applet.c \
