@@ -16,8 +16,12 @@
  * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+#include <libxml/xmlreader.h>
+
 #include "json.h"
 #include "metadata.h"
+#include "app_data.h"
 
 #define JSON_NOTES "notes"
 #define JSON_GUID "guid"
@@ -31,6 +35,58 @@
 #define JSON_PINNED "pinned"
 #define JSON_TAGS "tags"
 
+
+static gchar*
+remove_xml_tag_and_title(const gchar* content)
+{
+	
+	AppData *app_data = app_data_get();
+	
+	if (app_data->reader == NULL) {
+		app_data->reader = xmlReaderForMemory(content, strlen(content), "", "UTF-8", 0);
+	}
+	
+	if (xmlReaderNewMemory(app_data->reader, content, strlen(content), "", "UTF-8", 0) != 0) {
+		g_printerr("ERROR: Cannot reuse xml parser. \n");
+		g_assert_not_reached();
+	}
+	
+	/* Remove xml tags */
+	xmlTextReaderRead(app_data->reader);
+	gchar *result = xmlTextReaderReadInnerXml(app_data->reader);
+	
+	/* Remove first 2 lines */
+	gchar **parts = g_strsplit(result, "\n", 3);
+	
+	/*
+	g_printerr("###: >%s<\n", parts[0]);
+	g_printerr("###: >%s<\n", parts[1]);
+	g_printerr("###: >%s<\n", parts[2]);
+	*/
+	
+	g_free(result);
+	
+	if (strcmp(parts[1], "") == 0) {
+		result = g_strdup(parts[2]);
+	} else {
+		result = g_strconcat(parts[1], parts[2], NULL);
+	}
+	
+	g_strfreev(parts);
+	
+	g_printerr("ZZZZZZZ:\n>%s<\n", result);
+	
+	return result;
+}
+
+static gchar*
+convert_content(const gchar *content)
+{
+	gchar *tmp = remove_xml_tag_and_title(content);
+	gchar *result = g_strescape(tmp, NULL);
+	g_free(tmp);
+	return result;
+}
 
 JsonNode*
 json_get_node_from_note(Note *note)
@@ -57,7 +113,7 @@ json_get_node_from_note(Note *note)
 	json_object_add_member(obj, JSON_TITLE, node);
 	
 	node = json_node_new(JSON_NODE_VALUE);
-	json_node_set_string(node, note->content);
+	json_node_set_string(node, convert_content(note->content));
 	json_object_add_member(obj, JSON_NOTE_CONTENT, node);
 	
 	node = json_node_new(JSON_NODE_VALUE);
@@ -85,34 +141,55 @@ json_get_node_from_note(Note *note)
 	json_node_set_boolean(node, FALSE); /* TODO: Implement note->pinned */
 	json_object_add_member(obj, JSON_PINNED, node);
 	
-	if (note->tags != NULL) {
+	/*if (note->tags != NULL) {*/
 		
 		GList *tags = note->tags;
 		JsonArray *array = json_array_new();
 		
 		while (tags != NULL) {
 			gchar *tag = (gchar*)tags->data;
-			
 			node = json_node_new(JSON_NODE_VALUE);
 			json_node_set_string(node, tag);
 			json_array_add_element(array, node);
-			
 			tags = tags->next;
 		}
 		
 		node = json_node_new(JSON_NODE_ARRAY);
 		json_node_take_array(node, array);
 		json_object_add_member(obj, JSON_TAGS, node);
-	}
+	/*}*/
 	
 	json_node_take_object(root, obj);
 	
 	return root;
 }
 
+
+gchar*
+json_node_to_string(JsonNode *node, gboolean pretty)
+{
+	JsonGenerator *gen;
+	gchar *string;
+		
+	gen = json_generator_new();
+	if (pretty) {
+		g_object_set(gen, "pretty", TRUE, NULL);
+	}
+	json_generator_set_root(gen, node);
+	string = json_generator_to_data(gen, NULL);
+	
+	g_object_unref(gen);
+	
+	return string;
+}
+
 void
 json_print_note(Note *note)
 {
+	/*
+	 * TODO: Use json_node_to_string()
+	 */
+	
 	JsonNode *obj;
 	JsonGenerator *gen;
 	gchar *string;

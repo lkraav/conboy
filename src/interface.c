@@ -40,6 +40,9 @@
 #include "app_data.h"
 #include "settings.h"
 
+#include "conboy_oauth.h"
+#include "note.h"
+#include "json.h"
 
 static void initialize_tags(GtkTextBuffer *buffer) {
 	/*
@@ -206,6 +209,67 @@ on_font_size_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpoi
 	pango_font_description_set_size(font, gconf_value_get_int(entry->value));
 	gtk_widget_modify_font(GTK_WIDGET(textview), font);
 	pango_font_description_free(font);
+}
+
+
+static void
+on_sync_but_clicked(GtkButton *but, gpointer user_data)
+{
+	gchar *tok = "";
+	gchar *sec = "";
+	gchar *lnk = NULL;
+	
+	
+	Note *note = (Note*) user_data;
+	
+	
+	/*web_send_note(note);*/
+	
+	
+	
+	tok = settings_load_oauth_access_token();
+	sec = settings_load_oauth_access_secret();
+	
+	if (tok == NULL || sec == NULL) {
+		
+		lnk = get_auth_link(&tok, &sec);
+		GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, lnk);
+		g_printerr("Link:\n%s\n", lnk);
+		gtk_dialog_run(GTK_DIALOG(dialog));
+		gtk_widget_destroy (dialog);
+		
+		if (get_access_token(&tok, &sec)) {
+			g_printerr("Saving token & secret to gconf \n");
+			settings_save_oauth_access_token(tok);
+			settings_save_oauth_access_secret(sec);
+		}
+	}
+	
+	/*
+	 * TEST
+	 */
+	
+	web_send_note(note, tok, sec);
+	return;
+	
+	
+	/*
+	 * TODO: Implement, that if the call does not work, we might need to get
+	 * a new access token/secret.
+	 */
+	gchar *reply = get_all_notes(tok, sec);
+	
+	if (reply != NULL) {
+		GSList *notes = json_get_notes_from_string(reply);
+		while (notes != NULL) {
+			Note *note = (Note*)notes->data;
+			g_printerr("Title: %s\n", note->title);
+			g_printerr("GUID : %s\n", note->guid);
+			g_printerr("-------\n");
+			notes = notes->next;
+		}
+	}
+	
 }
 
 /*
@@ -519,6 +583,17 @@ GtkWidget* create_mainwin(Note *note) {
 	/* TOOLBAR */
 	toolbar = gtk_toolbar_new();
 
+	/***** TODO: Remove, only for testing *************/
+	
+	GtkWidget *sync_but = gtk_tool_button_new_from_stock(GTK_STOCK_CDROM);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(sync_but), 0);
+	
+	
+	
+	
+	/**********************/
+	
+	
 	/****/
 	button_dec_indent = gtk_action_create_tool_item(action_dec_indent);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_dec_indent), -1);
@@ -663,6 +738,13 @@ GtkWidget* create_mainwin(Note *note) {
 	        note);
 
 	/* Action signals */
+	
+	g_printerr("TITLE: %s\n", note->title);
+	
+	g_signal_connect(sync_but, "clicked",
+			G_CALLBACK(on_sync_but_clicked),
+			note);
+	
 	g_signal_connect(action_new, "activate",
 			G_CALLBACK(on_new_button_clicked),
 			ui);
