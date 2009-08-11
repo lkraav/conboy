@@ -20,6 +20,20 @@
 #include "app_data.h"
 
 void
+settings_save_active_plugins(GSList *active_plugins)
+{
+	AppData *app_data = app_data_get();
+	gconf_client_set_list(app_data->client, SETTINGS_ACTIVE_PLUGINS, GCONF_VALUE_STRING, active_plugins, NULL);
+}
+
+GSList*
+settings_load_active_plugins()
+{
+	AppData *app_data = app_data_get();
+	return gconf_client_get_list(app_data->client, SETTINGS_ACTIVE_PLUGINS, GCONF_VALUE_STRING, NULL);
+}
+
+void
 settings_save_oauth_access_token(gchar *token)
 {
 	AppData *app_data = app_data_get();

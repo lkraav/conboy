@@ -36,7 +36,7 @@
 #define SETTINGS_LINK_COLOR          SETTINGS_ROOT"/link_color"
 #define SETTINGS_OAUTH_ACCESS_TOKEN  SETTINGS_ROOT"/oauth_access_token"
 #define SETTINGS_OAUTH_ACCESS_SECRET SETTINGS_ROOT"/oauth_access_secret"
-
+#define SETTINGS_ACTIVE_PLUGINS      SETTINGS_ROOT"/active_plugins"
 
 typedef enum {
 	SETTINGS_SCROLLBAR_SIZE_SMALL,
@@ -54,6 +54,8 @@ typedef enum {
 	SETTINGS_COLOR_TYPE_LINKS
 } SettingsColorType;
 
+void settings_save_active_plugins(GSList *active_plugins);
+GSList* settings_load_active_plugins(void);
 
 void settings_save_oauth_access_token(gchar *token);
 gchar* settings_load_oauth_access_token(void);
