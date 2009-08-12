@@ -219,13 +219,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	gchar *sec = "";
 	gchar *lnk = NULL;
 	
-	
 	Note *note = (Note*) user_data;
-	
-	
-	/*web_send_note(note);*/
-	
-	
 	
 	tok = settings_load_oauth_access_token();
 	sec = settings_load_oauth_access_secret();

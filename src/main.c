@@ -26,6 +26,7 @@
 #include "settings.h"
 #include "search_window.h"
 /*#include "json.h"*/
+#include "conboy_plugin_info.h"
 
 
 #define APP_NAME "conboy"
@@ -97,7 +98,19 @@ main (int argc, char *argv[])
 	  search_window_open();
   }
 
+  /*
+   * Find a reliable method to get the plugin dir where the .plugin files are
+   */
   
+  const gchar *path = "/home/conny/workspace/conboy/src/plugins/storage_xml/conboy_storage_xml.plugin";
+  
+  /*const gchar *file = g_build_filename(path, "conboy", "plugins", "conboy_storage_xml.plugin", NULL);*/
+  
+  /*g_printerr("FILE: >%s<\n", path);*/
+  
+  ConboyPluginInfo *info = conboy_plugin_info_new(path);
+  g_printerr("DESC: %s\n", conboy_plugin_info_get_description(info));
+  g_printerr("INFO: %s\n", conboy_plugin_info_get_name(info));
   
   /*******/
   /*
