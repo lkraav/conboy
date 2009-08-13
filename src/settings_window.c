@@ -30,6 +30,134 @@
 #include "settings.h"
 #include "app_data.h"
 
+
+static void
+on_auth_but_clicked(GtkButton *button, gpointer user_data)
+{
+	g_printerr("Auth but\n");
+	
+	GtkEntry *entry = GTK_ENTRY(user_data);
+	const gchar *url = gtk_entry_get_text(entry);
+	
+	settings_save_sync_base_url(url);
+	
+	gchar *link = conboy_get_auth_link(url);
+	
+	/* TODO: Open link in browser */
+	g_printerr("____LINK: >%s<\n", link);
+	
+	GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Click ok after authenticating on the website.");
+	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	
+	if (conboy_get_access_token()) {
+		/* Disable Authenticate button and URL field */
+		/* Enable Clean button */
+		GtkWidget *ok_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "You're authenticated. Everything is good :)");
+		g_signal_connect(ok_dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+		gtk_dialog_run(GTK_DIALOG(ok_dialog));
+	} else {
+		GtkWidget *fail_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Something went wrong. Not good :(");
+		g_signal_connect(fail_dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+		gtk_dialog_run(GTK_DIALOG(fail_dialog));
+	}
+	
+	
+	
+}
+
+static void
+on_clean_but_clicked(GtkButton *button, gpointer user_data)
+{
+	g_printerr("Clean but\n");
+}
+
+static GtkWidget*
+sync_settings_widget_create()
+{
+	GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
+	gtk_widget_show(vbox);
+	
+	GtkWidget *label = gtk_label_new("");
+	/*
+	gchar *text =
+		"1) Enter URL of your sync service into the field below. An"
+		"example would be http://example.com:8000\n"
+		"2) Press the authenticate button. If the URL is correct, a"
+		"browser window will open and ask for your permission to share"
+		"your notes. If not already logged in, you first have to log in.\n"
+		"3) After granting access on the website this window should be opened"
+		"again. Synchronization is now configured";
+	gtk_label_set_line_wrap(label, TRUE);
+	gtk_label_set_markup(label, text);
+	*/
+	gtk_widget_show(label);
+	gtk_container_add(GTK_CONTAINER(vbox), label);
+	
+	GtkWidget *hbox = gtk_hbox_new(FALSE, 0);
+	gtk_widget_show(hbox);
+	gtk_container_add(GTK_CONTAINER(vbox), hbox);
+	
+	GtkWidget *url_label = gtk_label_new("URL:");
+	gtk_widget_show(url_label);
+	gtk_box_pack_start(GTK_BOX(hbox), url_label, FALSE, FALSE, 0);
+	
+	GtkWidget *url_entry = gtk_entry_new();
+	gtk_widget_set_size_request(url_entry, 600, -1);
+	gtk_widget_show(url_entry);
+	gtk_box_pack_start(GTK_BOX(hbox), url_entry, TRUE, TRUE, 0);
+	
+	GtkWidget *auth_but = gtk_button_new_with_label("Authenticate");
+	gtk_widget_show(auth_but);
+	gtk_box_pack_start(GTK_BOX(hbox), auth_but, FALSE, FALSE, 0);
+	
+	GtkWidget *clean_but = gtk_button_new_with_label("Clean");
+	gtk_widget_show(clean_but);
+	gtk_box_pack_start(GTK_BOX(hbox), clean_but, FALSE, FALSE, 0);
+	
+	g_signal_connect(auth_but, "clicked", G_CALLBACK(on_auth_but_clicked), url_entry);
+	g_signal_connect(clean_but, "clicked", G_CALLBACK(on_clean_but_clicked), NULL);
+	
+	/* Load url */
+	gchar *url = settings_load_sync_base_url();
+	gtk_entry_set_text(GTK_ENTRY(url_entry), url);
+	g_free(url);
+	
+	return vbox;
+}
+
+static void
+on_sync_but_clicked(GtkButton *button, gpointer user_data)
+{
+	GtkWindow *parent = GTK_WINDOW(user_data);
+	
+	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Synchronization settings"),
+				parent,
+				GTK_DIALOG_MODAL,
+				GTK_STOCK_OK,
+				GTK_RESPONSE_OK,
+				NULL);
+	
+	
+	GtkWidget *content_area = GTK_DIALOG(dialog)->vbox;
+	GtkWidget *content_widget = sync_settings_widget_create();
+
+	/* Add the widget to the dialog */
+	gtk_box_pack_start(GTK_BOX(content_area), content_widget, TRUE, TRUE, 10);
+
+	/* When a button (ok/cancel/etc.) is clicked or the dialog is closed - destroy it */
+	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	
+}
+
+static void
+on_plugin_but_clicked(GtkButton *button, gpointer user_data)
+{
+	
+}
+
 static void
 on_scroll_but_toggled(GtkToggleButton *button, gpointer user_data)
 {
@@ -227,8 +355,26 @@ GtkWidget *settings_widget_create()
 	gtk_widget_set_size_request(GTK_WIDGET(link_color_but), 70, 70);
 	#endif
 
-
-	/* Set initial values from gconf */
+	/* Adding buttons for sync and plugins */
+	GtkWidget *but_hbox = gtk_hbox_new(TRUE, 0);
+	gtk_widget_show(but_hbox);
+	gtk_container_add(GTK_CONTAINER(config_vbox), but_hbox);
+	
+	GtkWidget *sync_but = gtk_button_new_with_label("Synchonization");
+	gtk_widget_set_size_request(sync_but, -1, 70);
+	gtk_widget_show(sync_but);
+	
+	GtkWidget *plugin_but = gtk_button_new_with_label("Plug-ins");
+	gtk_widget_set_size_request(plugin_but, -1, 70);
+	gtk_widget_show(plugin_but);
+	
+	gtk_container_add(GTK_CONTAINER(but_hbox), sync_but);
+	gtk_container_add(GTK_CONTAINER(but_hbox), plugin_but);
+	
+	
+	/*
+	 * Set initial values from gconf
+	 */
 
 #ifndef HILDON_HAS_APP_MENU
 	/* Scrollbars */
@@ -277,7 +423,8 @@ GtkWidget *settings_widget_create()
 	g_signal_connect(text_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_TEXT));
 	g_signal_connect(link_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_LINKS));
 	g_signal_connect(back_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_BACKGROUND));
-
+	g_signal_connect(sync_but, "clicked", G_CALLBACK(on_sync_but_clicked), NULL);
+	g_signal_connect(plugin_but, "clicked", G_CALLBACK(on_plugin_but_clicked), NULL);
 	return config_vbox;
 }
 

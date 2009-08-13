@@ -226,17 +226,18 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	
 	if (tok == NULL || sec == NULL) {
 		
-		lnk = get_auth_link(&tok, &sec);
+		lnk = get_auth_link("http://localhost:8000", "bla", &tok, &sec);
 		GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, lnk);
 		g_printerr("Link:\n%s\n", lnk);
 		gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy (dialog);
 		
-		if (get_access_token(&tok, &sec)) {
-			g_printerr("Saving token & secret to gconf \n");
-			settings_save_oauth_access_token(tok);
-			settings_save_oauth_access_secret(sec);
+		/* TODO: Add error handling */
+		if (conboy_get_access_token()) {
+			/* Disable Authenticate button and URL field */
+			/* Enable Clean button */
 		}
+		
 	}
 	
 	/*

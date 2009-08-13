@@ -6,10 +6,10 @@
 #include "note.h"
 
 gchar*
-get_auth_link(gchar **t_key, gchar **t_secret);
+get_auth_link(gchar *call_url, gchar *link_url, gchar **t_key, gchar **t_secret);
 
 gboolean
-get_access_token(gchar **t_key, gchar **t_secret);
+get_access_token(gchar *url, gchar **t_key, gchar **t_secret);
 
 gchar*
 get_all_notes(const gchar *t_key, const gchar *t_secret);

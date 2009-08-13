@@ -37,6 +37,7 @@
 #define SETTINGS_OAUTH_ACCESS_TOKEN  SETTINGS_ROOT"/oauth_access_token"
 #define SETTINGS_OAUTH_ACCESS_SECRET SETTINGS_ROOT"/oauth_access_secret"
 #define SETTINGS_ACTIVE_PLUGINS      SETTINGS_ROOT"/active_plugins"
+#define SETTINGS_SYNC_BASE_URL       SETTINGS_ROOT"/sync_base_url"
 
 typedef enum {
 	SETTINGS_SCROLLBAR_SIZE_SMALL,
@@ -54,13 +55,17 @@ typedef enum {
 	SETTINGS_COLOR_TYPE_LINKS
 } SettingsColorType;
 
+
+void settings_save_sync_base_url(const gchar *url);
+gchar* settings_load_sync_base_url(void);
+
 void settings_save_active_plugins(GSList *active_plugins);
 GSList* settings_load_active_plugins(void);
 
-void settings_save_oauth_access_token(gchar *token);
+void settings_save_oauth_access_token(const gchar *token);
 gchar* settings_load_oauth_access_token(void);
 
-void settings_save_oauth_access_secret(gchar *secret);
+void settings_save_oauth_access_secret(const gchar *secret);
 gchar* settings_load_oauth_access_secret(void);
 
 void settings_save_font_size(gint size);

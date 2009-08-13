@@ -19,6 +19,21 @@
 #include "settings.h"
 #include "app_data.h"
 
+
+void
+settings_save_sync_base_url(const gchar *url)
+{
+	AppData *app_data = app_data_get();
+	gconf_client_set_string(app_data->client, SETTINGS_SYNC_BASE_URL, url, NULL);
+}
+
+gchar*
+settings_load_sync_base_url()
+{
+	AppData *app_data = app_data_get();
+	return gconf_client_get_string(app_data->client, SETTINGS_SYNC_BASE_URL, NULL);
+}
+
 void
 settings_save_active_plugins(GSList *active_plugins)
 {
@@ -34,7 +49,7 @@ settings_load_active_plugins()
 }
 
 void
-settings_save_oauth_access_token(gchar *token)
+settings_save_oauth_access_token(const gchar *token)
 {
 	AppData *app_data = app_data_get();
 	gconf_client_set_string(app_data->client, SETTINGS_OAUTH_ACCESS_TOKEN, token, NULL);
@@ -48,7 +63,7 @@ settings_load_oauth_access_token(void)
 }
 
 void
-settings_save_oauth_access_secret(gchar *secret)
+settings_save_oauth_access_secret(const gchar *secret)
 {
 	AppData *app_data = app_data_get();
 	gconf_client_set_string(app_data->client, SETTINGS_OAUTH_ACCESS_SECRET, secret, NULL);

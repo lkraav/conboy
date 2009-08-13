@@ -130,16 +130,38 @@ static int parse_reply(const char *reply, char **token, char **secret) {
   return ok;
 }
 
+gchar*
+conboy_get_auth_link(const gchar *base_url)
+{
+	gchar *tok = "";
+	gchar *sec = "";
+	
+	gchar *call_url = g_strconcat(base_url, "/oauth/request_token/", NULL);
+	gchar *link_url = g_strconcat(base_url, "/oauth/authenticate/", NULL);
+	
+	gchar *link = get_auth_link(call_url, link_url ,&tok, &sec);
+	
+	g_printerr("req_tok: %s\n", tok);
+	g_printerr("req_sec: %s\n", sec);
+	
+	settings_save_oauth_access_token(tok);
+	settings_save_oauth_access_secret(sec);
+	
+	g_free(call_url);
+	g_free(link_url);
+	
+	return link;
+}
 
 /* TODO: Improve error checking */
 gchar*
-get_auth_link(gchar **t_key, gchar **t_secret)
+get_auth_link(gchar *request_url, gchar *link_url, gchar **t_key, gchar **t_secret)
 {
 	gchar *postarg = NULL;
 	gchar *reply   = NULL;
 	gchar *link = NULL;
 	
-	gchar *req_url = oauth_sign_url2(request_token_uri, &postarg, OA_HMAC, "POST", c_key, c_secret, NULL, NULL);
+	gchar *req_url = oauth_sign_url2(request_url, &postarg, OA_HMAC, "POST", c_key, c_secret, NULL, NULL);
 	
 	if (req_url == NULL) {
 		return NULL;
@@ -159,18 +181,19 @@ get_auth_link(gchar **t_key, gchar **t_secret)
 	g_free(req_url);
 	g_free(reply);
 	
-	link = g_strconcat("http://localhost:8000/oauth/authenticate/?oauth_token=", *t_key, "&oauth_callback=http://www.google.de", NULL);
+	link = g_strconcat(link_url, "?oauth_token=", *t_key, "&oauth_callback=conboy://xxx", NULL);
 	
 	return link;
 }
 
 
 gboolean
-get_access_token(gchar **t_key, gchar **t_secret)
+get_access_token(gchar *url, gchar **t_key, gchar **t_secret)
 {
 	gchar *reply = NULL;
 	gchar *postarg = NULL;
-	gchar *req_url = oauth_sign_url2(access_token_uri, &postarg, OA_HMAC, "POST", c_key, c_secret, *t_key, *t_secret);
+	
+	gchar *req_url = oauth_sign_url2(url, &postarg, OA_HMAC, "POST", c_key, c_secret, *t_key, *t_secret);
 	
 	if (req_url == NULL) {
 		return FALSE;
@@ -187,6 +210,26 @@ get_access_token(gchar **t_key, gchar **t_secret)
 	
 	g_free(reply);
 	return TRUE;
+}
+
+gboolean
+conboy_get_access_token() {
+	
+	gchar *tok = settings_load_oauth_access_token();
+	gchar *sec = settings_load_oauth_access_secret();
+	gchar *url = settings_load_sync_base_url();
+	
+	url = g_strconcat(url, "/oauth/access_token/", NULL);
+	
+	if (get_access_token(url, &tok, &sec)) {
+		g_printerr("acc_tok: %s\n", tok);
+		g_printerr("acc_sec: %s\n", sec);
+		settings_save_oauth_access_token(tok);
+		settings_save_oauth_access_secret(sec);
+		return TRUE;
+	}
+	
+	return FALSE;
 }
 
 gchar*
@@ -221,7 +264,7 @@ web_send_note(Note *note, const gchar *t_key, const gchar *t_secret)
 	json_object_add_member(obj, "note-changes", node);
 	
 	node = json_node_new(JSON_NODE_VALUE);
-	json_node_set_int(node, 18);
+	json_node_set_int(node, 19);
 	json_object_add_member(obj, "latest-sync-revision", node);
 	
 	json_node_take_object(result, obj);
