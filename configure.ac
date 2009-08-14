@@ -4,7 +4,7 @@ AC_INIT(src/main.c)
 AM_CONFIG_HEADER(config.h)
 
 PACKAGE=conboy
-VERSION=0.5.0
+VERSION=0.5.9
 
 AM_INIT_AUTOMAKE($PACKAGE,$VERSION)
 
@@ -38,7 +38,7 @@ PKG_CHECK_MODULES(XML2, libxml-2.0 >= 2.6.0)
 AC_SUBST(XML2_CFLAGS)
 AC_SUBST(XML2_LIBS)
 
-PKG_CHECK_MODULES(JSON, json-glib-1.0 >= 0.7.4)
+PKG_CHECK_MODULES(JSON, json-glib-1.0 >= 0.6.2)
 AC_SUBST(JSON_CFLAGS)
 AC_SUBST(JSON_LIBS)
 
@@ -133,6 +133,7 @@ AC_SUBST(icon_40x40dir)
 AC_SUBST(icon_50x50dir)
 AC_SUBST(icon_scalabledir)
 
+AC_CONFIG_FILES([src/conboy_config.h])
 
 AC_OUTPUT([
     Makefile 

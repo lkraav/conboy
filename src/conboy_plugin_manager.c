@@ -8,6 +8,7 @@
 
 #include "conboy_plugin_manager.h"
 #include "conboy_plugin_info.h"
+#include "conboy_config.h"
 
 enum
 {
@@ -251,12 +252,11 @@ row_activated_cb (GtkTreeView       *tree_view,
 
 /**
  * Returns a GList of all ConboyPluginInfo objects found in the given
- * plugin_base_dir.
+ * plugin_base_dir or one level deeper in the directory hierarchy.
  * 
- * Looks at all files in plugin_base_dir if those are directories
- * it looks into those and tries to find a *.plugin file. The first
- * .plugin file which is found is used and a ConboyPluginInfo object
- * is created.
+ * Looks at all files in plugin_base_dir if those are .plugin files,
+ * ConboyPluginInfo objects are created. Also all directories of
+ * plugin_base_dir are searched.
  */
 static GList*
 plugin_manager_get_all_plugins (const gchar *plugin_base_dir)
@@ -266,27 +266,35 @@ plugin_manager_get_all_plugins (const gchar *plugin_base_dir)
 	 */
 	GList *result = NULL;
 	
-	/*const gchar *path = "/home/conny/workspace/conboy/src/plugins";*/
-	
 	const gchar *filename;
 	GDir *dir = g_dir_open(plugin_base_dir, 0, NULL);
 	while ((filename = g_dir_read_name(dir)) != NULL) {
 		gchar *full_path = g_build_filename(plugin_base_dir, filename, NULL);
+		
+		/* If it's a dir, check if it contains .plugin files */
 		if (g_file_test(full_path, G_FILE_TEST_IS_DIR)) {
-			
 			const gchar *inner_filename;
 			GDir *inner_dir = g_dir_open(full_path, 0, NULL);
 			while ((inner_filename = g_dir_read_name(inner_dir)) != NULL) {
+				g_printerr("Check: %s\n", inner_filename);
 				if (g_str_has_suffix(inner_filename, ".plugin")) {
 					gchar *plugin_file = g_build_filename(full_path, inner_filename, NULL);
 					ConboyPluginInfo *info = conboy_plugin_info_new(plugin_file);
 					result = g_list_prepend(result, info);
 					g_free(plugin_file);
-					break;
 				}
 			}
 			g_dir_close(inner_dir);
+			
+		/* If it's a file, check if it's a .plugin file */
+		} else if (g_file_test(full_path, G_FILE_TEST_EXISTS)) {
+			g_printerr("Check: %s\n", full_path);
+			if (g_str_has_suffix(full_path, ".plugin")) {
+				ConboyPluginInfo *info = conboy_plugin_info_new(full_path);
+				result = g_list_prepend(result, info);
+			}
 		}
+		
 		g_free(full_path);
 	}
 	
@@ -295,13 +303,29 @@ plugin_manager_get_all_plugins (const gchar *plugin_base_dir)
 	return result;
 }
 
+/*
+ * Returns the path set by the environment variable
+ * CONBOY_PLUGIN_DIR or if not set, the default path
+ * $prefix/lib/conboy
+ * 
+ * Return value needs to be freed
+ */
 static gchar*
 plugin_manager_get_plugin_base_dir()
 {
-	/*
-	 * TODO: Implement!!!!
-	 */
-	return "/home/conny/workspace/conboy/src/plugins";
+	gchar *path = NULL;
+	const gchar *env_path = g_getenv("CONBOY_PLUGIN_DIR");
+	if (path != NULL) {
+		if (g_file_test(env_path, G_FILE_TEST_IS_DIR)) {
+			path = g_strdup(env_path);
+		} else {
+			g_printerr("WARN: '%s' is not a directory or does not exist. Please set the environment variable CONBOY_PLUGIN_DIR correctly. Trying default.\n", path);
+		}
+	} else {
+		path = g_build_filename(PREFIX, "/lib/conboy");
+	}
+	
+	return path;
 }
 
 static void
@@ -845,14 +869,7 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 	GtkWidget *hbuttonbox;
 	gchar *markup;
 
-	/*conboy_debug (DEBUG_PLUGINS);*/
-
 	pm->priv = CONBOY_PLUGIN_MANAGER_GET_PRIVATE (pm);
-
-	/*
-	 * Always we create the manager, firstly we rescan the plugins directory
-	 */
-	/*conboy_plugins_engine_rescan_plugins (conboy_plugins_engine_get_default ());*/
 
 	gtk_box_set_spacing (GTK_BOX (pm), 6);
 
@@ -909,10 +926,7 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 	plugin_manager_construct_tree (pm);
 	
 
-	/* get the plugin engine and populate the treeview */
 	/*
-	pm->priv->engine = conboy_plugins_engine_get_default ();
-
 	g_signal_connect_after (pm->priv->engine,
 				"activate-plugin",
 				G_CALLBACK (plugin_toggled_cb),
@@ -922,23 +936,10 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 				G_CALLBACK (plugin_toggled_cb),
 				pm);
 	*/
-
-	/*
-	if (conboy_plugins_engine_get_plugin_list (pm->priv->engine) != NULL)
-	{
-		plugin_manager_populate_lists (pm);
-	}
-	else
-	{
-		gtk_widget_set_sensitive (pm->priv->about_button, FALSE);
-		gtk_widget_set_sensitive (pm->priv->configure_button, FALSE);		
-	}*/
 	
 	plugin_manager_populate_lists(pm);
 	
-	
-	
-	gtk_widget_show_all(pm);
+	gtk_widget_show_all(GTK_WIDGET(pm));
 }
 
 static void
