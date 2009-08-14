@@ -50,12 +50,14 @@ conboy_SOURCES = \
         conboy_note.c \
         conboy_storage.h \
         conboy_storage.c \
-        conboy_module.h \
-        conboy_module.c \
         conboy_oauth.h \
         conboy_oauth.c \
+        conboy_plugin.h \
+        conboy_plugin.c \
         conboy_plugin_info.h \
-        conboy_plugin_info.c
+        conboy_plugin_info.c \
+        conboy_plugin_manager.h \
+        conboy_plugin_manager.c
 
 #libconboy_applet_la_SOURCES = \
 #		conboy_applet.c \

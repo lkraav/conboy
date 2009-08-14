@@ -29,8 +29,24 @@
 #include "settings_window.h"
 #include "settings.h"
 #include "app_data.h"
+#include "conboy_plugin_manager.h"
+
+/********** Plugins Settings Widget *************/
+
+static GtkWidget*
+plugins_settings_widget_create()
+{
+	GtkWidget *result = conboy_plugin_manager_new();
+	return result;
+}
 
 
+
+/************************************************/
+
+
+
+/********** Synchsettings Widget **********/
 static void
 on_auth_but_clicked(GtkButton *button, gpointer user_data)
 {
@@ -61,8 +77,6 @@ on_auth_but_clicked(GtkButton *button, gpointer user_data)
 		g_signal_connect(fail_dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 		gtk_dialog_run(GTK_DIALOG(fail_dialog));
 	}
-	
-	
 	
 }
 
@@ -125,6 +139,7 @@ sync_settings_widget_create()
 	
 	return vbox;
 }
+/*******************************************/
 
 static void
 on_sync_but_clicked(GtkButton *button, gpointer user_data)
@@ -155,6 +170,26 @@ on_sync_but_clicked(GtkButton *button, gpointer user_data)
 static void
 on_plugin_but_clicked(GtkButton *button, gpointer user_data)
 {
+	GtkWindow *parent = GTK_WINDOW(user_data);
+		
+	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Plug-ins settings"),
+				parent,
+				GTK_DIALOG_MODAL,
+				GTK_STOCK_OK,
+				GTK_RESPONSE_OK,
+				NULL);
+	
+	
+	GtkWidget *content_area = GTK_DIALOG(dialog)->vbox;
+	GtkWidget *content_widget = plugins_settings_widget_create();
+
+	/* Add the widget to the dialog */
+	gtk_box_pack_start(GTK_BOX(content_area), content_widget, TRUE, TRUE, 10);
+
+	/* When a button (ok/cancel/etc.) is clicked or the dialog is closed - destroy it */
+	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+
+	gtk_dialog_run(GTK_DIALOG(dialog));
 	
 }
 
