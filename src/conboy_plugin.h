@@ -17,24 +17,24 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef CONBOY_MODULE_H
-#define CONBOY_MODULE_H
+#ifndef CONBOY_PLUGIN_H
+#define CONBOY_PLUGIN_H
 
 #include <glib-object.h>
 #include <gmodule.h>
 
 /* convention macros */
-#define CONBOY_TYPE_MODULE (conboy_module_get_type())
-#define CONBOY_MODULE(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),CONBOY_TYPE_MODULE, ConboyModule))
-#define CONBOY_MODULE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), CONBOY_TYPE_MODULE, ConboyModuleClass))
+#define CONBOY_TYPE_MODULE (conboy_plugin_get_type())
+#define CONBOY_PLUGIN(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),CONBOY_TYPE_MODULE, ConboyPlugin))
+#define CONBOY_PLUGIN_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), CONBOY_TYPE_MODULE, ConboyPluginClass))
 #define CONBOY_IS_MODULE(object)   (G_TYPE_CHECK_INSTANCE_TYPE ((object), CONBOY_TYPE_MODULE))
 #define CONBOY_IS_MODULE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), CONBOY_TYPE_MODULE))
-#define CONBOY_MODULE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), CONBOY_TYPE_MODULE, ConboyModuleClass))
+#define CONBOY_PLUGIN_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), CONBOY_TYPE_MODULE, ConboyPluginClass))
 
-typedef struct _ConboyModule ConboyModule;
-typedef struct _ConboyModuleClass ConboyModuleClass;
+typedef struct _ConboyPlugin ConboyPlugin;
+typedef struct _ConboyPluginClass ConboyPluginClass;
 
-struct _ConboyModule{
+struct _ConboyPlugin{
 	GObject parent;
 	
 	/* <private> */
@@ -44,20 +44,26 @@ struct _ConboyModule{
 	gboolean open_on_startup;	
 };
 
-struct _ConboyModuleClass{
+struct _ConboyPluginClass{
 	GObjectClass parent;
 
 	/* virtual methods */
-	gboolean	(*initialize)	(ConboyModule *module);
+	gboolean	(*initialize)	(ConboyPlugin *module);
 	
 	/* signals */
 	
 };
 
-GType		conboy_module_get_type		(void);
+GType		conboy_plugin_get_type		(void);
 
-ConboyModule	*conboy_module_new(const gchar *name);
-void		conboy_module_initialize_modules(ConboyModule **modules, GError **error);
-gboolean	conboy_module_initialize(ConboyModule *module);
+ConboyPlugin	*conboy_plugin_new(const gchar *name);
+void			 conboy_plugin_initialize_modules(ConboyPlugin **modules, GError **error);
+gboolean		 conboy_plugin_initialize(ConboyPlugin *module);
 
-#endif /* CONBOY_MODULE_H */
+/* Conny: I'm not sure whether this is the right place */
+/*
+gboolean	 	 conboy_plugin_is_configurable (ConboyPlugin *plugin);
+GtkWidget		*conboy_plugin_create_configure_dialog (ConboyPlugin *plugin);
+*/
+
+#endif /* CONBOY_PLUGIN_H */
