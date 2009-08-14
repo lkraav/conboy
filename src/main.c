@@ -97,39 +97,6 @@ main (int argc, char *argv[])
   } else {
 	  search_window_open();
   }
-
-  /*
-   * Find a reliable method to get the plugin dir where the .plugin files are
-   */
-  
-  const gchar *path = "/home/conny/workspace/conboy/src/plugins/storage_xml/conboy_storage_xml.plugin";
-  
-  /*const gchar *file = g_build_filename(path, "conboy", "plugins", "conboy_storage_xml.plugin", NULL);*/
-  
-  /*g_printerr("FILE: >%s<\n", path);*/
-  
-  ConboyPluginInfo *info = conboy_plugin_info_new(path);
-  g_printerr("DESC: %s\n", conboy_plugin_info_get_description(info));
-  g_printerr("INFO: %s\n", conboy_plugin_info_get_name(info));
-  
-  /*******/
-  /*
-  print_note_as_json(note);
-  JsonNode *node = get_json_object_from_note(note);
-  Note *xnote = get_note_from_json_object(node);
-  g_printerr("### %s \n", xnote->guid);
-  g_printerr("### %s \n", xnote->title);
-  g_printerr("### %f \n", xnote->content_version);
-  g_printerr("### %f \n", xnote->version);
-  g_printerr("### %i \n", xnote->last_change_date);
-  
-  GList *tags = note->tags;
-  while (tags != NULL) {
-	  g_printerr("TAG %s \n", (gchar*)tags->data);
-	  tags = tags->next;
-  }
-  */
-  /*********/
   
   gtk_main();
 
