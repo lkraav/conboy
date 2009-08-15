@@ -1,3 +1,9 @@
+conboy (0.5.9) stable; urgency=low
+
+  * Development version
+  
+ -- Cornelius Hald <hald@icandy.de>  Sat, 15 Aug 2009 16:57:24 +0200
+
 conboy (0.5.0) stable; urgency=low
 
   * Added full text search
