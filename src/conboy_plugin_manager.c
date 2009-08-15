@@ -1,3 +1,25 @@
+/* This file is part of Conboy.
+ *
+ * Copyright (C) 2009 Cornelius Hald
+ * 
+ * This file is based on gedit-plugin-manager.c from gedit (GPLv2)
+ * Copyright (C) 2002 Paolo Maggi and James Willcox
+ * Copyright (C) 2003-2006 Paolo Maggi
+ *
+ * Conboy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Conboy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -315,7 +337,7 @@ plugin_manager_get_plugin_base_dir()
 {
 	gchar *path = NULL;
 	const gchar *env_path = g_getenv("CONBOY_PLUGIN_DIR");
-	if (path != NULL) {
+	if (env_path != NULL) {
 		if (g_file_test(env_path, G_FILE_TEST_IS_DIR)) {
 			path = g_strdup(env_path);
 		} else {
@@ -912,7 +934,7 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 	gtk_container_add (GTK_CONTAINER (hbuttonbox), pm->priv->configure_button);
 
 	/* setup a window of a sane size. */
-	gtk_widget_set_size_request (GTK_WIDGET (viewport), 270, 100);
+	gtk_widget_set_size_request (GTK_WIDGET (viewport), 350, 200);
 
 	g_signal_connect (pm->priv->about_button,
 			  "clicked",
