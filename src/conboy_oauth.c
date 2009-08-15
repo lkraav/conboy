@@ -11,11 +11,12 @@
 #include "settings.h"
 #include "note.h"
 #include "json.h"
-
+/*
 #define request_token_uri "http://127.0.0.1:8000/oauth/request_token/"
 #define access_token_uri  "http://127.0.0.1:8000/oauth/access_token/"
 #define get_all_notes_uri "http://127.0.0.1:8000/api/1.0/root/notes/?include_notes=true"
 #define send_note_uri     "http://127.0.0.1:8000/api/1.0/root/notes/"
+*/
 
 #define c_key    "root"  /*< consumer key */
 #define c_secret "klaus" /*/< consumer secret */
@@ -164,12 +165,14 @@ get_auth_link(gchar *request_url, gchar *link_url, gchar **t_key, gchar **t_secr
 	gchar *req_url = oauth_sign_url2(request_url, &postarg, OA_HMAC, "POST", c_key, c_secret, NULL, NULL);
 	
 	if (req_url == NULL) {
+		g_printerr("ERROR: REQ URL = NULL\n");
 		return NULL;
 	}
 	
 	reply = oauth_http_post(req_url, postarg);
 	
 	if (reply == NULL) {
+		g_printerr("ERROR: Reply = NULL\n");
 		g_free(req_url);
 		return NULL;
 	}
@@ -193,19 +196,28 @@ get_access_token(gchar *url, gchar **t_key, gchar **t_secret)
 	gchar *reply = NULL;
 	gchar *postarg = NULL;
 	
+	g_printerr("###key: %s\n", *t_key);
+	g_printerr("###sec: %s\n", *t_secret);
+	
 	gchar *req_url = oauth_sign_url2(url, &postarg, OA_HMAC, "POST", c_key, c_secret, *t_key, *t_secret);
+
+	g_printerr("Access token request url:\n%s\n\n", req_url);
+	g_printerr("Access token request token:\n%s\n\n", postarg);
 	
 	if (req_url == NULL) {
 		return FALSE;
 	}
 	
-	reply = oauth_http_post(req_url, postarg);
+	return FALSE;
+	
+	/*reply = oauth_http_post(req_url, postarg);*/
+	reply = oauth_http_get(req_url, NULL);
 	if (reply == NULL) {
 		g_free(req_url);
 		return FALSE;
 	}
 	g_printerr("Access Reply: >%s< \n", reply);
-		  
+	/* TODO: Use return value of parse_reply */
 	parse_reply(reply, t_key, t_secret);
 	
 	g_free(reply);
@@ -232,19 +244,46 @@ conboy_get_access_token() {
 	return FALSE;
 }
 
+/*
+ * Works
+ */
 gchar*
-get_all_notes(const gchar *t_key, const gchar *t_secret)
-{
-	gchar *req_url = oauth_sign_url2(get_all_notes_uri, NULL, OA_HMAC, "GET", c_key, c_secret, t_key, t_secret);
-	g_printerr("%s\n", req_url);
+conboy_http_get(const gchar *url) {
+	
+	gchar *tok = settings_load_oauth_access_token();
+	gchar *sec = settings_load_oauth_access_secret();
+	
+	gchar *req_url = oauth_sign_url2(url, NULL, OA_HMAC, "GET", c_key, c_secret, tok, sec);
+	g_printerr("Request: %s\n", req_url);
 	gchar *reply = oauth_http_get(req_url, NULL);
-	g_printerr("Get All Notes Reply: >%s< \n", reply);
+	
+	g_free(tok);
+	g_free(sec);
+	g_free(req_url);
 	
 	return reply;
 }
 
+gchar*
+get_all_notes(const gchar *base_url, gboolean inc_notes, const gchar *t_key, const gchar *t_secret)
+{
+	gchar *url;
+	if (inc_notes) {
+		url = g_strconcat(base_url, "/api/1.0/root/notes/?include_notes=true", NULL);
+	} else {
+		url = g_strconcat(base_url, "/api/1.0/root/notes/", NULL);
+	}
+	
+	gchar *req_url = oauth_sign_url2(url, NULL, OA_HMAC, "GET", c_key, c_secret, t_key, t_secret);
+	g_printerr("%s\n", req_url);
+	gchar *reply = oauth_http_get(req_url, NULL);
+	g_printerr("Get All Notes Reply: >%s< \n", reply);
+	g_free(url);
+	return reply;
+}
+
 void
-web_send_note(Note *note, const gchar *t_key, const gchar *t_secret)
+web_send_note(Note *note, const gchar *base_url, const gchar *t_key, const gchar *t_secret)
 {
 	/*
 	 * Create correct json structure to send the note
@@ -278,7 +317,7 @@ web_send_note(Note *note, const gchar *t_key, const gchar *t_secret)
 
 	gchar *oauth_args = ""; 
 
-	gchar *uri = send_note_uri;
+	gchar *uri = g_strconcat(base_url, "/api/1.0/root/notes/", NULL);
 	
 	
 	gchar *req_url = oauth_sign_url2(uri, &oauth_args, OA_HMAC, "PUT", c_key, c_secret, t_key, t_secret);

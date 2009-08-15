@@ -215,55 +215,16 @@ on_font_size_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpoi
 static void
 on_sync_but_clicked(GtkButton *but, gpointer user_data)
 {
-	gchar *tok = "";
-	gchar *sec = "";
-	gchar *lnk = NULL;
+	settings_save_oauth_access_token("B3cSXdFFSLPQBCtm7H");
+	settings_save_oauth_access_secret("J2NLtKG9BeyrzG8J47kb6f32CeVhFgZH");
 	
-	Note *note = (Note*) user_data;
+	/*gchar *reply = conboy_http_get("http://127.0.0.1:8000/api/1.0/");*/
+	gchar *reply = conboy_http_get("http://10.11.1.183:8000/api/1.0/root/");
 	
-	tok = settings_load_oauth_access_token();
-	sec = settings_load_oauth_access_secret();
+	g_printerr("****************\n");
+	g_printerr("%s\n", reply);
+	g_printerr("****************\n");
 	
-	if (tok == NULL || sec == NULL) {
-		
-		lnk = get_auth_link("http://localhost:8000", "bla", &tok, &sec);
-		GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, lnk);
-		g_printerr("Link:\n%s\n", lnk);
-		gtk_dialog_run(GTK_DIALOG(dialog));
-		gtk_widget_destroy (dialog);
-		
-		/* TODO: Add error handling */
-		if (conboy_get_access_token()) {
-			/* Disable Authenticate button and URL field */
-			/* Enable Clean button */
-		}
-		
-	}
-	
-	/*
-	 * TEST
-	 */
-	
-	web_send_note(note, tok, sec);
-	return;
-	
-	
-	/*
-	 * TODO: Implement, that if the call does not work, we might need to get
-	 * a new access token/secret.
-	 */
-	gchar *reply = get_all_notes(tok, sec);
-	
-	if (reply != NULL) {
-		GSList *notes = json_get_notes_from_string(reply);
-		while (notes != NULL) {
-			Note *note = (Note*)notes->data;
-			g_printerr("Title: %s\n", note->title);
-			g_printerr("GUID : %s\n", note->guid);
-			g_printerr("-------\n");
-			notes = notes->next;
-		}
-	}
 	
 }
 
