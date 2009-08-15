@@ -51,6 +51,38 @@ static void cleanup()
 	app_data_free();
 }
 
+static gint dbus_handler(const gchar *interface,
+                         const gchar *method,
+                         GArray *arguments,
+                         gpointer data,
+                         osso_rpc_t *retval)
+{
+	g_printerr("Interface: %s\n", interface); /* Answer is: de.zwong.conboy */
+	g_printerr("Method: %s\n", method);       /* Answer is method from desktop file: load_url */
+	
+	/*
+	 * TODO: Argument of this method doesn't matter to us.
+	 * So just change method in .desktop file to "set_focus" or something like that
+	 * Then here if this method was called, call gtk_window_present() or equal.
+	 */
+	
+	if (arguments == NULL) {
+		g_printerr("Null arguments\n");
+		return OSSO_OK;
+	}
+	
+	g_printerr("Arguments:\n"); /* One arg in the list, which contains: 'conboy://hallo' */
+	gint i;
+	for(i = 0; i < arguments->len; ++i) {
+		osso_rpc_t val = g_array_index(arguments, osso_rpc_t, i);
+	      if ((val.type == DBUS_TYPE_STRING) && (val.value.s != NULL)) {
+	    	  g_printerr("hildon mime open: '%s'\n",val.value.s);
+	      }
+	}
+
+	return OSSO_OK;
+}
+
 
 int
 main (int argc, char *argv[])
@@ -82,6 +114,13 @@ main (int argc, char *argv[])
   if (osso_context == NULL) {
       return OSSO_ERROR;
   }
+  
+  /* Register rpc */
+  g_printerr("Setting mime callback\n");
+  if (osso_rpc_set_cb_f(osso_context, APP_SERVICE, APP_METHOD, APP_SERVICE, dbus_handler, NULL) != OSSO_OK) {
+        g_printerr("Failed to set mime callback\n");
+  }
+  g_printerr("Mime callback set\n");
 
   /* Create the Hildon program and setup the title */
   program = HILDON_PROGRAM(hildon_program_get_instance());

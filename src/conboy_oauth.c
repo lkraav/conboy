@@ -192,7 +192,8 @@ get_auth_link(gchar *request_url, gchar *link_url, gchar **t_key, gchar **t_secr
 	/* TODO: Use conboy:// instead of http://google.de. Problem is, it doesnt work for now.
 	 * There is some bug in Snowy/Piston/Django...
 	 * http://mail.gnome.org/archives/snowy-list/2009-July/msg00002.html */
-	link = g_strconcat(link_url, "?oauth_token=", *t_key, "&oauth_callback=http://www.google.de", NULL);
+	link = g_strconcat(link_url, "?oauth_token=", *t_key, "&oauth_callback=conboy://sync", NULL);
+	/*link = g_strconcat(link_url, "?oauth_token=", *t_key, "&oauth_callback=http://www.google.de", NULL);*/
 	
 	return link;
 }

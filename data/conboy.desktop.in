@@ -9,3 +9,10 @@ X-Window-Icon=conboy
 X-Window-Icon-Dimmed=conboy
 X-Osso-Service=de.zwong.conboy
 X-Osso-Type=application/x-executable
+X-Osso-URI-Actions=conboy
+
+[X-Osso-URI-Action Handler conboy]
+Method=load_url
+Name=put_to_front
+TranslationDomain=conboy
+
