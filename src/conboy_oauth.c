@@ -113,6 +113,9 @@ http_put(const gchar *url, const gchar *oauth_args, const gchar *body)
 	return (chunk.data);
 }
 
+/*
+ * Returns 0 on success, 1 otherwise
+ */
 static int parse_reply(const char *reply, char **token, char **secret) {
   int rc;
   int ok=1;
@@ -142,8 +145,10 @@ conboy_get_auth_link(const gchar *base_url)
 	
 	gchar *link = get_auth_link(call_url, link_url ,&tok, &sec);
 	
+	/*
 	g_printerr("req_tok: %s\n", tok);
 	g_printerr("req_sec: %s\n", sec);
+	*/
 	
 	settings_save_oauth_access_token(tok);
 	settings_save_oauth_access_secret(sec);
@@ -177,14 +182,17 @@ get_auth_link(gchar *request_url, gchar *link_url, gchar **t_key, gchar **t_secr
 		return NULL;
 	}
 	 
-	g_printerr("Token Reply: >%s< \n", reply);
-	  
-	parse_reply(reply, t_key, t_secret);
+	if (parse_reply(reply, t_key, t_secret)) {
+		g_printerr("ERROR: Reply could not be parsed\n");
+	}
 	
 	g_free(req_url);
 	g_free(reply);
 	
-	link = g_strconcat(link_url, "?oauth_token=", *t_key, "&oauth_callback=conboy://xxx", NULL);
+	/* TODO: Use conboy:// instead of http://google.de. Problem is, it doesnt work for now.
+	 * There is some bug in Snowy/Piston/Django...
+	 * http://mail.gnome.org/archives/snowy-list/2009-July/msg00002.html */
+	link = g_strconcat(link_url, "?oauth_token=", *t_key, "&oauth_callback=http://www.google.de", NULL);
 	
 	return link;
 }
@@ -196,32 +204,29 @@ get_access_token(gchar *url, gchar **t_key, gchar **t_secret)
 	gchar *reply = NULL;
 	gchar *postarg = NULL;
 	
-	g_printerr("###key: %s\n", *t_key);
-	g_printerr("###sec: %s\n", *t_secret);
-	
 	gchar *req_url = oauth_sign_url2(url, &postarg, OA_HMAC, "POST", c_key, c_secret, *t_key, *t_secret);
-
-	g_printerr("Access token request url:\n%s\n\n", req_url);
-	g_printerr("Access token request token:\n%s\n\n", postarg);
 	
 	if (req_url == NULL) {
+		g_printerr("ERROR: req_url = NULL");
 		return FALSE;
 	}
 	
-	return FALSE;
-	
-	/*reply = oauth_http_post(req_url, postarg);*/
-	reply = oauth_http_get(req_url, NULL);
+	reply = oauth_http_post(req_url, postarg);
 	if (reply == NULL) {
+		g_printerr("ERROR: reply = NULL");
 		g_free(req_url);
 		return FALSE;
 	}
-	g_printerr("Access Reply: >%s< \n", reply);
-	/* TODO: Use return value of parse_reply */
-	parse_reply(reply, t_key, t_secret);
 	
-	g_free(reply);
-	return TRUE;
+	g_printerr("Access Reply: >%s< \n", reply);
+	
+	if (parse_reply(reply, t_key, t_secret)) {
+		g_free(reply);
+		return FALSE;
+	} else {
+		g_free(reply);
+		return TRUE;
+	}
 }
 
 gboolean

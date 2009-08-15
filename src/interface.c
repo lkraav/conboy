@@ -211,12 +211,13 @@ on_font_size_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpoi
 	pango_font_description_free(font);
 }
 
-
 static void
 on_sync_but_clicked(GtkButton *but, gpointer user_data)
 {
+	/*
 	settings_save_oauth_access_token("B3cSXdFFSLPQBCtm7H");
 	settings_save_oauth_access_secret("J2NLtKG9BeyrzG8J47kb6f32CeVhFgZH");
+	*/
 	
 	/*gchar *reply = conboy_http_get("http://127.0.0.1:8000/api/1.0/");*/
 	gchar *reply = conboy_http_get("http://10.11.1.183:8000/api/1.0/root/");
@@ -227,6 +228,49 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	
 	
 }
+
+/*
+static void
+on_sync_but_clicked(GtkButton *but, gpointer user_data)
+{
+	gchar *tok = NULL;
+	gchar *sec = NULL;
+	gchar *lnk = NULL;
+	
+	Note *note = (Note*) user_data;
+	
+	
+	if (tok == NULL || sec == NULL) {
+		
+		lnk = get_auth_link("http://127.0.0.1:8000/oauth/request_token/", "http://127.0.0.1:8000/oauth/authenticate/", &tok, &sec);
+		GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, lnk);
+		g_printerr("Link:\n%s\n", lnk);
+		gtk_dialog_run(GTK_DIALOG(dialog));
+		gtk_widget_destroy (dialog);
+		
+		if (get_access_token("http://127.0.0.1:8000/oauth/access_token/", &tok, &sec)) {
+			g_printerr("Saving token & secret to gconf \n");
+			settings_save_oauth_access_token(tok);
+			settings_save_oauth_access_secret(sec);
+		}
+	}
+	
+	gchar *reply = get_all_notes("http://127.0.0.1:8000", TRUE, tok, sec);
+	
+	if (reply != NULL) {
+		GSList *notes = json_get_notes_from_string(reply);
+		while (notes != NULL) {
+			Note *note = (Note*)notes->data;
+			g_printerr("Title: %s\n", note->title);
+			g_printerr("GUID : %s\n", note->guid);
+			g_printerr("-------\n");
+			notes = notes->next;
+		}
+	}
+	
+}
+*/
+
 
 /*
  * I'm not sure what is better:

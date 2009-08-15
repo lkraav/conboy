@@ -18,6 +18,12 @@ void
 web_send_note(Note *note, const gchar *base_url, const gchar *t_key, const gchar *t_secret);
 
 gchar*
+conboy_get_auth_link(const gchar *base_url);
+
+gboolean
+conboy_get_access_token(void);
+
+gchar*
 conboy_http_get(const gchar *url);
 
 #endif /*CONBOY_OAUTH_H_*/
