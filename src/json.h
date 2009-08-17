@@ -22,6 +22,17 @@
 #include <json-glib/json-glib.h>
 #include "note.h"
 
+typedef struct {
+	gchar *user_name;
+	gchar *first_name;
+	gchar *last_name;
+	int    latest_sync_revision;
+	gchar *current_sync_guid;
+	gchar *api_ref;
+} User;
+
+
+User* json_get_user(const gchar* json_string);
 JsonNode* json_get_node_from_note(Note *note);
 Note* json_get_note_from_node(JsonNode *node);
 Note* json_get_note_from_string(const gchar *json_string);

@@ -219,12 +219,37 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	settings_save_oauth_access_secret("J2NLtKG9BeyrzG8J47kb6f32CeVhFgZH");
 	*/
 	
-	/*gchar *reply = conboy_http_get("http://127.0.0.1:8000/api/1.0/");*/
-	gchar *reply = conboy_http_get("http://10.11.1.183:8000/api/1.0/root/");
+	
+	gchar *reply = conboy_http_get("http://127.0.0.1:8000/api/1.0/");
+	
+	g_printerr("\n%s\n", reply);
+	
+	gchar *api_ref = json_get_api_ref(reply);
+	
+	
+	reply = conboy_http_get(api_ref);
+	
+	g_printerr("\%s\n", reply);
+	
+	User *user = json_get_user(reply);
+	
+	
+	gchar *all_notes = conboy_http_get(user->api_ref);
 	
 	g_printerr("****************\n");
-	g_printerr("%s\n", reply);
+	g_printerr("%s\n", all_notes);
 	g_printerr("****************\n");
+	
+	/*
+	 * TODO: We also need to read the latest-sync-revision from this
+	 * Json answer.
+	 */
+	
+	GSList *list = json_get_notes_from_string(all_notes);
+	while (list != NULL) {
+		g_printerr("Title: %s\n", ((Note*)list->data)->title);
+		list = list->next;
+	}
 	
 	
 }

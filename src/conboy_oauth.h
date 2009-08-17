@@ -12,7 +12,7 @@ gboolean
 get_access_token(gchar *url, gchar **t_key, gchar **t_secret);
 
 gchar*
-get_all_notes(const gchar *base_url, gboolean inc_notes, const gchar *t_key, const gchar *t_secret);
+get_all_notes(gboolean inc_notes);
 
 void
 web_send_note(Note *note, const gchar *base_url, const gchar *t_key, const gchar *t_secret);

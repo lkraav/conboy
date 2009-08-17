@@ -350,3 +350,65 @@ json_test()
 	g_slist_free(notes);	
 }
 
+
+gchar*
+json_get_api_ref(const gchar* json_string)
+{
+	JsonParser *parser = json_parser_new();
+	gchar *result = NULL;
+	GError *error = NULL;
+	
+	if (json_parser_load_from_data(parser, json_string, -1, &error)) {
+		JsonNode *node = json_parser_get_root(parser);
+		JsonObject *obj = json_node_get_object(node);		
+		node = json_object_get_member(obj, "user-ref");
+		obj = json_node_get_object(node);
+		node = json_object_get_member(obj, "api-ref");
+		result = json_node_dup_string(node);
+	} else {
+		if (error != NULL) g_printerr("ERROR: %s\n", error->message);
+	}
+	
+	g_object_unref(G_OBJECT(parser));
+	return result;
+}
+
+
+User*
+json_get_user(const gchar* json_string)
+{
+	JsonParser *parser = json_parser_new();
+	User *result = g_new(User, 1);
+	GError *error = NULL;
+	
+	if (json_parser_load_from_data(parser, json_string, -1, &error)) {
+		JsonNode *node = json_parser_get_root(parser);
+		JsonObject *obj = json_node_get_object(node);
+		
+		node = json_object_get_member(obj, "user-name");
+		result->user_name = json_node_dup_string(node);
+		
+		node = json_object_get_member(obj, "first-name");
+		result->first_name = json_node_dup_string(node);
+		
+		node = json_object_get_member(obj, "last-name");
+		result->last_name = json_node_dup_string(node);
+		
+		node = json_object_get_member(obj, "latest-sync-revision");
+		result->latest_sync_revision = json_node_get_int(node);
+		
+		node = json_object_get_member(obj, "current-sync-guid");
+		result->current_sync_guid = json_node_dup_string(node);
+		
+		node = json_object_get_member(obj, "notes-ref");
+		obj = json_node_get_object(node);
+		node = json_object_get_member(obj, "api-ref");
+		result->api_ref = json_node_dup_string(node);
+		
+	} else {
+		if (error != NULL) g_printerr("ERROR: %s\n", error->message);
+	}
+	
+	g_object_unref(G_OBJECT(parser));
+	return result;
+}

@@ -113,6 +113,54 @@ http_put(const gchar *url, const gchar *oauth_args, const gchar *body)
 	return (chunk.data);
 }
 
+
+
+static gchar*
+http_get(const gchar *url)
+{
+	CURL *curl;
+	CURLcode res;
+
+	struct MemoryStruct chunk;
+	chunk.data=NULL;
+	chunk.size = 0;
+
+	curl = curl_easy_init();
+	if(!curl) return NULL;
+	
+	/* Enable debugging */
+	/*
+	curl_easy_setopt(curl, CURLOPT_VERBOSE, TRUE);
+	curl_easy_setopt(curl, CURLOPT_HEADER, TRUE);
+	*/
+
+	curl_easy_setopt(curl, CURLOPT_URL, url);
+	
+	/* Enable and disable headers to look as similar as possibele like Tomboy */
+	struct curl_slist *headers = NULL;
+	headers = curl_slist_append(headers, "Connection: keep-alive");
+	headers = curl_slist_append(headers, "Accept:");
+	headers = curl_slist_append(headers, "User-Agent:");
+	
+	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+	curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
+
+	/* Setup function to read the reply */
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+
+	/* Perfome the request */
+	res = curl_easy_perform(curl);
+	if (res) {
+	  return NULL;
+	}
+
+	curl_easy_cleanup(curl);
+	return (chunk.data);
+}
+
+
+
 /*
  * Returns 0 on success, 1 otherwise
  */
@@ -261,7 +309,8 @@ conboy_http_get(const gchar *url) {
 	
 	gchar *req_url = oauth_sign_url2(url, NULL, OA_HMAC, "GET", c_key, c_secret, tok, sec);
 	g_printerr("Request: %s\n", req_url);
-	gchar *reply = oauth_http_get(req_url, NULL);
+	/*gchar *reply = oauth_http_get(req_url, NULL);*/ /* <<< Does not return the complete string */
+	gchar *reply = http_get(req_url);
 	
 	g_free(tok);
 	g_free(sec);
@@ -269,10 +318,14 @@ conboy_http_get(const gchar *url) {
 	
 	return reply;
 }
-
+/*
 gchar*
-get_all_notes(const gchar *base_url, gboolean inc_notes, const gchar *t_key, const gchar *t_secret)
+get_all_notes(gboolean inc_notes)
 {
+	gchar *base_url = settings_load_sync_base_url();
+	gchar *t_key = settings_load_oauth_access_token();
+	gchar *t_secret = settings_load_oauth_access_secret();
+	
 	gchar *url;
 	if (inc_notes) {
 		url = g_strconcat(base_url, "/api/1.0/root/notes/?include_notes=true", NULL);
@@ -287,6 +340,7 @@ get_all_notes(const gchar *base_url, gboolean inc_notes, const gchar *t_key, con
 	g_free(url);
 	return reply;
 }
+*/
 
 void
 web_send_note(Note *note, const gchar *base_url, const gchar *t_key, const gchar *t_secret)
