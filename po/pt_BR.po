@@ -1,0 +1,197 @@
+# Brazilian Portuguese translation of Conboy.
+# Copyright © 2009 the Conboy authors.
+# This file is distributed under the same license as the conboy package.
+# Leonardo Ferreira Fontenelle <leonardof@gnome.org>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: conboy 0.5.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-06-26 23:03+0200\n"
+"PO-Revision-Date: 2009-06-27\n"
+"Last-Translator: Leonardo Ferreira Fontenelle <leonardof@gnome.org>\n"
+"Language-Team: Brazilian Portuguese <ldp-br@bazar.conectiva.com.br>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/interface.c:201 ../src/interface.c:303 ../src/interface.c:341
+#: ../src/interface.c:402 ../src/interface.c:440
+msgid "Bold"
+msgstr "Negrito"
+
+#: ../src/interface.c:202 ../src/interface.c:304
+msgid "Bullets"
+msgstr "Marcadores"
+
+#: ../src/interface.c:203 ../src/interface.c:305
+msgid "Decrease Indent"
+msgstr "Diminuir recuo"
+
+#: ../src/interface.c:204 ../src/interface.c:306
+msgid "Delete Note"
+msgstr "Excluir nota"
+
+#: ../src/interface.c:205 ../src/interface.c:307 ../src/interface.c:345
+#: ../src/interface.c:406 ../src/interface.c:444
+msgid "Fixed Width"
+msgstr "Largura fixa"
+
+#: ../src/interface.c:206 ../src/interface.c:306 ../src/interface.c:344
+#: ../src/interface.c:308 ../src/interface.c:405 ../src/interface.c:443
+msgid "Highlight"
+msgstr "Destacar"
+
+#: ../src/interface.c:207 ../src/interface.c:309
+msgid "Increase Indent"
+msgstr "Aumentar recuo"
+
+#: ../src/interface.c:208 ../src/interface.c:310
+msgid "Link"
+msgstr "Link"
+
+#: ../src/interface.c:209 ../src/interface.c:311
+msgid "New Note"
+msgstr "Nova nota"
+
+#: ../src/interface.c:210
+msgid "Open"
+msgstr "Abrir"
+
+#: ../src/interface.c:211 ../src/interface.c:314
+msgid "Close All Notes"
+msgstr "Fechar todas as notas"
+
+#: ../src/interface.c:212 ../src/interface.c:304 ../src/interface.c:342
+#: ../src/interface.c:315 ../src/interface.c:403 ../src/interface.c:441
+msgid "Italic"
+msgstr "Itálico"
+
+#: ../src/interface.c:213 ../src/interface.c:305 ../src/interface.c:343
+#: ../src/interface.c:316 ../src/interface.c:404 ../src/interface.c:442
+msgid "Strikeout"
+msgstr "Tachado"
+
+#: ../src/interface.c:214 ../src/interface.c:317
+msgid "Style"
+msgstr "Estilo"
+
+#: ../src/interface.c:215 ../src/interface.c:318
+msgid "Zoom In"
+msgstr "Ampliar"
+
+#: ../src/interface.c:216 ../src/interface.c:319
+msgid "Zoom Out"
+msgstr "Reduzir"
+
+#: ../src/interface.c:217 ../src/interface.c:320
+msgid "Find In Note"
+msgstr "Localizar na nota"
+
+#: ../src/interface.c:219 ../src/interface.c:308 ../src/interface.c:346
+#: ../src/interface.c:322 ../src/interface.c:407 ../src/interface.c:445
+#: ../src/settings_window.c:111
+msgid "Small"
+msgstr "Pequeno"
+
+#: ../src/interface.c:220 ../src/interface.c:323
+msgid "Normal"
+msgstr "Normal"
+
+#: ../src/interface.c:221 ../src/interface.c:309 ../src/interface.c:347
+#: ../src/interface.c:324 ../src/interface.c:408 ../src/interface.c:446
+#: ../src/settings_window.c:115
+msgid "Large"
+msgstr "Grande"
+
+#: ../src/interface.c:222 ../src/interface.c:310 ../src/interface.c:348
+#: ../src/interface.c:325 ../src/interface.c:409 ../src/interface.c:447
+msgid "Huge"
+msgstr "Enorme"
+
+#: ../src/interface.c:397 ../src/interface.c:498
+msgid "Text Style"
+msgstr "Estio do texto"
+
+#: ../src/interface.c:466 ../src/search_window.c:267 ../src/interface.c:571
+#: ../src/search_window.c:374
+msgid "Search:"
+msgstr "Pesquisar:"
+
+#: ../src/search_window.c:257 ../src/search_window.c:341
+msgid "Search All Notes"
+msgstr "Pesquisar todas as notas"
+
+#: ../src/search_window.c:327 ../src/search_window.c:447
+msgid "Note"
+msgstr "Nota"
+
+#: ../src/search_window.c:346 ../src/search_window.c:464
+msgid "Last Changed"
+msgstr "Última alteração"
+
+#: ../src/callbacks.c:590 ../src/callbacks.c:586
+msgid "Really delete this note?"
+msgstr "Excluir mesmo essa nota?"
+
+#: ../src/callbacks.c:592 ../src/callbacks.c:588
+msgid "If you delete a note it is permanently lost."
+msgstr "Se você excluir uma nota, ela será perdida para sempre."
+
+#: ../src/note.c:341 ../src/note.c:374
+#, c-format
+msgid "New Note %i"
+msgstr "Nova nota %i"
+
+#: ../src/note.c:344 ../src/note.c:377
+msgid "Describe your new note here."
+msgstr "Descreva sua nova nota aqui."
+
+#: ../src/search_window.c:284 ../src/search_window.c:349
+msgid "Sort By Title"
+msgstr "Ordenar por título"
+
+#: ../src/search_window.c:285 ../src/search_window.c:350
+msgid "Sort By Date"
+msgstr "Ordenar por data"
+
+#: ../src/interface.c:312
+msgid "Open Note"
+msgstr "Abrir nota"
+
+#: ../src/interface.c:313
+msgid "Settings"
+msgstr "Configurações"
+
+#: ../src/settings_window.c:106
+msgid "Scrollbar Size"
+msgstr "Tamanho da barra de rolagem"
+
+#: ../src/settings_window.c:126
+msgid "On Startup"
+msgstr "Ao iniciar"
+
+#: ../src/settings_window.c:144 ../src/settings_window.c:149
+msgid "Show Note"
+msgstr "Mostrar nota"
+
+#: ../src/settings_window.c:145 ../src/settings_window.c:150
+msgid "Show Search"
+msgstr "Mostrar pesquisa"
+
+#: ../src/settings_window.c:168 ../src/settings_window.c:170
+msgid "Use Custom Colors"
+msgstr "Usar cores personalizadas"
+
+#: ../src/settings_window.c:184
+msgid "Text"
+msgstr "Texto"
+
+#: ../src/settings_window.c:198
+msgid "Background"
+msgstr "Plano de fundo"
+
+#: ../src/settings_window.c:212
+msgid "Links"
+msgstr "Links"
+
