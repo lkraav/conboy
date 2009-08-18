@@ -241,8 +241,10 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	g_printerr("****************\n");
 	
 	/*
+	 * 
 	 * TODO: We also need to read the latest-sync-revision from this
 	 * Json answer.
+	 * 
 	 */
 	
 	GSList *list = json_get_notes_from_string(all_notes);

@@ -4,6 +4,7 @@
 #include <gconf/gconf-client.h>
 #include <hildon/hildon-program.h>
 #include <libxml/xmlreader.h>
+#include <libosso.h>
 
 #include "note_list_store.h"
 
@@ -18,6 +19,7 @@ typedef struct
 	HildonWindow  *search_window;
 	NoteListStore *note_store;
 	xmlTextReader *reader;
+	osso_context_t *osso_ctx;
 } AppData;
 
 AppData* app_data_get(void);

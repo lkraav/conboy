@@ -77,7 +77,7 @@ main (int argc, char *argv[])
 {
   HildonProgram *program;
   Note *note;
-  osso_context_t *osso_context;
+  /*osso_context_t *osso_context;*/
   AppData *app_data;
 
   /* Init i18n */
@@ -96,10 +96,10 @@ main (int argc, char *argv[])
 
   /* Initialize maemo application */
   g_printerr("Starting %s, Version %s \n", APP_NAME, VERSION);
-  osso_context = osso_initialize(APP_SERVICE, VERSION, TRUE, NULL);
+  app_data->osso_ctx = osso_initialize(APP_SERVICE, VERSION, TRUE, NULL);
 
   /* Check that initialization was ok */
-  if (osso_context == NULL) {
+  if (app_data->osso_ctx == NULL) {
       return OSSO_ERROR;
   }
 
@@ -123,7 +123,7 @@ main (int argc, char *argv[])
   cleanup();
   
   /* Deinitialize OSSO */
-  osso_deinitialize(osso_context);
+  osso_deinitialize(app_data->osso_ctx);
 
   return 0;
 }

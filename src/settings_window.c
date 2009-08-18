@@ -21,6 +21,9 @@
 #include <glib/gprintf.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-color-button.h>
+#include <tablet-browser-interface.h>
+#include <dbus/dbus-protocol.h>
+
 #ifdef HILDON_HAS_APP_MENU
 #include <hildon/hildon-gtk.h>
 #include <hildon/hildon-check-button.h>
@@ -59,8 +62,13 @@ on_auth_but_clicked(GtkButton *button, gpointer user_data)
 	
 	gchar *link = conboy_get_auth_link(url);
 	
-	/* TODO: Open link in browser */
-	g_printerr("____LINK: >%s<\n", link);
+	/* Open link in browser */
+	AppData *app_data = app_data_get();
+	osso_rpc_run_with_defaults(app_data->osso_ctx, "osso_browser",
+			OSSO_BROWSER_OPEN_NEW_WINDOW_REQ, NULL, 
+			DBUS_TYPE_STRING, link, DBUS_TYPE_INVALID);
+
+	g_printerr("Opening browser with URL: >%s<\n", link);
 	
 	GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Click ok after authenticating on the website.");
 	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
