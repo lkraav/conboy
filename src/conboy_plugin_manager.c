@@ -76,8 +76,7 @@ conboy_plugin_manager_class_init (ConboyPluginManagerClass *klass)
 }
 
 static void
-about_button_cb (GtkWidget          *button,
-		 ConboyPluginManager *pm)
+about_button_cb (GtkWidget *button, ConboyPluginManager *pm)
 {
 	ConboyPluginInfo *info;
 
@@ -92,7 +91,7 @@ about_button_cb (GtkWidget          *button,
 		gtk_widget_destroy (pm->priv->about);
 
 	pm->priv->about = g_object_new (GTK_TYPE_ABOUT_DIALOG,
-		"program-name", conboy_plugin_info_get_name (info),
+		"name", conboy_plugin_info_get_name (info),
 		"copyright", conboy_plugin_info_get_copyright (info),
 		"authors", conboy_plugin_info_get_authors (info),
 		"comments", conboy_plugin_info_get_description (info),
@@ -100,9 +99,8 @@ about_button_cb (GtkWidget          *button,
 		/*"logo-icon-name", conboy_plugin_info_get_icon_name (info),*/
 		"version", conboy_plugin_info_get_version (info),
 		NULL);
-
-	gtk_window_set_destroy_with_parent (GTK_WINDOW (pm->priv->about),
-					    TRUE);
+	
+	gtk_window_set_destroy_with_parent (GTK_WINDOW (pm->priv->about), TRUE);
 
 	g_signal_connect (pm->priv->about,
 			  "response",
@@ -113,8 +111,7 @@ about_button_cb (GtkWidget          *button,
 			  G_CALLBACK (gtk_widget_destroyed),
 			  &pm->priv->about);
 
-	gtk_window_set_transient_for (GTK_WINDOW (pm->priv->about),
-				      GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET(pm))));
+	gtk_window_set_modal(GTK_WINDOW(pm->priv->about), TRUE);
 	gtk_widget_show (pm->priv->about);
 }
 
@@ -173,13 +170,12 @@ plugin_manager_view_info_cell_cb (GtkTreeViewColumn *tree_column,
 					conboy_plugin_info_get_description (info));
 	g_object_set (G_OBJECT (cell),
 		      "markup", text,
-		      /*"sensitive", conboy_plugin_info_is_available (info),*/
-		      "sensitive", TRUE,
+		      "sensitive", conboy_plugin_info_is_available (info),
 		      NULL);
 
 	g_free (text);
 }
-
+/*
 static void
 plugin_manager_view_icon_cell_cb (GtkTreeViewColumn *tree_column,
 				  GtkCellRenderer   *cell,
@@ -197,13 +193,12 @@ plugin_manager_view_icon_cell_cb (GtkTreeViewColumn *tree_column,
 	if (info == NULL)
 		return;
 
-	/*
-	g_object_set (G_OBJECT (cell),
-		      "icon-name", conboy_plugin_info_get_icon_name (info),
-		      "sensitive", conboy_plugin_info_is_available (info),
-		      NULL);
-	 */
-}
+//	g_object_set (G_OBJECT (cell),
+//		      "icon-name", conboy_plugin_info_get_icon_name (info),
+//		      "sensitive", conboy_plugin_info_is_available (info),
+//		      NULL);
+
+}*/
 
 
 static void
@@ -215,6 +210,7 @@ active_toggled_cb (GtkCellRendererToggle *cell,
 	GtkTreePath *path;
 	GtkTreeModel *model;
 
+	g_printerr("Toggled\n");
 	/*conboy_debug (DEBUG_PLUGINS);*/
 
 	path = gtk_tree_path_new_from_string (path_str);
@@ -368,20 +364,13 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 
 	while (plugins)
 	{
-		ConboyPluginInfo *info;
-		info = (ConboyPluginInfo *)plugins->data;
+		ConboyPluginInfo *info = (ConboyPluginInfo*) plugins->data;
 
 		gtk_list_store_append (model, &iter);
-		/*
+		
 		gtk_list_store_set (model, &iter,
 				    ACTIVE_COLUMN, conboy_plugin_info_is_active (info),
 				    AVAILABLE_COLUMN, conboy_plugin_info_is_available (info),
-				    INFO_COLUMN, info,
-				    -1);
-		*/
-		gtk_list_store_set (model, &iter,
-				    ACTIVE_COLUMN, TRUE,
-				    AVAILABLE_COLUMN, TRUE,
 				    INFO_COLUMN, info,
 				    -1);
 
@@ -411,6 +400,13 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 	}
 }
 
+/**
+ * TODO: Add here to code to load a plugin if we decided to
+ * load them during runtime - which we should if we want that
+ * a plugin can offer a Settings-Dialog.
+ * 
+ * Or add code here to save to GConf which plugins are active
+ */
 static gboolean
 plugin_manager_set_active (ConboyPluginManager *pm,
 			   GtkTreeIter        *iter,
@@ -430,7 +426,7 @@ plugin_manager_set_active (ConboyPluginManager *pm,
 	{
 		/* activate the plugin */
 		/*
-		if (!conboy_plugins_engine_activate_plugin (pm->priv->engine, info)) {
+		if (!c (pm->priv->engine, info)) {
 			conboy_debug_message (DEBUG_PLUGINS, "Could not activate %s.\n", 
 					     conboy_plugin_info_get_name (info));
 		 */
@@ -460,11 +456,12 @@ plugin_manager_toggle_active (ConboyPluginManager *pm,
 	gboolean active;
 	
 	/*conboy_debug (DEBUG_PLUGINS);*/
+	g_printerr("plugin_manager_toggle_active\n");
 
 	gtk_tree_model_get (model, iter, ACTIVE_COLUMN, &active, -1);
-
+	g_printerr("Active1: %i\n", active);
 	active ^= 1;
-
+	g_printerr("Active2: %i\n", active);
 	plugin_manager_set_active (pm, iter, model, active);
 }
 
@@ -492,6 +489,7 @@ plugin_manager_get_selected_plugin (ConboyPluginManager *pm)
 	return info;
 }
 
+/*
 static void
 plugin_manager_set_active_all (ConboyPluginManager *pm,
 			       gboolean            active)
@@ -499,7 +497,7 @@ plugin_manager_set_active_all (ConboyPluginManager *pm,
 	GtkTreeModel *model;
 	GtkTreeIter iter;
 
-	/*conboy_debug (DEBUG_PLUGINS);*/
+	conboy_debug (DEBUG_PLUGINS);
 
 	model = gtk_tree_view_get_model (GTK_TREE_VIEW (pm->priv->tree));
 
@@ -512,6 +510,7 @@ plugin_manager_set_active_all (ConboyPluginManager *pm,
 	}
 	while (gtk_tree_model_iter_next (model, &iter));
 }
+*/
 
 /* Callback used as the interactive search comparison function */
 static gboolean
@@ -553,6 +552,7 @@ name_search_cb (GtkTreeModel *model,
 	return retval;
 }
 
+/*
 static void
 enable_plugin_menu_cb (GtkMenu            *menu,
 		       ConboyPluginManager *pm)
@@ -570,20 +570,25 @@ enable_plugin_menu_cb (GtkMenu            *menu,
 	if (gtk_tree_selection_get_selected (selection, NULL, &iter))
 		plugin_manager_toggle_active (pm, &iter, model);
 }
+*/
 
+/*
 static void
 enable_all_menu_cb (GtkMenu            *menu,
 		    ConboyPluginManager *pm)
 {
 	plugin_manager_set_active_all (pm, TRUE);
 }
+*/
 
+/*
 static void
 disable_all_menu_cb (GtkMenu            *menu,
 		     ConboyPluginManager *pm)
 {
 	plugin_manager_set_active_all (pm, FALSE);
 }
+*/
 
 /*
 static GtkWidget *
@@ -783,12 +788,12 @@ plugin_manager_construct_tree (ConboyPluginManager *pm)
 	gtk_tree_view_column_set_title (column, PLUGIN_MANAGER_NAME_TITLE);
 	gtk_tree_view_column_set_resizable (column, TRUE);
 
-	cell = gtk_cell_renderer_pixbuf_new ();
+	/*cell = gtk_cell_renderer_pixbuf_new ();
 	gtk_tree_view_column_pack_start (column, cell, FALSE);
 	g_object_set (cell, "stock-size", GTK_ICON_SIZE_SMALL_TOOLBAR, NULL);
 	gtk_tree_view_column_set_cell_data_func (column, cell,
 						 plugin_manager_view_icon_cell_cb,
-						 pm, NULL);
+						 pm, NULL);*/
 	
 	cell = gtk_cell_renderer_text_new ();
 	gtk_tree_view_column_pack_start (column, cell, TRUE);

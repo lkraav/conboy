@@ -25,6 +25,7 @@ struct _ConboyPluginInfo
 	gchar            **authors;
 	gchar             *copyright;
 	gchar             *version;
+	gboolean           available;
 };
 
 ConboyPluginInfo  *conboy_plugin_info_new       (const gchar *file);
@@ -39,6 +40,9 @@ const gchar	 *conboy_plugin_info_get_description   (ConboyPluginInfo *info);
 const gchar **conboy_plugin_info_get_authors       (ConboyPluginInfo *info);
 const gchar	 *conboy_plugin_info_get_copyright     (ConboyPluginInfo *info);
 const gchar  *conboy_plugin_info_get_version       (ConboyPluginInfo *info);
+gboolean      conboy_plugin_info_is_available      (ConboyPluginInfo *info);
+gboolean      conboy_plugin_info_is_active         (ConboyPluginInfo *info);
+
 
 G_END_DECLS
 

@@ -169,6 +169,8 @@ conboy_plugin_info_new (const gchar *file)
 	
 	g_key_file_free (plugin_file);
 	
+	info->available = TRUE;
+	
 	return info;
 
 error:
@@ -227,4 +229,21 @@ conboy_plugin_info_get_version (ConboyPluginInfo *info)
 	g_return_val_if_fail (info != NULL, NULL);
 
 	return info->version;
+}
+
+gboolean
+conboy_plugin_info_is_available (ConboyPluginInfo *info)
+{
+	g_return_val_if_fail (info != NULL, FALSE);
+
+	return info->available != FALSE;
+}
+
+gboolean
+conboy_plugin_info_is_active (ConboyPluginInfo *info)
+{
+	g_return_val_if_fail (info != NULL, FALSE);
+
+	/*return info->available && info->plugin != NULL;*/
+	return FALSE;
 }
