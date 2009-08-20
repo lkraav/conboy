@@ -299,7 +299,7 @@ json_get_note_from_string(const gchar *json_string)
 	
 	return note;
 }
-
+/*
 GSList*
 json_get_notes_from_string(const gchar *json_string)
 {
@@ -328,6 +328,7 @@ json_get_notes_from_string(const gchar *json_string)
 	
 	return result;
 }
+*/
 
 
 void
@@ -335,19 +336,20 @@ json_test()
 {
 	gchar *test = "{\"notes\": [{\"note-content\": \"Bla bla bla bla\", \"open-on-startup\": false, \"last-metadata-change-date\": \"2009-07-11T11:04:38.204883-05:00\", \"tags\": [], \"title\": \"Test Note\", \"create-date\": \"2009-07-11T11:04:38.204839-05:00\", \"pinned\": false, \"last-sync-revision\": -1, \"last-change-date\": \"2009-07-11T11:04:38.204911-05:00\", \"guid\": \"0058318f-47de-4240-81f7-f846d013250b\"}], \"latest-sync-revision\": -1}";
 	
-	GSList *notes = json_get_notes_from_string(test);
+	JsonNoteList *note_list = json_get_note_list(test);
 	
-	while (notes != NULL) {
-		Note *note = (Note*) notes->data;
+	while (note_list->notes != NULL) {
+		Note *note = (Note*) note_list->notes->data;
 		
 		g_printerr("Title: %s\n", note->title);
 		g_printerr("GUID : %s\n", note->guid);
 		g_printerr("------\n");
 		
-		notes = notes->next;
+		note_list->notes = note_list->notes->next;
 	}
 
-	g_slist_free(notes);	
+	g_slist_free(note_list->notes);
+	g_free(note_list);
 }
 
 
@@ -374,11 +376,12 @@ json_get_api_ref(const gchar* json_string)
 }
 
 
-User*
+
+JsonUser*
 json_get_user(const gchar* json_string)
 {
 	JsonParser *parser = json_parser_new();
-	User *result = g_new(User, 1);
+	JsonUser *result = g_new0(JsonUser, 1);
 	GError *error = NULL;
 	
 	if (json_parser_load_from_data(parser, json_string, -1, &error)) {
@@ -407,6 +410,38 @@ json_get_user(const gchar* json_string)
 		
 	} else {
 		if (error != NULL) g_printerr("ERROR: %s\n", error->message);
+	}
+	
+	g_object_unref(G_OBJECT(parser));
+	return result;
+}
+
+JsonNoteList*
+json_get_note_list(const gchar* json_string)
+{
+	JsonParser *parser = json_parser_new();
+	JsonNoteList *result = g_new0(JsonNoteList, 1);
+	GError *error = NULL;
+	
+	if (json_parser_load_from_data(parser, json_string, -1, &error)) {
+		JsonNode *node = json_parser_get_root(parser);
+		JsonObject *obj = json_node_get_object(node);
+		
+		node = json_object_get_member(obj, "latest-sync-revision");
+		result->latest_sync_revision = json_node_get_int(node);
+		
+		node = json_object_get_member(obj, JSON_NOTES);
+		JsonArray *array = json_node_get_array(node);
+		
+		GList *elements = json_array_get_elements(array);
+		while (elements != NULL) {	
+			JsonNode *element = (JsonNode*)elements->data;
+			Note *note = json_get_note_from_node(element);
+			result->notes = g_slist_append(result->notes, note);
+			elements = elements->next;
+		}
+	} else {
+		g_printerr("ERROR: Could not parse the following JSON string:\n%s\n", json_string);
 	}
 	
 	g_object_unref(G_OBJECT(parser));

@@ -231,7 +231,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	
 	g_printerr("\%s\n", reply);
 	
-	User *user = json_get_user(reply);
+	JsonUser *user = json_get_user(reply);
 	
 	
 	gchar *all_notes = conboy_http_get(user->api_ref);
@@ -240,17 +240,14 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	g_printerr("%s\n", all_notes);
 	g_printerr("****************\n");
 	
-	/*
-	 * 
-	 * TODO: We also need to read the latest-sync-revision from this
-	 * Json answer.
-	 * 
-	 */
 	
-	GSList *list = json_get_notes_from_string(all_notes);
-	while (list != NULL) {
-		g_printerr("Title: %s\n", ((Note*)list->data)->title);
-		list = list->next;
+	
+	JsonNoteList *note_list = json_get_note_list(all_notes);
+	g_printerr("LATEST_SYNC_REVISION: %i\n", note_list->latest_sync_revision);
+	GSList *notes = note_list->notes;
+	while (notes != NULL) {
+		g_printerr("Title: %s\n", ((Note*)notes->data)->title);
+		notes = notes->next;
 	}
 	
 	
