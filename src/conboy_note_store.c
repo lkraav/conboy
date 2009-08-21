@@ -89,7 +89,7 @@ conboy_note_store_add(ConboyNoteStore *self, Note *note, GtkTreeIter *iter)
 	GtkTreeIter iter1;
 
 	/* validate our parameters */
-	g_return_if_fail(NOTE_IS_LIST_STORE(self));
+	g_return_if_fail(CONBOY_IS_NOTE_STORE(self));
 	/*g_return_if_fail(NOTE_IS_NOTE(note));*/
 
 	/* put this object in our data storage */
@@ -114,7 +114,7 @@ conboy_note_store_get_object(ConboyNoteStore *self, GtkTreeIter *iter)
 	Note *note;
 
 	/* validate our parameters */
-	g_return_val_if_fail(NOTE_IS_LIST_STORE(self), NULL);
+	g_return_val_if_fail(CONBOY_IS_NOTE_STORE(self), NULL);
 	g_return_val_if_fail(iter != NULL, NULL);
 
 	/* retreive the object using our parent's interface, take our own
@@ -148,7 +148,7 @@ conboy_note_store_get_column_type(GtkTreeModel *self, int column)
 	};
 
 	/* validate our parameters */
-	g_return_val_if_fail(NOTE_IS_LIST_STORE(self), G_TYPE_INVALID);
+	g_return_val_if_fail(CONBOY_IS_NOTE_STORE(self), G_TYPE_INVALID);
 	g_return_val_if_fail(column >= 0 && column < N_COLUMNS, G_TYPE_INVALID);
 
 	return types[column];
@@ -184,7 +184,7 @@ conboy_note_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, G
 	}
 
 	/* validate our parameters */
-	g_return_if_fail(NOTE_IS_LIST_STORE(self));
+	g_return_if_fail(CONBOY_IS_NOTE_STORE(self));
 	g_return_if_fail(iter != NULL);
 	g_return_if_fail(column >= 0 && column < N_COLUMNS);
 	g_return_if_fail(value != NULL);
@@ -237,7 +237,7 @@ conboy_note_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, G
 
 ConboyNoteStore *conboy_note_store_new(void)
 {
-	return g_object_new(NOTE_TYPE_LIST_STORE, NULL);
+	return g_object_new(CONBOY_TYPE_NOTE_STORE, NULL);
 }
 
 gboolean conboy_note_store_remove(ConboyNoteStore *self, Note *note)

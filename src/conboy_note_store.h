@@ -25,19 +25,19 @@
 
 G_BEGIN_DECLS
 
-#define NOTE_TYPE_LIST_STORE conboy_note_store_get_type()
+#define CONBOY_TYPE_NOTE_STORE conboy_note_store_get_type()
 
 #define CONBOY_NOTE_STORE(obj) \
-  (G_TYPE_CHECK_INSTANCE_CAST ((obj), NOTE_TYPE_LIST_STORE, ConboyNoteStore))
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), CONBOY_TYPE_NOTE_STORE, ConboyNoteStore))
 
 #define CONBOY_NOTE_STORE_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_CAST ((klass), NOTE_TYPE_LIST_STORE, ConboyNoteStoreClass))
+  (G_TYPE_CHECK_CLASS_CAST ((klass), CONBOY_TYPE_NOTE_STORE, ConboyNoteStoreClass))
 
-#define NOTE_IS_LIST_STORE(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), NOTE_TYPE_LIST_STORE))
+#define CONBOY_IS_NOTE_STORE(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), CONBOY_TYPE_NOTE_STORE))
 
-#define NOTE_IS_LIST_STORE_CLASS(klass) \
-  (G_TYPE_CHECK_CLASS_TYPE ((klass), NOTE_TYPE_LIST_STORE))
+#define CONBOY_IS_NOTE_STORE_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), CONBOY_TYPE_NOTE_STORE))
 
 #define CONBOY_NOTE_STORE_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), NOTE_TYPE_LISTSTORE, ConboyNoteStoreClass))
