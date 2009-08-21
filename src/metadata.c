@@ -34,7 +34,7 @@
 
 #include "metadata.h"
 #include "note.h"
-#include "note_list_store.h"
+#include "conboy_note_store.h"
 #include "app_data.h"
 
 

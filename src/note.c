@@ -30,7 +30,7 @@
 #include "metadata.h"
 #include "interface.h"
 #include "note.h"
-#include "note_list_store.h"
+#include "conboy_note_store.h"
 #include "storage.h"
 #include "note_buffer.h"
 
@@ -67,7 +67,7 @@ void note_show_by_title(const char* title)
 	Note *note;
 	AppData *app_data = app_data_get();
 
-	note = note_list_store_find_by_title(app_data->note_store, title);
+	note = conboy_note_store_find_by_title(app_data->note_store, title);
 
 	if (note == NULL) {
 		note = note_create_new();
@@ -216,10 +216,10 @@ void note_save(Note *note)
 
 	app_data = app_data_get();	
 	/* If first save, add to list of all notes */
-	if (!note_list_store_find(app_data->note_store, note)) {
-		note_list_store_add(app_data->note_store, note, NULL);
+	if (!conboy_note_store_find(app_data->note_store, note)) {
+		conboy_note_store_add(app_data->note_store, note, NULL);
 	} else {
-		note_list_store_note_changed(app_data->note_store, note);
+		conboy_note_store_note_changed(app_data->note_store, note);
 	}
 
 	gtk_text_buffer_set_modified(buffer, FALSE);
@@ -272,7 +272,7 @@ void note_delete(Note *note)
 	*/
 
 	/* Remove from list store */
-	note_list_store_remove(app_data->note_store, note);
+	conboy_note_store_remove(app_data->note_store, note);
 
 	/* Free memory */
 	/*note_free(note);*/
@@ -296,7 +296,7 @@ gboolean note_is_open(Note *note)
 gboolean note_exists(Note *note)
 {
 	AppData *app_data = app_data_get();
-	Note *element = note_list_store_find(app_data->note_store, note);
+	Note *element = conboy_note_store_find(app_data->note_store, note);
 	if (element == NULL) {
 		return FALSE;
 	} else {
@@ -379,7 +379,7 @@ void note_show_new(Note *note)
 	/*note->filename = (gchar*)note_get_new_filename(note->guid);*/
 
 	if (note->title == NULL) {
-		notes_count = note_list_store_get_length(app_data->note_store);
+		notes_count = conboy_note_store_get_length(app_data->note_store);
 		note->title = g_strdup_printf(_("New Note %i"), notes_count);
 	}
 

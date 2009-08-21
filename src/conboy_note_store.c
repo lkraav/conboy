@@ -26,48 +26,48 @@
 #include "app_data.h"
 #include "note.h"
 #include "metadata.h"
-#include "note_list_store.h"
+#include "conboy_note_store.h"
 
 /*
  * Implementation of the interface
  */
-static void note_list_store_tree_model_iface_init(GtkTreeModelIface *iface);
-static int note_list_store_get_n_columns(GtkTreeModel *self);
-static GType note_list_store_get_column_type(GtkTreeModel *self, int column);
-static void note_list_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GValue *value);
+static void conboy_note_store_tree_model_iface_init(GtkTreeModelIface *iface);
+static int conboy_note_store_get_n_columns(GtkTreeModel *self);
+static GType conboy_note_store_get_column_type(GtkTreeModel *self, int column);
+static void conboy_note_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GValue *value);
 
-/* NoteListStore inherits from GtkListStore, and implements the GtkTreeStore
+/* ConboyNoteStore inherits from GtkListStore, and implements the GtkTreeStore
  * interface */
-G_DEFINE_TYPE_EXTENDED(NoteListStore, note_list_store, GTK_TYPE_LIST_STORE, 0,
+G_DEFINE_TYPE_EXTENDED(ConboyNoteStore, conboy_note_store, GTK_TYPE_LIST_STORE, 0,
 		G_IMPLEMENT_INTERFACE(GTK_TYPE_TREE_MODEL,
-			note_list_store_tree_model_iface_init))
+			conboy_note_store_tree_model_iface_init))
 
 /* our parent's model iface */
 static GtkTreeModelIface parent_iface = { 0, };
 
 /* this method is called once to set up the class */
 static void
-note_list_store_class_init (NoteListStoreClass *klass)
+conboy_note_store_class_init (ConboyNoteStoreClass *klass)
 {
 }
 
 /* this method is called once to set up the interface */
 static void
-note_list_store_tree_model_iface_init(GtkTreeModelIface *iface)
+conboy_note_store_tree_model_iface_init(GtkTreeModelIface *iface)
 {
 	/* this is where we override the interface methods */
 	/* first make a copy of our parent's interface to call later */
 	parent_iface = *iface;
 
 	/* now put in our own overriding methods */
-	iface->get_n_columns = note_list_store_get_n_columns;
-	iface->get_column_type = note_list_store_get_column_type;
-	iface->get_value = note_list_store_get_value;
+	iface->get_n_columns = conboy_note_store_get_n_columns;
+	iface->get_column_type = conboy_note_store_get_column_type;
+	iface->get_value = conboy_note_store_get_value;
 }
 
 /* this method is called every time an instance of the class is created */
 static void
-note_list_store_init (NoteListStore *self)
+conboy_note_store_init (ConboyNoteStore *self)
 {
 	/* initialise the underlying storage for the GtkListStore */
 	GType types[] = { G_TYPE_POINTER };
@@ -84,7 +84,7 @@ note_list_store_init (NoteListStore *self)
  * Appends @obj to the list.
  */
 void
-note_list_store_add(NoteListStore *self, Note *note, GtkTreeIter *iter)
+conboy_note_store_add(ConboyNoteStore *self, Note *note, GtkTreeIter *iter)
 {
 	GtkTreeIter iter1;
 
@@ -108,7 +108,7 @@ note_list_store_add(NoteListStore *self, Note *note, GtkTreeIter *iter)
 /* retreive an object from our parent's data storage,
  * unref the returned object when done */
 static Note*
-note_list_store_get_object(NoteListStore *self, GtkTreeIter *iter)
+conboy_note_store_get_object(ConboyNoteStore *self, GtkTreeIter *iter)
 {
 	GValue value = {0};
 	Note *note;
@@ -130,14 +130,14 @@ note_list_store_get_object(NoteListStore *self, GtkTreeIter *iter)
 
 /* this method returns the number of columns in our tree model */
 static int
-note_list_store_get_n_columns(GtkTreeModel *self)
+conboy_note_store_get_n_columns(GtkTreeModel *self)
 {
 	return N_COLUMNS;
 }
 
 /* this method returns the type of each column in our tree model */
 static GType
-note_list_store_get_column_type(GtkTreeModel *self, int column)
+conboy_note_store_get_column_type(GtkTreeModel *self, int column)
 {
 	/* This is, how it should look to the outside. So we have an icon, title, change_date and the note itself */
 	GType types[] = {
@@ -172,7 +172,7 @@ get_date_string(time_t t)
 GdkPixbuf *_icon = NULL; /* TODO: Should not be global */
 /* this method retrieves the value for a particular column */
 static void
-note_list_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GValue *value)
+conboy_note_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GValue *value)
 {
 	Note *note;
 	if (_icon == NULL) {
@@ -190,10 +190,10 @@ note_list_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GVa
 	g_return_if_fail(value != NULL);
 
 	/* get the object from our parent's storage */
-	note = note_list_store_get_object(NOTE_LIST_STORE(self), iter);
+	note = conboy_note_store_get_object(CONBOY_NOTE_STORE(self), iter);
 
 	/* initialise our GValue to the required type */
-	g_value_init(value, note_list_store_get_column_type(GTK_TREE_MODEL (self), column));
+	g_value_init(value, conboy_note_store_get_column_type(GTK_TREE_MODEL (self), column));
 
 	switch (column)
 	{
@@ -235,23 +235,23 @@ note_list_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GVa
  * Own stuff
  */
 
-NoteListStore *note_list_store_new(void)
+ConboyNoteStore *conboy_note_store_new(void)
 {
 	return g_object_new(NOTE_TYPE_LIST_STORE, NULL);
 }
 
-gboolean note_list_store_remove(NoteListStore *self, Note *note)
+gboolean conboy_note_store_remove(ConboyNoteStore *self, Note *note)
 {
 	GtkTreeIter iter;
 
-	if (note_list_store_get_iter(self, note, &iter)) {
+	if (conboy_note_store_get_iter(self, note, &iter)) {
 		gtk_list_store_remove(GTK_LIST_STORE(self), &iter);
 		return TRUE;
 	}
 	return FALSE;
 }
 
-gboolean note_list_store_get_iter(NoteListStore *self, Note *note_a, GtkTreeIter *iter)
+gboolean conboy_note_store_get_iter(ConboyNoteStore *self, Note *note_a, GtkTreeIter *iter)
 {
 	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self), iter)) do
 	{
@@ -265,18 +265,18 @@ gboolean note_list_store_get_iter(NoteListStore *self, Note *note_a, GtkTreeIter
 	return FALSE;
 }
 
-Note *note_list_store_find(NoteListStore *self, Note *note_a)
+Note *conboy_note_store_find(ConboyNoteStore *self, Note *note_a)
 {
 	Note *note_b;
 	GtkTreeIter iter;
-	if (note_list_store_get_iter(self, note_a, &iter)) {
+	if (conboy_note_store_get_iter(self, note_a, &iter)) {
 		gtk_tree_model_get(GTK_TREE_MODEL(self), &iter, NOTE_COLUMN, &note_b, -1);
 		return note_b;
 	}
 	return NULL;
 }
 
-Note *note_list_store_find_by_title(NoteListStore *self, const gchar *title)
+Note *conboy_note_store_find_by_title(ConboyNoteStore *self, const gchar *title)
 {
 	GtkTreeIter iter;
 	gchar *title_a = g_utf8_casefold(title, -1);
@@ -298,7 +298,7 @@ Note *note_list_store_find_by_title(NoteListStore *self, const gchar *title)
 	return NULL;
 }
 
-gint note_list_store_get_length(NoteListStore *self)
+gint conboy_note_store_get_length(ConboyNoteStore *self)
 {
 	gint count = 0;
 	GtkTreeIter iter;
@@ -310,7 +310,7 @@ gint note_list_store_get_length(NoteListStore *self)
 	return count;
 }
 
-Note *note_list_store_get_latest(NoteListStore *self)
+Note *conboy_note_store_get_latest(ConboyNoteStore *self)
 {
 	GtkTreeIter iter;
 	Note *latest_note = NULL;
@@ -330,10 +330,10 @@ Note *note_list_store_get_latest(NoteListStore *self)
 	return latest_note;
 }
 
-void note_list_store_note_changed(NoteListStore *self, Note *note)
+void conboy_note_store_note_changed(ConboyNoteStore *self, Note *note)
 {
 	GtkTreeIter iter;
-	if (note_list_store_get_iter(self, note, &iter)) {
+	if (conboy_note_store_get_iter(self, note, &iter)) {
 		GtkTreePath *path = gtk_tree_model_get_path(GTK_TREE_MODEL(self), &iter);
 		gtk_tree_model_row_changed(GTK_TREE_MODEL(self), path, &iter);
 		gtk_tree_path_free(path);

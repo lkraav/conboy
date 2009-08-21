@@ -22,7 +22,7 @@
 #include <gconf/gconf-client.h>
 #include <hildon/hildon-program.h>
 
-#include "note_list_store.h"
+#include "conboy_note_store.h"
 
 /*#define BULLET "\342\200\242 "*/
 /*#define BULLET "\u2022 "*/

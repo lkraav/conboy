@@ -1,0 +1,75 @@
+/* This file is part of Conboy.
+ * 
+ * Copyright (C) 2009 Cornelius Hald
+ *
+ * Conboy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Conboy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef _CONBOY_NOTE_STORE
+#define _CONBOY_NOTE_STORE
+
+#include <gtk/gtk.h>
+#include "note.h"
+#include "metadata.h"
+
+G_BEGIN_DECLS
+
+#define NOTE_TYPE_LIST_STORE conboy_note_store_get_type()
+
+#define CONBOY_NOTE_STORE(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST ((obj), NOTE_TYPE_LIST_STORE, ConboyNoteStore))
+
+#define CONBOY_NOTE_STORE_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_CAST ((klass), NOTE_TYPE_LIST_STORE, ConboyNoteStoreClass))
+
+#define NOTE_IS_LIST_STORE(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE ((obj), NOTE_TYPE_LIST_STORE))
+
+#define NOTE_IS_LIST_STORE_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE ((klass), NOTE_TYPE_LIST_STORE))
+
+#define CONBOY_NOTE_STORE_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), NOTE_TYPE_LISTSTORE, ConboyNoteStoreClass))
+
+typedef struct {
+  GtkListStore parent;
+} ConboyNoteStore;
+
+typedef struct {
+  GtkListStoreClass parent_class;
+} ConboyNoteStoreClass;
+
+typedef enum {
+	ICON_COLUMN,
+	TITLE_COLUMN,
+	CHANGE_DATE_COLUMN,
+	NOTE_COLUMN,
+	N_COLUMNS
+} ConboyNoteStoreColumn;
+
+GType conboy_note_store_get_type(void);
+
+ConboyNoteStore *conboy_note_store_new(void);
+void conboy_note_store_add(ConboyNoteStore *self, Note *note, GtkTreeIter *iter);
+gboolean conboy_note_store_remove(ConboyNoteStore *self, Note *note);
+gboolean conboy_note_store_get_iter(ConboyNoteStore *self, Note *note_a, GtkTreeIter *iter);
+Note *conboy_note_store_find(ConboyNoteStore *self, Note *note);
+Note *conboy_note_store_find_by_title(ConboyNoteStore *self, const gchar *title);
+gint conboy_note_store_get_length(ConboyNoteStore *self);
+Note *conboy_note_store_get_latest(ConboyNoteStore *self);
+void conboy_note_store_note_changed(ConboyNoteStore *self, Note *note);
+
+G_END_DECLS
+
+#endif /* _CONBOY_NOTE_STORE */

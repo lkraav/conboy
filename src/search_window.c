@@ -33,7 +33,7 @@
 #include "search_window.h"
 #include "metadata.h"
 #include "note.h"
-#include "note_list_store.h"
+#include "conboy_note_store.h"
 #include "settings.h"
 #include "search.h"
 
@@ -338,7 +338,7 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	GtkWidget *button_sort_by_date;
 #endif
 	GtkTreeSelection *selection;
-	NoteListStore *store;
+	ConboyNoteStore *store;
 	GtkTreeModel *filtered_store;
 	GtkTreeModel *sorted_store;
 	GtkCellRenderer *renderer;

@@ -31,7 +31,7 @@
 AppData *_app_data = NULL;
 
 
-static void populate_note_store(NoteListStore *store, const gchar *user_path) {
+static void populate_note_store(ConboyNoteStore *store, const gchar *user_path) {
 
 	GList *ids = storage_get_all_note_ids();
 	Note *note;
@@ -45,7 +45,7 @@ static void populate_note_store(NoteListStore *store, const gchar *user_path) {
 		note = storage_load_note((gchar*)ids->data);
 		g_free(ids->data);
 		if (note != NULL) {
-			note_list_store_add(store, note, &iter);
+			conboy_note_store_add(store, note, &iter);
 		}
 		ids = ids->next;
 		count++;
@@ -66,7 +66,7 @@ AppData* app_data_get() {
 		gint font_size;
 		GConfClient *client;
 		const gchar *path;
-		NoteListStore *store;
+		ConboyNoteStore *store;
 
 		client = gconf_client_get_default();
 		gconf_client_add_dir(client, SETTINGS_ROOT, GCONF_CLIENT_PRELOAD_NONE, NULL);
@@ -83,7 +83,7 @@ AppData* app_data_get() {
 			g_mkdir(path, 0700);
 		}
 
-		store = note_list_store_new();
+		store = conboy_note_store_new();
 
 		_app_data = g_new(AppData, 1);
 		_app_data->user_path = path;

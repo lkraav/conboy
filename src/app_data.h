@@ -6,7 +6,7 @@
 #include <libxml/xmlreader.h>
 #include <libosso.h>
 
-#include "note_list_store.h"
+#include "conboy_note_store.h"
 
 typedef struct
 {
@@ -17,7 +17,7 @@ typedef struct
 	gboolean	   fullscreen;
 	gboolean       portrait;
 	HildonWindow  *search_window;
-	NoteListStore *note_store;
+	ConboyNoteStore *note_store;
 	xmlTextReader *reader;
 	osso_context_t *osso_ctx;
 } AppData;

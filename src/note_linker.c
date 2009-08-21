@@ -25,7 +25,7 @@
 
 #include "app_data.h"
 #include "metadata.h"
-#include "note_list_store.h"
+#include "conboy_note_store.h"
 #include "note_linker.h"
 
 #ifndef max

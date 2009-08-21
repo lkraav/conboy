@@ -26,6 +26,7 @@
 #include "settings.h"
 #include "search_window.h"
 /*#include "json.h"*/
+#include "conboy_note.h"
 #include "conboy_plugin_info.h"
 
 
@@ -90,6 +91,47 @@ main (int argc, char *argv[])
 #else
   gtk_init(&argc, &argv);
 #endif
+  
+  /**************/
+  
+  /*ConboyNote *cnote = conboy_note_new();*/
+  ConboyNote *cnote = conboy_note_new();
+  g_object_set(cnote, "title", "New Note 123");
+  /*g_object_set(cnote, "guid", "1111-2222-3333", "title", "New Note", NULL);*/
+  
+  gchar *title;
+  gchar *guid;
+  
+  g_object_get(cnote, "title", &title, "guid", &guid);
+  
+  g_printerr("Title: %s\n", title);
+  g_printerr("GUID: %s\n", guid);
+  
+  
+  
+  g_object_get(cnote, "title", &title, "guid", &guid);
+    
+  g_printerr("Title: %s\n", title);
+  g_printerr("GUID: %s\n", guid);
+  
+  g_object_ref(cnote);
+  g_object_ref(cnote);
+  
+  g_object_unref(cnote);
+  g_object_unref(cnote);
+  
+  g_object_get(cnote, "title", &title, "guid", &guid);
+  g_printerr("After 2 unrefs. Title: %s\n", title);
+  
+  g_object_unref(cnote);
+  
+  g_object_get(cnote, "title", &title, "guid", &guid);
+  
+  g_printerr("After last. Title: %s\n", title);
+  
+  return;
+  /*************/
+  
 
   /* Call this to initialize it */
   app_data = app_data_get();

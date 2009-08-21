@@ -28,8 +28,8 @@ conboy_SOURCES = \
         note.c \
         search_window.h \
         search_window.c \
-        note_list_store.c \
-        note_list_store.h \
+        conboy_note_store.c \
+        conboy_note_store.h \
         note_linker.h \
         note_linker.c \
         app_data.h \
