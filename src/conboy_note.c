@@ -35,8 +35,8 @@ _conboy_note_constructor (GType type,
 
 	ConboyNote *note = CONBOY_NOTE(object);
 	note->guid = NULL;
-	note->content = NULL;
 	note->title = NULL;
+	note->content = NULL;
 	
 	return G_OBJECT(object);
 }
@@ -133,13 +133,13 @@ conboy_note_set_property (GObject *object, guint id, const GValue *value, GParam
 	switch (id)
 	{
 		case PROP_GUID:
-			note->guid = g_value_get_string(value);
+			note->guid = g_value_dup_string(value);
 			break;
 		case PROP_TITLE:
-			note->title = g_value_get_string(value);
+			note->title = g_value_dup_string(value);
 			break;
 		case PROP_CONTENT:
-			note->content = g_value_get_string(value);
+			note->content = g_value_dup_string(value);
 			break;
 		case PROP_CREATE_DATE:
 			note->create_date = g_value_get_uint(value);
