@@ -39,11 +39,11 @@ struct _ConboyNote {
 	
 	/* <private> */
 	/* identifiers */
-	gchar *guid;
+	const gchar *guid;
 	
 	/* note */
-	gchar *content;
-	gchar *title;
+	const gchar *content;
+	const gchar *title;
 
 	/* metadata */
 	time_t last_change_date;
@@ -52,6 +52,7 @@ struct _ConboyNote {
 
 	/* ui */
 	gboolean open_on_startup;
+	gboolean pinned;
 	gint cursor_position;
 	gint width;
 	gint height;
@@ -70,6 +71,17 @@ struct _ConboyNoteClass {
 	
 };
 
-GType		conboy_note_get_type		(void);
+/*
+ * Public methods
+ */
+GType		 conboy_note_get_type		(void);
+ConboyNote*  conboy_note_new            (void);
+
+void         conboy_note_add_tag        (ConboyNote* note, gchar*);
+void         conboy_note_remove_tag     (ConboyNote* note, gchar*);
+void         conboy_note_clear_tags     (ConboyNote* note);
+GList*       conboy_note_get_tags       (ConboyNote* note);
+
+
 
 #endif /* CONBOY_NOTE_H */
