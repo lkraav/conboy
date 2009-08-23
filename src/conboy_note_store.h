@@ -22,6 +22,8 @@
 #include <gtk/gtk.h>
 #include "note.h"
 #include "metadata.h"
+#include "conboy_note.h"
+#include "conboy_storage.h"
 
 G_BEGIN_DECLS
 
@@ -69,6 +71,7 @@ Note *conboy_note_store_find_by_title(ConboyNoteStore *self, const gchar *title)
 gint conboy_note_store_get_length(ConboyNoteStore *self);
 Note *conboy_note_store_get_latest(ConboyNoteStore *self);
 void conboy_note_store_note_changed(ConboyNoteStore *self, Note *note);
+void conboy_note_store_fill_from_storage(ConboyNoteStore *self, ConboyStorage *storage);
 
 G_END_DECLS
 

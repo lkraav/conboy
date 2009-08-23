@@ -16,16 +16,16 @@ typedef struct _ConboyPluginInfo        ConboyPluginInfo;
 
 struct _ConboyPluginInfo
 {
-	gint               refcount;
-	/*ConboyPlugin       *plugin;*/
-	gchar             *file;
-	gchar             *module_name;
-	gchar             *name;
-	gchar             *desc;
-	gchar            **authors;
-	gchar             *copyright;
-	gchar             *version;
-	gboolean           available;
+	gint			refcount;
+	ConboyPlugin*	plugin;
+	gchar*			file;
+	gchar*			module_name;
+	gchar*			name;
+	gchar*			desc;
+	gchar**			authors;
+	gchar*			copyright;
+	gchar*			version;
+	gboolean		available;
 };
 
 ConboyPluginInfo  *conboy_plugin_info_new       (const gchar *file);

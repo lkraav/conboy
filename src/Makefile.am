@@ -3,7 +3,7 @@
 SUBDIRS = plugins
 
 # Includes
-INCLUDES = $(HILDON_CFLAGS) $(OSSO_CFLAGS) $(HILDONDESKTOP_CFLAGS) $(GCONF_CFLAGS) $(XML2_CFLAGS) $(JSON_CFLAGS) $(OAUTH_CFLAGS) $(CURL_CFLAGS)
+INCLUDES = $(GMODULE_CFLAGS) $(HILDON_CFLAGS) $(OSSO_CFLAGS) $(HILDONDESKTOP_CFLAGS) $(GCONF_CFLAGS) $(XML2_CFLAGS) $(JSON_CFLAGS) $(OAUTH_CFLAGS) $(CURL_CFLAGS)
 
 # Binary
 bin_PROGRAMS = \
@@ -48,16 +48,19 @@ conboy_SOURCES = \
         search.c \
         conboy_note.h \
         conboy_note.c \
-        conboy_storage.h \
-        conboy_storage.c \
         conboy_oauth.h \
         conboy_oauth.c \
         conboy_plugin.h \
         conboy_plugin.c \
+        conboy_storage_plugin.h \
+        conboy_storage_plugin.c \
         conboy_plugin_info.h \
         conboy_plugin_info.c \
         conboy_plugin_manager.h \
-        conboy_plugin_manager.c
+        conboy_plugin_manager.c \
+        conboy_storage.h \
+        conboy_storage.c
+        
 
 #libconboy_applet_la_SOURCES = \
 #		conboy_applet.c \
@@ -73,7 +76,7 @@ conboy_SOURCES = \
 
 # LDADD
 conboy_LDADD = \
-        $(HILDON_LIBS) $(OSSO_LIBS) $(GCONF_LIBS) $(HILDONDESKTOP_LIBS) $(XML2_LIBS) $(JSON_LIBS) $(OAUTH_LIBS) $(CURL_LIBS)
+        $(GMODULE_LIBS) $(HILDON_LIBS) $(OSSO_LIBS) $(GCONF_LIBS) $(HILDONDESKTOP_LIBS) $(XML2_LIBS) $(JSON_LIBS) $(OAUTH_LIBS) $(CURL_LIBS)
 
 #libconboy_applet_la_LIBADD = \
 #		$(HILDONDESKTOP_LIBS)

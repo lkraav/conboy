@@ -37,17 +37,14 @@ conboy_plugin_info_copy (ConboyPluginInfo *info)
 void
 conboy_plugin_info_unref (ConboyPluginInfo *info)
 {
-	if (!g_atomic_int_dec_and_test (&info->refcount))
+	if (!g_atomic_int_dec_and_test (&info->refcount)) {
 		return;
+	}
 
-	/*
-	if (info->plugin != NULL)
-	{
+	if (info->plugin != NULL) {
 		conboy_debug_message (DEBUG_PLUGINS, "Unref plugin %s", info->name);
-
 		g_object_unref (info->plugin);
 	}
-	*/
 
 	g_free (info->file);
 	g_free (info->module_name);

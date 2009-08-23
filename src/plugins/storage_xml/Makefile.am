@@ -9,12 +9,14 @@ INCLUDES = \
 plugin_LTLIBRARIES = libstoragexml.la
 
 libstoragexml_la_SOURCES = \
-    conboy_storage_xml.h  \
-    conboy_storage_xml.c
+    conboy_storage_plugin_xml.h  \
+    conboy_storage_plugin_xml.c
 
 #TODO: Reduce number of libs most of them are not needed
 libstoragexml_la_LIBADD = \
         $(HILDON_LIBS) $(OSSO_LIBS) $(GCONF_LIBS) $(HILDONDESKTOP_LIBS) $(XML2_LIBS) $(JSON_LIBS)
+
+libstoragexml_la_LDFLAGS = -module -avoid-version
 
 plugin_in_files = conboy_storage_xml.plugin.in
 

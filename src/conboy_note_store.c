@@ -27,6 +27,8 @@
 #include "note.h"
 #include "metadata.h"
 #include "conboy_note_store.h"
+#include "conboy_storage.h"
+#include "conboy_note.h"
 
 /*
  * Implementation of the interface
@@ -337,6 +339,17 @@ void conboy_note_store_note_changed(ConboyNoteStore *self, Note *note)
 		GtkTreePath *path = gtk_tree_model_get_path(GTK_TREE_MODEL(self), &iter);
 		gtk_tree_model_row_changed(GTK_TREE_MODEL(self), path, &iter);
 		gtk_tree_path_free(path);
+	}
+}
+
+void
+conboy_note_store_fill_from_storage(ConboyNoteStore *self, ConboyStorage *storage)
+{
+	ConboyNote **notes = conboy_storage_note_list(storage);
+	gint i = 0;
+	while (notes[i] != NULL) {
+		conboy_note_store_add(self, notes[i], NULL);
+		i++;
 	}
 }
 

@@ -28,6 +28,7 @@
 /*#include "json.h"*/
 #include "conboy_note.h"
 #include "conboy_plugin_info.h"
+#include "conboy_plugin.h"
 
 
 #define APP_NAME "conboy"
@@ -94,40 +95,52 @@ main (int argc, char *argv[])
   
   /**************/
   
-  /*ConboyNote *cnote = conboy_note_new();*/
-  ConboyNote *cnote = conboy_note_new();
-  g_object_set(cnote, "title", "New Note 123");
-  /*g_object_set(cnote, "guid", "1111-2222-3333", "title", "New Note", NULL);*/
+  /*
+  ConboyPlugin *plugin = g_object_new(CONBOY_TYPE_STORAGE_PLUGIN_XML, NULL);
+  if (plugin == NULL) {
+	  g_printerr("ERROR: plugin is NULL\n");
+  } else {
+	  g_printerr("Not null\n");
+  }
   
-  gchar *title;
-  gchar *guid;
+  if (!CONBOY_IS_PLUGIN(plugin)) {
+	  g_printerr("ERROR: not a plugin \n");
+  } else {
+	  g_printerr("Good: it's a plugin \n");
+  }
   
-  g_object_get(cnote, "title", &title, "guid", &guid);
+  return;
+  */
   
-  g_printerr("Title: %s\n", title);
-  g_printerr("GUID: %s\n", guid);
+  ConboyPlugin *plugin = conboy_plugin_new_from_path("/home/conny/workspace/conboy/src/plugins/storage_xml/libstoragexml.la");
+  
+  if (plugin == NULL) {
+	  g_printerr("ERROR: Plugin is null\n");
+	  return;
+  }
+  
+  if (CONBOY_IS_PLUGIN(plugin)) {
+	  g_printerr("GOOD: It is a ConboyPlugin\n");
+  }
+  
+  if (CONBOY_IS_STORAGE_PLUGIN(plugin)) {
+	  g_printerr("GOOD: It is a ConboyStoragePlugin\n");
+  }
   
   
+  conboy_storage_plugin_note_load(plugin, "aaaa-bbbb-ccccc");
   
-  g_object_get(cnote, "title", &title, "guid", &guid);
-    
-  g_printerr("Title: %s\n", title);
-  g_printerr("GUID: %s\n", guid);
+  /*
+  ConboyStoragePlugin *plug = g_object_new(CONBOY_TYPE_STORAGE_PLUGIN, NULL);
+  conboy_storage_plugin_note_list(plug);
   
-  g_object_ref(cnote);
-  g_object_ref(cnote);
+  ConboyStorage *storage = g_object_new(CONBOY_TYPE_STORAGE, NULL);
+  ConboyNoteStore  *store   = g_object_new(CONBOY_TYPE_NOTE_STORE, NULL);
   
-  g_object_unref(cnote);
-  g_object_unref(cnote);
+  conboy_note_store_fill_from_storage(store, storage);
+  */
   
-  g_object_get(cnote, "title", &title, "guid", &guid);
-  g_printerr("After 2 unrefs. Title: %s\n", title);
-  
-  g_object_unref(cnote);
-  
-  g_object_get(cnote, "title", &title, "guid", &guid);
-  
-  g_printerr("After last. Title: %s\n", title);
+  /* TODO: Iterate and print titles */
   
   return;
   /*************/

@@ -17,15 +17,57 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "conboy_storage_plugin_xml.h"
+
+#include "conboy_plugin_info.h"
 #include "conboy_plugin.h"
 
-static GObjectClass *parent_class = NULL;
+
+G_DEFINE_ABSTRACT_TYPE(ConboyPlugin, conboy_plugin, G_TYPE_OBJECT);
+/*G_DEFINE_TYPE(ConboyPlugin, conboy_plugin, G_TYPE_OBJECT);*/
 
 
-#define _CONBOY_PLUGINS_DIR "/usr/lib/conboy/modules"
+
+
+static void
+conboy_plugin_class_dispose(GObject *object)
+{
+	ConboyPlugin *self = CONBOY_PLUGIN(object);
+	
+	g_free(self->name);
+	self->name = NULL;
+
+	g_free(self->path);
+	self->path = NULL;
+
+	if (self->gmodule)
+		g_module_close(self->gmodule);
+	self->gmodule = NULL;
+
+	G_OBJECT_CLASS(conboy_plugin_parent_class)->dispose(object);
+}
+
+static void
+conboy_plugin_class_init (ConboyPluginClass *klass)
+{
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+	object_class->dispose = conboy_plugin_class_dispose;
+}
+
+static void
+conboy_plugin_init (ConboyPlugin *self)
+{
+	g_printerr("INFO: conboy_plugin_init() called\n");
+}
+
+/*
+ * Public methods
+ */
 
 /* Opens all modules from given array.
    Modules array should be NULL terminated */
+/*
 void
 conboy_plugin_initialize_modules(ConboyPlugin **modules, GError **error)
 {
@@ -50,8 +92,10 @@ conboy_plugin_initialize_modules(ConboyPlugin **modules, GError **error)
 		}
 	}
 }
+*/
 
-/* Initialize new ConboyPluginby name */
+/* Initialize new ConboyPlugin by name */
+/*
 ConboyPlugin *
 conboy_plugin_new(const gchar *name)
 {
@@ -62,7 +106,8 @@ conboy_plugin_new(const gchar *name)
 
 	return g_object_new(module_type, NULL);
 }
-
+*/
+/*
 gboolean 
 conboy_plugin_initialize (ConboyPlugin *module)
 {
@@ -72,79 +117,41 @@ conboy_plugin_initialize (ConboyPlugin *module)
 
 	return cmc->initialize(module);
 }
+*/
 
-/* GOBJECT ROUTINES */
-
-static GObject *
-_conboy_plugin_constructor (GType type,
-		guint n_construct_properties,
-		GObjectConstructParam *construct_properties) 
+void
+conboy_plugin_activate (ConboyPlugin *self)
 {
-	GObject *object = (GObject *)
-		G_OBJECT_CLASS (parent_class)->constructor (type,
-				n_construct_properties,
-				construct_properties);
-
-	CONBOY_PLUGIN(object)->name = NULL;
-	CONBOY_PLUGIN(object)->path = NULL;
-	CONBOY_PLUGIN(object)->gmodule = NULL;
-	CONBOY_PLUGIN(object)->open_on_startup = FALSE;
-	
-	return G_OBJECT(object);
+	g_return_if_fail (CONBOY_IS_PLUGIN(self));
+	CONBOY_PLUGIN_GET_CLASS(self)->activate(self);
 }
 
-static void
-_conboy_plugin_class_dispose(GObject *object)
+ConboyPlugin*
+conboy_plugin_new_from_info (ConboyPluginInfo *info)
 {
-	ConboyPlugin *self = CONBOY_PLUGIN(object);
 	
-	g_free(self->name);
-	self->name = NULL;
-
-	g_free(self->path);
-	self->path = NULL;
-
-	if (self->gmodule)
-		g_module_close(self->gmodule);
-	self->gmodule = NULL;
-
-	parent_class->dispose(object);
 }
 
-static void
-_conboy_plugin_class_init (ConboyPluginClass *klass, gpointer g_class_data)
-{
-	GObjectClass *object_class = G_OBJECT_CLASS (klass);
-	parent_class = g_type_class_peek_parent (klass);
-	ConboyPluginClass *cmc = CONBOY_PLUGIN_CLASS(object_class);
 
-	object_class->constructor = _conboy_plugin_constructor;
-	object_class->dispose = _conboy_plugin_class_dispose;
+/**
+ * TODO: Add error handling. A lot can go wrong here.
+ */
+ConboyPlugin*
+conboy_plugin_new_from_path (gchar *filename)
+{
+	ConboyPlugin *result = NULL;
 	
-	cmc->initialize = NULL;
-}
-
-GType
-conboy_plugin_get_type (void)
-{
-	static GType type = 0;
-	if (type == 0) {
-
-		static const GTypeInfo info = {
-			sizeof (ConboyPluginClass),
-			NULL,           /* base_init */
-			NULL,           /* base_finalize */
-			(GClassInitFunc) _conboy_plugin_class_init,
-			NULL,           /* class_finalize */
-			NULL,           /* class_data */
- 			sizeof (ConboyPlugin),
-			0,              /* n_preallocs */
-			NULL
-		};
-
-		type = g_type_register_static (G_TYPE_OBJECT,
-				"ConboyPlugin", &info, 0);
+	typedef ConboyPlugin* (* TypeFunc) (void);
+	TypeFunc func = NULL;
+	
+	GModule *module = g_module_open(filename, G_MODULE_BIND_LAZY);
+	g_module_symbol(module, "conboy_storage_plugin_xml_new", (gpointer*)&func);
+	
+	if (func == NULL) {
+		g_printerr("ERROR: Could not load plugin: %s\n", g_module_error());
 	}
-
-	return type;
+	
+	result = func();
+	
+	return result;
 }

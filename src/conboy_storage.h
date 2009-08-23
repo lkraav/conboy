@@ -21,41 +21,50 @@
 #define CONBOY_STORAGE_H
 
 #include <glib-object.h>
+#include "conboy_storage_plugin.h"
 
 /* convention macros */
-#define CONBOY_TYPE_STORAGE (conboy_storage_get_type())
-#define CONBOY_STORAGE(object) (G_TYPE_CHECK_INSTANCE_CAST ((object),CONBOY_TYPE_STORAGE, ConboyStorage))
-#define CONBOY_STORAGE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), CONBOY_TYPE_STORAGE, ConboyStorageClass))
-#define CONBOY_IS_STORAGE(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), CONBOY_TYPE_STORAGE))
-#define CONBOY_IS_STORAGE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), CONBOY_TYPE_STORAGE))
-#define CONBOY_STORAGE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), CONBOY_TYPE_STORAGE, ConboyStorageClass))
+#define CONBOY_TYPE_STORAGE				(conboy_storage_get_type())
+#define CONBOY_STORAGE(object)			(G_TYPE_CHECK_INSTANCE_CAST ((object),CONBOY_TYPE_STORAGE, ConboyStorage))
+#define CONBOY_STORAGE_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST ((klass), CONBOY_TYPE_STORAGE, ConboyStorageClass))
+#define CONBOY_IS_STORAGE(object)		(G_TYPE_CHECK_INSTANCE_TYPE ((object), CONBOY_TYPE_STORAGE))
+#define CONBOY_IS_STORAGE_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), CONBOY_TYPE_STORAGE))
+#define CONBOY_STORAGE_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), CONBOY_TYPE_STORAGE, ConboyStorageClass))
 
-typedef struct _ConboyStorage ConboyStorage;
-typedef struct _ConboyStorageClass ConboyStorageClass;
+typedef struct _ConboyStorage 		ConboyStorage;
+typedef struct _ConboyStorageClass	ConboyStorageClass;
 
-struct _ConboyStorage{
+struct _ConboyStorage {
 	GObject parent;
+	ConboyStoragePlugin *plugin;
 };
 
-struct _ConboyStorageClass{
+struct _ConboyStorageClass {
 	GObjectClass parent;
 	
 	/* virtual methods */
+	/*
 	ConboyNote*		(*load)		(ConboyStorage *self, const gchar *uuid);
 	gboolean		(*save)		(ConboyStorage *self, ConboyNote *note);
 	gboolean		(*delete)	(ConboyStorage *self, ConboyNote *note);
-	ConboyNote**	(*list)		(ConboyStorage *self, guint *n_notes);
-	gchar**			(*list_ids)	(ConboyStorage *self, guint *n_notes);	
-
+	ConboyNote**	(*list)		(ConboyStorage *self);
+	gchar**			(*list_ids)	(ConboyStorage *self);	
+	 */
 	/* signals */
 };
 
 GType			conboy_storage_get_type			(void);
 ConboyNote*		conboy_storage_note_new			(void);
-ConboyNote*		conboy_storage_note_load		(ConboyStorage *self, const gchar *uuid);
+
+ConboyNote*		conboy_storage_note_load		(ConboyStorage *self, const gchar *guid);
 gboolean		conboy_storage_note_save		(ConboyStorage *self, ConboyNote *note);
 gboolean		conboy_storage_note_delete		(ConboyStorage *self, ConboyNote *note);
-ConboyNote**	conboy_storage_note_list		(ConboyStorage *self, guint *n_notes);
-gchar**			conboy_storage_note_list_ids	(ConboyStorage *self, guint *n_notes);	
+ConboyNote**	conboy_storage_note_list		(ConboyStorage *self);
+gchar**			conboy_storage_note_list_ids	(ConboyStorage *self);
+
+void					conboy_storage_set_plugin	(ConboyStorage *self, ConboyStoragePlugin *plugin);
+void					conboy_storage_unset_plugin	(ConboyStorage *self);
+ConboyStoragePlugin*	conboy_storage_get_plugin	(ConboyStorage *self);
+
 
 #endif /* CONBOY_STORAGE_H */
