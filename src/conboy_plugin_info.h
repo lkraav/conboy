@@ -43,9 +43,11 @@ const gchar **conboy_plugin_info_get_authors       (ConboyPluginInfo *info);
 const gchar	 *conboy_plugin_info_get_copyright     (ConboyPluginInfo *info);
 const gchar  *conboy_plugin_info_get_version       (ConboyPluginInfo *info);
 gboolean      conboy_plugin_info_is_available      (ConboyPluginInfo *info);
+gboolean      conboy_plugin_info_is_configurable   (ConboyPluginInfo *info);
 gboolean      conboy_plugin_info_is_active         (ConboyPluginInfo *info);
 
-ConboyPlugin*	conboy_plugin_info_create_plugin	(ConboyPluginInfo *info);
+gboolean	conboy_plugin_info_activate_plugin		(ConboyPluginInfo *info);
+gboolean	conboy_plugin_info_deactivate_plugin	(ConboyPluginInfo *info);
 
 
 G_END_DECLS

@@ -9,12 +9,14 @@ INCLUDES = \
 plugin_LTLIBRARIES = libstoragemidgard.la
 
 libstoragemidgard_la_SOURCES = \
-    conboy_storage_midgard.h  \
-    conboy_storage_midgard.c
+    conboy_storage_plugin_midgard.h  \
+    conboy_storage_plugin_midgard.c
 
 #TODO: Reduce number of libs most of them are not needed
 libstoragemidgard_la_LIBADD = \
         $(HILDON_LIBS) $(OSSO_LIBS) $(GCONF_LIBS) $(HILDONDESKTOP_LIBS) $(XML2_LIBS) $(JSON_LIBS)
+
+libstoragemidgard_la_LDFLAGS = -module -avoid-version
 
 plugin_in_files = conboy_storage_midgard.plugin.in
 

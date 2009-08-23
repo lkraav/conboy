@@ -23,12 +23,12 @@
 #include <glib-object.h>
 
 /* convention macros */
-#define CONBOY_TYPE_STORAGE_PLUGIN_XML (conboy_storage_plugin_xml_get_type())
-#define CONBOY_STORAGE_PLUGIN_XML(object) (G_TYPE_CHECK_INSTANCE_CAST ((object),CONBOY_TYPE_STORAGE_PLUGIN_XML, ConboyStoragePluginXml))
-#define CONBOY_STORAGE_PLUGIN_XML_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), CONBOY_TYPE_STORAGE_PLUGIN_XML, ConboyStoragePluginXmlClass))
-#define CONBOY_IS_STORAGE_PLUGIN_XML(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), CONBOY_TYPE_STORAGE_PLUGIN_XML))
-#define CONBOY_IS_STORAGE_PLUGIN_XML_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), CONBOY_TYPE_STORAGE_PLUGIN_XML))
-#define CONBOY_STORAGE_PLUGIN_XML_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), CONBOY_TYPE_STORAGE_PLUGIN_XML, ConboyStoragePluginXmlClass))
+#define CONBOY_TYPE_STORAGE_PLUGIN_XML				(conboy_storage_plugin_xml_get_type())
+#define CONBOY_STORAGE_PLUGIN_XML(object)			(G_TYPE_CHECK_INSTANCE_CAST ((object),CONBOY_TYPE_STORAGE_PLUGIN_XML, ConboyStoragePluginXml))
+#define CONBOY_STORAGE_PLUGIN_XML_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST ((klass), CONBOY_TYPE_STORAGE_PLUGIN_XML, ConboyStoragePluginXmlClass))
+#define CONBOY_IS_STORAGE_PLUGIN_XML(object)		(G_TYPE_CHECK_INSTANCE_TYPE ((object), CONBOY_TYPE_STORAGE_PLUGIN_XML))
+#define CONBOY_IS_STORAGE_PLUGIN_XML_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), CONBOY_TYPE_STORAGE_PLUGIN_XML))
+#define CONBOY_STORAGE_PLUGIN_XML_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), CONBOY_TYPE_STORAGE_PLUGIN_XML, ConboyStoragePluginXmlClass))
 
 typedef struct _ConboyStoragePluginXml 		ConboyStoragePluginXml;
 typedef struct _ConboyStoragePluginXmlClass ConboyStoragePluginXmlClass;
@@ -41,7 +41,7 @@ struct _ConboyStoragePluginXmlClass {
 	ConboyStoragePluginClass parent;
 };
 
-GType		conboy_storage_plugin_xml_get_type			(void);
-ConboyStoragePluginXml* conboy_storage_plugin_xml_new	(void);
+GType					conboy_storage_plugin_xml_get_type	(void);
+ConboyStoragePluginXml* conboy_plugin_new					(void);
 
 #endif /* CONBOY_STORAGE_PLUGIN_XML_H */

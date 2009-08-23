@@ -48,14 +48,9 @@ enum
 struct _ConboyPluginManagerPrivate
 {
 	GtkWidget	*tree;
-
 	GtkWidget	*about_button;
 	GtkWidget	*configure_button;
-
-	/*ConboyPluginsEngine *engine;*/
-
 	GtkWidget 	*about;
-	
 	GtkWidget	*popup_menu;
 };
 
@@ -133,7 +128,7 @@ configure_button_cb (GtkWidget          *button,
 			     conboy_plugin_info_get_name (info));
 	*/
 	
-	g_print("Not yet implemented: Configuring: %s\n", conboy_plugin_info_get_name (info));
+	g_printerr("Not yet implemented: Configuring: %s\n", conboy_plugin_info_get_name (info));
 	
 	/*
 	toplevel = GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET(pm)));
@@ -220,8 +215,9 @@ active_toggled_cb (GtkCellRendererToggle *cell,
 
 	gtk_tree_model_get_iter (model, &iter, path);
 
-	if (&iter != NULL)
+	if (&iter != NULL) {
 		plugin_manager_toggle_active (pm, &iter, model);
+	}
 
 	gtk_tree_path_free (path);
 }
@@ -240,9 +236,7 @@ cursor_changed_cb (GtkTreeView *view,
 	gtk_widget_set_sensitive (GTK_WIDGET (pm->priv->about_button),
 				  info != NULL);
 	gtk_widget_set_sensitive (GTK_WIDGET (pm->priv->configure_button),
-				  (info != NULL) && 
-				   /*conboy_plugin_info_is_configurable (info));*/
-				  FALSE);
+				   conboy_plugin_info_is_configurable (info));
 }
 
 static void
@@ -390,13 +384,8 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 		gtk_tree_model_get (GTK_TREE_MODEL (model), &iter,
 				    INFO_COLUMN, &info, -1);
 
-		/*
 		gtk_widget_set_sensitive (GTK_WIDGET (pm->priv->configure_button),
 					  conboy_plugin_info_is_configurable (info));
-		*/
-		gtk_widget_set_sensitive (GTK_WIDGET (pm->priv->configure_button),
-					  TRUE);
-		
 	}
 }
 
@@ -422,27 +411,13 @@ plugin_manager_set_active (ConboyPluginManager *pm,
 
 	g_return_val_if_fail (info != NULL, FALSE);
 
-	if (active)
-	{
+	if (active) {
 		/* activate the plugin */
-		/*
-		if (!c (pm->priv->engine, info)) {
-			conboy_debug_message (DEBUG_PLUGINS, "Could not activate %s.\n", 
-					     conboy_plugin_info_get_name (info));
-		 */
-			res = FALSE;
-		/*}*/
-	}
-	else
-	{
+		return conboy_plugin_info_activate_plugin(info);
+		
+	} else {
 		/* deactivate the plugin */
-		/*
-		if (!conboy_plugins_engine_deactivate_plugin (pm->priv->engine, info)) {
-			conboy_debug_message (DEBUG_PLUGINS, "Could not deactivate %s.\n", 
-					     conboy_plugin_info_get_name (info));
-		 */
-			res = FALSE;
-		/*}*/
+		return conboy_plugin_info_deactivate_plugin(info);
 	}
 
 	return res;
@@ -459,9 +434,7 @@ plugin_manager_toggle_active (ConboyPluginManager *pm,
 	g_printerr("plugin_manager_toggle_active\n");
 
 	gtk_tree_model_get (model, iter, ACTIVE_COLUMN, &active, -1);
-	g_printerr("Active1: %i\n", active);
 	active ^= 1;
-	g_printerr("Active2: %i\n", active);
 	plugin_manager_set_active (pm, iter, model, active);
 }
 
@@ -689,6 +662,7 @@ show_tree_popup_menu (GtkTreeView        *tree,
 	}
 }
 
+
 static gboolean
 button_press_event_cb (GtkWidget          *tree,
 		       GdkEventButton     *event,
@@ -827,6 +801,7 @@ plugin_manager_construct_tree (ConboyPluginManager *pm)
 			  "cursor_changed",
 			  G_CALLBACK (cursor_changed_cb),
 			  pm);
+	
 	g_signal_connect (pm->priv->tree,
 			  "row_activated",
 			  G_CALLBACK (row_activated_cb),
@@ -836,10 +811,7 @@ plugin_manager_construct_tree (ConboyPluginManager *pm)
 			  "button-press-event",
 			  G_CALLBACK (button_press_event_cb),
 			  pm);
-	g_signal_connect (pm->priv->tree,
-			  "popup-menu",
-			  G_CALLBACK (popup_menu_cb),
-			  pm);
+	
 	gtk_widget_show (pm->priv->tree);
 }
 

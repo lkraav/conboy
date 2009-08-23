@@ -25,7 +25,7 @@ G_DEFINE_TYPE(ConboyStoragePluginXml, conboy_storage_plugin_xml, CONBOY_TYPE_STO
 
 
 ConboyStoragePluginXml*
-conboy_storage_plugin_xml_new ()
+conboy_plugin_new ()
 {
 	g_printerr("Hello from xml plugin \n");
 	return g_object_new(CONBOY_TYPE_STORAGE_PLUGIN_XML, NULL);
@@ -142,9 +142,10 @@ conboy_storage_plugin_xml_class_init (ConboyStoragePluginXmlClass *klass)
 }
 
 static void
-conboy_storage_plugin_xml_init (ConboyStoragePluginXml *klass)
+conboy_storage_plugin_xml_init (ConboyStoragePluginXml *self)
 {
 	g_printerr("XML: init called\n");
+	CONBOY_PLUGIN(self)->has_settings = TRUE;
 }
 
 

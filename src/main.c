@@ -29,6 +29,7 @@
 #include "conboy_note.h"
 #include "conboy_plugin_info.h"
 #include "conboy_plugin.h"
+#include "conboy_note_store.h"
 
 
 #define APP_NAME "conboy"
@@ -112,7 +113,12 @@ main (int argc, char *argv[])
   return;
   */
   
-  ConboyPlugin *plugin = conboy_plugin_new_from_path("/home/conny/workspace/conboy/src/plugins/storage_xml/libstoragexml.la");
+  /*ConboyPlugin *plugin = conboy_plugin_new_from_path("/home/conny/workspace/conboy/src/plugins/storage_xml/libstoragexml.la");*/
+  /*
+  ConboyPluginInfo *info = conboy_plugin_info_new("/home/conny/workspace/conboy/src/plugins/storage_xml/conboy_storage_xml.plugin");
+  
+  ConboyPlugin *plugin = conboy_plugin_info_create_plugin(info);
+  
   
   if (plugin == NULL) {
 	  g_printerr("ERROR: Plugin is null\n");
@@ -129,7 +135,7 @@ main (int argc, char *argv[])
   
   
   conboy_storage_plugin_note_load(plugin, "aaaa-bbbb-ccccc");
-  
+  */
   /*
   ConboyStoragePlugin *plug = g_object_new(CONBOY_TYPE_STORAGE_PLUGIN, NULL);
   conboy_storage_plugin_note_list(plug);
@@ -142,7 +148,7 @@ main (int argc, char *argv[])
   
   /* TODO: Iterate and print titles */
   
-  return;
+  /*return;*/
   /*************/
   
 
@@ -164,7 +170,7 @@ main (int argc, char *argv[])
 
   if (settings_load_startup_window() == SETTINGS_STARTUP_WINDOW_NOTE) {
 	  /* Get the most recent note. If there is none, create new. */
-	  note = note_list_store_get_latest(app_data->note_store);
+	  note = conboy_note_store_get_latest(app_data->note_store);
 	  if (note == NULL) {
 		  note = note_create_new();
 	  }

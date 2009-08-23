@@ -26,13 +26,12 @@
 
 
 /* convention macros */
-#define CONBOY_TYPE_PLUGIN (conboy_plugin_get_type())
-#define CONBOY_PLUGIN(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),CONBOY_TYPE_PLUGIN, ConboyPlugin))
-#define CONBOY_PLUGIN_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), CONBOY_TYPE_PLUGIN, ConboyPluginClass))
-#define CONBOY_IS_PLUGIN(object)   (G_TYPE_CHECK_INSTANCE_TYPE ((object), CONBOY_TYPE_PLUGIN))
-#define CONBOY_IS_PLUGIN_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), CONBOY_TYPE_PLUGIN))
-#define CONBOY_PLUGIN_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), CONBOY_TYPE_PLUGIN, ConboyPluginClass))
-
+#define CONBOY_TYPE_PLUGIN				(conboy_plugin_get_type())
+#define CONBOY_PLUGIN(object)			(G_TYPE_CHECK_INSTANCE_CAST ((object),CONBOY_TYPE_PLUGIN, ConboyPlugin))
+#define CONBOY_PLUGIN_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST ((klass), CONBOY_TYPE_PLUGIN, ConboyPluginClass))
+#define CONBOY_IS_PLUGIN(object)		(G_TYPE_CHECK_INSTANCE_TYPE ((object), CONBOY_TYPE_PLUGIN))
+#define CONBOY_IS_PLUGIN_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), CONBOY_TYPE_PLUGIN))
+#define CONBOY_PLUGIN_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), CONBOY_TYPE_PLUGIN, ConboyPluginClass))
 
 typedef struct _ConboyPlugin		ConboyPlugin;
 typedef struct _ConboyPluginClass	ConboyPluginClass;
@@ -41,18 +40,14 @@ struct _ConboyPlugin{
 	GObject parent;
 	
 	/* <private> */
-	gchar *path;
-	gchar *name;
 	GModule *gmodule;
-	gboolean open_on_startup;	
+	gboolean has_settings;
 };
 
 struct _ConboyPluginClass{
 	GObjectClass parent;
 
 	/* virtual methods */
-	void		(*activate)		(ConboyPlugin *self);
-	void		(*deactivate)	(ConboyPlugin *self);
 	GtkWidget* 	(*get_widget)	(ConboyPlugin *self);
 	
 	/* signals */
@@ -60,22 +55,10 @@ struct _ConboyPluginClass{
 };
 
 GType			conboy_plugin_get_type		(void);
-
-/*
-ConboyPlugin*	conboy_plugin_new(const gchar *name);
-void			conboy_plugin_initialize_modules(ConboyPlugin **modules, GError **error);
-gboolean		conboy_plugin_initialize(ConboyPlugin *module);
-*/
-
-void			conboy_plugin_activate (ConboyPlugin *self);
-void			conboy_plugin_deactivate (ConboyPlugin *self);
+ConboyPlugin*	conboy_plugin_new_from_path (gchar *filename);
 
 gboolean	 	conboy_plugin_has_settings (ConboyPlugin *self);
 GtkWidget*		conboy_plugin_get_settings_widget (ConboyPlugin *self);
 
-struct ConboyPluginInfo;
-
-ConboyPlugin*	conboy_plugin_new_from_path (gchar *filename);
-/*ConboyPlugin*	conboy_plugin_new_from_info (ConboyPluginInfo *info);*/
 
 #endif /* CONBOY_PLUGIN_H */

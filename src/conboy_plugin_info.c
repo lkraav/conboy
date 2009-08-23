@@ -245,8 +245,17 @@ conboy_plugin_info_is_active (ConboyPluginInfo *info)
 	return FALSE;
 }
 
-ConboyPlugin*
-conboy_plugin_info_create_plugin (ConboyPluginInfo *info)
+gboolean
+conboy_plugin_info_is_configurable (ConboyPluginInfo *info)
+{
+	if (conboy_plugin_info_is_active(info)) {
+		return conboy_plugin_has_settings(info->plugin);
+	}
+	return FALSE;
+}
+
+gboolean
+conboy_plugin_info_activate_plugin (ConboyPluginInfo *info)
 {
 	g_return_val_if_fail(info != NULL, NULL);
 	g_return_val_if_fail(info->file != NULL, NULL);
@@ -274,5 +283,13 @@ conboy_plugin_info_create_plugin (ConboyPluginInfo *info)
 	g_free(filename);
 	g_free(path);
 	
-	return result;
+	return (CONBOY_PLUGIN(result));
+}
+
+gboolean
+conboy_plugin_info_deactivate_plugin (ConboyPluginInfo *info)
+{
+	g_object_unref(info->plugin);
+	info->plugin = NULL;
+	return TRUE;
 }
