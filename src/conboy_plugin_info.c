@@ -42,7 +42,7 @@ conboy_plugin_info_unref (ConboyPluginInfo *info)
 	}
 
 	if (info->plugin != NULL) {
-		conboy_debug_message (DEBUG_PLUGINS, "Unref plugin %s", info->name);
+		/*conboy_debug_message (DEBUG_PLUGINS, "Unref plugin %s", info->name);*/
 		g_object_unref (info->plugin);
 	}
 
@@ -241,6 +241,38 @@ conboy_plugin_info_is_active (ConboyPluginInfo *info)
 {
 	g_return_val_if_fail (info != NULL, FALSE);
 
-	/*return info->available && info->plugin != NULL;*/
+	return info->available && info->plugin != NULL;
 	return FALSE;
+}
+
+ConboyPlugin*
+conboy_plugin_info_create_plugin (ConboyPluginInfo *info)
+{
+	g_return_val_if_fail(info != NULL, NULL);
+	g_return_val_if_fail(info->file != NULL, NULL);
+	g_return_val_if_fail(info->module_name != NULL, NULL);
+	
+	ConboyPlugin *result = NULL;
+	
+	gchar *dir = g_path_get_dirname(info->file);
+	gchar *filename = g_strconcat("lib", info->module_name, ".la", NULL);
+	gchar *path = g_build_filename(dir, filename, NULL);
+	g_printerr("INFO: Trying to create plugin from: %s\n", path);
+	
+	result = conboy_plugin_new_from_path(path);
+	
+	if (result != NULL) {
+		if (info->plugin) {
+			g_object_unref(info->plugin);
+			info->plugin = NULL;
+		}
+		g_object_ref(result);
+		info->plugin = result;
+	}
+	
+	g_free(dir);
+	g_free(filename);
+	g_free(path);
+	
+	return result;
 }

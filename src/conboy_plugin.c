@@ -126,12 +126,17 @@ conboy_plugin_activate (ConboyPlugin *self)
 	CONBOY_PLUGIN_GET_CLASS(self)->activate(self);
 }
 
+/*
 ConboyPlugin*
 conboy_plugin_new_from_info (ConboyPluginInfo *info)
 {
-	
-}
 
+	const gchar *name = conboy_plugin_info_get_module_name(info);
+	
+	g_printerr("Module name: %s\n", name);
+	g_printerr("Filename: %s\n", info->file);
+}
+*/
 
 /**
  * TODO: Add error handling. A lot can go wrong here.
