@@ -12,6 +12,7 @@ typedef struct
 {
 	const gchar   *user_path;
 	GList         *open_notes;
+	GList		  *open_windows;
 	GConfClient   *client;
 	HildonProgram *program;
 	gboolean	   fullscreen;
@@ -21,6 +22,7 @@ typedef struct
 	xmlTextReader *reader;
 	osso_context_t *osso_ctx;
 	ConboyStorage  *storage;
+	UserInterface  *note_window;
 } AppData;
 
 AppData* app_data_get(void);

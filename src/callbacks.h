@@ -21,6 +21,7 @@
 #define CALLBACKS_H
 
 #include "note.h"
+#include "interface.h"
 
 gboolean
 on_window_delete		   (GtkObject		*window,
@@ -160,7 +161,7 @@ on_bold_action_activated		(GtkAction	*action,
 
 
 void on_find_button_clicked(GtkAction *action, gpointer user_data);
-void on_find_bar_search(GtkWidget *widget, Note *note);
+void on_find_bar_search(GtkWidget *widget, UserInterface *ui);
 void on_find_bar_close(GtkWidget *widget, UserInterface *ui);
 
 

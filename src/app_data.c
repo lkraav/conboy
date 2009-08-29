@@ -32,33 +32,6 @@
 AppData *_app_data = NULL;
 
 
-static void populate_note_store(ConboyNoteStore *store, const gchar *user_path) {
-
-	GList *ids = storage_get_all_note_ids();
-	Note *note;
-	GtkTreeIter iter;
-	gulong micro;
-	gint count = 0;
-	GTimer *timer = g_timer_new();
-	g_timer_start(timer);
-
-	while (ids != NULL) {
-		note = storage_load_note((gchar*)ids->data);
-		g_free(ids->data);
-		if (note != NULL) {
-			conboy_note_store_add(store, note, &iter);
-		}
-		ids = ids->next;
-		count++;
-	}
-	
-	g_timer_stop(timer);
-	g_timer_elapsed(timer, &micro);
-	g_timer_destroy(timer);
-	g_printerr("Loading %i notes took %ld micro seconds \n", count, micro);
-
-	g_list_free(ids);
-}
 
 
 AppData* app_data_get() {
@@ -104,6 +77,7 @@ AppData* app_data_get() {
 		_app_data->search_window = NULL;
 		_app_data->reader = NULL;
 		_app_data->storage = storage; 
+		_app_data->note_window = NULL;
 
 		/*populate_note_store(store, path);*/
 		conboy_note_store_fill_from_storage(store, storage);

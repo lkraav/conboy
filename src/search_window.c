@@ -157,7 +157,7 @@ gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer
 {
 	GtkWidget *window = GTK_WIDGET(user_data);
 	AppData *app_data = app_data_get();
-	GList *open_notes;
+	GList *open_windows;
 
 	switch (event->keyval) {
 
@@ -171,15 +171,15 @@ gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer
 		app_data->fullscreen = !app_data->fullscreen;
 
 		/* Set all open windows to fullscreen or unfullscreen */
-		open_notes = app_data->open_notes;
-		while (open_notes != NULL) {
-			Note *open_note = (Note*)open_notes->data;
+		open_windows = app_data->open_windows;
+		while (open_windows != NULL) {
+			UserInterface *open_window = (UserInterface*)open_windows->data;
 			if (app_data->fullscreen) {
-				gtk_window_fullscreen(GTK_WINDOW(open_note->ui->window));
+				gtk_window_fullscreen(GTK_WINDOW(open_window->window));
 			} else {
-				gtk_window_unfullscreen(GTK_WINDOW(open_note->ui->window));
+				gtk_window_unfullscreen(GTK_WINDOW(open_window->window));
 			}
-			open_notes = open_notes->next;
+			open_windows = open_windows->next;
 		}
 		/* Set search window to fullscreen or unfullscreen */
 		if (app_data->search_window != NULL) {
@@ -274,7 +274,8 @@ on_new_note_action_activated(GtkAction *action, gpointer user_data)
 {
 	GtkWidget *window = GTK_WIDGET(user_data);
 	gtk_widget_hide(window);
-	note_show(note_create_new());
+	ConboyNote *note = conboy_note_new();
+	note_show(note);
 }
 
 static

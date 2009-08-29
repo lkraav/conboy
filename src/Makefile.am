@@ -59,7 +59,9 @@ conboy_SOURCES = \
         conboy_plugin_manager.h \
         conboy_plugin_manager.c \
         conboy_storage.h \
-        conboy_storage.c
+        conboy_storage.c \
+        conboy_note_window.h \
+        conboy_note_window.c
         
 
 #libconboy_applet_la_SOURCES = \

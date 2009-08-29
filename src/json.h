@@ -36,14 +36,14 @@ typedef struct {
 	gint   latest_sync_revision;
 } JsonNoteList;
 
-JsonNoteList* json_get_note_list(const gchar* json_string);
-JsonUser* json_get_user(const gchar* json_string);
-JsonNode* json_get_node_from_note(Note *note);
-Note* json_get_note_from_node(JsonNode *node);
-Note* json_get_note_from_string(const gchar *json_string);
-void json_print_note(Note *note);
-gchar* json_node_to_string(JsonNode *node, gboolean pretty);
-GSList *json_get_notes_from_string(const gchar *json_string);
+JsonNoteList* 	json_get_note_list(const gchar* json_string);
+JsonUser* 		json_get_user(const gchar* json_string);
+JsonNode* 		json_get_node_from_note(ConboyNote *note);
+ConboyNote*		json_get_note_from_node(JsonNode *node);
+ConboyNote*		json_get_note_from_string(const gchar *json_string);
+void 			json_print_note(ConboyNote *note);
+gchar* 			json_node_to_string(JsonNode *node, gboolean pretty);
+GSList*			json_get_notes_from_string(const gchar *json_string);
 
 void json_test(void);
 

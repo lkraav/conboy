@@ -19,6 +19,43 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-GtkWidget* create_mainwin(Note *metadata);
+#include <gtk/gtk.h>
+#include "conboy_note.h"
+
+typedef struct
+{
+	ConboyNote			*note;
+	HildonWindow        *window;
+	GtkTextView         *view;
+	GtkTextBuffer       *buffer;
+	HildonFindToolbar	*find_bar;
+	gboolean             find_bar_is_visible;
+	GtkWidget			*style_menu;
+
+	GtkToggleToolButton *button_bold;
+	GtkToggleToolButton *button_italic;
+	GtkToggleToolButton *button_strike;
+	GtkToggleToolButton *button_highlight;
+	GtkToggleToolButton *button_bullets;
+
+	GtkToggleAction     *action_bold;
+	GtkToggleAction     *action_italic;
+	GtkToggleAction	    *action_fixed;
+	GtkToggleAction     *action_strike;
+	GtkToggleAction     *action_highlight;
+	GtkToggleAction     *action_bullets;
+	GtkAction           *action_link;
+	GtkRadioAction		*action_font_small;
+	GtkAction			*action_inc_indent;
+	GtkAction			*action_dec_indent;
+	
+	GList               *listeners;
+	
+	GSList				*active_tags;
+
+} UserInterface;
+
+UserInterface* create_mainwin(ConboyNote *note);
+
 
 #endif /* INTERFACE_H */

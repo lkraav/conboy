@@ -23,41 +23,13 @@
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-find-toolbar.h>
 
-typedef struct
-{
-	HildonWindow        *window;
-	GtkTextView         *view;
-	GtkTextBuffer       *buffer;
-	HildonFindToolbar	*find_bar;
-	gboolean             find_bar_is_visible;
-	GtkWidget			*style_menu;
+#include "interface.h"
 
-	GtkToggleToolButton *button_bold;
-	GtkToggleToolButton *button_italic;
-	GtkToggleToolButton *button_strike;
-	GtkToggleToolButton *button_highlight;
-	GtkToggleToolButton *button_bullets;
-
-	GtkToggleAction     *action_bold;
-	GtkToggleAction     *action_italic;
-	GtkToggleAction	    *action_fixed;
-	GtkToggleAction     *action_strike;
-	GtkToggleAction     *action_highlight;
-	GtkToggleAction     *action_bullets;
-	GtkAction           *action_link;
-	GtkRadioAction		*action_font_small;
-	GtkAction			*action_inc_indent;
-	GtkAction			*action_dec_indent;
-	
-	GList               *listeners;
-
-} UserInterface;
 
 typedef struct
 {
-  UserInterface *ui;
+  
   gchar   *title;
-  /*gchar   *filename;*/
   gchar   *content;
 
   time_t last_change_date;
@@ -84,23 +56,21 @@ typedef struct
 } Note;
 
 
-Note* note_create_new(void);
-
 void note_free(Note *note);
 
 void note_format_title(GtkTextBuffer *buffer);
 
 void note_set_window_title_from_buffer(GtkWindow *win, GtkTextBuffer *buffer);
 
-void note_save(Note *note);
+void note_save(UserInterface *ui);
 
-void note_close_window(Note *note);
+void note_close_window(UserInterface *ui);
 
-void note_delete(Note *note);
+void note_delete(ConboyNote *note);
 
 gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer);
 
-void note_show(Note *note);
+void note_show(ConboyNote *note);
 
 void note_show_by_title(const char* title);
 
@@ -108,19 +78,19 @@ void note_show_existing(Note *note);
 
 void note_show_new(Note *note);
 
-gboolean note_is_open(Note *note);
+gboolean note_is_open(UserInterface *ui);
 
-void note_set_focus(Note *note);
+void note_set_focus(UserInterface *ui);
 
-gboolean note_exists(Note *note);
+gboolean note_exists(ConboyNote *note);
 
-void note_add_active_tag(Note *note, GtkTextTag *tag);
+void note_add_active_tag(UserInterface *ui, GtkTextTag *tag);
 
-void note_remove_active_tag(Note *note, GtkTextTag *tag);
+void note_remove_active_tag(UserInterface *ui, GtkTextTag *tag);
 
-void note_add_active_tag_by_name(Note *note, const gchar *tag_name);
+void note_add_active_tag_by_name(UserInterface *ui, const gchar *tag_name);
 
-void note_remove_active_tag_by_name(Note *note, const gchar *tag_name);
+void note_remove_active_tag_by_name(UserInterface *ui, const gchar *tag_name);
 
 void note_add_tag(Note *note, gchar *tag);
 

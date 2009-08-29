@@ -30,6 +30,7 @@
 #include "conboy_plugin_info.h"
 #include "conboy_plugin.h"
 #include "conboy_note_store.h"
+#include "conboy_note_window.h"
 
 
 #define APP_NAME "conboy"
@@ -79,7 +80,7 @@ int
 main (int argc, char *argv[])
 {
   HildonProgram *program;
-  Note *note;
+  ConboyNote *note;
   /*osso_context_t *osso_context;*/
   AppData *app_data;
 
@@ -199,17 +200,27 @@ main (int argc, char *argv[])
   /* Create the Hildon program and setup the title */
   program = HILDON_PROGRAM(hildon_program_get_instance());
   g_set_application_name("Conboy");
+  
+  
+  /****************/
+  
+  
+  
+  /*****************/
+  
+
 
   if (settings_load_startup_window() == SETTINGS_STARTUP_WINDOW_NOTE) {
-	  /* Get the most recent note. If there is none, create new. */
+	  
 	  note = conboy_note_store_get_latest(app_data->note_store);
 	  if (note == NULL) {
-		  note = note_create_new();
+		  note = conboy_note_new();
 	  }
 	  note_show(note);
   } else {
 	  search_window_open();
   }
+
   
   gtk_main();
 

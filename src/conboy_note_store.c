@@ -224,7 +224,7 @@ conboy_note_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, G
 		case CHANGE_DATE_COLUMN:
 			if (note != NULL) {
 				gint date;
-				g_object_get(note, "last-change-date", &date, NULL);
+				g_object_get(note, "change-date", &date, NULL);
 				g_value_set_string(value, get_date_string(date));
 			} else {
 				g_value_set_string(value, "");

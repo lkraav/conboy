@@ -239,65 +239,7 @@ void process_note(xmlTextReader *reader, Note *note)
 }
 
 
-/**
- * Loads a complete note from the storage backend. The note must be freed
- * when you're done with it.
- * If an error occurs NULL is returned.
- */
-Note* storage_load_note(const gchar *guid)
-{
-	AppData *app_data = app_data_get();
-	int ret;
-	Note *note;
-	gchar *filename;
-	xmlTextReader *reader;
-	
-	g_assert(guid != NULL);
-	
-	filename = g_strconcat(app_data->user_path, guid, ".note", NULL);
-	
-	/* We try to reuse the existing xml parser. If none exists yet, we create a new one. */
-	/*
-	if (app_data->reader == NULL) {
-		app_data->reader = xmlReaderForFile(filename, NULL, 0);
-	}
-	
-	if (xmlReaderNewFile(app_data->reader, filename, NULL, 0) != 0) {
-		g_printerr("ERROR: Cannot reuse xml parser. \n");
-		g_assert_not_reached();
-	}
-	
-	if (app_data->reader == NULL) {
-		g_printerr("ERROR: Cannot open file: %s\n", filename);
-		g_assert_not_reached();
-	}
-	*/
-	/* Reusing the xml parser does not work here. TODO: File a bug for libxml2 */
-	reader = xmlReaderForFile(filename, NULL, 0);
-	/*xmlReaderNewFile(reader, filename, NULL, 0);*/ /* To reproduce uncomment this line */
-	
-	note = note_create_new();
-	note->guid = g_strdup(guid);
-	
-	ret = xmlTextReaderRead(reader);
-	while (ret == 1) {
-		process_note(reader, note);
-		ret = xmlTextReaderRead(reader);
-	}
-		
-	if (ret != 0) {
-		g_printerr("ERROR: Failed to parse file: %s\n", filename);
-	}
-	
-	xmlFreeTextReader(reader);
-	g_free(filename);
-	
-	if (ret != 0) {
-		return NULL;
-	} else {
-		return note;
-	}
-}
+
 
 
 /* =============================================================== */

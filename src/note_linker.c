@@ -35,7 +35,7 @@
 typedef struct {
 	gint   start_offset;
 	gint   end_offset;
-	Note  *note;
+	ConboyNote  *note;
 } SearchHit;
 
 /* TODO: Optimize this. We need a place where all titles are stored, info which is the longest, ... */
@@ -78,7 +78,7 @@ GSList* find_titles(gchar *haystack) {
 	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
 	while (valid) {
 		gchar *u_needle;
-		Note *note;
+		ConboyNote *note;
 		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
 		
 		/* If title is empty, look at next note. An empty title would bring us into an infinit loop */
@@ -143,7 +143,7 @@ extend_block(GtkTextIter *start_iter, GtkTextIter *end_iter, gint max_len, GtkTe
 }
 
 static void
-highlight_titles(Note *note, GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_iter)
+highlight_titles(ConboyNote *note, GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_iter)
 {
 	GtkTextTag *url_tag  = gtk_text_tag_table_lookup(buffer->tag_table, "link:url");
 	/* For all titles look if they occure in haystack. For all matches apply tag */
@@ -188,9 +188,9 @@ highlight_titles(Note *note, GtkTextBuffer *buffer, GtkTextIter *start_iter, Gtk
 	g_slist_free(hits);
 }
 
-void auto_highlight_links(Note *note, GtkTextIter *start_iter, GtkTextIter *end_iter)
+void auto_highlight_links(UserInterface *ui, GtkTextIter *start_iter, GtkTextIter *end_iter)
 {
-	GtkTextBuffer *buffer = note->ui->buffer;
+	GtkTextBuffer *buffer = ui->buffer;
 	GtkTextTag *link_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	int max_len = get_length_of_longest_title();
 	
@@ -201,7 +201,7 @@ void auto_highlight_links(Note *note, GtkTextIter *start_iter, GtkTextIter *end_
 	gtk_text_buffer_remove_tag(buffer, link_tag, start_iter, end_iter);
 
 	/* Add links */
-	highlight_titles(note, buffer, start_iter, end_iter);
+	highlight_titles(ui->note, buffer, start_iter, end_iter);
 }
 
 

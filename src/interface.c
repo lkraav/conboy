@@ -301,9 +301,10 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
  * 1) Declaring all as GtkWidget, so that Fremantle and Diablo code can share these.
  * 2) Declare all as the actual types, so inside the code it's easy to know which type a widget has.
  */
-GtkWidget* create_mainwin(Note *note) {
+UserInterface* create_mainwin(ConboyNote *note) {
 
-	UserInterface *ui = note->ui;
+	UserInterface *ui = g_new0(UserInterface, 1);
+	ui->note = note;
 
 	GtkWidget *mainwin;
 	GtkWidget *vbox1;
@@ -379,7 +380,8 @@ GtkWidget* create_mainwin(Note *note) {
 
 	mainwin = hildon_window_new();
 	gtk_window_set_title(GTK_WINDOW(mainwin), "Conboy");
-
+	ui->window = HILDON_WINDOW(mainwin);
+	
 	screen = gdk_screen_get_default();
 
 	accel_group = gtk_accel_group_new();
@@ -759,7 +761,7 @@ GtkWidget* create_mainwin(Note *note) {
 	/* Window signals */
 	g_signal_connect(mainwin, "delete-event",
 	        G_CALLBACK(on_window_delete),
-	        note);
+	        ui);
 
 	/* Action signals */
 	
@@ -767,7 +769,7 @@ GtkWidget* create_mainwin(Note *note) {
 	
 	g_signal_connect(sync_but, "clicked",
 			G_CALLBACK(on_sync_but_clicked),
-			note);
+			ui);
 	
 	g_signal_connect(action_new, "activate",
 			G_CALLBACK(on_new_button_clicked),
@@ -775,32 +777,32 @@ GtkWidget* create_mainwin(Note *note) {
 
 	g_signal_connect(action_bold, "activate",
 			G_CALLBACK(on_format_button_clicked),
-			note);
+			ui);
 
 	g_signal_connect(action_italic, "activate",
 			G_CALLBACK(on_format_button_clicked),
-			note);
+			ui);
 
 	g_signal_connect(action_strike, "activate",
 			G_CALLBACK(on_format_button_clicked),
-			note);
+			ui);
 
 	g_signal_connect(action_highlight, "activate",
 			G_CALLBACK(on_format_button_clicked),
-			note);
+			ui);
 
 	g_signal_connect(action_fixed, "activate",
 			G_CALLBACK(on_format_button_clicked),
-			note);
+			ui);
 
 	/* It is enough to listen to one action of the radio group */
 	g_signal_connect(action_font_small, "changed",
 			G_CALLBACK(on_font_size_radio_group_changed),
-			note);
+			ui);
 
 	g_signal_connect(action_bullets, "activate",
 			G_CALLBACK(on_bullets_button_clicked),
-			note);
+			ui);
 
 	g_signal_connect(action_quit, "activate",
 			G_CALLBACK(on_quit_button_clicked),
@@ -820,7 +822,7 @@ GtkWidget* create_mainwin(Note *note) {
 
 	g_signal_connect(action_link, "activate",
 			G_CALLBACK(on_link_button_clicked),
-			note);
+			ui);
 
 	g_signal_connect(action_notes, "activate",
 			G_CALLBACK(on_notes_button_clicked),
@@ -828,7 +830,7 @@ GtkWidget* create_mainwin(Note *note) {
 
 	g_signal_connect(action_delete, "activate",
 			G_CALLBACK(on_delete_button_clicked),
-			note);
+			ui);
 
 	g_signal_connect(action_zoom_in, "activate",
 			G_CALLBACK(on_smaller_button_clicked),
@@ -844,13 +846,13 @@ GtkWidget* create_mainwin(Note *note) {
 
 	g_signal_connect(action_find, "activate",
 			G_CALLBACK(on_find_button_clicked),
-			note);
+			ui);
 
 
 	/* OTHER SIGNALS */
 	g_signal_connect ((gpointer) buffer, "mark-set",
 			G_CALLBACK (on_textview_cursor_moved),
-			note);
+			ui);
 
 	g_signal_connect ((gpointer) buffer, "changed",
 			G_CALLBACK (on_textbuffer_changed),
@@ -858,7 +860,7 @@ GtkWidget* create_mainwin(Note *note) {
 
 	g_signal_connect ((gpointer)buffer, "modified-changed",
 			G_CALLBACK(on_text_buffer_modified_changed),
-			note);
+			ui);
 
 	g_signal_connect ((gpointer)textview, "tap-and-hold",
 			G_CALLBACK(on_textview_tap_and_hold),
@@ -866,23 +868,23 @@ GtkWidget* create_mainwin(Note *note) {
 
 	g_signal_connect ((gpointer)mainwin, "key_press_event",
 			G_CALLBACK(on_hardware_key_pressed),
-			note);
+			ui);
 
 	g_signal_connect ((gpointer)textview, "key-press-event",
 			G_CALLBACK(on_text_view_key_pressed),
-			note);
+			ui);
 
 	g_signal_connect_after ((gpointer)buffer, "insert-text",
 			G_CALLBACK(on_text_buffer_insert_text),
-			note);
+			ui);
 
 	g_signal_connect_after ((gpointer)buffer, "delete-range",
 			G_CALLBACK(on_text_buffer_delete_range),
-			note);
+			ui);
 
 	g_signal_connect((gpointer)find_bar, "search",
 			G_CALLBACK(on_find_bar_search),
-			note);
+			ui);
 
 	g_signal_connect((gpointer)find_bar, "close",
 			G_CALLBACK(on_find_bar_close),
@@ -910,9 +912,9 @@ GtkWidget* create_mainwin(Note *note) {
 	link_internal_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	g_signal_connect ((gpointer) link_internal_tag, "event",
 			G_CALLBACK (on_link_internal_tag_event),
-			note);
+			ui);
 
 
-	return mainwin;
+	return ui;
 }
 

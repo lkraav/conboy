@@ -89,7 +89,7 @@ convert_content(const gchar *content)
 }
 
 JsonNode*
-json_get_node_from_note(Note *note)
+json_get_node_from_note(ConboyNote *note)
 {
 	JsonNode *root;
 	JsonObject *obj;
@@ -184,7 +184,7 @@ json_node_to_string(JsonNode *node, gboolean pretty)
 }
 
 void
-json_print_note(Note *note)
+json_print_note(ConboyNote *note)
 {
 	/*
 	 * TODO: Use json_node_to_string()
@@ -216,12 +216,12 @@ json_print_note(Note *note)
  * completly unexpected.
  * TODO: Check for memory leaks
  */
-Note*
+ConboyNote*
 json_get_note_from_node(JsonNode *node)
 {
 	JsonNode *member;
 	GList *tags;
-	Note *note = note_create_new();
+	ConboyNote *note = conboy_note_new();
 	JsonObject *obj = json_node_get_object(node);
 	
 	/*
@@ -266,19 +266,19 @@ json_get_note_from_node(JsonNode *node)
 		tags = json_array_get_elements(json_node_get_array(member));
 		while (tags != NULL) {
 			JsonNode *node = (JsonNode*)tags->data;
-			note_add_tag(note, (gchar*)json_node_dup_string(node));
+			conboy_note_add_tag(note, (gchar*)json_node_dup_string(node));
 			tags = tags->next;
 		}
 		g_list_free(tags);
 	}
 	
 	/* Currently not specified for the JSON format. So we set it here. */
-	note->version = 0.3;
+	note->note_version = 0.3;
 	
 	return note;
 }
 
-Note*
+ConboyNote*
 json_get_note_from_string(const gchar *json_string)
 {
 	JsonParser *parser = json_parser_new();
@@ -436,7 +436,7 @@ json_get_note_list(const gchar* json_string)
 		GList *elements = json_array_get_elements(array);
 		while (elements != NULL) {	
 			JsonNode *element = (JsonNode*)elements->data;
-			Note *note = json_get_note_from_node(element);
+			ConboyNote *note = json_get_note_from_node(element);
 			result->notes = g_slist_append(result->notes, note);
 			elements = elements->next;
 		}
