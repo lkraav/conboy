@@ -53,7 +53,7 @@ is_row_visible(GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data)
 {
 	SearchWindowData *data = (SearchWindowData*)user_data;
 	GHashTable *search_result = data->search_result;
-	Note *note;
+	ConboyNote *note;
 
 	/* In case the search field does not exist yet, or containts no text, show all */
 	if (data->search_field == NULL) {
@@ -117,7 +117,7 @@ void on_clear_button_clicked(GtkWidget *widget, gpointer user_data)
 static
 void on_row_activated(GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *column, gpointer user_data)
 {
-	Note *note;
+	ConboyNote *note;
 	GtkTreeIter iter;
 	AppData *app_data = app_data_get();
 	GtkTreeModel *model = gtk_tree_view_get_model(view);
@@ -303,8 +303,8 @@ gint compare_titles(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointe
 static
 gint compare_dates(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
 {
-	Note *note_a;
-	Note *note_b;
+	ConboyNote *note_a, *note_b;
+	gint date_a, date_b;
 
 	if (a == NULL || b == NULL) {
 		return 0;
@@ -316,8 +316,11 @@ gint compare_dates(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer
 	if (note_a == NULL || note_b == NULL) {
 		return 0;
 	}
+	
+	g_object_get(note_a, "change-date", &date_a, NULL);
+	g_object_get(note_b, "change-date", &date_b, NULL);
 
-	return note_a->last_change_date - note_b->last_change_date;
+	return date_a - date_b;
 }
 
 static

@@ -62,16 +62,17 @@ typedef enum {
 
 GType conboy_note_store_get_type(void);
 
-ConboyNoteStore *conboy_note_store_new(void);
-void conboy_note_store_add(ConboyNoteStore *self, Note *note, GtkTreeIter *iter);
-gboolean conboy_note_store_remove(ConboyNoteStore *self, Note *note);
-gboolean conboy_note_store_get_iter(ConboyNoteStore *self, Note *note_a, GtkTreeIter *iter);
-Note *conboy_note_store_find(ConboyNoteStore *self, Note *note);
-Note *conboy_note_store_find_by_title(ConboyNoteStore *self, const gchar *title);
-gint conboy_note_store_get_length(ConboyNoteStore *self);
-Note *conboy_note_store_get_latest(ConboyNoteStore *self);
-void conboy_note_store_note_changed(ConboyNoteStore *self, Note *note);
-void conboy_note_store_fill_from_storage(ConboyNoteStore *self, ConboyStorage *storage);
+ConboyNoteStore*	conboy_note_store_new(void);
+
+void				conboy_note_store_add(ConboyNoteStore *self, ConboyNote *note, GtkTreeIter *iter);
+gboolean			conboy_note_store_remove(ConboyNoteStore *self, ConboyNote *note);
+gboolean			conboy_note_store_get_iter(ConboyNoteStore *self, ConboyNote *note_a, GtkTreeIter *iter);
+ConboyNote*			conboy_note_store_find(ConboyNoteStore *self, ConboyNote *note);
+ConboyNote*			conboy_note_store_find_by_title(ConboyNoteStore *self, const gchar *title);
+gint				conboy_note_store_get_length(ConboyNoteStore *self);
+ConboyNote*			conboy_note_store_get_latest(ConboyNoteStore *self);
+void 				conboy_note_store_note_changed(ConboyNoteStore *self, ConboyNote *note);
+void 				conboy_note_store_fill_from_storage(ConboyNoteStore *self, ConboyStorage *storage);
 
 G_END_DECLS
 

@@ -96,6 +96,7 @@ main (int argc, char *argv[])
   
   /**************/
   
+  /*
   ConboyStorage *storage = conboy_storage_new();
   
   ConboyPluginInfo *info = conboy_plugin_info_new("/home/conny/workspace/conboy/src/plugins/storage_xml/conboy_storage_xml.plugin");   
@@ -109,7 +110,7 @@ main (int argc, char *argv[])
   g_object_set(cnote, "content", "bla bla bla bla", NULL);
   
   conboy_storage_note_save(storage, cnote);
-  
+  */
   /*
   GSList *notes = conboy_storage_note_list(storage);
   while (notes != NULL) {
@@ -124,7 +125,7 @@ main (int argc, char *argv[])
   /* TODO: TEST / IMPLEMENT SAVE */
   
   
-  return;
+  /*return;*/
   
   
   /*

@@ -23,9 +23,10 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 
-#include "app_data.h"
+#include "conboy_plugin_info.h"
 #include "storage.h"
 #include "settings.h"
+#include "app_data.h"
 
 /* Global AppData only access with get_app_data() */
 AppData *_app_data = NULL;
@@ -82,6 +83,13 @@ AppData* app_data_get() {
 		if (!g_file_test(path, G_FILE_TEST_EXISTS)) {
 			g_mkdir(path, 0700);
 		}
+		
+		/* Create storage */
+		ConboyStorage *storage = conboy_storage_new();
+		ConboyPluginInfo *info = conboy_plugin_info_new("/home/conny/workspace/conboy/src/plugins/storage_xml/conboy_storage_xml.plugin");
+		conboy_plugin_info_activate_plugin(info);
+		conboy_storage_set_plugin(storage, CONBOY_STORAGE_PLUGIN(info->plugin)); 
+		 
 
 		store = conboy_note_store_new();
 
@@ -95,8 +103,10 @@ AppData* app_data_get() {
 		_app_data->portrait = is_portrait_mode();
 		_app_data->search_window = NULL;
 		_app_data->reader = NULL;
+		_app_data->storage = storage; 
 
-		populate_note_store(store, path);
+		/*populate_note_store(store, path);*/
+		conboy_note_store_fill_from_storage(store, storage);
 	}
 
 	return _app_data;

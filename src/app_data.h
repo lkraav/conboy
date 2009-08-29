@@ -20,6 +20,7 @@ typedef struct
 	ConboyNoteStore *note_store;
 	xmlTextReader *reader;
 	osso_context_t *osso_ctx;
+	ConboyStorage  *storage;
 } AppData;
 
 AppData* app_data_get(void);
