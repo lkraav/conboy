@@ -54,6 +54,8 @@ _conboy_note_class_dispose(GObject *object)
 
 	g_free((gchar*)self->content);
 	self->content = NULL;
+	
+	conboy_note_clear_tags(self);
 
 	parent_class->dispose(object);
 }
@@ -68,6 +70,7 @@ enum {
 	PROP_METADATA_CHANGE_DATE,
 	PROP_CURSOR_POSITION,
 	PROP_PINNED,
+	PROP_OPEN_ON_STARTUP,
 	PROP_WIDTH,
 	PROP_HEIGHT,
 	PROP_X,
@@ -107,6 +110,9 @@ conboy_note_get_property (GObject *object, guint id, GValue *value, GParamSpec *
 		case PROP_PINNED:
 			g_value_set_boolean(value, note->pinned);
 			break;
+		case PROP_OPEN_ON_STARTUP:
+			g_value_set_boolean(value, note->open_on_startup);
+			break;
 		case PROP_WIDTH:
 			g_value_set_int(value, note->width);
 			break;
@@ -118,6 +124,12 @@ conboy_note_get_property (GObject *object, guint id, GValue *value, GParamSpec *
 			break;
 		case PROP_CONTENT_VERSION:
 			g_value_set_double(value, note->content_version);
+			break;
+		case PROP_X:
+			g_value_set_int(value, note->x);
+			break;
+		case PROP_Y:
+			g_value_set_int(value, note->y);
 			break;
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(object, id, spec);
@@ -156,11 +168,20 @@ conboy_note_set_property (GObject *object, guint id, const GValue *value, GParam
 		case PROP_PINNED:
 			note->pinned = g_value_get_boolean(value);
 			break;
+		case PROP_OPEN_ON_STARTUP:
+			note->open_on_startup = g_value_get_boolean(value);
+			break;
 		case PROP_WIDTH:
 			note->width = g_value_get_int(value);
 			break;
 		case PROP_HEIGHT:
 			note->height = g_value_get_int(value);
+			break;
+		case PROP_X:
+			note->x = g_value_get_int(value);
+			break;
+		case PROP_Y:
+			note->y = g_value_get_int(value);
 			break;
 		case PROP_NOTE_VERSION:
 			note->note_version = g_value_get_double(value);
@@ -203,48 +224,52 @@ _conboy_note_class_init (ConboyNoteClass *klass, gpointer g_class_data)
 			"XML representation of the notes content", NULL, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_CONTENT, spec);
 	
-	spec = g_param_spec_string("create-date", "Create date",
-			"The date of note creation", NULL, G_PARAM_READWRITE);	
+	spec = g_param_spec_uint("create-date", "Create date",
+			"The date of note creation", 0, G_MAXINT, 0, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_CREATE_DATE, spec);
 	
-	spec = g_param_spec_string("change-date", "Change date",
-			"The date of the last change", NULL, G_PARAM_READWRITE);	
+	spec = g_param_spec_uint("change-date", "Change date",
+			"The date of the last change", 0, G_MAXINT, 0, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_CHANGE_DATE, spec);
 	
-	spec = g_param_spec_string("metadata-change-date", "Metadata change date",
-			"The date of the last metadata change", NULL, G_PARAM_READWRITE);	
+	spec = g_param_spec_uint("metadata-change-date", "Metadata change date",
+			"The date of the last metadata change", 0, G_MAXINT, 0, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_METADATA_CHANGE_DATE, spec);
 	
-	spec = g_param_spec_string("cursor-position", "Cursor position",
-			"The current cursor position", NULL, G_PARAM_READWRITE);	
+	spec = g_param_spec_int("cursor-position", "Cursor position",
+			"The current cursor position", 0, G_MAXINT, 0, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_CURSOR_POSITION, spec);
 	
-	spec = g_param_spec_string("pinned", "Pinned",
-			"Whether or not the note is pinned (sticky)", NULL, G_PARAM_READWRITE);	
+	spec = g_param_spec_boolean("pinned", "Pinned",
+			"Whether or not the note is pinned (sticky)", FALSE, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_PINNED, spec);
 	
-	spec = g_param_spec_string("width", "Window width",
-			"The width of the note window", NULL, G_PARAM_READWRITE);	
+	spec = g_param_spec_boolean("open-on-startup", "Open on startup",
+			"Whether or not the note should be opened on startup", FALSE, G_PARAM_READWRITE);
+	g_object_class_install_property(object_class, PROP_OPEN_ON_STARTUP, spec);
+	
+	spec = g_param_spec_int("width", "Window width",
+			"The width of the note window", 0, G_MAXINT, 0, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_WIDTH, spec);
 	
-	spec = g_param_spec_string("height", "Window height",
-			"The height of the note window", NULL, G_PARAM_READWRITE);	
+	spec = g_param_spec_int("height", "Window height",
+			"The height of the note window", 0, G_MAXINT, 0, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_HEIGHT, spec);
 	
-	spec = g_param_spec_string("x", "Window x position",
-			"The x position of the note window", NULL, G_PARAM_READWRITE);	
+	spec = g_param_spec_int("x", "Window x position",
+			"The x position of the note window", 0, G_MAXINT, 0, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_X, spec);
 	
-	spec = g_param_spec_string("y", "Window y position",
-			"The y position of the note window", NULL, G_PARAM_READWRITE);	
+	spec = g_param_spec_int("y", "Window y position",
+			"The y position of the note window", 0, G_MAXINT, 0, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_Y, spec);
 	
-	spec = g_param_spec_string("note-version", "Note version",
-			"The version of the note", NULL, G_PARAM_READWRITE);	
+	spec = g_param_spec_double("note-version", "Note version",
+			"The version of the note", 0, G_MAXDOUBLE, 0, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_NOTE_VERSION, spec);
 	
-	spec = g_param_spec_string("content-version", "Content version",
-			"The version notes content", NULL, G_PARAM_READWRITE);	
+	spec = g_param_spec_double("content-version", "Content version",
+			"The version notes content", 0, G_MAXDOUBLE, 0, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_NOTE_VERSION, spec);
 	
 }
@@ -291,3 +316,48 @@ conboy_note_new()
 {
 	return g_object_new(CONBOY_TYPE_NOTE, "guid", note_get_uuid(), NULL);
 }
+
+ConboyNote*
+conboy_note_new_with_guid(const gchar* guid)
+{
+	return g_object_new(CONBOY_TYPE_NOTE, "guid", guid, NULL);
+}
+
+void
+conboy_note_add_tag(ConboyNote* note, const gchar* tag)
+{
+	g_return_if_fail(note != NULL);
+	g_return_if_fail(tag != NULL);
+	
+	g_return_if_fail(CONBOY_IS_NOTE(note));
+	
+	note->tags = g_list_append(note->tags, g_strdup(tag));
+}
+
+void
+conboy_note_clear_tags(ConboyNote* note)
+{
+	g_return_if_fail(note != NULL);
+	g_return_if_fail(CONBOY_IS_NOTE(note));
+	g_return_if_fail(note->tags != NULL);
+	
+	GList *tags = note->tags;
+	while (tags != NULL) {
+		g_free(tags->data);
+		tags = tags->next;
+	}
+	g_list_free(note->tags);
+	note->tags = NULL;
+}
+
+
+GList*
+conboy_note_get_tags(ConboyNote* note)
+{
+	g_return_val_if_fail(note != NULL, NULL);
+	g_return_val_if_fail(CONBOY_IS_NOTE(note), NULL);
+	
+	return note->tags;
+}
+
+

@@ -20,7 +20,6 @@
 #include "conboy_storage_plugin.h"
 
 G_DEFINE_ABSTRACT_TYPE(ConboyStoragePlugin, conboy_storage_plugin, CONBOY_TYPE_PLUGIN)
-/*G_DEFINE_TYPE(ConboyStoragePlugin, conboy_storage_plugin, CONBOY_TYPE_PLUGIN)*/
 
 
 /* GOBJECT ROUTINES */
@@ -29,18 +28,6 @@ static void
 conboy_storage_plugin_dispose(GObject *object)
 {
 	ConboyStoragePlugin *self = CONBOY_STORAGE_PLUGIN(object);
-	/*
-	g_free(self->name);
-	self->name = NULL;
-
-	g_free(self->path);
-	self->path = NULL;
-
-	if (self->gmodule)
-		g_module_close(self->gmodule);
-	self->gmodule = NULL;
-	*/
-
 	G_OBJECT_CLASS(conboy_storage_plugin_parent_class)->dispose(object);
 }
 
@@ -55,22 +42,11 @@ conboy_storage_plugin_init (ConboyStoragePlugin *self)
 static void
 conboy_storage_plugin_class_init (ConboyStoragePluginClass *klass)
 {
-	/*
-	GObjectClass *object_class = G_OBJECT_CLASS (klass);
-	parent_class = g_type_class_peek_parent (klass);
-	ConboyStoragePluginClass *cmc = CONBOY_STORAGE_PLUGIN_CLASS(object_class);
-
-	object_class->constructor = _conboy_storage_plugin_constructor;
-	object_class->dispose = _conboy_storage_plugin_class_dispose;
-	
-	cmc->initialize = NULL;
-	*/
-	
 	/* This class is abstract, we don't provide default implementation */
-	klass->load = NULL;
-	klass->save = NULL;
-	klass->delete = NULL;
-	klass->list = NULL;
+	klass->load     = NULL;
+	klass->save     = NULL;
+	klass->delete   = NULL;
+	klass->list     = NULL;
 	klass->list_ids = NULL;
 }
 
@@ -98,13 +74,13 @@ conboy_storage_plugin_note_delete (ConboyStoragePlugin *self, ConboyNote *note)
 	return CONBOY_STORAGE_PLUGIN_GET_CLASS(self)->delete(self, note);
 }
 
-ConboyNote**
+GSList*
 conboy_storage_plugin_note_list (ConboyStoragePlugin *self)
 {
 	return CONBOY_STORAGE_PLUGIN_GET_CLASS(self)->list(self);
 }
 
-gchar**
+GSList*
 conboy_storage_plugin_note_list_ids (ConboyStoragePlugin *self)
 {
 	return CONBOY_STORAGE_PLUGIN_GET_CLASS(self)->list_ids(self);

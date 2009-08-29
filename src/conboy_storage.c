@@ -79,6 +79,50 @@ conboy_storage_init (ConboyStorage *self)
  * Public methods
  */
 
+ConboyStorage*
+conboy_storage_new()
+{
+	return g_object_new(CONBOY_TYPE_STORAGE, NULL);
+}
+
+void
+conboy_storage_set_plugin(ConboyStorage *self, ConboyStoragePlugin *plugin)
+{
+	g_return_if_fail(self != NULL);
+	g_return_if_fail(plugin != NULL);
+	
+	g_return_if_fail(CONBOY_IS_STORAGE(self));
+	g_return_if_fail(CONBOY_IS_STORAGE_PLUGIN(plugin));
+	
+	if (self->plugin != NULL) {
+		conboy_storage_unset_plugin(self);
+	}
+	
+	g_object_ref(plugin);
+	self->plugin = plugin;
+}
+
+void
+conboy_storage_unset_plugin(ConboyStorage *self)
+{
+	g_return_if_fail(self != NULL);
+	g_return_if_fail(CONBOY_IS_STORAGE(self));
+	g_return_if_fail(self->plugin != NULL);
+	
+	g_object_unref(self->plugin);
+	self->plugin = NULL;
+}
+
+ConboyStoragePlugin*
+conboy_storage_get_plugin(ConboyStorage *self)
+{
+	g_return_val_if_fail(self != NULL, NULL);
+	g_return_val_if_fail(CONBOY_IS_STORAGE(self), NULL);
+	g_return_val_if_fail(self->plugin != NULL, NULL);
+	g_return_val_if_fail(CONBOY_IS_STORAGE_PLUGIN(self->plugin), NULL);
+	return self->plugin;
+}
+
 ConboyNote*
 conboy_storage_note_load (ConboyStorage *self, const gchar *guid)
 {
@@ -132,7 +176,7 @@ conboy_storage_note_delete (ConboyStorage *self, ConboyNote *note)
 	return conboy_storage_plugin_note_delete(self->plugin, note);
 }
 
-ConboyNote**
+GSList*
 conboy_storage_note_list (ConboyStorage *self)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
@@ -145,7 +189,7 @@ conboy_storage_note_list (ConboyStorage *self)
 	return conboy_storage_plugin_note_list(self->plugin);
 }
 
-gchar**
+GSList*
 conboy_storage_note_list_ids (ConboyStorage *self)
 {
 	g_return_val_if_fail(self != NULL, FALSE);

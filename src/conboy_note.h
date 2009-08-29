@@ -49,6 +49,7 @@ struct _ConboyNote {
 	time_t last_change_date;
 	time_t last_metadata_change_date;
 	time_t create_date;
+	GList  *tags;
 
 	/* ui */
 	gboolean open_on_startup;
@@ -76,9 +77,10 @@ struct _ConboyNoteClass {
  */
 GType		 conboy_note_get_type		(void);
 ConboyNote*  conboy_note_new            (void);
+ConboyNote*  conboy_note_new_with_guid	(const gchar* guid);
 
-void         conboy_note_add_tag        (ConboyNote* note, gchar*);
-void         conboy_note_remove_tag     (ConboyNote* note, gchar*);
+void         conboy_note_add_tag        (ConboyNote* note, const gchar*);
+void         conboy_note_remove_tag     (ConboyNote* note, const gchar*);
 void         conboy_note_clear_tags     (ConboyNote* note);
 GList*       conboy_note_get_tags       (ConboyNote* note);
 

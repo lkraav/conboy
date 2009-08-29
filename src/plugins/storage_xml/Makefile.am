@@ -4,7 +4,9 @@ plugindir = $(pluginslibdir)
 INCLUDES = \
     -I$(top_srcdir)  \
     $(HILDON_CFLAGS) \
-    $(CONBOY_CFLAGS)
+    $(CONBOY_CFLAGS) \
+    $(XML2_CFLAGS) \
+    $(GCONF_CFLAGS)
            
 plugin_LTLIBRARIES = libstoragexml.la
 

@@ -96,6 +96,37 @@ main (int argc, char *argv[])
   
   /**************/
   
+  ConboyStorage *storage = conboy_storage_new();
+  
+  ConboyPluginInfo *info = conboy_plugin_info_new("/home/conny/workspace/conboy/src/plugins/storage_xml/conboy_storage_xml.plugin");   
+  
+  conboy_plugin_info_activate_plugin(info);
+  
+  conboy_storage_set_plugin(storage, CONBOY_STORAGE_PLUGIN(info->plugin)); 
+  
+  ConboyNote *cnote = conboy_storage_note_load(storage, "5381469e-3232-4a63-9cd1-7e2501287143");
+  
+  g_object_set(cnote, "content", "bla bla bla bla", NULL);
+  
+  conboy_storage_note_save(storage, cnote);
+  
+  /*
+  GSList *notes = conboy_storage_note_list(storage);
+  while (notes != NULL) {
+	  gchar *title;
+	  gchar *xml;
+	  g_object_get(notes->data, "title", &title, "content", &xml, NULL);
+	  g_printerr("TITLE: %s\n", title);
+	  notes = notes->next;
+  }
+  */
+  
+  /* TODO: TEST / IMPLEMENT SAVE */
+  
+  
+  return;
+  
+  
   /*
   ConboyPlugin *plugin = g_object_new(CONBOY_TYPE_STORAGE_PLUGIN_XML, NULL);
   if (plugin == NULL) {

@@ -41,26 +41,16 @@ struct _ConboyStorage {
 
 struct _ConboyStorageClass {
 	GObjectClass parent;
-	
-	/* virtual methods */
-	/*
-	ConboyNote*		(*load)		(ConboyStorage *self, const gchar *uuid);
-	gboolean		(*save)		(ConboyStorage *self, ConboyNote *note);
-	gboolean		(*delete)	(ConboyStorage *self, ConboyNote *note);
-	ConboyNote**	(*list)		(ConboyStorage *self);
-	gchar**			(*list_ids)	(ConboyStorage *self);	
-	 */
-	/* signals */
 };
 
 GType			conboy_storage_get_type			(void);
-ConboyNote*		conboy_storage_note_new			(void);
+ConboyStorage*	conboy_storage_new				(void);
 
 ConboyNote*		conboy_storage_note_load		(ConboyStorage *self, const gchar *guid);
 gboolean		conboy_storage_note_save		(ConboyStorage *self, ConboyNote *note);
 gboolean		conboy_storage_note_delete		(ConboyStorage *self, ConboyNote *note);
-ConboyNote**	conboy_storage_note_list		(ConboyStorage *self);
-gchar**			conboy_storage_note_list_ids	(ConboyStorage *self);
+GSList*			conboy_storage_note_list		(ConboyStorage *self);
+GSList*			conboy_storage_note_list_ids	(ConboyStorage *self);
 
 void					conboy_storage_set_plugin	(ConboyStorage *self, ConboyStoragePlugin *plugin);
 void					conboy_storage_unset_plugin	(ConboyStorage *self);

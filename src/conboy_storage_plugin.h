@@ -41,14 +41,6 @@ typedef struct _ConboyStoragePluginClass	ConboyStoragePluginClass;
 
 struct _ConboyStoragePlugin {
 	ConboyPlugin parent;
-	
-	/* <private> */
-	/*
-	gchar *path;
-	gchar *name;
-	GModule *gmodule;
-	gboolean open_on_startup;
-	*/	
 };
 
 struct _ConboyStoragePluginClass {
@@ -58,8 +50,8 @@ struct _ConboyStoragePluginClass {
 	ConboyNote*		(*load)		(ConboyStoragePlugin *self, const gchar* guid);
 	gboolean		(*save)		(ConboyStoragePlugin *self, ConboyNote *note);
 	gboolean		(*delete)	(ConboyStoragePlugin *self, ConboyNote *note);
-	ConboyNote**	(*list)		(ConboyStoragePlugin *self);
-	gchar**			(*list_ids)	(ConboyStoragePlugin *self);
+	GSList*			(*list)		(ConboyStoragePlugin *self);
+	GSList*			(*list_ids)	(ConboyStoragePlugin *self);
 
 	/* signals */
 	
@@ -67,11 +59,33 @@ struct _ConboyStoragePluginClass {
 
 GType			conboy_storage_plugin_get_type (void);
 
+/**
+ * Loads a note from the storage backend. It does not alter the note in any way.
+ */
 ConboyNote*		conboy_storage_plugin_note_load (ConboyStoragePlugin *self, const gchar *guid);
+
+/**
+ * Saves the note to the storage backend. It does not alter or update any of the notes properties.
+ * E.g. Updating the last modification date is not the job of this method.
+ */
 gboolean		conboy_storage_plugin_note_save (ConboyStoragePlugin *self, ConboyNote *note);
+
+/**
+ * Completely deletes the note from the storage backend. It does not invalidate or free this note.
+ */
 gboolean 		conboy_storage_plugin_note_delete (ConboyStoragePlugin *self, ConboyNote *note);
-ConboyNote**	conboy_storage_plugin_note_list (ConboyStoragePlugin *self);
-gchar**			conboy_storage_plugin_note_list_ids (ConboyStoragePlugin *self);
+
+/**
+ * Returns a GSList of all available notes as ConboyNote objects. The list needs to
+ * be freed by the caller.
+ */
+GSList*			conboy_storage_plugin_note_list (ConboyStoragePlugin *self);
+
+/**
+ * Returns a GSList of strings (gchar arrays) containing the GUIDs of all available notes.
+ * The list and the strings have to be freed by the caller.
+ */
+GSList*			conboy_storage_plugin_note_list_ids (ConboyStoragePlugin *self);
 
 
 #endif /* CONBOY_STORAGE_PLUGIN_H */

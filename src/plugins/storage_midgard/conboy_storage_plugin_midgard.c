@@ -64,7 +64,7 @@ _conboy_storage_plugin_midgard_note_delete (ConboyStoragePlugin *self, ConboyNot
 	return FALSE;
 }
 
-static ConboyNote**
+static GSList*
 _conboy_storage_plugin_midgard_note_list (ConboyStoragePlugin *self)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
@@ -76,7 +76,7 @@ _conboy_storage_plugin_midgard_note_list (ConboyStoragePlugin *self)
 	return NULL;
 }
 
-static gchar**
+static GSList*
 _conboy_storage_plugin_midgard_note_list_ids (ConboyStoragePlugin *self)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
