@@ -149,9 +149,12 @@ search(const gchar *query, GHashTable *result)
 		Note *note;
 		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
 		
-		/*if (has_match(note->content, words)) {*/
-			match_count = find_match_count(note->content, words);
-		/*}*/
+		gchar *content;
+		g_object_get(note, "content", &content, NULL);
+		if (content != NULL) {
+			match_count = find_match_count(content, words);
+		}
+		
 			
 		if (match_count > 0) {
 			g_hash_table_insert(result, note, GINT_TO_POINTER(match_count));
