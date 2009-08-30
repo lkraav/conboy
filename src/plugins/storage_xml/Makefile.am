@@ -11,8 +11,8 @@ INCLUDES = \
 plugin_LTLIBRARIES = libstoragexml.la
 
 libstoragexml_la_SOURCES = \
-    conboy_storage_plugin_xml.h  \
-    conboy_storage_plugin_xml.c
+    conboy_xml_storage_plugin.h  \
+    conboy_xml_storage_plugin.c
 
 #TODO: Reduce number of libs most of them are not needed
 libstoragexml_la_LIBADD = \

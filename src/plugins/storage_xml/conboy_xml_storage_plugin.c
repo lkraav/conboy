@@ -26,7 +26,7 @@
 
 #include "../../conboy_note.h"
 #include "../../conboy_storage_plugin.h"
-#include "conboy_storage_plugin_xml.h"
+#include "conboy_xml_storage_plugin.h"
 
 #define NOTE_TAG "note"
 #define TITLE_TAG "title"
