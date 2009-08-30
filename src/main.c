@@ -80,7 +80,6 @@ main (int argc, char *argv[])
 {
   HildonProgram *program;
   ConboyNote *note;
-  /*osso_context_t *osso_context;*/
   AppData *app_data;
 
   /* Init i18n */
@@ -93,95 +92,6 @@ main (int argc, char *argv[])
 #else
   gtk_init(&argc, &argv);
 #endif
-  
-  /**************/
-  
-  /*
-  ConboyStorage *storage = conboy_storage_new();
-  
-  ConboyPluginInfo *info = conboy_plugin_info_new("/home/conny/workspace/conboy/src/plugins/storage_xml/conboy_storage_xml.plugin");   
-  
-  conboy_plugin_info_activate_plugin(info);
-  
-  conboy_storage_set_plugin(storage, CONBOY_STORAGE_PLUGIN(info->plugin)); 
-  
-  ConboyNote *cnote = conboy_storage_note_load(storage, "5381469e-3232-4a63-9cd1-7e2501287143");
-  
-  g_object_set(cnote, "content", "bla bla bla bla", NULL);
-  
-  conboy_storage_note_save(storage, cnote);
-  */
-  /*
-  GSList *notes = conboy_storage_note_list(storage);
-  while (notes != NULL) {
-	  gchar *title;
-	  gchar *xml;
-	  g_object_get(notes->data, "title", &title, "content", &xml, NULL);
-	  g_printerr("TITLE: %s\n", title);
-	  notes = notes->next;
-  }
-  */
-  
-  /* TODO: TEST / IMPLEMENT SAVE */
-  
-  
-  /*return;*/
-  
-  
-  /*
-  ConboyPlugin *plugin = g_object_new(CONBOY_TYPE_STORAGE_PLUGIN_XML, NULL);
-  if (plugin == NULL) {
-	  g_printerr("ERROR: plugin is NULL\n");
-  } else {
-	  g_printerr("Not null\n");
-  }
-  
-  if (!CONBOY_IS_PLUGIN(plugin)) {
-	  g_printerr("ERROR: not a plugin \n");
-  } else {
-	  g_printerr("Good: it's a plugin \n");
-  }
-  
-  return;
-  */
-  
-  /*ConboyPlugin *plugin = conboy_plugin_new_from_path("/home/conny/workspace/conboy/src/plugins/storage_xml/libstoragexml.la");*/
-  /*
-  ConboyPluginInfo *info = conboy_plugin_info_new("/home/conny/workspace/conboy/src/plugins/storage_xml/conboy_storage_xml.plugin");
-  
-  ConboyPlugin *plugin = conboy_plugin_info_create_plugin(info);
-  
-  
-  if (plugin == NULL) {
-	  g_printerr("ERROR: Plugin is null\n");
-	  return;
-  }
-  
-  if (CONBOY_IS_PLUGIN(plugin)) {
-	  g_printerr("GOOD: It is a ConboyPlugin\n");
-  }
-  
-  if (CONBOY_IS_STORAGE_PLUGIN(plugin)) {
-	  g_printerr("GOOD: It is a ConboyStoragePlugin\n");
-  }
-  
-  
-  conboy_storage_plugin_note_load(plugin, "aaaa-bbbb-ccccc");
-  */
-  /*
-  ConboyStoragePlugin *plug = g_object_new(CONBOY_TYPE_STORAGE_PLUGIN, NULL);
-  conboy_storage_plugin_note_list(plug);
-  
-  ConboyStorage *storage = g_object_new(CONBOY_TYPE_STORAGE, NULL);
-  ConboyNoteStore  *store   = g_object_new(CONBOY_TYPE_NOTE_STORE, NULL);
-  
-  conboy_note_store_fill_from_storage(store, storage);
-  */
-  
-  /* TODO: Iterate and print titles */
-  
-  /*return;*/
-  /*************/
   
 
   /* Call this to initialize it */
