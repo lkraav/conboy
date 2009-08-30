@@ -36,8 +36,6 @@ conboy_SOURCES = \
         app_data.c \
         json.h \
         json.c \
-        note_buffer.h \
-        note_buffer.c \
         settings.h \
         settings.c \
         settings_window.h \
@@ -57,7 +55,9 @@ conboy_SOURCES = \
         conboy_plugin_manager.h \
         conboy_plugin_manager.c \
         conboy_storage.h \
-        conboy_storage.c
+        conboy_storage.c \
+        conboy_note_buffer.h \
+        conboy_note_buffer.c
         
 
 #libconboy_applet_la_SOURCES = \

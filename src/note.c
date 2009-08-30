@@ -31,7 +31,7 @@
 #include "interface.h"
 #include "note.h"
 #include "conboy_note_store.h"
-#include "note_buffer.h"
+#include "conboy_note_buffer.h"
 
 #define _(String)gettext(String)
 
@@ -128,7 +128,7 @@ void note_save(UserInterface *ui)
 	GtkTextMark *mark;
 	gint cursor_position;
 	AppData *app_data = app_data_get();
-	GtkTextBuffer *buffer = ui->buffer;
+	ConboyNoteBuffer *buffer = ui->buffer;
 	ConboyNote *note = ui->note;
 	
 	/* If note is empty, don't save */
@@ -184,7 +184,7 @@ void note_save(UserInterface *ui)
 	}
 	
 	/* Clear note content, then set it with fresh data from the text buffer */
-	g_object_set(note, "content", note_buffer_get_xml(buffer), NULL);
+	g_object_set(note, "content", conboy_note_buffer_get_xml(buffer), NULL);
 
 	/* Save the complete note */
 	conboy_storage_note_save(app_data->storage, note);
@@ -352,98 +352,4 @@ void note_show(ConboyNote *note)
 	/* unblock signals */
 	g_signal_handlers_unblock_matched(buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, note);
 }
-
-/*
-void note_show_new(Note *note)
-{
-	AppData *app_data = app_data_get();
-	GtkTextBuffer *buffer = note->ui->buffer;
-	GtkTextIter start, end;
-	const gchar *content;
-	gint notes_count;
-
-	note->guid = get_uuid();
-
-	if (note->title == NULL) {
-		notes_count = conboy_note_store_get_length(app_data->note_store);
-		note->title = g_strdup_printf(_("New Note %i"), notes_count);
-	}
-
-	content = g_strconcat(note->title, "\n\n", _("Describe your new note here."), NULL);
-	gtk_text_buffer_set_text(buffer, content, -1);
-
-	gtk_text_buffer_get_iter_at_line(buffer, &start, 2);
-	gtk_text_buffer_get_end_iter(buffer, &end);
-	gtk_text_buffer_select_range(buffer, &start, &end);
-}
-*/
-
-/*
-void note_show_existing(ConboyNote *note)
-{
-	GtkTextBuffer *buffer = note->ui->buffer;
-	GtkTextIter iter;
-
-	gtk_text_buffer_get_start_iter(buffer, &iter);
-
-	note_buffer_set_xml(buffer, note->content);
-
-	gtk_text_buffer_get_iter_at_offset(buffer, &iter, note->cursor_position);
-	gtk_text_buffer_place_cursor(buffer, &iter);
-
-	gtk_text_view_scroll_to_mark(note->ui->view, gtk_text_buffer_get_insert(buffer), 0.0, TRUE, 0.0, 0.5);
-}
-*/
-
-void note_add_active_tag_by_name(UserInterface *ui, const gchar *tag_name)
-{
-	note_add_active_tag(ui, gtk_text_tag_table_lookup(ui->buffer->tag_table, tag_name));
-}
-
-void note_remove_active_tag_by_name(UserInterface *ui, const gchar *tag_name)
-{
-	note_remove_active_tag(ui, gtk_text_tag_table_lookup(ui->buffer->tag_table, tag_name));
-}
-
-/**
- * Add a tag to the list of active_tags, if it is not yet in the list.
- */
-void note_add_active_tag(UserInterface *ui, GtkTextTag *tag)
-{
-	GSList *tags;
-
-	if (ui == NULL) {
-		g_printerr("ERROR: note_add_active_tag: note is NULL\n");
-		return;
-	}
-	if (tag == NULL) {
-		g_printerr("ERROR: note_add_active_tag: tag is NULL\n");
-		return;
-	}
-
-	tags = ui->active_tags;
-	while (tags != NULL) {
-		if (strcmp(((GtkTextTag*)tags->data)->name, tag->name) == 0) {
-			return;
-		}
-		tags = tags->next;
-	}
-	ui->active_tags = g_slist_prepend(ui->active_tags, tag);
-}
-
-/**
- * Removes a tag from the list of active_tags if it is in this list.
- */
-void note_remove_active_tag(UserInterface *ui, GtkTextTag *tag)
-{
-	GSList *tags = ui->active_tags;
-	while (tags != NULL) {
-		if (strcmp(GTK_TEXT_TAG(tags->data)->name, tag->name) == 0) {
-			ui->active_tags = g_slist_remove(ui->active_tags, tags->data);
-			return;
-		}
-		tags = tags->next;
-	}
-}
-
 

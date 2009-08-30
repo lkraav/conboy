@@ -51,7 +51,7 @@ typedef struct
 	
 	GList               *listeners;
 	
-	GSList				*active_tags;
+	/*GSList				*active_tags;*/
 
 } UserInterface;
 

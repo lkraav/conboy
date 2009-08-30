@@ -39,6 +39,7 @@
 #include "interface.h"
 #include "app_data.h"
 #include "settings.h"
+#include "conboy_note_buffer.h"
 
 #include "conboy_oauth.h"
 #include "note.h"
@@ -687,12 +688,11 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	gtk_box_pack_start(GTK_BOX (vbox1), scrolledwindow1, TRUE, TRUE, 0);
 
 	/* TEXT VIEW */
+	buffer = conboy_note_buffer_new();
 #ifdef HILDON_HAS_APP_MENU
-	textview = hildon_text_view_new();
-	buffer = hildon_text_view_get_buffer(HILDON_TEXT_VIEW(textview));
+	textview = hildon_text_view_new_with_buffer(buffer);
 #else
-	textview = gtk_text_view_new();
-	buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(textview));
+	textview = gtk_text_view_new_with_buffer(buffer);
 #endif
 	gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(textview), GTK_WRAP_WORD);
 	gtk_widget_show(textview);
@@ -920,5 +920,5 @@ UserInterface* create_mainwin(ConboyNote *note) {
 
 void conboy_note_window_show_note(UserInterface *ui, ConboyNote *note)
 {
-	note_buffer_set_xml(ui->buffer, note->content);
+	conboy_note_buffer_set_xml(ui->buffer, note->content);
 }

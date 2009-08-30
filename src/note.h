@@ -50,13 +50,12 @@ void note_set_focus(UserInterface *ui);
 
 gboolean note_exists(ConboyNote *note);
 
+
+/*
 void note_add_active_tag(UserInterface *ui, GtkTextTag *tag);
-
 void note_remove_active_tag(UserInterface *ui, GtkTextTag *tag);
-
 void note_add_active_tag_by_name(UserInterface *ui, const gchar *tag_name);
-
 void note_remove_active_tag_by_name(UserInterface *ui, const gchar *tag_name);
-
+*/
 
 #endif /* NOTE_H */
