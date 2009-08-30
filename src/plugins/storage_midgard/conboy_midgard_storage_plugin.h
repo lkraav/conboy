@@ -23,7 +23,7 @@
 #include <glib-object.h>
 
 /* convention macros */
-#define CONBOY_TYPE_MIDGARD_STORAGE_PLUGIN				(conboy_storage_plugin_midgard_get_type())
+#define CONBOY_TYPE_MIDGARD_STORAGE_PLUGIN				(conboy_midgard_storage_plugin_get_type())
 #define CONBOY_MIDGARD_STORAGE_PLUGIN(object)			(G_TYPE_CHECK_INSTANCE_CAST ((object),CONBOY_TYPE_MIDGARD_STORAGE_PLUGIN, ConboyMidgardStoragePlugin))
 #define CONBOY_MIDGARD_STORAGE_PLUGIN_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST ((klass), CONBOY_TYPE_MIDGARD_STORAGE_PLUGIN, ConboyMidgardStoragePluginClass))
 #define CONBOY_IS_MIDGARD_STORAGE_PLUGIN(object)		(G_TYPE_CHECK_INSTANCE_TYPE ((object), CONBOY_TYPE_MIDGARD_STORAGE_PLUGIN))
