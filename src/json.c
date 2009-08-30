@@ -282,7 +282,7 @@ ConboyNote*
 json_get_note_from_string(const gchar *json_string)
 {
 	JsonParser *parser = json_parser_new();
-	Note *note = NULL;
+	ConboyNote *note = NULL;
 	
 	if (json_parser_load_from_data(parser, json_string, -1, NULL)) {
 		JsonNode *root_node = json_parser_get_root(parser); 
@@ -339,7 +339,7 @@ json_test()
 	JsonNoteList *note_list = json_get_note_list(test);
 	
 	while (note_list->notes != NULL) {
-		Note *note = (Note*) note_list->notes->data;
+		ConboyNote *note = (ConboyNote*) note_list->notes->data;
 		
 		g_printerr("Title: %s\n", note->title);
 		g_printerr("GUID : %s\n", note->guid);

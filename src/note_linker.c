@@ -49,10 +49,10 @@ get_length_of_longest_title()
 	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
 
 	while (valid) {
-		Note *note;
+		ConboyNote *note;
 		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
 		max_length = max(g_utf8_strlen(note->title, -1), max_length);
-		valid = gtk_tree_model_iter_next(model, &iter); /* TODO: Too much casting in this function. Maybe introduce note_list_store_iter_next() etc... */
+		valid = gtk_tree_model_iter_next(model, &iter);
 	}
 
 	return max_length;

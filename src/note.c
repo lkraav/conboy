@@ -31,20 +31,9 @@
 #include "interface.h"
 #include "note.h"
 #include "conboy_note_store.h"
-#include "storage.h"
 #include "note_buffer.h"
 
 #define _(String)gettext(String)
-
-void note_free(Note *note)
-{
-	g_free(note->content);
-	g_free(note->title);
-	g_free(note->guid);
-	g_slist_free(note->active_tags);
-	g_free(note);
-	note = NULL;
-}
 
 void note_show_by_title(const char* title)
 {
@@ -455,14 +444,6 @@ void note_remove_active_tag(UserInterface *ui, GtkTextTag *tag)
 		}
 		tags = tags->next;
 	}
-}
-
-/**
- * Adds a tag (e.g. notebook) to a note
- */
-void note_add_tag(Note *note, gchar *tag)
-{
-	note->tags = g_list_prepend(note->tags, tag);
 }
 
 

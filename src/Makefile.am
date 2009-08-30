@@ -36,8 +36,6 @@ conboy_SOURCES = \
         app_data.c \
         json.h \
         json.c \
-        storage.h \
-        xml_storage.c \
         note_buffer.h \
         note_buffer.c \
         settings.h \

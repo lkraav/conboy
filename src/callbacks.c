@@ -625,9 +625,9 @@ void
 on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 										 gpointer		user_data)
 {
-	Note *note = (Note*)user_data;
+	UserInterface *ui = (UserInterface*)user_data;
 
-	if (!gtk_text_buffer_get_modified(buffer)) {
+	if (!gtk_text_buffer_get_modified(ui->buffer)) {
 		/*g_printerr("Buffer changed from dirty to saved \n");*/
 		return;
 	}
@@ -635,7 +635,7 @@ on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 	/*g_printerr("Buffer is dirty. Saving in 10 seconds\n");*/
 
 	/* Save 10 seconds after the buffer got dirty */
-	g_timeout_add(4000, (GSourceFunc)note_save_callback, note);
+	g_timeout_add(4000, (GSourceFunc)note_save_callback, ui);
 }
 
 static

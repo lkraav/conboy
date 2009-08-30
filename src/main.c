@@ -42,13 +42,7 @@ static void cleanup()
 	AppData *app_data = app_data_get();
 	GtkTreeIter iter;
 	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
-	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
-	while (valid) {
-		Note *note;
-		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
-		note_free(note);
-		valid = gtk_tree_model_iter_next(model, &iter);
-	}
+	gtk_list_store_clear(GTK_LIST_STORE(app_data->note_store));
 	
 	/* Free AppData */
 	app_data_free();

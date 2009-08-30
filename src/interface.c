@@ -246,7 +246,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	g_printerr("LATEST_SYNC_REVISION: %i\n", note_list->latest_sync_revision);
 	GSList *notes = note_list->notes;
 	while (notes != NULL) {
-		g_printerr("Title: %s\n", ((Note*)notes->data)->title);
+		g_printerr("Title: %s\n", ((ConboyNote*)notes->data)->title);
 		notes = notes->next;
 	}
 	

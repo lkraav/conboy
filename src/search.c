@@ -146,7 +146,7 @@ search(const gchar *query, GHashTable *result)
 
 	while (valid) {
 		gint match_count = 0;
-		Note *note;
+		ConboyNote *note;
 		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
 		
 		gchar *content;

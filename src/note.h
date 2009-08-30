@@ -26,38 +26,6 @@
 #include "interface.h"
 
 
-typedef struct
-{
-  
-  gchar   *title;
-  gchar   *content;
-
-  time_t last_change_date;
-  time_t last_metadata_change_date;
-  time_t create_date;
-
-  gint cursor_position;
-  gint width;
-  gint height;
-  gint x;
-  gint y;
-  gboolean open_on_startup;
-  double version;
-  double content_version;
-
-  gchar *guid;
-  GList *tags; /* Tags aka notebooks */
-  
-  
-  
-  GSList *active_tags; /* TODO: This shouldn't really be part of this structure, more UI, because it is never written to disk */
-  
-
-} Note;
-
-
-void note_free(Note *note);
-
 void note_format_title(GtkTextBuffer *buffer);
 
 void note_set_window_title_from_buffer(GtkWindow *win, GtkTextBuffer *buffer);
@@ -74,9 +42,7 @@ void note_show(ConboyNote *note);
 
 void note_show_by_title(const char* title);
 
-void note_show_existing(Note *note);
 
-void note_show_new(Note *note);
 
 gboolean note_is_open(UserInterface *ui);
 
@@ -92,6 +58,5 @@ void note_add_active_tag_by_name(UserInterface *ui, const gchar *tag_name);
 
 void note_remove_active_tag_by_name(UserInterface *ui, const gchar *tag_name);
 
-void note_add_tag(Note *note, gchar *tag);
 
 #endif /* NOTE_H */

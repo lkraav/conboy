@@ -24,7 +24,6 @@
 #include <glib/gstdio.h>
 
 #include "conboy_plugin_info.h"
-#include "storage.h"
 #include "settings.h"
 #include "app_data.h"
 
