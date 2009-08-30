@@ -347,6 +347,7 @@ void note_show(ConboyNote *note)
 		note_show_new(note);
 	}
 	*/
+	conboy_note_window_show_note(ui, note);
 
 	app_data->open_notes = g_list_append(app_data->open_notes, note);
 	app_data->open_windows = g_list_append(app_data->open_notes, note);

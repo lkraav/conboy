@@ -918,3 +918,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	return ui;
 }
 
+void conboy_note_window_show_note(UserInterface *ui, ConboyNote *note)
+{
+	note_buffer_set_xml(ui->buffer, note->content);
+}

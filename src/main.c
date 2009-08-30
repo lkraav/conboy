@@ -30,7 +30,6 @@
 #include "conboy_plugin_info.h"
 #include "conboy_plugin.h"
 #include "conboy_note_store.h"
-#include "conboy_note_window.h"
 
 
 #define APP_NAME "conboy"
