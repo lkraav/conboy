@@ -9,8 +9,8 @@ INCLUDES = \
 plugin_LTLIBRARIES = libstoragemidgard.la
 
 libstoragemidgard_la_SOURCES = \
-    conboy_storage_plugin_midgard.h  \
-    conboy_storage_plugin_midgard.c
+    conboy_midgard_storage_plugin.h  \
+    conboy_midgard_storage_plugin.c
 
 #TODO: Reduce number of libs most of them are not needed
 libstoragemidgard_la_LIBADD = \

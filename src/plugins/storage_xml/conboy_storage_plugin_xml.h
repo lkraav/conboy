@@ -17,31 +17,31 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef CONBOY_STORAGE_PLUGIN_XML_H
-#define CONBOY_STORAGE_PLUGIN_XML_H
+#ifndef CONBOY_XML_STORAGE_PLUGIN_H
+#define CONBOY_XML_STORAGE_PLUGIN_H
 
 #include <glib-object.h>
 
 /* convention macros */
-#define CONBOY_TYPE_STORAGE_PLUGIN_XML				(conboy_storage_plugin_xml_get_type())
-#define CONBOY_STORAGE_PLUGIN_XML(object)			(G_TYPE_CHECK_INSTANCE_CAST ((object),CONBOY_TYPE_STORAGE_PLUGIN_XML, ConboyStoragePluginXml))
-#define CONBOY_STORAGE_PLUGIN_XML_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST ((klass), CONBOY_TYPE_STORAGE_PLUGIN_XML, ConboyStoragePluginXmlClass))
-#define CONBOY_IS_STORAGE_PLUGIN_XML(object)		(G_TYPE_CHECK_INSTANCE_TYPE ((object), CONBOY_TYPE_STORAGE_PLUGIN_XML))
-#define CONBOY_IS_STORAGE_PLUGIN_XML_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), CONBOY_TYPE_STORAGE_PLUGIN_XML))
-#define CONBOY_STORAGE_PLUGIN_XML_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), CONBOY_TYPE_STORAGE_PLUGIN_XML, ConboyStoragePluginXmlClass))
+#define CONBOY_TYPE_XML_STORAGE_PLUGIN				(conboy_xml_storage_plugin_get_type())
+#define CONBOY_XML_STORAGE_PLUGIN(object)			(G_TYPE_CHECK_INSTANCE_CAST ((object),CONBOY_TYPE_XML_STORAGE_PLUGIN, ConboyXmlStoragePlugin))
+#define CONBOY_XML_STORAGE_PLUGIN_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST ((klass), CONBOY_TYPE_XML_STORAGE_PLUGIN, ConboyXmlStoragePluginClass))
+#define CONBOY_IS_XML_STORAGE_PLUGIN(object)		(G_TYPE_CHECK_INSTANCE_TYPE ((object), CONBOY_TYPE_XML_STORAGE_PLUGIN))
+#define CONBOY_IS_XML_STORAGE_PLUGIN_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), CONBOY_TYPE_XML_STORAGE_PLUGIN))
+#define CONBOY_XML_STORAGE_PLUGIN_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), CONBOY_TYPE_XML_STORAGE_PLUGIN, ConboyXmlStoragePluginClass))
 
-typedef struct _ConboyStoragePluginXml 		ConboyStoragePluginXml;
-typedef struct _ConboyStoragePluginXmlClass ConboyStoragePluginXmlClass;
+typedef struct _ConboyXmlStoragePlugin 		ConboyXmlStoragePlugin;
+typedef struct _ConboyXmlStoragePluginClass ConboyXmlStoragePluginClass;
 
-struct _ConboyStoragePluginXml {
+struct _ConboyXmlStoragePlugin {
 	ConboyStoragePlugin parent;
 };
 
-struct _ConboyStoragePluginXmlClass {
+struct _ConboyXmlStoragePluginClass {
 	ConboyStoragePluginClass parent;
 };
 
-GType					conboy_storage_plugin_xml_get_type	(void);
-ConboyStoragePluginXml* conboy_plugin_new					(void);
+GType					conboy_xml_storage_plugin_get_type	(void);
+ConboyXmlStoragePlugin* conboy_plugin_new					(void);
 
-#endif /* CONBOY_STORAGE_PLUGIN_XML_H */
+#endif /* CONBOY_XML_STORAGE_PLUGIN_H */

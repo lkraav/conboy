@@ -44,7 +44,7 @@
 #define TAGS_TAG "tags"
 #define TAG_TAG "tag"
 
-G_DEFINE_TYPE(ConboyStoragePluginXml, conboy_storage_plugin_xml, CONBOY_TYPE_STORAGE_PLUGIN);
+G_DEFINE_TYPE(ConboyXmlStoragePlugin, conboy_xml_storage_plugin, CONBOY_TYPE_STORAGE_PLUGIN);
 
 typedef enum {
 	NOTE,
@@ -277,11 +277,11 @@ write_footer(xmlTextWriter *writer, ConboyNote *note)
  * Public methods
  */
 
-ConboyStoragePluginXml*
+ConboyXmlStoragePlugin*
 conboy_plugin_new ()
 {
 	g_printerr("Hello from xml plugin \n");
-	return g_object_new(CONBOY_TYPE_STORAGE_PLUGIN_XML, NULL);
+	return g_object_new(CONBOY_TYPE_XML_STORAGE_PLUGIN, NULL);
 }
 
 
@@ -290,7 +290,7 @@ load (ConboyStoragePlugin *self, const gchar *guid)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(guid != NULL, FALSE);
-	g_return_val_if_fail(CONBOY_IS_STORAGE_PLUGIN_XML(self), FALSE);
+	g_return_val_if_fail(CONBOY_IS_XML_STORAGE_PLUGIN(self), FALSE);
 	
 	
 	AppData *app_data = app_data_get();
@@ -333,12 +333,12 @@ save (ConboyStoragePlugin *self, ConboyNote *note)
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(note != NULL, FALSE);
 
-	g_return_val_if_fail(CONBOY_IS_STORAGE_PLUGIN_XML(self), FALSE);
+	g_return_val_if_fail(CONBOY_IS_XML_STORAGE_PLUGIN(self), FALSE);
 	g_return_val_if_fail(CONBOY_IS_NOTE(note), FALSE);
 
 	/* TODO */
 	/* Write note to xml file */
-	g_printerr("Called 'save' on ConboyStoragePluginXml\n");
+	g_printerr("Called 'save' on ConboyXmlStoragePlugin\n");
 	
 	
 	AppData *app_data = app_data_get();
@@ -377,12 +377,12 @@ delete (ConboyStoragePlugin *self, ConboyNote *note)
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(note != NULL, FALSE);
 
-	g_return_val_if_fail(CONBOY_IS_STORAGE_PLUGIN_XML(self), FALSE);
+	g_return_val_if_fail(CONBOY_IS_XML_STORAGE_PLUGIN(self), FALSE);
 	g_return_val_if_fail(CONBOY_IS_NOTE(note), FALSE);
 
 	/* TODO */
 	/* Delete xml file */
-	g_printerr("Called 'delete' on ConboyStoragePluginXml\n");
+	g_printerr("Called 'delete' on ConboyXmlStoragePlugin\n");
 
 	return FALSE;
 }
@@ -391,7 +391,7 @@ static GSList*
 list_ids (ConboyStoragePlugin *self)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
-	g_return_val_if_fail(CONBOY_IS_STORAGE_PLUGIN_XML(self), FALSE);
+	g_return_val_if_fail(CONBOY_IS_XML_STORAGE_PLUGIN(self), FALSE);
 	
 	const gchar *filename;
 	AppData *app_data = app_data_get();
@@ -414,9 +414,9 @@ static GSList*
 list (ConboyStoragePlugin *self)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
-	g_return_val_if_fail(CONBOY_IS_STORAGE_PLUGIN_XML(self), FALSE);	
+	g_return_val_if_fail(CONBOY_IS_XML_STORAGE_PLUGIN(self), FALSE);
 
-	g_printerr("Called 'list' on ConboyStoragePluginXml\n");
+	g_printerr("Called 'list' on ConboyXmlStoragePlugin\n");
 	GSList *result = NULL;
 	GSList *ids = list_ids(self);
 	GSList *iter = ids;
@@ -439,16 +439,16 @@ list (ConboyStoragePlugin *self)
 static void
 dispose(GObject *object)
 {
-	ConboyStoragePluginXml *self = CONBOY_STORAGE_PLUGIN_XML(object);
+	ConboyXmlStoragePlugin *self = CONBOY_XML_STORAGE_PLUGIN(object);
 	
 	/*g_free((gchar *)self->path);
 	self->path = NULL;*/
 
-	G_OBJECT_CLASS(conboy_storage_plugin_xml_parent_class)->dispose(object);
+	G_OBJECT_CLASS(conboy_xml_storage_plugin_parent_class)->dispose(object);
 }
 
 static void
-conboy_storage_plugin_xml_class_init (ConboyStoragePluginXmlClass *klass)
+conboy_xml_storage_plugin_class_init (ConboyXmlStoragePluginClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	ConboyStoragePluginClass *storage_class = CONBOY_STORAGE_PLUGIN_CLASS(klass);
@@ -468,7 +468,7 @@ conboy_storage_plugin_xml_class_init (ConboyStoragePluginXmlClass *klass)
 }
 
 static void
-conboy_storage_plugin_xml_init (ConboyStoragePluginXml *self)
+conboy_xml_storage_plugin_init (ConboyXmlStoragePlugin *self)
 {
 	g_printerr("XML: init called\n");
 	CONBOY_PLUGIN(self)->has_settings = TRUE;
