@@ -350,6 +350,6 @@ void note_show(ConboyNote *note)
 	gtk_text_buffer_set_modified(buffer, FALSE);
 
 	/* unblock signals */
-	g_signal_handlers_unblock_matched(buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, note);
+	g_signal_handlers_unblock_matched(buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
 }
 

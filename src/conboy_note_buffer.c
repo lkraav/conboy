@@ -42,7 +42,6 @@ conboy_note_buffer_class_init (ConboyNoteBufferClass *klass)
 }
 
 
-
 /*
  * Implementation
  */
@@ -54,7 +53,7 @@ conboy_note_buffer_new()
 }
 
 void
-conboy_note_buffer_add_tag (ConboyNoteBuffer *self, GtkTextTag *tag)
+conboy_note_buffer_add_active_tag (ConboyNoteBuffer *self, GtkTextTag *tag)
 {
 	g_return_if_fail(self != NULL);
 	g_return_if_fail(tag != NULL);
@@ -72,7 +71,7 @@ conboy_note_buffer_add_tag (ConboyNoteBuffer *self, GtkTextTag *tag)
 }
 
 void
-conboy_note_buffer_remove_tag (ConboyNoteBuffer *self, GtkTextTag *tag)
+conboy_note_buffer_remove_active_tag (ConboyNoteBuffer *self, GtkTextTag *tag)
 {
 	g_return_if_fail(self != NULL);
 	g_return_if_fail(tag != NULL);
@@ -90,27 +89,27 @@ conboy_note_buffer_remove_tag (ConboyNoteBuffer *self, GtkTextTag *tag)
 }
 
 void
-conboy_note_buffer_add_tag_by_name (ConboyNoteBuffer *self, const gchar *tag_name)
+conboy_note_buffer_add_active_tag_by_name (ConboyNoteBuffer *self, const gchar *tag_name)
 {
 	g_return_if_fail(self != NULL);
 	g_return_if_fail(tag_name != NULL);
 	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
 	
-	conboy_note_buffer_add_tag(self, gtk_text_tag_table_lookup(GTK_TEXT_BUFFER(self)->tag_table, tag_name));
+	conboy_note_buffer_add_active_tag(self, gtk_text_tag_table_lookup(GTK_TEXT_BUFFER(self)->tag_table, tag_name));
 }
 
 void
-conboy_note_buffer_remove_tag_by_name (ConboyNoteBuffer *self, const gchar *tag_name)
+conboy_note_buffer_remove_active_tag_by_name (ConboyNoteBuffer *self, const gchar *tag_name)
 {
 	g_return_if_fail(self != NULL);
 	g_return_if_fail(tag_name != NULL);
 	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
 		
-	conboy_note_buffer_remove_tag(self, gtk_text_tag_table_lookup(GTK_TEXT_BUFFER(self)->tag_table, tag_name));
+	conboy_note_buffer_remove_active_tag(self, gtk_text_tag_table_lookup(GTK_TEXT_BUFFER(self)->tag_table, tag_name));
 }
 
 GSList*
-conboy_note_buffer_get_tags (ConboyNoteBuffer *self)
+conboy_note_buffer_get_active_tags (ConboyNoteBuffer *self)
 {
 	g_return_val_if_fail(self != NULL, NULL);
 	g_return_val_if_fail(CONBOY_IS_NOTE_BUFFER(self), NULL);
@@ -119,7 +118,7 @@ conboy_note_buffer_get_tags (ConboyNoteBuffer *self)
 }
 
 void
-conboy_note_buffer_clear_tags (ConboyNoteBuffer *self)
+conboy_note_buffer_clear_active_tags (ConboyNoteBuffer *self)
 {
 	g_return_if_fail(self != NULL);
 	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
@@ -129,7 +128,7 @@ conboy_note_buffer_clear_tags (ConboyNoteBuffer *self)
 }
 
 void
-conboy_note_buffer_set_tags (ConboyNoteBuffer *self, GSList *tags)
+conboy_note_buffer_set_active_tags (ConboyNoteBuffer *self, GSList *tags)
 {
 	g_return_if_fail(self != NULL);
 	g_return_if_fail(tags != NULL);
@@ -140,7 +139,6 @@ conboy_note_buffer_set_tags (ConboyNoteBuffer *self, GSList *tags)
 	self->active_tags = NULL;
 	
 	/* Copy elements of given list */
-	/*GSList *list = tags;*/
 	while (tags != NULL) {
 		self->active_tags = g_slist_prepend(self->active_tags, tags->data);
 		tags = tags->next;

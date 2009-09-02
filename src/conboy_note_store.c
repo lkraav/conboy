@@ -366,9 +366,7 @@ conboy_note_store_fill_from_storage(ConboyNoteStore *self, ConboyStorage *storag
 	g_printerr("conboy_note_store_fill_from_storage()\n");
 	GSList *notes = conboy_storage_note_list(storage);
 	while (notes != NULL) {
-		g_printerr("### Before add\n");
 		conboy_note_store_add(self, notes->data, NULL);
-		g_printerr("### After add\n");
 		notes = notes->next;
 	}
 	g_slist_free(notes);

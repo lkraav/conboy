@@ -32,17 +32,17 @@ GType				conboy_note_buffer_get_type (void);
 
 ConboyNoteBuffer*	conboy_note_buffer_new(void);
 
-void	conboy_note_buffer_add_tag				(ConboyNoteBuffer *self, GtkTextTag *tag);
-void	conboy_note_buffer_remove_tag			(ConboyNoteBuffer *self, GtkTextTag *tag);
-void	conboy_note_buffer_add_tag_by_name		(ConboyNoteBuffer *self, const gchar *tag_name);
-void	conboy_note_buffer_remove_tag_by_name	(ConboyNoteBuffer *self, const gchar *tag_name);
+void	conboy_note_buffer_add_active_tag				(ConboyNoteBuffer *self, GtkTextTag *tag);
+void	conboy_note_buffer_remove_active_tag			(ConboyNoteBuffer *self, GtkTextTag *tag);
+void	conboy_note_buffer_add_active_tag_by_name		(ConboyNoteBuffer *self, const gchar *tag_name);
+void	conboy_note_buffer_remove_active_tag_by_name	(ConboyNoteBuffer *self, const gchar *tag_name);
 
 /**
  * The list belongs to the ConboyNoteBuffer, don't free or change it.
  */
-GSList*	conboy_note_buffer_get_tags				(ConboyNoteBuffer *self);
-void	conboy_note_buffer_set_tags				(ConboyNoteBuffer *self, GSList *tags);
-void	conboy_note_buffer_clear_tags			(ConboyNoteBuffer *self);
+GSList*	conboy_note_buffer_get_active_tags				(ConboyNoteBuffer *self);
+void	conboy_note_buffer_set_active_tags				(ConboyNoteBuffer *self, GSList *tags);
+void	conboy_note_buffer_clear_active_tags			(ConboyNoteBuffer *self);
 
 gchar*	conboy_note_buffer_get_xml				(ConboyNoteBuffer *self);
 void	conboy_note_buffer_set_xml				(ConboyNoteBuffer *self, const gchar *xmlString);

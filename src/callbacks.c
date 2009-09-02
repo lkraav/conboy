@@ -64,6 +64,10 @@ static void change_format(UserInterface *ui, GtkToggleAction *action)
 	GtkTextIter start_iter, end_iter;
 	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(ui->buffer);
 
+	if (CONBOY_IS_NOTE_BUFFER(buffer)) {
+		g_printerr("''' ITs A NOTE BUFFER '''\n");
+	}
+	
 	const gchar *tag_name = gtk_action_get_name(GTK_ACTION(action));
 
 	if (gtk_toggle_action_get_active(action)) {
@@ -108,7 +112,7 @@ static void change_format(UserInterface *ui, GtkToggleAction *action)
 		} else {
 			/* Nothing is selected, so this style should start from here on */
 			GtkTextTag *tag = gtk_text_tag_table_lookup(buffer->tag_table, tag_name);
-			conboy_note_buffer_add_tag(CONBOY_NOTE_BUFFER(ui->buffer), tag);
+			conboy_note_buffer_add_active_tag(CONBOY_NOTE_BUFFER(ui->buffer), tag);
 		}
 	} else {
 		/* The button just became deactive, so we should remove the formatting */
@@ -121,7 +125,7 @@ static void change_format(UserInterface *ui, GtkToggleAction *action)
 		} else {
 			/* Nothing is selected, so this style should stop from here on */
 			GtkTextTag *tag = gtk_text_tag_table_lookup(buffer->tag_table, tag_name);
-			conboy_note_buffer_remove_tag(CONBOY_NOTE_BUFFER(ui->buffer), tag);
+			conboy_note_buffer_remove_active_tag(CONBOY_NOTE_BUFFER(ui->buffer), tag);
 		}
 	}
 
@@ -163,13 +167,13 @@ on_font_size_radio_group_changed       (GtkRadioAction  *action,
 
 	} else {
 		/* Remove all possible size tags */
-		conboy_note_buffer_remove_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "size:small");
-		conboy_note_buffer_remove_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "size:large");
-		conboy_note_buffer_remove_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "size:huge");
+		conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "size:small");
+		conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "size:large");
+		conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "size:huge");
 
 		/* If not normal size, add one size tag */
 		if (strcmp(tag_name, "size:normal") != 0) {
-			conboy_note_buffer_add_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), tag_name);
+			conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), tag_name);
 		}
 	}
 }
@@ -334,8 +338,8 @@ on_bullets_button_clicked				(GtkAction		*action,
 			line = gtk_text_iter_get_line(&start_iter);
 			add_bullets(buffer, line, line, buffer_get_depth_tag(buffer, 1));
 			
-			conboy_note_buffer_add_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
-			conboy_note_buffer_add_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
+			conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
+			conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
 		}
 	} else {
 		/* The button just became deactive, so we should remove the formatting */
@@ -344,8 +348,8 @@ on_bullets_button_clicked				(GtkAction		*action,
 			gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter);
 			remove_bullets(buffer, &start_iter, &end_iter);
 
-			conboy_note_buffer_remove_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
-			conboy_note_buffer_remove_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
+			conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
+			conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
 
 		} else {
 			/* Nothing is selected */
@@ -353,8 +357,8 @@ on_bullets_button_clicked				(GtkAction		*action,
 			gtk_text_buffer_get_iter_at_mark(buffer, &end_iter, gtk_text_buffer_get_insert(buffer));
 			remove_bullets(buffer, &start_iter, &end_iter);
 
-			conboy_note_buffer_remove_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
-			conboy_note_buffer_remove_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
+			conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
+			conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
 		}
 	}
 
@@ -427,18 +431,21 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	}
 
 	/* Clean the list of active tags */
-	conboy_note_buffer_clear_tags(CONBOY_NOTE_BUFFER(ui->buffer));
+	conboy_note_buffer_clear_active_tags(CONBOY_NOTE_BUFFER(ui->buffer));
 
 	/* Add tags at this location */
-	conboy_note_buffer_set_tags(CONBOY_NOTE_BUFFER(ui->buffer), gtk_text_iter_get_tags(location));
+	tags = gtk_text_iter_get_tags(location);
+	if (tags != NULL) {
+		conboy_note_buffer_set_active_tags(CONBOY_NOTE_BUFFER(ui->buffer), tags);
+	}
 
 	/* Go the beginning of line and check if there is a bullet.
 	 * If yes, add list-item and list tags and enable the indent actions */
 	gtk_text_iter_set_line_offset(location, 0);
 	if (iter_get_depth_tag(location) != NULL) {
 		/* Add tags */
-		conboy_note_buffer_add_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
-		conboy_note_buffer_add_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
+		conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
+		conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
 		/* Enable indent actions */
 		gtk_action_set_sensitive(ui->action_inc_indent, TRUE);
 		gtk_action_set_sensitive(ui->action_dec_indent, TRUE);
@@ -449,7 +456,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	}
 
 	/* Copy pointer for iteration */
-	tags = conboy_note_buffer_get_tags(CONBOY_NOTE_BUFFER(ui->buffer));
+	tags = conboy_note_buffer_get_active_tags(CONBOY_NOTE_BUFFER(ui->buffer));
 
 
 	/* Blocking signals here because the ..set_active() method makes the buttons
@@ -462,7 +469,7 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	g_signal_handlers_block_by_func(ui->action_fixed, on_format_button_clicked, ui);
 	g_signal_handlers_block_by_func(ui->action_bullets, on_bullets_button_clicked, ui);
 	g_signal_handlers_block_by_func(ui->action_font_small, on_font_size_radio_group_changed, ui);
-
+	
 	/* TODO: This can be optimized: Note disable all and then enable selected, but determine state and then
 	 * set the state. */
 	gtk_toggle_action_set_active(ui->action_bold, FALSE);
@@ -625,6 +632,8 @@ on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 {
 	UserInterface *ui = (UserInterface*)user_data;
 
+	g_printerr("Buffer changed\n");
+	
 	if (!gtk_text_buffer_get_modified(ui->buffer)) {
 		/*g_printerr("Buffer changed from dirty to saved \n");*/
 		return;
@@ -800,9 +809,9 @@ static gboolean add_new_line(UserInterface *ui)
 			GSList *tmp;
 
 			/* Remove all tags but <list> from active tags */
-			tmp = g_slist_copy(conboy_note_buffer_get_tags(CONBOY_NOTE_BUFFER(buffer)));
-			conboy_note_buffer_clear_tags(CONBOY_NOTE_BUFFER(buffer));
-			conboy_note_buffer_add_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
+			tmp = g_slist_copy(conboy_note_buffer_get_active_tags(CONBOY_NOTE_BUFFER(buffer)));
+			conboy_note_buffer_clear_active_tags(CONBOY_NOTE_BUFFER(buffer));
+			conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
 
 			/* Insert newline and bullet */
 			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
@@ -812,7 +821,7 @@ static gboolean add_new_line(UserInterface *ui)
 			add_bullets(buffer, line, line, depth_tag);
 
 			/* Add all tags back to active tags */
-			conboy_note_buffer_set_tags(CONBOY_NOTE_BUFFER(buffer), tmp);
+			conboy_note_buffer_set_active_tags(CONBOY_NOTE_BUFFER(buffer), tmp);
 
 			return TRUE;
 
@@ -821,8 +830,8 @@ static gboolean add_new_line(UserInterface *ui)
 			GtkTextIter start = iter;
 
 			/* Disable list and list-item tags */
-			conboy_note_buffer_remove_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
-			conboy_note_buffer_remove_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
+			conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
+			conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
 
 			/* Delete the bullet and the last newline */
 			gtk_text_iter_set_line_offset(&start, 0);
@@ -866,9 +875,9 @@ static gboolean add_new_line(UserInterface *ui)
 			/* TODO: Copied from above */
 
 			/* Remove all tags but <list> from active tags */
-			tmp = g_slist_copy(conboy_note_buffer_get_tags(CONBOY_NOTE_BUFFER(ui->buffer)));
-			conboy_note_buffer_clear_tags(CONBOY_NOTE_BUFFER(ui->buffer));
-			conboy_note_buffer_add_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
+			tmp = g_slist_copy(conboy_note_buffer_get_active_tags(CONBOY_NOTE_BUFFER(ui->buffer)));
+			conboy_note_buffer_clear_active_tags(CONBOY_NOTE_BUFFER(ui->buffer));
+			conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
 
 			/* Insert newline and bullet */
 			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
@@ -878,10 +887,10 @@ static gboolean add_new_line(UserInterface *ui)
 
 			/* Add all tags back to active tags */
 			/*ui->active_tags = tmp;*/
-			conboy_note_buffer_set_tags(CONBOY_NOTE_BUFFER(ui->buffer), tmp);
+			conboy_note_buffer_set_active_tags(CONBOY_NOTE_BUFFER(ui->buffer), tmp);
 
 			/* Turn on the list-item tag from here on */
-			conboy_note_buffer_add_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
+			conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
 
 			/* Revaluate (turn on) the bullet button */
 			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
@@ -903,6 +912,8 @@ on_text_view_key_pressed                      (GtkWidget   *widget,
 {
 	UserInterface *ui = (UserInterface*)user_data;
 
+	g_printerr("On View key pressed \n");
+	
 	switch (event->keyval) {
 		case GDK_Return:
 		case GDK_KP_Enter:
@@ -917,8 +928,8 @@ static void
 apply_active_tags(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, UserInterface *ui)
 {
 	GtkTextIter start_iter;
-	GSList *active_tags = conboy_note_buffer_get_tags(CONBOY_NOTE_BUFFER(buffer));
-
+	GSList *active_tags = conboy_note_buffer_get_active_tags(CONBOY_NOTE_BUFFER(buffer));
+	
 	/* Only apply active tags on typed text, not on pasted text */
 	if (g_utf8_strlen(input, -1) > 1) {
 		return;
@@ -928,6 +939,8 @@ apply_active_tags(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, 
 	if (gtk_text_iter_get_line(iter) == 0) {
 		return;
 	}
+	
+	g_printerr("apply_active_tags()\n");
 
 	/* First remove all tags, then apply all active tags */
 	start_iter = *iter;

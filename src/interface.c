@@ -688,7 +688,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	gtk_box_pack_start(GTK_BOX (vbox1), scrolledwindow1, TRUE, TRUE, 0);
 
 	/* TEXT VIEW */
-	buffer = conboy_note_buffer_new();
+	buffer = GTK_TEXT_BUFFER(conboy_note_buffer_new());
 #ifdef HILDON_HAS_APP_MENU
 	textview = hildon_text_view_new_with_buffer(buffer);
 #else
@@ -874,7 +874,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 			G_CALLBACK(on_text_view_key_pressed),
 			ui);
 
-	g_signal_connect_after ((gpointer)buffer, "insert-text",
+	g_signal_connect_after (GTK_TEXT_BUFFER(buffer), "insert-text",
 			G_CALLBACK(on_text_buffer_insert_text),
 			ui);
 
@@ -920,5 +920,5 @@ UserInterface* create_mainwin(ConboyNote *note) {
 
 void conboy_note_window_show_note(UserInterface *ui, ConboyNote *note)
 {
-	conboy_note_buffer_set_xml(ui->buffer, note->content);
+	conboy_note_buffer_set_xml(CONBOY_NOTE_BUFFER(ui->buffer), note->content);
 }
