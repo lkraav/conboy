@@ -439,6 +439,7 @@ list (ConboyStoragePlugin *self)
 static void
 dispose(GObject *object)
 {
+	g_printerr("INFO: Dispose() called on xml storage plugin\n");
 	ConboyXmlStoragePlugin *self = CONBOY_XML_STORAGE_PLUGIN(object);
 	
 	/*g_free((gchar *)self->path);

@@ -108,6 +108,7 @@ _conboy_midgard_storage_plugin_constructor (GType type,
 static void
 _conboy_midgard_storage_plugin_dispose(GObject *object)
 {
+	g_printerr("INFO: Dispose() called on Midgard plugin\n");
 	ConboyMidgardStoragePlugin *self = CONBOY_MIDGARD_STORAGE_PLUGIN(object);
 	
 	g_free((gchar *)self->user);
