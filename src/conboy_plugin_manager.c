@@ -111,8 +111,7 @@ about_button_cb (GtkWidget *button, ConboyPluginManager *pm)
 }
 
 static void
-configure_button_cb (GtkWidget          *button,
-		     ConboyPluginManager *pm)
+configure_button_cb (GtkWidget *button, ConboyPluginManager *pm)
 {
 	ConboyPluginInfo *info;
 	/*GtkWindow *toplevel;*/
@@ -340,6 +339,33 @@ plugin_manager_get_plugin_base_dir()
 	return path;
 }
 
+
+static void
+conboy_plugin_state_changed (ConboyPluginInfo *info, gboolean active, ConboyPluginManager *pm)
+{
+	GtkTreeSelection *selection;
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(pm->priv->tree));
+	
+	gtk_tree_model_get_iter_first(model, &iter);
+
+	/* Iterate over all rows. Once we found the row containing the given ConboyPluginInfo
+	 * we set the active flag of this row */
+	do {
+		ConboyPluginInfo *tinfo;
+		gtk_tree_model_get(model, &iter, INFO_COLUMN, &tinfo, -1);
+		if (tinfo == info) {
+			break;
+		}
+	}
+	while (gtk_tree_model_iter_next(model, &iter));
+	
+	/* Set the active flag. This will reflect in the UI */
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, ACTIVE_COLUMN, conboy_plugin_info_is_active (info), -1);
+}
+
 static void
 plugin_manager_populate_lists (ConboyPluginManager *pm)
 {
@@ -347,10 +373,6 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 	GtkListStore *model;
 	GtkTreeIter iter;
 
-	/*conboy_debug (DEBUG_PLUGINS);*/
-
-	/*plugins = conboy_plugins_engine_get_plugin_list (pm->priv->engine);*/
-	
 	gchar *plugin_base_dir = plugin_manager_get_plugin_base_dir();
 	plugins = plugin_manager_get_all_plugins(plugin_base_dir);
 
@@ -367,6 +389,8 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 				    AVAILABLE_COLUMN, conboy_plugin_info_is_available (info),
 				    INFO_COLUMN, info,
 				    -1);
+		
+		g_signal_connect(info, "plugin-status-changed", G_CALLBACK(conboy_plugin_state_changed), pm);
 
 		plugins = plugins->next;
 	}
@@ -396,31 +420,27 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
  * 
  * Or add code here to save to GConf which plugins are active
  */
-static gboolean
+static void
 plugin_manager_set_active (ConboyPluginManager *pm,
 			   GtkTreeIter        *iter,
 			   GtkTreeModel       *model,
 			   gboolean            active)
 {
 	ConboyPluginInfo *info;
-	gboolean res = TRUE;
 	
-	/*conboy_debug (DEBUG_PLUGINS);*/
-
 	gtk_tree_model_get (model, iter, INFO_COLUMN, &info, -1);
 
 	g_return_val_if_fail (info != NULL, FALSE);
 
 	if (active) {
 		/* activate the plugin */
-		return conboy_plugin_info_activate_plugin(info);
+		conboy_plugin_info_activate_plugin(info);
 		
 	} else {
 		/* deactivate the plugin */
-		return conboy_plugin_info_deactivate_plugin(info);
+		conboy_plugin_info_deactivate_plugin(info);
 	}
 
-	return res;
 }
 
 static void
@@ -859,6 +879,7 @@ plugin_toggled_cb (ConboyPluginsEngine *engine,
 }
 */
 
+
 static void 
 conboy_plugin_manager_init (ConboyPluginManager *pm)
 {
@@ -924,9 +945,8 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 
 	plugin_manager_construct_tree (pm);
 	
-
 	/*
-	g_signal_connect_after (pm->priv->engine,
+	g_signal_connect (pm->priv->engine,
 				"activate-plugin",
 				G_CALLBACK (plugin_toggled_cb),
 				pm);
@@ -950,6 +970,8 @@ conboy_plugin_manager_finalize (GObject *object)
 					      plugin_toggled_cb,
 					      pm);
 */
+	/* TODO: Remove all signal handlers of all PluginInfos
+	 */
 
 	if (pm->priv->popup_menu)
 		gtk_widget_destroy (pm->priv->popup_menu);

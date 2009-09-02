@@ -21,63 +21,82 @@
 #define PLUGIN_COPYRIGHT    "Copyright"
 
 
-void
-conboy_plugin_info_ref (ConboyPluginInfo *info)
-{
-	g_atomic_int_inc (&info->refcount);
-}
+G_DEFINE_TYPE(ConboyPluginInfo, conboy_plugin_info, G_TYPE_OBJECT);
 
-static ConboyPluginInfo *
-conboy_plugin_info_copy (ConboyPluginInfo *info)
+static void
+conboy_plugin_info_class_dispose (GObject *object)
 {
-	conboy_plugin_info_ref (info);
-	return info;
-}
-
-void
-conboy_plugin_info_unref (ConboyPluginInfo *info)
-{
-	if (!g_atomic_int_dec_and_test (&info->refcount)) {
-		return;
+	ConboyPluginInfo *self = CONBOY_PLUGIN_INFO(object);
+	
+	if (self->plugin != NULL) {
+		g_object_unref(self->plugin);
 	}
 
-	if (info->plugin != NULL) {
-		/*conboy_debug_message (DEBUG_PLUGINS, "Unref plugin %s", info->name);*/
-		g_object_unref (info->plugin);
-	}
+	g_free (self->file);
+	g_free (self->module_name);
+	g_free (self->name);
+	g_free (self->desc);
+	g_free (self->copyright);
+	g_free (self->version);
+	g_strfreev (self->authors);
 
-	g_free (info->file);
-	g_free (info->module_name);
-	g_free (info->name);
-	g_free (info->desc);
-	g_free (info->copyright);
-	g_free (info->version);
-	g_strfreev (info->authors);
-
-	g_free (info);
+	/* TODO: Not sure that I should free self here */
+	/*g_free (self);*/	
 }
 
-/**
- * conboy_plugin_info_get_type:
- *
- * Retrieves the #GType object which is associated with the #ConboyPluginInfo
- * class.
- *
- * Return value: the GType associated with #ConboyPluginInfo.
- **/
-GType
-conboy_plugin_info_get_type (void)
+
+
+enum {
+	PLUGIN_STATUS_CHANGED,
+	LAST_SIGNAL
+};
+
+static guint signals[LAST_SIGNAL] = {0};
+
+static void conboy_plugin_info_status_changed (ConboyPluginInfo *info, gboolean active)
 {
-	static GType the_type = 0;
+	g_printerr("Plugin '%s'   Active '%i'\n", conboy_plugin_info_get_name(info), active);
+}
 
-	if (G_UNLIKELY (!the_type))
-		the_type = g_boxed_type_register_static (
-					"ConboyPluginInfo",
-					(GBoxedCopyFunc) conboy_plugin_info_copy,
-					(GBoxedFreeFunc) conboy_plugin_info_unref);
+static void
+conboy_plugin_info_class_init (ConboyPluginInfoClass *klass)
+{
+	G_OBJECT_CLASS(klass)->dispose = conboy_plugin_info_class_dispose;
+	
+	klass->plugin_status_changed = conboy_plugin_info_status_changed;
+	
+	signals[PLUGIN_STATUS_CHANGED] =
+		g_signal_new(
+				"plugin-status-changed",
+				CONBOY_TYPE_PLUGIN_INFO,
+				G_SIGNAL_RUN_LAST,
+				G_STRUCT_OFFSET(ConboyPluginInfoClass, plugin_status_changed),
+				NULL, NULL,
+				g_cclosure_marshal_VOID__BOOLEAN,
+				G_TYPE_NONE,
+				1,
+				G_TYPE_BOOLEAN);
+}
 
-	return the_type;
-} 
+static void
+conboy_plugin_info_init (ConboyPluginInfo *self)
+{
+	g_return_if_fail(CONBOY_PLUGIN_INFO(self));
+	
+	self->authors = NULL;
+	self->available = FALSE;
+	self->copyright = NULL;
+	self->desc = NULL;
+	self->file = NULL;
+	self->module_name = NULL;
+	self->name = NULL;
+	self->plugin = NULL;
+	self->version = NULL;
+}
+
+/*
+ * Implementation
+ */ 
 
 /**
  * conboy_plugin_info_new:
@@ -98,8 +117,8 @@ conboy_plugin_info_new (const gchar *file)
 
 	g_print("Loading plugin: %s\n", file);
 
-	info = g_new0 (ConboyPluginInfo, 1);
-	info->refcount = 1;
+	info = g_object_new(CONBOY_TYPE_PLUGIN_INFO, NULL);
+	
 	info->file = g_strdup (file);
 
 	plugin_file = g_key_file_new ();
@@ -240,9 +259,8 @@ gboolean
 conboy_plugin_info_is_active (ConboyPluginInfo *info)
 {
 	g_return_val_if_fail (info != NULL, FALSE);
-
+	g_printerr("Is active: %i\n", (info->available && info->plugin != NULL));
 	return info->available && info->plugin != NULL;
-	return FALSE;
 }
 
 gboolean
@@ -261,6 +279,11 @@ conboy_plugin_info_activate_plugin (ConboyPluginInfo *info)
 	g_return_val_if_fail(info->file != NULL, NULL);
 	g_return_val_if_fail(info->module_name != NULL, NULL);
 	
+	if (info->plugin != NULL) {
+		g_printerr("ERROR: Plugin is already active\n");
+		return FALSE;
+	}
+	
 	ConboyPlugin *result = NULL;
 	
 	gchar *dir = g_path_get_dirname(info->file);
@@ -271,12 +294,11 @@ conboy_plugin_info_activate_plugin (ConboyPluginInfo *info)
 	result = conboy_plugin_new_from_path(path);
 	
 	if (result != NULL) {
-		if (info->plugin) {
-			g_object_unref(info->plugin);
-			info->plugin = NULL;
-		}
-		g_object_ref(result);
+		/*g_object_ref(result);*/ /*new does already ref it */
 		info->plugin = result;
+		
+		/* Emmit signal */
+		g_signal_emit_by_name(info, "plugin-status-changed", TRUE);
 	}
 	
 	g_free(dir);
@@ -289,7 +311,18 @@ conboy_plugin_info_activate_plugin (ConboyPluginInfo *info)
 gboolean
 conboy_plugin_info_deactivate_plugin (ConboyPluginInfo *info)
 {
+	g_return_val_if_fail(info != NULL, FALSE);
+	g_return_val_if_fail(CONBOY_IS_PLUGIN_INFO(info), FALSE);
+	
+	if (info->plugin == NULL || !CONBOY_IS_PLUGIN(info->plugin)) {
+		g_printerr("ERROR: Plugin not active. Cannot be deactivated\n");
+		return FALSE;
+	}
+	
 	g_object_unref(info->plugin);
 	info->plugin = NULL;
+	
+	/* Emmit signal */
+	g_signal_emit_by_name(info, "plugin-status-changed", FALSE);
 	return TRUE;
 }

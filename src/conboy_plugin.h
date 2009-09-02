@@ -36,7 +36,7 @@
 typedef struct _ConboyPlugin		ConboyPlugin;
 typedef struct _ConboyPluginClass	ConboyPluginClass;
 
-struct _ConboyPlugin{
+struct _ConboyPlugin {
 	GObject parent;
 	
 	/* <private> */
@@ -44,7 +44,7 @@ struct _ConboyPlugin{
 	gboolean has_settings;
 };
 
-struct _ConboyPluginClass{
+struct _ConboyPluginClass {
 	GObjectClass parent;
 
 	/* virtual methods */

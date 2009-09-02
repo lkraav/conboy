@@ -27,13 +27,21 @@
 G_DEFINE_ABSTRACT_TYPE(ConboyPlugin, conboy_plugin, G_TYPE_OBJECT);
 
 static void
-conboy_plugin_class_dispose(GObject *object)
+conboy_plugin_dispose(GObject *object)
 {
+	g_return_if_fail(object != NULL);
+	g_return_if_fail(CONBOY_IS_PLUGIN(object));
+	
+	g_printerr("INFO: Dispose() on plugin called\n");
 	ConboyPlugin *self = CONBOY_PLUGIN(object);
 	
 	if (self->gmodule) {
 		g_printerr("INFO: Unloading library\n");
-		g_module_close(self->gmodule);
+		if (g_module_close(self->gmodule)) {
+			g_printerr("INFO: Module closed\n");
+		} else {
+			g_printerr("ERROR: Could not close module: '%s'\n", g_module_error());
+		}
 	}
 	self->gmodule = NULL;
 
@@ -45,7 +53,7 @@ conboy_plugin_class_init (ConboyPluginClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-	object_class->dispose = conboy_plugin_class_dispose;
+	object_class->dispose = conboy_plugin_dispose;
 }
 
 static void
