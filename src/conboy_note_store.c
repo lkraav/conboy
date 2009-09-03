@@ -39,6 +39,7 @@ static int		conboy_note_store_get_n_columns(GtkTreeModel *self);
 static GType	conboy_note_store_get_column_type(GtkTreeModel *self, int column);
 static void		conboy_note_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GValue *value);
 
+
 /* ConboyNoteStore inherits from GtkListStore, and implements the GtkTreeStore
  * interface */
 G_DEFINE_TYPE_EXTENDED(ConboyNoteStore, conboy_note_store, GTK_TYPE_LIST_STORE, 0,

@@ -23,6 +23,7 @@ typedef struct
 	osso_context_t *osso_ctx;
 	ConboyStorage  *storage;
 	UserInterface  *note_window;
+	GList          *plugin_infos;
 } AppData;
 
 AppData* app_data_get(void);

@@ -28,16 +28,18 @@
 
 #include <glib/gi18n.h>
 
-#include "conboy_plugin_manager.h"
 #include "conboy_plugin_info.h"
 #include "conboy_config.h"
+#include "app_data.h"
+
+#include "conboy_plugin_manager.h"
 
 enum
 {
 	ACTIVE_COLUMN,
 	AVAILABLE_COLUMN,
 	INFO_COLUMN,
-	N_COLUMNS
+	NUM_COLUMNS
 };
 
 #define PLUGIN_MANAGER_NAME_TITLE _("Plugin")
@@ -261,84 +263,6 @@ row_activated_cb (GtkTreeView       *tree_view,
 	plugin_manager_toggle_active (pm, &iter, model);
 }
 
-/**
- * Returns a GList of all ConboyPluginInfo objects found in the given
- * plugin_base_dir or one level deeper in the directory hierarchy.
- * 
- * Looks at all files in plugin_base_dir if those are .plugin files,
- * ConboyPluginInfo objects are created. Also all directories of
- * plugin_base_dir are searched.
- */
-static GList*
-plugin_manager_get_all_plugins (const gchar *plugin_base_dir)
-{
-	/*
-	 * for each file with .plugin ending create ConboyPluginInfo
-	 */
-	GList *result = NULL;
-	
-	const gchar *filename;
-	GDir *dir = g_dir_open(plugin_base_dir, 0, NULL);
-	while ((filename = g_dir_read_name(dir)) != NULL) {
-		gchar *full_path = g_build_filename(plugin_base_dir, filename, NULL);
-		
-		/* If it's a dir, check if it contains .plugin files */
-		if (g_file_test(full_path, G_FILE_TEST_IS_DIR)) {
-			const gchar *inner_filename;
-			GDir *inner_dir = g_dir_open(full_path, 0, NULL);
-			while ((inner_filename = g_dir_read_name(inner_dir)) != NULL) {
-				g_printerr("Check: %s\n", inner_filename);
-				if (g_str_has_suffix(inner_filename, ".plugin")) {
-					gchar *plugin_file = g_build_filename(full_path, inner_filename, NULL);
-					ConboyPluginInfo *info = conboy_plugin_info_new(plugin_file);
-					result = g_list_prepend(result, info);
-					g_free(plugin_file);
-				}
-			}
-			g_dir_close(inner_dir);
-			
-		/* If it's a file, check if it's a .plugin file */
-		} else if (g_file_test(full_path, G_FILE_TEST_EXISTS)) {
-			g_printerr("Check: %s\n", full_path);
-			if (g_str_has_suffix(full_path, ".plugin")) {
-				ConboyPluginInfo *info = conboy_plugin_info_new(full_path);
-				result = g_list_prepend(result, info);
-			}
-		}
-		
-		g_free(full_path);
-	}
-	
-	g_dir_close(dir);
-
-	return result;
-}
-
-/*
- * Returns the path set by the environment variable
- * CONBOY_PLUGIN_DIR or if not set, the default path
- * $prefix/lib/conboy
- * 
- * Return value needs to be freed
- */
-static gchar*
-plugin_manager_get_plugin_base_dir()
-{
-	gchar *path = NULL;
-	const gchar *env_path = g_getenv("CONBOY_PLUGIN_DIR");
-	if (env_path != NULL) {
-		if (g_file_test(env_path, G_FILE_TEST_IS_DIR)) {
-			path = g_strdup(env_path);
-		} else {
-			g_printerr("WARN: '%s' is not a directory or does not exist. Please set the environment variable CONBOY_PLUGIN_DIR correctly. Trying default.\n", path);
-		}
-	} else {
-		path = g_build_filename(PREFIX, "/lib/conboy");
-	}
-	
-	return path;
-}
-
 
 static void
 conboy_plugin_state_changed (ConboyPluginInfo *info, gboolean active, ConboyPluginManager *pm)
@@ -369,12 +293,13 @@ conboy_plugin_state_changed (ConboyPluginInfo *info, gboolean active, ConboyPlug
 static void
 plugin_manager_populate_lists (ConboyPluginManager *pm)
 {
-	const GList *plugins;
+	GList *plugins;
 	GtkListStore *model;
 	GtkTreeIter iter;
 
-	gchar *plugin_base_dir = plugin_manager_get_plugin_base_dir();
-	plugins = plugin_manager_get_all_plugins(plugin_base_dir);
+	AppData *app_data = app_data_get();
+	
+	plugins = app_data->plugin_infos;
 
 	model = GTK_LIST_STORE (gtk_tree_view_get_model (GTK_TREE_VIEW (pm->priv->tree)));
 
@@ -382,6 +307,8 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 	{
 		ConboyPluginInfo *info = (ConboyPluginInfo*) plugins->data;
 
+		g_printerr("Adding: %s\n", conboy_plugin_info_get_name(info));
+		
 		gtk_list_store_append (model, &iter);
 		
 		gtk_list_store_set (model, &iter,
@@ -747,7 +674,7 @@ plugin_manager_construct_tree (ConboyPluginManager *pm)
 
 	/*conboy_debug (DEBUG_PLUGINS);*/
 
-	model = gtk_list_store_new (N_COLUMNS,
+	model = gtk_list_store_new (NUM_COLUMNS,
 				    G_TYPE_BOOLEAN,
 				    G_TYPE_BOOLEAN,
 				    G_TYPE_POINTER);
