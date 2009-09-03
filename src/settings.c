@@ -21,6 +21,23 @@
 
 
 void
+settings_save_storage_plugin_name(GConfClient *client, const gchar *name)
+{
+	gconf_client_set_string(client, SETTINGS_STORAGE_PLUGIN_NAME, name, NULL);
+}
+
+gchar*
+settings_load_storage_plugin_name(GConfClient *client) {
+	/*AppData *app_data = app_data_get();*/ /* Called from app_data_get(), so we cannot call it here again*/
+	gchar *result = gconf_client_get_string(client, SETTINGS_STORAGE_PLUGIN_NAME, NULL);
+	if (result == NULL) {
+		settings_save_storage_plugin_name(client, "storagexml");
+		return "storagexml"; 
+	}
+	return result;
+}
+
+void
 settings_save_sync_base_url(const gchar *url)
 {
 	AppData *app_data = app_data_get();

@@ -21,6 +21,7 @@
 
 #include <glib/gtypes.h>
 #include <gdk/gdkcolor.h>
+#include <gconf/gconf-client.h>
 
 /* TODO: It would be nice to have those defines not in the public interface,
  * but therefor settings.c must be able to send "changed signals. Those are
@@ -38,6 +39,7 @@
 #define SETTINGS_OAUTH_ACCESS_SECRET SETTINGS_ROOT"/oauth_access_secret"
 #define SETTINGS_ACTIVE_PLUGINS      SETTINGS_ROOT"/active_plugins"
 #define SETTINGS_SYNC_BASE_URL       SETTINGS_ROOT"/sync_base_url"
+#define SETTINGS_STORAGE_PLUGIN_NAME SETTINGS_ROOT"/storage_plugin_name"
 
 typedef enum {
 	SETTINGS_SCROLLBAR_SIZE_SMALL,
@@ -55,6 +57,9 @@ typedef enum {
 	SETTINGS_COLOR_TYPE_LINKS
 } SettingsColorType;
 
+
+void settings_save_storage_plugin_name(GConfClient *client, const gchar *name);
+gchar* settings_load_storage_plugin_name(GConfClient *client);
 
 void settings_save_sync_base_url(const gchar *url);
 gchar* settings_load_sync_base_url(void);

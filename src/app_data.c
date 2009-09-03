@@ -157,7 +157,8 @@ AppData* app_data_get() {
 		
 		/* Create storage */
 		ConboyStorage *storage = conboy_storage_new();
-		ConboyPluginInfo *info = get_plugin_info_by_module_name("storagexml", plugin_infos);
+		gchar *plugin_name = settings_load_storage_plugin_name(client);
+		ConboyPluginInfo *info = get_plugin_info_by_module_name(plugin_name, plugin_infos);
 		conboy_plugin_info_activate_plugin(info);
 		conboy_storage_set_plugin(storage, CONBOY_STORAGE_PLUGIN(info->plugin)); 
 		 
