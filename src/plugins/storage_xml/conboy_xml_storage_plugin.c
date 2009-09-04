@@ -22,8 +22,6 @@
 #include <string.h>
 #include <glib/gprintf.h>
 
-#include "../../app_data.h"      /* TODO: Not nice to include complete app_data.h here. It pulls in stuff like GConf etc. also many things are now accessible, but we only need the path to all .notes */
-
 #include "../../conboy_note.h"
 #include "../../conboy_storage_plugin.h"
 #include "conboy_xml_storage_plugin.h"
@@ -292,15 +290,13 @@ load (ConboyStoragePlugin *self, const gchar *guid)
 	g_return_val_if_fail(guid != NULL, FALSE);
 	g_return_val_if_fail(CONBOY_IS_XML_STORAGE_PLUGIN(self), FALSE);
 	
-	
-	AppData *app_data = app_data_get();
 	int ret;
 	ConboyNote *note;
 	gchar *filename;
 	xmlTextReader *reader;
 	
 	
-	filename = g_strconcat(app_data->user_path, guid, ".note", NULL);
+	filename = g_strconcat(CONBOY_XML_STORAGE_PLUGIN(self)->path, guid, ".note", NULL);
 	
 	reader = xmlReaderForFile(filename, NULL, 0);
 	
@@ -340,14 +336,12 @@ save (ConboyStoragePlugin *self, ConboyNote *note)
 	/* Write note to xml file */
 	g_printerr("Called 'save' on ConboyXmlStoragePlugin\n");
 	
-	
-	AppData *app_data = app_data_get();
 	xmlTextWriter *writer;
 	gchar *filename;
 	
 	g_assert(note->guid != NULL);
 	
-	filename = g_strconcat(app_data->user_path, note->guid, ".note", NULL);
+	filename = g_strconcat(CONBOY_XML_STORAGE_PLUGIN(self)->path, note->guid, ".note", NULL);
 	
 	writer = xmlNewTextWriterFilename(filename, 0);
 	if (writer == NULL) {
@@ -394,8 +388,7 @@ list_ids (ConboyStoragePlugin *self)
 	g_return_val_if_fail(CONBOY_IS_XML_STORAGE_PLUGIN(self), FALSE);
 	
 	const gchar *filename;
-	AppData *app_data = app_data_get();
-	GDir *dir = g_dir_open(app_data->user_path, 0, NULL);
+	GDir *dir = g_dir_open(CONBOY_XML_STORAGE_PLUGIN(self)->path, 0, NULL);
 	GSList *result = NULL;
 	
 	while ((filename = g_dir_read_name(dir)) != NULL) {
@@ -442,8 +435,8 @@ dispose(GObject *object)
 	g_printerr("INFO: Dispose() called on xml storage plugin\n");
 	ConboyXmlStoragePlugin *self = CONBOY_XML_STORAGE_PLUGIN(object);
 	
-	/*g_free((gchar *)self->path);
-	self->path = NULL;*/
+	g_free(self->path);
+	self->path = NULL;
 
 	G_OBJECT_CLASS(conboy_xml_storage_plugin_parent_class)->dispose(object);
 }
@@ -473,6 +466,7 @@ conboy_xml_storage_plugin_init (ConboyXmlStoragePlugin *self)
 {
 	g_printerr("XML: init called\n");
 	CONBOY_PLUGIN(self)->has_settings = TRUE;
+	self->path = g_strconcat(g_get_home_dir(), "/.conboy/", NULL);
 }
 
 

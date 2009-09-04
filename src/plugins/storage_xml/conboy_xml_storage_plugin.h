@@ -35,6 +35,8 @@ typedef struct _ConboyXmlStoragePluginClass ConboyXmlStoragePluginClass;
 
 struct _ConboyXmlStoragePlugin {
 	ConboyStoragePlugin parent;
+	/*<private>*/
+	gchar *path;
 };
 
 struct _ConboyXmlStoragePluginClass {
