@@ -38,7 +38,12 @@ struct _ConboyPluginInfoClass
 {
 	GObjectClass parent;
 	
-	void (*plugin_status_changed)	(ConboyPluginInfo *info, gboolean active);
+	void (*plugin_activate)			(ConboyPluginInfo *info);
+	void (*plugin_deactivate)		(ConboyPluginInfo *info);
+	
+	void (*plugin_activated)		(ConboyPluginInfo *info);
+	void (*plugin_deactivated)		(ConboyPluginInfo *info);
+	
 };
 
 ConboyPluginInfo  *conboy_plugin_info_new       (const gchar *file);

@@ -57,7 +57,9 @@ conboy_SOURCES = \
         conboy_storage.h \
         conboy_storage.c \
         conboy_note_buffer.h \
-        conboy_note_buffer.c
+        conboy_note_buffer.c \
+        conboy_plugin_store.h \
+        conboy_plugin_store.c
         
 
 #libconboy_applet_la_SOURCES = \

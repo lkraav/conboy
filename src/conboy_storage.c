@@ -17,6 +17,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "conboy_note_store.h"
+#include "conboy_plugin.h"
+#include "conboy_plugin_info.h"
+
 #include "conboy_storage.h"
 
 
@@ -27,18 +31,9 @@ conboy_storage_dispose (GObject *gobject)
 {
 	ConboyStorage *self = CONBOY_STORAGE(gobject);
 	
-	/* 
-	 * In dispose, you are supposed to free all types referenced from this
-	 * object which might themselves hold a reference to self. Generally,
-	 * the most simple solution is to unref all members on which you own a 
-	 * reference.
-	 */
-	
-	/* dispose might be called multiple times, so we must guard against
-	 * calling g_object_unref() on an invalid GObject.
-	 */
-	
 	if (self->plugin) {
+		/* TODO: g_signal_emit(self, "deactivate"; */
+		
 		g_object_unref(self->plugin);
 		self->plugin = NULL;
 	}
@@ -59,21 +54,69 @@ conboy_storage_finalize (GObject *gobject)
 }
 
 static void
+conboy_storage_activated(ConboyStorage *storage) {
+	g_printerr("Default: Storage activated\n");
+}
+
+static void
+conboy_storage_deactivated(ConboyStorage *storage) {
+	g_printerr("Default: Storage deactivated\n");
+}
+
+enum {
+	ACTIVATED,
+	DEACTIVATED,
+	LAST_SIGNAL
+};
+
+static guint signals[LAST_SIGNAL] = {0};
+
+static void
 conboy_storage_class_init (ConboyStorageClass *klass)
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
 	
 	gobject_class->dispose = conboy_storage_dispose;
 	gobject_class->finalize = conboy_storage_finalize;
+	
+	klass->activated 	= conboy_storage_activated;
+	klass->deactivated 	= conboy_storage_deactivated;
+			
+	signals[ACTIVATED] =
+		g_signal_new(
+				"activated",
+				CONBOY_TYPE_STORAGE,
+				G_SIGNAL_RUN_LAST,
+				G_STRUCT_OFFSET(ConboyStorageClass, activated),
+				NULL, NULL,
+				g_cclosure_marshal_VOID__VOID,
+				G_TYPE_NONE,
+				0);
+	
+	signals[DEACTIVATED] =
+		g_signal_new(
+				"deactivated",
+				CONBOY_TYPE_STORAGE,
+				G_SIGNAL_RUN_LAST,
+				G_STRUCT_OFFSET(ConboyStorageClass, deactivated),
+				NULL, NULL,
+				g_cclosure_marshal_VOID__VOID,
+				G_TYPE_NONE,
+				0);
+	
 }
+
 
 static void
 conboy_storage_init (ConboyStorage *self)
 {
 	/* Init all members */
 	self->plugin = NULL;
+	self->plugin_store = NULL;
+	
+	g_printerr("INFO: Initializing ConboyStorage\n");
 }
-
+	
 
 /*
  * Public methods
@@ -85,43 +128,98 @@ conboy_storage_new()
 	return g_object_new(CONBOY_TYPE_STORAGE, NULL);
 }
 
-void
-conboy_storage_set_plugin(ConboyStorage *self, ConboyStoragePlugin *plugin)
+static void
+conboy_storage_set_active_plugin(ConboyStorage *self, ConboyPluginStore *plugin_store)
 {
-	g_return_if_fail(self != NULL);
-	g_return_if_fail(plugin != NULL);
-	
-	g_return_if_fail(CONBOY_IS_STORAGE(self));
-	g_return_if_fail(CONBOY_IS_STORAGE_PLUGIN(plugin));
-	
-	if (self->plugin != NULL) {
-		conboy_storage_unset_plugin(self);
+	GList *infos = conboy_plugin_store_get_plugin_infos(plugin_store);
+	while (infos) {
+		ConboyPluginInfo *info = CONBOY_PLUGIN_INFO(infos->data);
+		if (conboy_plugin_info_is_active(info)) {
+			if (CONBOY_IS_STORAGE_PLUGIN(info->plugin)) {
+				g_printerr("# Set active plugin for Storage\n");
+				self->plugin = CONBOY_STORAGE_PLUGIN(info->plugin);
+				g_object_ref(self->plugin);
+				/* TODO: g_signal_emit(self, "activated"); */
+				break;
+			}
+		}
+		infos = infos->next;
 	}
-	
-	g_object_ref(plugin);
-	self->plugin = plugin;
 }
 
-void
-conboy_storage_unset_plugin(ConboyStorage *self)
+static void
+on_plugin_activated(ConboyPluginStore *store, ConboyPluginInfo *info, ConboyStorage *self)
 {
+	g_return_if_fail(info != NULL);
 	g_return_if_fail(self != NULL);
-	g_return_if_fail(CONBOY_IS_STORAGE(self));
-	g_return_if_fail(self->plugin != NULL);
 	
+	g_return_if_fail(CONBOY_IS_PLUGIN_INFO(info));
+	g_return_if_fail(CONBOY_IS_STORAGE(self));
+	
+	if (self->plugin != NULL) {
+		g_printerr("ERROR: Plugin has been activated, but there is already one active\n");
+		return;
+	}
+	
+	self->plugin = CONBOY_STORAGE_PLUGIN(info->plugin);
+	g_object_ref(self->plugin);
+	g_signal_emit_by_name(self, "activated");
+}
+
+static void
+on_plugin_deactivate(ConboyPluginStore *store, ConboyPluginInfo *info, ConboyStorage *self)
+{
+	g_printerr("on_plugin_deactivated called\n");
+	
+	g_return_if_fail(info != NULL);
+	g_return_if_fail(self != NULL);
+	
+	g_return_if_fail(CONBOY_IS_PLUGIN_INFO(info));
+	g_return_if_fail(CONBOY_IS_STORAGE(self));
+	
+	if (!CONBOY_IS_STORAGE_PLUGIN(info->plugin)) return;
+	
+	if (self->plugin == NULL) {
+		g_printerr("ERROR: There is no plugin in use, so it cannot be deactivated \n");
+		return;
+	}
+	
+	if (self->plugin != CONBOY_STORAGE_PLUGIN(info->plugin)) {
+		g_printerr("ERROR: Another plugin is getting deactivated, but we don't use it\n");
+		return;
+	}
+	
+	g_printerr("## INFO: Storage: Fire deactivate signale\n");
+	g_signal_emit_by_name(self, "deactivated");
 	g_object_unref(self->plugin);
 	self->plugin = NULL;
 }
 
-ConboyStoragePlugin*
-conboy_storage_get_plugin(ConboyStorage *self)
+void
+conboy_storage_set_plugin_store(ConboyStorage *self, ConboyPluginStore *plugin_store)
 {
-	g_return_val_if_fail(self != NULL, NULL);
-	g_return_val_if_fail(CONBOY_IS_STORAGE(self), NULL);
-	g_return_val_if_fail(self->plugin != NULL, NULL);
-	g_return_val_if_fail(CONBOY_IS_STORAGE_PLUGIN(self->plugin), NULL);
-	return self->plugin;
+	g_return_if_fail(self != NULL);
+	g_return_if_fail(plugin_store != NULL);
+	
+	g_return_if_fail(CONBOY_IS_STORAGE(self));
+	g_return_if_fail(CONBOY_IS_PLUGIN_STORE(plugin_store));
+	
+	g_printerr("INFO: Setting the plugin store\n");
+	
+	if (self->plugin_store == NULL) {
+		self->plugin_store = plugin_store;
+		g_object_ref(plugin_store);
+		
+		conboy_storage_set_active_plugin(self, plugin_store);
+		
+		g_signal_connect(plugin_store, "plugin-activated", G_CALLBACK(on_plugin_activated), self);
+		g_signal_connect(plugin_store, "plugin-deactivate", G_CALLBACK(on_plugin_deactivate), self);
+		
+	} else {
+		g_printerr("ERROR: PluginStore already set\n");
+	}
 }
+
 
 ConboyNote*
 conboy_storage_note_load (ConboyStorage *self, const gchar *guid)
@@ -179,12 +277,12 @@ conboy_storage_note_delete (ConboyStorage *self, ConboyNote *note)
 GSList*
 conboy_storage_note_list (ConboyStorage *self)
 {
-	g_return_val_if_fail(self != NULL, FALSE);
-	g_return_val_if_fail(CONBOY_IS_STORAGE(self), FALSE);	
+	g_return_val_if_fail(self != NULL, NULL);
+	g_return_val_if_fail(CONBOY_IS_STORAGE(self), NULL);	
 	
 	
-	g_return_val_if_fail(self->plugin != NULL, FALSE);
-	g_return_val_if_fail(CONBOY_IS_STORAGE_PLUGIN(self->plugin), FALSE);
+	g_return_val_if_fail(self->plugin != NULL, NULL);
+	g_return_val_if_fail(CONBOY_IS_STORAGE_PLUGIN(self->plugin), NULL);
 
 	return conboy_storage_plugin_note_list(self->plugin);
 }

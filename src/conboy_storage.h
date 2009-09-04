@@ -22,6 +22,7 @@
 
 #include <glib-object.h>
 #include "conboy_storage_plugin.h"
+#include "conboy_plugin_store.h"
 
 /* convention macros */
 #define CONBOY_TYPE_STORAGE				(conboy_storage_get_type())
@@ -37,10 +38,14 @@ typedef struct _ConboyStorageClass	ConboyStorageClass;
 struct _ConboyStorage {
 	GObject parent;
 	ConboyStoragePlugin *plugin;
+	ConboyPluginStore *plugin_store;
 };
 
 struct _ConboyStorageClass {
 	GObjectClass parent;
+	
+	void (*activated)	(ConboyStorage *storage);
+	void (*deactivated)	(ConboyStorage *storage);
 };
 
 GType			conboy_storage_get_type			(void);
@@ -52,9 +57,13 @@ gboolean		conboy_storage_note_delete		(ConboyStorage *self, ConboyNote *note);
 GSList*			conboy_storage_note_list		(ConboyStorage *self);
 GSList*			conboy_storage_note_list_ids	(ConboyStorage *self);
 
+/*
 void					conboy_storage_set_plugin	(ConboyStorage *self, ConboyStoragePlugin *plugin);
 void					conboy_storage_unset_plugin	(ConboyStorage *self);
 ConboyStoragePlugin*	conboy_storage_get_plugin	(ConboyStorage *self);
+*/
+
+void 	conboy_storage_set_plugin_store (ConboyStorage *self, ConboyPluginStore *plugin_store);
 
 
 #endif /* CONBOY_STORAGE_H */

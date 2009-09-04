@@ -47,35 +47,76 @@ conboy_plugin_info_class_dispose (GObject *object)
 
 
 enum {
-	PLUGIN_STATUS_CHANGED,
+	PLUGIN_ACTIVATE,
+	PLUGIN_DEACTIVATE,
+	PLUGIN_ACTIVATED,
+	PLUGIN_DEACTIVATED,
 	LAST_SIGNAL
 };
 
 static guint signals[LAST_SIGNAL] = {0};
 
+/*
 static void conboy_plugin_info_status_changed (ConboyPluginInfo *info, gboolean active)
 {
 	g_printerr("Plugin '%s'   Active '%i'\n", conboy_plugin_info_get_name(info), active);
 }
+*/
 
 static void
 conboy_plugin_info_class_init (ConboyPluginInfoClass *klass)
 {
 	G_OBJECT_CLASS(klass)->dispose = conboy_plugin_info_class_dispose;
 	
-	klass->plugin_status_changed = conboy_plugin_info_status_changed;
+	klass->plugin_activate    = NULL;
+	klass->plugin_deactivate  = NULL;
+	klass->plugin_activated   = NULL;
+	klass->plugin_deactivated = NULL;
 	
-	signals[PLUGIN_STATUS_CHANGED] =
+	signals[PLUGIN_ACTIVATE] =
 		g_signal_new(
-				"plugin-status-changed",
+				"plugin-activate",
 				CONBOY_TYPE_PLUGIN_INFO,
 				G_SIGNAL_RUN_LAST,
-				G_STRUCT_OFFSET(ConboyPluginInfoClass, plugin_status_changed),
+				G_STRUCT_OFFSET(ConboyPluginInfoClass, plugin_activate),
 				NULL, NULL,
-				g_cclosure_marshal_VOID__BOOLEAN,
+				g_cclosure_marshal_VOID__VOID,
 				G_TYPE_NONE,
-				1,
-				G_TYPE_BOOLEAN);
+				0);
+	
+	signals[PLUGIN_DEACTIVATE] =
+			g_signal_new(
+				"plugin-deactivate",
+				CONBOY_TYPE_PLUGIN_INFO,
+				G_SIGNAL_RUN_LAST,
+				G_STRUCT_OFFSET(ConboyPluginInfoClass, plugin_deactivate),
+				NULL, NULL,
+				g_cclosure_marshal_VOID__VOID,
+				G_TYPE_NONE,
+				0);
+		
+	signals[PLUGIN_ACTIVATED] =
+			g_signal_new(
+				"plugin-activated",
+				CONBOY_TYPE_PLUGIN_INFO,
+				G_SIGNAL_RUN_LAST,
+				G_STRUCT_OFFSET(ConboyPluginInfoClass, plugin_activated),
+				NULL, NULL,
+				g_cclosure_marshal_VOID__VOID,
+				G_TYPE_NONE,
+				0);
+		
+	signals[PLUGIN_DEACTIVATED] =
+			g_signal_new(
+				"plugin-deactivated",
+				CONBOY_TYPE_PLUGIN_INFO,
+				G_SIGNAL_RUN_LAST,
+				G_STRUCT_OFFSET(ConboyPluginInfoClass, plugin_deactivated),
+				NULL, NULL,
+				g_cclosure_marshal_VOID__VOID,
+				G_TYPE_NONE,
+				0);
+		
 }
 
 static void
@@ -291,14 +332,18 @@ conboy_plugin_info_activate_plugin (ConboyPluginInfo *info)
 	gchar *path = g_build_filename(dir, filename, NULL);
 	g_printerr("INFO: Trying to create plugin from: %s\n", path);
 	
+	g_signal_emit_by_name(info, "plugin-activate");
+	
 	result = conboy_plugin_new_from_path(path);
 	
 	if (result != NULL) {
-		/*g_object_ref(result);*/ /*new does already ref it */
 		info->plugin = result;
 		
 		/* Emmit signal */
-		g_signal_emit_by_name(info, "plugin-status-changed", TRUE);
+		/* Signals are synchronous, so if we call something after
+		 * g_signal_emit, we know that all signal handlers
+		 * already finished at this point */
+		g_signal_emit_by_name(info, "plugin-activated");
 	}
 	
 	g_free(dir);
@@ -318,11 +363,18 @@ conboy_plugin_info_deactivate_plugin (ConboyPluginInfo *info)
 		g_printerr("ERROR: Plugin not active. Cannot be deactivated\n");
 		return FALSE;
 	}
+
+	/* We emit the signal before destroying the plugin, so that
+	 * listeners have a change to react, e.g. save notes. */
+	g_signal_emit_by_name(info, "plugin-deactivate");
 	
+	
+	g_printerr("## NOW KILLING THE PLUGIN\n");
 	g_object_unref(info->plugin);
+	g_printerr("## NOW AFTER KILLING THE PLUGIN\n");
 	info->plugin = NULL;
 	
-	/* Emmit signal */
-	g_signal_emit_by_name(info, "plugin-status-changed", FALSE);
+	g_signal_emit_by_name(info, "plugin-deactivated");
+	
 	return TRUE;
 }

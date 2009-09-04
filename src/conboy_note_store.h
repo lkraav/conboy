@@ -46,6 +46,8 @@ G_BEGIN_DECLS
 
 typedef struct {
   GtkListStore parent;
+  /* <privat> */
+  ConboyStorage *storage;
 } ConboyNoteStore;
 
 typedef struct {
@@ -72,7 +74,8 @@ ConboyNote*			conboy_note_store_find_by_title(ConboyNoteStore *self, const gchar
 gint				conboy_note_store_get_length(ConboyNoteStore *self);
 ConboyNote*			conboy_note_store_get_latest(ConboyNoteStore *self);
 void 				conboy_note_store_note_changed(ConboyNoteStore *self, ConboyNote *note);
-void 				conboy_note_store_fill_from_storage(ConboyNoteStore *self, ConboyStorage *storage);
+/*void 				conboy_note_store_fill_from_storage(ConboyNoteStore *self, ConboyStorage *storage);*/
+void				conboy_note_store_set_storage(ConboyNoteStore *self, ConboyStorage *storage);
 
 G_END_DECLS
 

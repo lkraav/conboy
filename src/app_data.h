@@ -7,6 +7,7 @@
 #include <libosso.h>
 
 #include "conboy_note_store.h"
+#include "conboy_plugin_store.h"
 
 typedef struct
 {
@@ -23,7 +24,7 @@ typedef struct
 	osso_context_t *osso_ctx;
 	ConboyStorage  *storage;
 	UserInterface  *note_window;
-	GList          *plugin_infos;
+	ConboyPluginStore *plugin_store;
 } AppData;
 
 AppData* app_data_get(void);

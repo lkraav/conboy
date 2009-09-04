@@ -265,12 +265,19 @@ row_activated_cb (GtkTreeView       *tree_view,
 
 
 static void
-conboy_plugin_state_changed (ConboyPluginInfo *info, gboolean active, ConboyPluginManager *pm)
+conboy_plugin_activated_deactivated_cb (ConboyPluginInfo *info, ConboyPluginManager *pm)
 {
-	GtkTreeSelection *selection;
 	GtkTreeModel *model;
 	GtkTreeIter iter;
-
+	
+	g_printerr("------- State changed -------\n");
+	
+	g_return_if_fail(info != NULL);
+	g_return_if_fail(pm != NULL);
+	
+	g_return_if_fail(CONBOY_IS_PLUGIN_INFO(info));
+	g_return_if_fail(CONBOY_IS_PLUGIN_MANAGER(pm));
+	
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(pm->priv->tree));
 	
 	gtk_tree_model_get_iter_first(model, &iter);
@@ -299,7 +306,7 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 
 	AppData *app_data = app_data_get();
 	
-	plugins = app_data->plugin_infos;
+	plugins = conboy_plugin_store_get_plugin_infos(app_data->plugin_store);
 
 	model = GTK_LIST_STORE (gtk_tree_view_get_model (GTK_TREE_VIEW (pm->priv->tree)));
 
@@ -317,7 +324,14 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 				    INFO_COLUMN, info,
 				    -1);
 		
-		g_signal_connect(info, "plugin-status-changed", G_CALLBACK(conboy_plugin_state_changed), pm);
+		if (!CONBOY_IS_PLUGIN_MANAGER(pm)) {
+			g_printerr("+++++++++++++++++ no manager \n");
+		} else {
+			g_printerr("+++++++++++++++++ manager is ok \n");
+		}
+		
+		g_signal_connect(info, "plugin-activated",   G_CALLBACK(conboy_plugin_activated_deactivated_cb), pm);
+		g_signal_connect(info, "plugin-deactivated", G_CALLBACK(conboy_plugin_activated_deactivated_cb), pm);
 
 		plugins = plugins->next;
 	}
@@ -761,50 +775,6 @@ plugin_manager_construct_tree (ConboyPluginManager *pm)
 	
 	gtk_widget_show (pm->priv->tree);
 }
-
-/*
-static void
-plugin_toggled_cb (ConboyPluginsEngine *engine,
-		   ConboyPluginInfo    *info,
-		   ConboyPluginManager *pm)
-{
-	GtkTreeSelection *selection;
-	GtkTreeModel *model;
-	GtkTreeIter iter;
-	gboolean info_found = FALSE;
-
-	selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (pm->priv->tree));
-
-	if (gtk_tree_selection_get_selected (selection, &model, &iter))
-	{
-		ConboyPluginInfo *tinfo;
-		gtk_tree_model_get (model, &iter, INFO_COLUMN, &tinfo, -1);
-		info_found = info == tinfo;
-	}
-
-	if (!info_found)
-	{
-		gtk_tree_model_get_iter_first (model, &iter);
-
-		do
-		{
-			ConboyPluginInfo *tinfo;
-			gtk_tree_model_get (model, &iter, INFO_COLUMN, &tinfo, -1);
-			info_found = info == tinfo;
-		}
-		while (!info_found && gtk_tree_model_iter_next (model, &iter));
-	}
-
-	if (!info_found)
-	{
-		g_warning ("ConboyPluginManager: plugin '%s' not found in the tree model",
-			   conboy_plugin_info_get_name (info));
-		return;
-	}
-
-	gtk_list_store_set (GTK_LIST_STORE (model), &iter, ACTIVE_COLUMN, conboy_plugin_info_is_active (info), -1);
-}
-*/
 
 
 static void 

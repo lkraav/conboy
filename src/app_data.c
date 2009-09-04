@@ -27,88 +27,13 @@
 #include "conboy_plugin_info.h"
 #include "settings.h"
 #include "conboy_config.h"
+#include "conboy_plugin_store.h"
 #include "app_data.h"
 
 /* Global AppData only access with get_app_data() */
 AppData *_app_data = NULL;
 
 
-/*
- * Returns the path set by the environment variable
- * CONBOY_PLUGIN_DIR or if not set, the default path
- * $prefix/lib/conboy
- * 
- * Return value needs to be freed
- */
-static gchar*
-get_plugin_base_dir()
-{
-	gchar *path = NULL;
-	const gchar *env_path = g_getenv("CONBOY_PLUGIN_DIR");
-	if (env_path != NULL) {
-		if (g_file_test(env_path, G_FILE_TEST_IS_DIR)) {
-			path = g_strdup(env_path);
-		} else {
-			g_printerr("WARN: '%s' is not a directory or does not exist. Please set the environment variable CONBOY_PLUGIN_DIR correctly. Trying default.\n", path);
-		}
-	} else {
-		path = g_build_filename(PREFIX, "/lib/conboy");
-	}
-	return path;
-}
-
-/**
- * Returns a GList of all ConboyPluginInfo objects found in the given
- * plugin_base_dir or one level deeper in the directory hierarchy.
- * 
- * Looks at all files in plugin_base_dir if those are .plugin files,
- * ConboyPluginInfo objects are created. Also all directories of
- * plugin_base_dir are searched.
- */
-static GList*
-get_all_plugin_infos (const gchar *plugin_base_dir)
-{
-	/*
-	 * for each file with .plugin ending create ConboyPluginInfo
-	 */
-	GList *result = NULL;
-	
-	const gchar *filename;
-	GDir *dir = g_dir_open(plugin_base_dir, 0, NULL);
-	while ((filename = g_dir_read_name(dir)) != NULL) {
-		gchar *full_path = g_build_filename(plugin_base_dir, filename, NULL);
-		
-		/* If it's a dir, check if it contains .plugin files */
-		if (g_file_test(full_path, G_FILE_TEST_IS_DIR)) {
-			const gchar *inner_filename;
-			GDir *inner_dir = g_dir_open(full_path, 0, NULL);
-			while ((inner_filename = g_dir_read_name(inner_dir)) != NULL) {
-				g_printerr("Check: %s\n", inner_filename);
-				if (g_str_has_suffix(inner_filename, ".plugin")) {
-					gchar *plugin_file = g_build_filename(full_path, inner_filename, NULL);
-					ConboyPluginInfo *info = conboy_plugin_info_new(plugin_file);
-					result = g_list_prepend(result, info);
-					g_free(plugin_file);
-				}
-			}
-			g_dir_close(inner_dir);
-			
-		/* If it's a file, check if it's a .plugin file */
-		} else if (g_file_test(full_path, G_FILE_TEST_EXISTS)) {
-			g_printerr("Check: %s\n", full_path);
-			if (g_str_has_suffix(full_path, ".plugin")) {
-				ConboyPluginInfo *info = conboy_plugin_info_new(full_path);
-				result = g_list_prepend(result, info);
-			}
-		}
-		
-		g_free(full_path);
-	}
-	
-	g_dir_close(dir);
-
-	return result;
-}
 
 static
 ConboyPluginInfo*
@@ -132,7 +57,7 @@ AppData* app_data_get() {
 		gint font_size;
 		GConfClient *client;
 		const gchar *path;
-		ConboyNoteStore *store;
+		ConboyNoteStore *note_store;
 
 		client = gconf_client_get_default();
 		gconf_client_add_dir(client, SETTINGS_ROOT, GCONF_CLIENT_PRELOAD_NONE, NULL);
@@ -150,24 +75,21 @@ AppData* app_data_get() {
 		}
 		
 		/* Dicover plugins */
-		gchar *plugin_path = get_plugin_base_dir();
-		GList *plugin_infos = get_all_plugin_infos(plugin_path);
-		g_free(plugin_path);
-		
+		ConboyPluginStore *plugin_store = conboy_plugin_store_new();
 		
 		/* Create storage */
 		ConboyStorage *storage = conboy_storage_new();
-		gchar *plugin_name = settings_load_storage_plugin_name(client);
-		ConboyPluginInfo *info = get_plugin_info_by_module_name(plugin_name, plugin_infos);
-		conboy_plugin_info_activate_plugin(info);
-		conboy_storage_set_plugin(storage, CONBOY_STORAGE_PLUGIN(info->plugin)); 
-		 
+		conboy_storage_set_plugin_store(storage, plugin_store);
+		g_object_unref(plugin_store);
 
-		store = conboy_note_store_new();
+		/* Create store */
+		note_store = conboy_note_store_new();
+		conboy_note_store_set_storage(note_store, storage);
+		g_object_unref(storage);
 
 		_app_data = g_new(AppData, 1);
 		_app_data->user_path = path;
-		_app_data->note_store = store;
+		_app_data->note_store = note_store;
 		_app_data->open_notes = NULL;
 		_app_data->client = client;
 		_app_data->program = hildon_program_get_instance();
@@ -177,9 +99,9 @@ AppData* app_data_get() {
 		_app_data->reader = NULL;
 		_app_data->storage = storage; 
 		_app_data->note_window = NULL;
-		_app_data->plugin_infos = plugin_infos;
+		_app_data->plugin_store = plugin_store;
 
-		conboy_note_store_fill_from_storage(store, storage);
+		/*conboy_note_store_fill_from_storage(store, storage);*/
 	}
 
 	return _app_data;

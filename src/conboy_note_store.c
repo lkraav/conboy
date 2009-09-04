@@ -23,7 +23,6 @@
 #include <string.h>
 #include <gtk/gtk.h>
 
-#include "app_data.h"
 #include "note.h"
 #include "metadata.h"
 #include "conboy_storage.h"
@@ -75,8 +74,9 @@ conboy_note_store_init (ConboyNoteStore *self)
 {
 	/* initialise the underlying storage for the GtkListStore */
 	GType types[] = { CONBOY_TYPE_NOTE };
-
 	gtk_list_store_set_column_types(GTK_LIST_STORE(self), 1, types);
+	
+	self->storage = NULL;
 }
 
 /**
@@ -361,15 +361,50 @@ conboy_note_store_note_changed(ConboyNoteStore *self, ConboyNote *note)
 	}
 }
 
-void
-conboy_note_store_fill_from_storage(ConboyNoteStore *self, ConboyStorage *storage)
+
+static void
+on_storage_activated(ConboyStorage *storage, ConboyNoteStore *self)
 {
-	g_printerr("conboy_note_store_fill_from_storage()\n");
+	if (conboy_note_store_get_length(self) > 0) {
+		g_printerr("ERROR: Storage activated, but already notes in notes store\n");
+		gtk_list_store_clear(GTK_LIST_STORE(self));
+	}
+
+	/* Add all notes from Storage to NoteStore */
 	GSList *notes = conboy_storage_note_list(storage);
-	while (notes != NULL) {
+	while (notes) {
 		conboy_note_store_add(self, notes->data, NULL);
 		notes = notes->next;
 	}
-	g_slist_free(notes);
+}
+
+static void
+on_storage_deactivated(ConboyStorage *storage, ConboyNoteStore *self)
+{
+	gtk_list_store_clear(GTK_LIST_STORE(self));
+}
+
+void
+conboy_note_store_set_storage(ConboyNoteStore *self, ConboyStorage *storage) {
+	
+	g_return_if_fail(self != NULL);
+	g_return_if_fail(storage != NULL);
+	
+	g_return_if_fail(CONBOY_IS_NOTE_STORE(self));
+	g_return_if_fail(CONBOY_IS_STORAGE(storage));
+	
+	g_printerr("filling note store\n");
+	
+	self->storage = storage;
+	g_object_ref(storage);
+	
+	GSList *notes = conboy_storage_note_list(storage);
+	while (notes) {
+		conboy_note_store_add(self, notes->data, NULL);
+		notes = notes->next;
+	}
+	
+	g_signal_connect(storage, "activated",   G_CALLBACK(on_storage_activated),   self);
+	g_signal_connect(storage, "deactivated", G_CALLBACK(on_storage_deactivated), self);
 }
 
