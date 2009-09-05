@@ -217,6 +217,13 @@ on_new_button_clicked					(GtkAction		*action,
 										 gpointer		 user_data)
 {
 	ConboyNote *note = conboy_note_new();
+	
+	gchar *xml =
+		"<note-content version=\"0.1\">New Note XX\n\n"
+		"Describe your new note here.</note-content>";
+	
+	g_object_set(note, "title", "New Note", "content", xml, NULL);
+	
 	note_show(note);
 }
 
