@@ -296,6 +296,46 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 }
 */
 
+static void
+on_storage_activated (ConboyStorage *storage, UserInterface *ui)
+{
+	g_printerr("Storage activated\n");
+	
+	AppData *app_data = app_data_get();
+	ConboyNote *note =conboy_note_store_get_latest(app_data->note_store);
+	note_show(note);
+	
+	gtk_widget_set_sensitive(GTK_WIDGET(ui->view), TRUE);
+	gtk_widget_set_sensitive(GTK_WIDGET(ui->toolbar), TRUE);
+}
+
+static void
+on_storage_deactivated (ConboyStorage *storage, UserInterface *ui)
+{
+	g_printerr("Storage deactivated\n");
+	
+	if (gtk_text_buffer_get_modified(ui->buffer)) {
+		note_save(ui);
+	}
+	
+	/* Block automatic saving, set text, unblock saving */
+	g_signal_handlers_block_matched(ui->buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
+	gtk_text_buffer_set_text(ui->buffer, "No storage backend plugin loaded. Please configure one in 'Settings'.", -1);
+	g_signal_handlers_unblock_matched(ui->buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
+	
+	conboy_note_buffer_clear_active_tags(CONBOY_NOTE_BUFFER(ui->buffer));
+	
+	/*note_close();*/
+	
+	/*
+	AppData *app_data = app_data_get();
+	app_data->open_notes = NULL;
+	*/
+	
+	gtk_widget_set_sensitive(GTK_WIDGET(ui->view), FALSE);
+	gtk_widget_set_sensitive(GTK_WIDGET(ui->toolbar), FALSE);
+}
+
 
 /*
  * I'm not sure what is better:
@@ -609,6 +649,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 
 	/* TOOLBAR */
 	toolbar = gtk_toolbar_new();
+	ui->toolbar = GTK_TOOLBAR(toolbar);
 
 	/***** TODO: Remove, only for testing *************/
 	
@@ -889,6 +930,15 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	g_signal_connect((gpointer)find_bar, "close",
 			G_CALLBACK(on_find_bar_close),
 			ui);
+	
+	/* Listening to activation / deactivation of storage */
+	ConboyStorage *storage = app_data->storage;
+	g_signal_connect(app_data->storage, "activated",
+			G_CALLBACK(on_storage_activated), ui);
+	
+	g_signal_connect(app_data->storage, "deactivated",
+			G_CALLBACK(on_storage_deactivated), ui);
+	
 
 	/* Listen to changes in the settings */
 	/* TODO: Use an array instead of the list */

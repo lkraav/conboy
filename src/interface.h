@@ -31,6 +31,7 @@ typedef struct
 	HildonFindToolbar	*find_bar;
 	gboolean             find_bar_is_visible;
 	GtkWidget			*style_menu;
+	GtkToolbar			*toolbar;
 
 	GtkToggleToolButton *button_bold;
 	GtkToggleToolButton *button_italic;
@@ -51,7 +52,7 @@ typedef struct
 	
 	GList               *listeners;
 	
-	/*GSList				*active_tags;*/
+	
 
 } UserInterface;
 

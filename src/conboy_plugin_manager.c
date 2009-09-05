@@ -115,6 +115,15 @@ about_button_cb (GtkWidget *button, ConboyPluginManager *pm)
 static void
 configure_button_cb (GtkWidget *button, ConboyPluginManager *pm)
 {
+	
+	/*
+	 * 
+	 * 
+	 * TODO: IMPLEMENT
+	 * 
+	 * 
+	 */ 
+	
 	ConboyPluginInfo *info;
 	/*GtkWindow *toplevel;*/
 
@@ -171,30 +180,6 @@ plugin_manager_view_info_cell_cb (GtkTreeViewColumn *tree_column,
 
 	g_free (text);
 }
-/*
-static void
-plugin_manager_view_icon_cell_cb (GtkTreeViewColumn *tree_column,
-				  GtkCellRenderer   *cell,
-				  GtkTreeModel      *tree_model,
-				  GtkTreeIter       *iter,
-				  gpointer           data)
-{
-	ConboyPluginInfo *info;
-	
-	g_return_if_fail (tree_model != NULL);
-	g_return_if_fail (tree_column != NULL);
-
-	gtk_tree_model_get (tree_model, iter, INFO_COLUMN, &info, -1);
-
-	if (info == NULL)
-		return;
-
-//	g_object_set (G_OBJECT (cell),
-//		      "icon-name", conboy_plugin_info_get_icon_name (info),
-//		      "sensitive", conboy_plugin_info_is_available (info),
-//		      NULL);
-
-}*/
 
 
 static void
@@ -265,12 +250,10 @@ row_activated_cb (GtkTreeView       *tree_view,
 
 
 static void
-conboy_plugin_activated_deactivated_cb (ConboyPluginInfo *info, ConboyPluginManager *pm)
+conboy_plugin_activated_deactivated_cb (ConboyPluginStore *store, ConboyPluginInfo *info, ConboyPluginManager *pm)
 {
 	GtkTreeModel *model;
 	GtkTreeIter iter;
-	
-	g_printerr("------- State changed -------\n");
 	
 	g_return_if_fail(info != NULL);
 	g_return_if_fail(pm != NULL);
@@ -313,26 +296,13 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 	while (plugins)
 	{
 		ConboyPluginInfo *info = (ConboyPluginInfo*) plugins->data;
-
-		g_printerr("Adding: %s\n", conboy_plugin_info_get_name(info));
-		
 		gtk_list_store_append (model, &iter);
-		
 		gtk_list_store_set (model, &iter,
 				    ACTIVE_COLUMN, conboy_plugin_info_is_active (info),
 				    AVAILABLE_COLUMN, conboy_plugin_info_is_available (info),
 				    INFO_COLUMN, info,
 				    -1);
 		
-		if (!CONBOY_IS_PLUGIN_MANAGER(pm)) {
-			g_printerr("+++++++++++++++++ no manager \n");
-		} else {
-			g_printerr("+++++++++++++++++ manager is ok \n");
-		}
-		
-		g_signal_connect(info, "plugin-activated",   G_CALLBACK(conboy_plugin_activated_deactivated_cb), pm);
-		g_signal_connect(info, "plugin-deactivated", G_CALLBACK(conboy_plugin_activated_deactivated_cb), pm);
-
 		plugins = plugins->next;
 	}
 
@@ -371,7 +341,7 @@ plugin_manager_set_active (ConboyPluginManager *pm,
 	
 	gtk_tree_model_get (model, iter, INFO_COLUMN, &info, -1);
 
-	g_return_val_if_fail (info != NULL, FALSE);
+	g_return_if_fail (info != NULL);
 
 	if (active) {
 		/* activate the plugin */
@@ -656,13 +626,6 @@ button_press_event_cb (GtkWidget          *tree,
 	return TRUE;
 }
 
-static gboolean
-popup_menu_cb (GtkTreeView        *tree,
-	       ConboyPluginManager *pm)
-{
-	show_tree_popup_menu (tree, pm, NULL);
-	return TRUE;
-}
 
 static gint 
 model_name_sort_func (GtkTreeModel *model,
@@ -842,16 +805,12 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 
 	plugin_manager_construct_tree (pm);
 	
-	/*
-	g_signal_connect (pm->priv->engine,
-				"activate-plugin",
-				G_CALLBACK (plugin_toggled_cb),
-				pm);
-	g_signal_connect_after (pm->priv->engine,
-				"deactivate-plugin",
-				G_CALLBACK (plugin_toggled_cb),
-				pm);
-	*/
+	
+	AppData *app_data = app_data_get();
+	ConboyPluginStore *plugin_store = app_data->plugin_store;
+	
+	g_signal_connect(plugin_store, "plugin-activated",   G_CALLBACK(conboy_plugin_activated_deactivated_cb), pm);
+	g_signal_connect(plugin_store, "plugin-deactivated", G_CALLBACK(conboy_plugin_activated_deactivated_cb), pm);
 	
 	plugin_manager_populate_lists(pm);
 	
@@ -862,16 +821,10 @@ static void
 conboy_plugin_manager_finalize (GObject *object)
 {
 	ConboyPluginManager *pm = CONBOY_PLUGIN_MANAGER (object);
-/*
-	g_signal_handlers_disconnect_by_func (pm->priv->engine,
-					      plugin_toggled_cb,
-					      pm);
-*/
-	/* TODO: Remove all signal handlers of all PluginInfos
-	 */
-
-	if (pm->priv->popup_menu)
-		gtk_widget_destroy (pm->priv->popup_menu);
+	
+	AppData *app_data = app_data_get();
+	ConboyPluginStore *plugin_store = app_data->plugin_store;
+	g_signal_handlers_disconnect_by_func(plugin_store, conboy_plugin_activated_deactivated_cb, pm);
 
 	G_OBJECT_CLASS (conboy_plugin_manager_parent_class)->finalize (object);
 
