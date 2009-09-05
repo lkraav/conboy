@@ -52,7 +52,7 @@ struct _ConboyStoragePluginClass {
 	gboolean		(*delete)	(ConboyStoragePlugin *self, ConboyNote *note);
 	GSList*			(*list)		(ConboyStoragePlugin *self);
 	GSList*			(*list_ids)	(ConboyStoragePlugin *self);
-
+	
 	/* signals */
 	
 };

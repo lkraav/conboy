@@ -116,40 +116,46 @@ static void
 configure_button_cb (GtkWidget *button, ConboyPluginManager *pm)
 {
 	
-	/*
-	 * 
-	 * 
-	 * TODO: IMPLEMENT
-	 * 
-	 * 
-	 */ 
+	g_printerr("INFO: configure button pressed\n");
+	g_return_if_fail(pm != NULL);
+	g_return_if_fail(CONBOY_IS_PLUGIN_MANAGER(pm));
 	
-	ConboyPluginInfo *info;
-	/*GtkWindow *toplevel;*/
-
-	/*conboy_debug (DEBUG_PLUGINS);*/
-
-	info = plugin_manager_get_selected_plugin (pm);
-
-	g_return_if_fail (info != NULL);
-
-	/*
-	conboy_debug_message (DEBUG_PLUGINS, "Configuring: %s\n", 
-			     conboy_plugin_info_get_name (info));
-	*/
+	ConboyPluginInfo *info = plugin_manager_get_selected_plugin (pm);
 	
-	g_printerr("Not yet implemented: Configuring: %s\n", conboy_plugin_info_get_name (info));
 	
-	/*
-	toplevel = GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET(pm)));
-	 */
-	/*
-	conboy_plugins_engine_configure_plugin (pm->priv->engine,
-					       info, toplevel);
-					       */
-	/*
-	conboy_debug_message (DEBUG_PLUGINS, "Done");
-	*/	
+	if (!conboy_plugin_info_is_configurable(info)) {
+		g_printerr("ERROR: Plugin is not configurable");
+		return;
+	}
+	
+	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Plugin settings"),
+			NULL,
+			GTK_DIALOG_MODAL,
+			GTK_STOCK_OK,
+			GTK_RESPONSE_OK,
+			NULL);
+
+	GtkWidget *content_area = GTK_DIALOG(dialog)->vbox;
+	
+	if (info->plugin == NULL) {
+		g_printerr("ERROR: PLUGIN IS NULL\n");
+		return;
+	}
+	
+	GtkWidget *settings = conboy_plugin_get_settings_widget(info->plugin);
+	if (settings == NULL) {
+		g_printerr("ERROR: Settings widget it NULL\n");
+		return;
+	}
+	gtk_widget_show(settings);
+
+	/* Add the widget to the dialog */
+	gtk_box_pack_start(GTK_BOX(content_area), settings, TRUE, TRUE, 10);
+
+	/* When a button (ok/cancel/etc.) is clicked or the dialog is closed - destroy it */
+	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+
+	gtk_dialog_run(GTK_DIALOG(dialog));
 }
 
 static void

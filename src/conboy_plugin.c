@@ -136,4 +136,22 @@ conboy_plugin_has_settings (ConboyPlugin *self)
 	return self->has_settings;
 }
 
+GtkWidget*
+conboy_plugin_get_settings_widget (ConboyPlugin *self)
+{
+	g_printerr("get_settings_widget() called\n");
+	
+	if (!self->has_settings) {
+		g_printerr("ERROR: Plugin has no settings\n");
+		return NULL;
+	}
+	
+	if (CONBOY_PLUGIN_GET_CLASS(self)->get_widget == NULL) {
+		g_printerr("ERROR: No implementation provided for conboy_plugin_get_settings_widget()\n");
+		return NULL;
+	}
+	
+	return CONBOY_PLUGIN_GET_CLASS(self)->get_widget(self);
+}
+
 
