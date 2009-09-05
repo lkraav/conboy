@@ -128,7 +128,7 @@ void note_save(UserInterface *ui)
 	GtkTextMark *mark;
 	gint cursor_position;
 	AppData *app_data = app_data_get();
-	ConboyNoteBuffer *buffer = ui->buffer;
+	GtkTextBuffer *buffer = ui->buffer;
 	ConboyNote *note = ui->note;
 	
 	/* If note is empty, don't save */
@@ -184,7 +184,7 @@ void note_save(UserInterface *ui)
 	}
 	
 	/* Clear note content, then set it with fresh data from the text buffer */
-	g_object_set(note, "content", conboy_note_buffer_get_xml(buffer), NULL);
+	g_object_set(note, "content", conboy_note_buffer_get_xml(CONBOY_NOTE_BUFFER(buffer)), NULL);
 
 	/* Save the complete note */
 	conboy_storage_note_save(app_data->storage, note);

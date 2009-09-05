@@ -465,7 +465,7 @@ static void
 conboy_xml_storage_plugin_init (ConboyXmlStoragePlugin *self)
 {
 	g_printerr("XML: init called\n");
-	CONBOY_PLUGIN(self)->has_settings = TRUE;
+	CONBOY_PLUGIN(self)->has_settings = FALSE;
 	self->path = g_strconcat(g_get_home_dir(), "/.conboy/", NULL);
 }
 

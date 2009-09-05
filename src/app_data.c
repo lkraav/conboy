@@ -34,23 +34,6 @@
 AppData *_app_data = NULL;
 
 
-
-static
-ConboyPluginInfo*
-get_plugin_info_by_module_name(const gchar *name, GList *infos)
-{
-	while (infos) {
-		ConboyPluginInfo *info = CONBOY_PLUGIN_INFO(infos->data);
-		if (strcmp(conboy_plugin_info_get_module_name(info), name) == 0) {
-			return info; 
-		}
-		infos = infos->next;
-	}
-	g_printerr("ERROR: Could not find a plugin info with module name: '%s'\n", name);
-	return NULL;
-}
-
-
 AppData* app_data_get() {
 
 	if (_app_data == NULL) {
@@ -88,7 +71,6 @@ AppData* app_data_get() {
 		g_object_unref(storage);
 
 		_app_data = g_new(AppData, 1);
-		_app_data->user_path = path;
 		_app_data->note_store = note_store;
 		_app_data->open_notes = NULL;
 		_app_data->client = client;
@@ -113,7 +95,6 @@ void app_data_free()
 
 	g_object_unref(app_data->client);
 	g_list_free(app_data->open_notes);
-	g_free((gchar*)app_data->user_path);
 	if (app_data->search_window != NULL) {
 		gtk_widget_destroy(GTK_WIDGET(app_data->search_window));
 	}

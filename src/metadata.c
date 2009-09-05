@@ -69,13 +69,6 @@ gchar* get_uuid()
 	return result;
 }
 
-const gchar* note_get_new_filename(const gchar *uuid)
-{
-	AppData *app_data = app_data_get();
-	return g_strconcat(app_data->user_path, uuid, ".note", NULL);
-}
-
-
 /**
  * Returns the given time as iso8601 formatted string.
  * Example: 2009-03-24T13:16:42.0000000+01:00
