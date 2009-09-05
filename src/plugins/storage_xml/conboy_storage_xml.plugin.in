@@ -1,5 +1,6 @@
 [Conboy Plugin]
 Module=storagexml
+Kind=storage
 _Name=XML Storage Backend
 _Description=Loads and saves notes from the local filesystem.
 Version=0.1

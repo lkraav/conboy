@@ -31,6 +31,7 @@ struct _ConboyPluginInfo {
 	gchar**			authors;
 	gchar*			copyright;
 	gchar*			version;
+	gchar*			kind;
 	gboolean		available;
 };
 
@@ -52,6 +53,7 @@ GType		 conboy_plugin_info_get_type		(void) G_GNUC_CONST;
 
 const gchar	 *conboy_plugin_info_get_module_name   (ConboyPluginInfo *info);
 const gchar	 *conboy_plugin_info_get_name          (ConboyPluginInfo *info);
+const gchar  *conboy_plugin_info_get_kind          (ConboyPluginInfo *info);
 const gchar	 *conboy_plugin_info_get_description   (ConboyPluginInfo *info);
 const gchar **conboy_plugin_info_get_authors       (ConboyPluginInfo *info);
 const gchar	 *conboy_plugin_info_get_copyright     (ConboyPluginInfo *info);

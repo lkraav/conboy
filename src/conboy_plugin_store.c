@@ -65,7 +65,9 @@ create_all_plugin_infos (const gchar *plugin_base_dir)
 				if (g_str_has_suffix(inner_filename, ".plugin")) {
 					gchar *plugin_file = g_build_filename(full_path, inner_filename, NULL);
 					ConboyPluginInfo *info = conboy_plugin_info_new(plugin_file);
-					result = g_list_prepend(result, info);
+					if (info) {
+						result = g_list_prepend(result, info);
+					}
 					g_free(plugin_file);
 				}
 			}
@@ -92,6 +94,23 @@ static void
 on_plugin_activate(ConboyPluginInfo *info, ConboyPluginStore *self)
 {
 	g_signal_emit_by_name(self, "plugin-activate", info);
+
+	/* If a storage plugin was activated and another storage plugin is already active,
+	 * then first deactivate the already active plugin. */
+	if (strcmp(conboy_plugin_info_get_kind(info), "storage") == 0) {
+		GList *infos = self->plugins;
+		while (infos) {
+			ConboyPluginInfo *other_info = CONBOY_PLUGIN_INFO(infos->data);
+			if (other_info != info) {
+				if (strcmp(conboy_plugin_info_get_kind(other_info), "storage") == 0) {
+					if (conboy_plugin_info_is_active(other_info)) {
+						conboy_plugin_info_deactivate_plugin(other_info);
+					}
+				}
+			}
+			infos = infos->next;
+		}
+	}
 }
 
 static void
@@ -173,7 +192,7 @@ conboy_plugin_store_dispose(GObject *object)
 	while (plugins) {
 		ConboyPluginInfo *info = CONBOY_PLUGIN_INFO(plugins->data);
 		/*
-		 * TODO: Is this needed or not?
+		 * TODO: Remove signal handlers
 		 */
 		plugins = plugins->next;
 	}

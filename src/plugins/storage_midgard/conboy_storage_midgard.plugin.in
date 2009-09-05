@@ -1,5 +1,6 @@
 [Conboy Plugin]
 Module=storagemidgard
+Kind=storage
 _Name=Midgard Storage Backend
 _Description=Loads and saves notes from a Midgard repository.
 Version=0.1

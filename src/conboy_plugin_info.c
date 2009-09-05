@@ -15,6 +15,7 @@
 #define PLUGIN_GROUP        "Conboy Plugin"
 #define PLUGIN_MODULE       "Module"
 #define PLUGIN_NAME         "Name"
+#define PLUGIN_KIND			"Kind"
 #define PLUGIN_DESCRIPTION  "Description"
 #define PLUGIN_VERSION      "Version"
 #define PLUGIN_AUTHORS      "Authors"
@@ -34,6 +35,7 @@ conboy_plugin_info_class_dispose (GObject *object)
 
 	g_free (self->file);
 	g_free (self->module_name);
+	g_free (self->kind);
 	g_free (self->name);
 	g_free (self->desc);
 	g_free (self->copyright);
@@ -56,12 +58,6 @@ enum {
 
 static guint signals[LAST_SIGNAL] = {0};
 
-/*
-static void conboy_plugin_info_status_changed (ConboyPluginInfo *info, gboolean active)
-{
-	g_printerr("Plugin '%s'   Active '%i'\n", conboy_plugin_info_get_name(info), active);
-}
-*/
 
 static void
 conboy_plugin_info_class_init (ConboyPluginInfoClass *klass)
@@ -129,6 +125,7 @@ conboy_plugin_info_init (ConboyPluginInfo *self)
 	self->copyright = NULL;
 	self->desc = NULL;
 	self->file = NULL;
+	self->kind = NULL;
 	self->module_name = NULL;
 	self->name = NULL;
 	self->plugin = NULL;
@@ -166,7 +163,7 @@ conboy_plugin_info_new (const gchar *file)
 	if (!g_key_file_load_from_file (plugin_file, file, G_KEY_FILE_NONE, NULL))
 	{
 		g_warning ("Bad plugin file: %s", file);
-		goto error;
+		return NULL;
 	}
 
 	
@@ -176,8 +173,8 @@ conboy_plugin_info_new (const gchar *file)
 	if ((str != NULL) && (*str != '\0')) {
 		info->module_name = str;
 	} else {
-		g_warning ("Could not find '%s' in %s", PLUGIN_MODULE, file);
-		goto error;
+		g_warning ("ERROR: Could not find '%s' in %s", PLUGIN_MODULE, file);
+		return NULL;
 	}
 
 
@@ -186,8 +183,18 @@ conboy_plugin_info_new (const gchar *file)
 	if (str) {
 		info->name = str;
 	} else {
-		g_warning ("Could not find 'Name' in %s", file);
-		goto error;
+		g_warning ("ERROR: Could not find 'Name' in %s", file);
+		return NULL;
+	}
+	
+	
+	/* Get Kind */
+	str = g_key_file_get_string (plugin_file, PLUGIN_GROUP, PLUGIN_KIND, NULL);
+	if (str) {
+		info->kind = str;
+	} else {
+		g_printerr("ERROR: Could not find '%s' in %s\n", PLUGIN_KIND, file);
+		return NULL;
 	}
 
 	
@@ -229,15 +236,6 @@ conboy_plugin_info_new (const gchar *file)
 	info->available = TRUE;
 	
 	return info;
-
-error:
-	g_free (info->file);
-	g_free (info->module_name);
-	g_free (info->name);
-	g_free (info);
-	g_key_file_free (plugin_file);
-
-	return NULL;
 }
 
 const gchar *
@@ -286,6 +284,14 @@ conboy_plugin_info_get_version (ConboyPluginInfo *info)
 	g_return_val_if_fail (info != NULL, NULL);
 
 	return info->version;
+}
+
+const gchar*
+conboy_plugin_info_get_kind (ConboyPluginInfo *info)
+{
+	g_return_val_if_fail (info != NULL, NULL);
+	
+	return info->kind;
 }
 
 gboolean
