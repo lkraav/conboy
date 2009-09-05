@@ -353,6 +353,7 @@ save (ConboyStoragePlugin *self, ConboyNote *note)
 	gchar *content;
 	g_object_get(note, "content", &content, NULL);
 	xmlTextWriterWriteRaw(writer, note->content);
+	xmlTextWriterEndElement(writer); /* close <text> */
 	g_free(content);
 	write_footer(writer, note);
 	
