@@ -302,8 +302,13 @@ on_storage_activated (ConboyStorage *storage, UserInterface *ui)
 	g_printerr("Storage activated\n");
 	
 	AppData *app_data = app_data_get();
-	ConboyNote *note =conboy_note_store_get_latest(app_data->note_store);
-	note_show(note);
+	ConboyNote *note = conboy_note_store_get_latest(app_data->note_store);
+	if (note != NULL) {
+		note_show(note);
+	} else {
+		/* TODO: Create new note */
+		gtk_text_buffer_set_text(ui->buffer, "", -1);
+	}
 	
 	gtk_widget_set_sensitive(GTK_WIDGET(ui->view), TRUE);
 	gtk_widget_set_sensitive(GTK_WIDGET(ui->toolbar), TRUE);
