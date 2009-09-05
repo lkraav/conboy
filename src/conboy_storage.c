@@ -53,15 +53,6 @@ conboy_storage_finalize (GObject *gobject)
 	G_OBJECT_CLASS(conboy_storage_parent_class)->finalize(gobject);
 }
 
-static void
-conboy_storage_activated(ConboyStorage *storage) {
-	g_printerr("Default: Storage activated\n");
-}
-
-static void
-conboy_storage_deactivated(ConboyStorage *storage) {
-	g_printerr("Default: Storage deactivated\n");
-}
 
 enum {
 	ACTIVATED,
@@ -79,8 +70,8 @@ conboy_storage_class_init (ConboyStorageClass *klass)
 	gobject_class->dispose = conboy_storage_dispose;
 	gobject_class->finalize = conboy_storage_finalize;
 	
-	klass->activated 	= conboy_storage_activated;
-	klass->deactivated 	= conboy_storage_deactivated;
+	klass->activated 	= NULL;
+	klass->deactivated 	= NULL;
 			
 	signals[ACTIVATED] =
 		g_signal_new(
@@ -139,7 +130,6 @@ conboy_storage_set_active_plugin(ConboyStorage *self, ConboyPluginStore *plugin_
 				g_printerr("# Set active plugin for Storage\n");
 				self->plugin = CONBOY_STORAGE_PLUGIN(info->plugin);
 				g_object_ref(self->plugin);
-				/* TODO: g_signal_emit(self, "activated"); */
 				break;
 			}
 		}
