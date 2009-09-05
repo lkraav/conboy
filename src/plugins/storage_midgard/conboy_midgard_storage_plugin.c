@@ -87,6 +87,51 @@ _conboy_midgard_storage_plugin_note_list_ids (ConboyStoragePlugin *self)
 	return NULL;
 }
 
+static GtkWidget*
+_conboy_midgard_storage_plugin_get_widget (ConboyPlugin *self)
+{
+	g_return_val_if_fail(self != NULL, NULL);
+	g_return_val_if_fail(CONBOY_IS_PLUGIN(self), NULL);
+	
+	/* First row */
+	GtkWidget *hbox1 = gtk_hbox_new(FALSE, 0);
+	GtkWidget *label1 = gtk_label_new("Host:");
+	GtkWidget *entry1 = gtk_entry_new();
+	gtk_container_add(GTK_CONTAINER(hbox1), label1);
+	gtk_container_add(GTK_CONTAINER(hbox1), entry1);
+	gtk_widget_show(label1);
+	gtk_widget_show(entry1);
+	gtk_widget_show(hbox1);
+	
+	/* First row */
+	GtkWidget *hbox2 = gtk_hbox_new(FALSE, 0);
+	GtkWidget *label2 = gtk_label_new("Username:");
+	GtkWidget *entry2 = gtk_entry_new();
+	gtk_container_add(GTK_CONTAINER(hbox2), label2);
+	gtk_container_add(GTK_CONTAINER(hbox2), entry2);
+	gtk_widget_show(label2);
+	gtk_widget_show(entry2);
+	gtk_widget_show(hbox2);
+		
+	/* First row */
+	GtkWidget *hbox3 = gtk_hbox_new(FALSE, 0);
+	GtkWidget *label3 = gtk_label_new("Password:");
+	GtkWidget *entry3 = gtk_entry_new();
+	gtk_container_add(GTK_CONTAINER(hbox3), label3);
+	gtk_container_add(GTK_CONTAINER(hbox3), entry3);
+	gtk_widget_show(label3);
+	gtk_widget_show(entry3);
+	gtk_widget_show(hbox3);
+	
+	/* Result widget */
+	GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(vbox), hbox1);
+	gtk_container_add(GTK_CONTAINER(vbox), hbox2);
+	gtk_container_add(GTK_CONTAINER(vbox), hbox3);
+	
+	return vbox;
+}
+
 /* GOBJECT ROUTINES */
 
 static GObject *
@@ -124,16 +169,19 @@ static void
 conboy_midgard_storage_plugin_class_init (ConboyMidgardStoragePluginClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
-	ConboyStoragePluginClass *parent_class = conboy_midgard_storage_plugin_parent_class;
+	ConboyPluginClass *plugin_class = CONBOY_PLUGIN_CLASS(klass);
+	ConboyStoragePluginClass *storage_plugin_class = CONBOY_STORAGE_PLUGIN_CLASS(klass);
 
 	object_class->constructor = _conboy_midgard_storage_plugin_constructor;
 	object_class->dispose     = _conboy_midgard_storage_plugin_dispose;
 
-	parent_class->load     = _conboy_midgard_storage_plugin_note_load;
-	parent_class->save     = _conboy_midgard_storage_plugin_note_save;
-	parent_class->delete   = _conboy_midgard_storage_plugin_note_delete;
-	parent_class->list     = _conboy_midgard_storage_plugin_note_list;
-	parent_class->list_ids = _conboy_midgard_storage_plugin_note_list_ids;
+	storage_plugin_class->load     = _conboy_midgard_storage_plugin_note_load;
+	storage_plugin_class->save     = _conboy_midgard_storage_plugin_note_save;
+	storage_plugin_class->delete   = _conboy_midgard_storage_plugin_note_delete;
+	storage_plugin_class->list     = _conboy_midgard_storage_plugin_note_list;
+	storage_plugin_class->list_ids = _conboy_midgard_storage_plugin_note_list_ids;
+	
+	plugin_class->get_widget 		= _conboy_midgard_storage_plugin_get_widget;
 }
 
 static void
