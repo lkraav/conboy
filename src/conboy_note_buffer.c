@@ -325,7 +325,7 @@ static gint sort_by_prio(GtkTextTag *tag1, GtkTextTag *tag2)
 }
 
 static
-void write_content(xmlTextWriter *writer, GtkTextBuffer *buffer, double version)
+void write_content(xmlTextWriter *writer, GtkTextBuffer *buffer, gdouble version)
 {
 	int rc = 0;
 	GtkTextIter start, end;
@@ -339,7 +339,7 @@ void write_content(xmlTextWriter *writer, GtkTextBuffer *buffer, double version)
 	  
 	/* Start note-content element */
 	rc = xmlTextWriterStartElement(writer, BAD_CAST "note-content");
-	g_sprintf(version_str, "%.1f", version);
+	g_ascii_formatd(version_str, 10, "%.1f", version);
 	rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "version", BAD_CAST &version_str);
 	
 	/*****************************************************/

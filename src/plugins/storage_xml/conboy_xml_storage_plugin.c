@@ -184,7 +184,7 @@ write_header(xmlTextWriter *writer, ConboyNote *note)
 {
 	int rc;
 	gchar version[20];
-	double note_version;
+	gdouble note_version;
 	gchar *title;
 	
 	g_object_get(note, "title", &title, "note-version", &note_version, NULL);
@@ -198,7 +198,7 @@ write_header(xmlTextWriter *writer, ConboyNote *note)
 	/* Start note element */
 	rc = xmlTextWriterStartElement(writer, BAD_CAST "note");
 	
-	g_sprintf(version, "%.1f", note_version);
+	g_ascii_formatd(version, 20, "%.1f", note_version);
 	rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "version", BAD_CAST &version);
 	rc = xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xmlns", BAD_CAST "link", NULL, BAD_CAST "http://beatniksoftware.com/tomboy/link");
 	rc = xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xmlns", BAD_CAST "size", NULL, BAD_CAST "http://beatniksoftware.com/tomboy/size");
