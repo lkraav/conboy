@@ -273,7 +273,7 @@ json_get_note_from_node(JsonNode *node)
 	}
 	
 	/* Currently not specified for the JSON format. So we set it here. */
-	note->note_version = 0.3;
+	g_object_set(note, "note-version", 0.3, NULL);
 	
 	return note;
 }

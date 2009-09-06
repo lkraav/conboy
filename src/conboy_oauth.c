@@ -309,7 +309,6 @@ conboy_http_get(const gchar *url) {
 	
 	gchar *req_url = oauth_sign_url2(url, NULL, OA_HMAC, "GET", c_key, c_secret, tok, sec);
 	g_printerr("Request: %s\n", req_url);
-	/*gchar *reply = oauth_http_get(req_url, NULL);*/ /* <<< Does not return the complete string */
 	gchar *reply = http_get(req_url);
 	
 	g_free(tok);

@@ -227,15 +227,14 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	
 	gchar *api_ref = json_get_api_ref(reply);
 	
-	
 	reply = conboy_http_get(api_ref);
 	
 	g_printerr("\%s\n", reply);
 	
 	JsonUser *user = json_get_user(reply);
 	
-	
-	gchar *all_notes = conboy_http_get(user->api_ref);
+	gchar *get_all_notes_url = g_strconcat(user->api_ref, "?include_notes=true", NULL);
+	gchar *all_notes = conboy_http_get(get_all_notes_url);
 	
 	g_printerr("****************\n");
 	g_printerr("%s\n", all_notes);
@@ -247,7 +246,10 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	g_printerr("LATEST_SYNC_REVISION: %i\n", note_list->latest_sync_revision);
 	GSList *notes = note_list->notes;
 	while (notes != NULL) {
+		g_printerr("#######\n");
 		g_printerr("Title: %s\n", ((ConboyNote*)notes->data)->title);
+		g_printerr("%s\n", ((ConboyNote*)notes->data)->content);
+		g_printerr("#######\n");
 		notes = notes->next;
 	}
 	
@@ -976,4 +978,5 @@ UserInterface* create_mainwin(ConboyNote *note) {
 void conboy_note_window_show_note(UserInterface *ui, ConboyNote *note)
 {
 	conboy_note_buffer_set_xml(CONBOY_NOTE_BUFFER(ui->buffer), note->content);
+	ui->note = note;
 }

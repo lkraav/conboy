@@ -61,8 +61,8 @@ struct _ConboyNote {
 	gint y;
 	
 	/* version */
-	double note_version;
-	double content_version;
+	gdouble note_version;
+	gdouble content_version;
 };
 
 struct _ConboyNoteClass {

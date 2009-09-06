@@ -38,6 +38,9 @@ _conboy_note_constructor (GType type,
 	note->title = NULL;
 	note->content = NULL;
 	
+	note->note_version = 0.3;
+	note->content_version = 0.1;
+	
 	return G_OBJECT(object);
 }
 
@@ -265,12 +268,12 @@ _conboy_note_class_init (ConboyNoteClass *klass, gpointer g_class_data)
 	g_object_class_install_property(object_class, PROP_Y, spec);
 	
 	spec = g_param_spec_double("note-version", "Note version",
-			"The version of the note", 0, G_MAXDOUBLE, 0, G_PARAM_READWRITE);	
+			"The version of the note", 0, G_MAXDOUBLE, 0.3, G_PARAM_READWRITE);	
 	g_object_class_install_property(object_class, PROP_NOTE_VERSION, spec);
 	
 	spec = g_param_spec_double("content-version", "Content version",
-			"The version notes content", 0, G_MAXDOUBLE, 0, G_PARAM_READWRITE);	
-	g_object_class_install_property(object_class, PROP_NOTE_VERSION, spec);
+			"The version notes content", 0, G_MAXDOUBLE, 0.1, G_PARAM_READWRITE);	
+	g_object_class_install_property(object_class, PROP_CONTENT_VERSION, spec);
 	
 }
 
