@@ -341,35 +341,52 @@ get_all_notes(gboolean inc_notes)
 }
 */
 
-void
-web_send_note(ConboyNote *note, const gchar *base_url, const gchar *t_key, const gchar *t_secret)
+gint
+web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time)
 {
+	gchar *base_url = settings_load_sync_base_url();
+	gchar *t_key = settings_load_oauth_access_token();
+	gchar *t_secret = settings_load_oauth_access_secret();
+	
+	
 	/*
 	 * Create correct json structure to send the note
 	 */
-	
 	JsonNode *result = json_node_new(JSON_NODE_OBJECT);
-	
 	JsonObject *obj = json_object_new();
-	
-	JsonNode *note_node = json_get_node_from_note(note);
-	
 	JsonArray *array = json_array_new();
-	json_array_add_element(array, note_node);
+	
+	while (notes) {
+		ConboyNote *note = CONBOY_NOTE(notes->data);
+		if (note->last_metadata_change_date > last_sync_time) {
+			g_printerr("Will send: %s\n", note->title);
+			JsonNode *note_node = json_get_node_from_note(note);
+			json_array_add_element(array, note_node);
+		}
+		notes = notes->next;
+	}
+	
+	if (json_array_get_length(array) == 0) {
+		g_printerr("INFO: No new notes on client. Sending nothing.\n");
+		return expected_rev - 1;
+	}
 	
 	JsonNode *node = json_node_new(JSON_NODE_ARRAY);
 	json_node_set_array(node, array);
 	json_object_add_member(obj, "note-changes", node);
 	
 	node = json_node_new(JSON_NODE_VALUE);
-	json_node_set_int(node, 19);
+	json_node_set_int(node, expected_rev);
 	json_object_add_member(obj, "latest-sync-revision", node);
 	
 	json_node_take_object(result, obj);
 	
-	
+	/* Convert to string */
 	gchar *json_string = json_node_to_string(result, FALSE);
 	
+	g_printerr("&&&&&&&&&&&&&&&&&&\n");
+	g_printerr("%s\n", json_string);
+	g_printerr("&&&&&&&&&&&&&&&&&&\n");
 	
 	
 	/*gchar *json_string = "{ \"note-changes\" : [ { \"note-content\" : \"One line of super Inhalt\\nAnd another\\n\", \"tags\" : [], \"pinned\" : false, \"last-meta-data-change-date\" : \"2009-08-07T10:00:45.0000000+02:00\", \"guid\" : \"4621178a-5c4a-2222-a473-1bff040ea575\", \"create-date\" : \"2009-08-07T10:00:32.0000000+02:00\", \"open-on-startup\" : false, \"note-content-version\" : 0.1, \"last-change-date\" : \"2009-08-07T10:00:45.0000000+02:00\", \"title\" : \"New Note mit mehr Inhalt\" } ], \"latest-sync-revision\" : 12 }";*/
@@ -387,9 +404,60 @@ web_send_note(ConboyNote *note, const gchar *base_url, const gchar *t_key, const
 	g_printerr("Reply from Snowy:\n");
 	g_printerr("%s\n", reply);
 	
+	/*
+	 * TODO: Parse answer and see if expected_rev fits or not
+	 */
+	return expected_rev;
 }
 
 
 
 
+/*
+void
+web_send_note(ConboyNote *note, gint expected_rev)
+{
+	gchar *base_url = settings_load_sync_base_url();
+	gchar *t_key = settings_load_oauth_access_token();
+	gchar *t_secret = settings_load_oauth_access_secret();
+	
+	JsonNode *result = json_node_new(JSON_NODE_OBJECT);
+	
+	JsonObject *obj = json_object_new();
+	
+	JsonNode *note_node = json_get_node_from_note(note);
+	
+	JsonArray *array = json_array_new();
+	json_array_add_element(array, note_node);
+	
+	JsonNode *node = json_node_new(JSON_NODE_ARRAY);
+	json_node_set_array(node, array);
+	json_object_add_member(obj, "note-changes", node);
+	
+	node = json_node_new(JSON_NODE_VALUE);
+	json_node_set_int(node, expected_rev);
+	json_object_add_member(obj, "latest-sync-revision", node);
+	
+	json_node_take_object(result, obj);
+	
+	
+	gchar *json_string = json_node_to_string(result, FALSE);
+	
+	
+	
 
+	gchar *oauth_args = ""; 
+
+	gchar *uri = g_strconcat(base_url, "/api/1.0/root/notes/", NULL);
+	
+	
+	gchar *req_url = oauth_sign_url2(uri, &oauth_args, OA_HMAC, "PUT", c_key, c_secret, t_key, t_secret);
+
+	gchar *reply = http_put(req_url, oauth_args, json_string);
+
+	
+	g_printerr("Reply from Snowy:\n");
+	g_printerr("%s\n", reply);
+	
+}
+*/

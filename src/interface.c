@@ -212,28 +212,78 @@ on_font_size_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpoi
 	pango_font_description_free(font);
 }
 
+static GList*
+remove_by_guid(GList *list, ConboyNote *note_to_remove)
+{
+	gchar *guid;
+	g_object_get(note_to_remove, "guid", &guid, NULL);
+	ConboyNote *found_note = NULL;
+	
+	GList *iter = list;
+	while (iter) {
+		ConboyNote *note = CONBOY_NOTE(iter->data);
+		gchar *other_guid;
+		g_object_get(note, "guid", &other_guid, NULL);
+		if (strcmp(guid, other_guid) == 0) {
+			found_note = note;
+		}
+		g_free(other_guid);
+		if (found_note) break;
+		iter = iter->next;
+	}
+	
+	g_free(guid);
+	
+	if (found_note) {
+		g_printerr("Remove note\n");
+		return g_list_remove(list, found_note);
+	} else {
+		return list;
+	}
+}
+
 static void
 on_sync_but_clicked(GtkButton *but, gpointer user_data)
 {
-	/*
-	settings_save_oauth_access_token("B3cSXdFFSLPQBCtm7H");
-	settings_save_oauth_access_secret("J2NLtKG9BeyrzG8J47kb6f32CeVhFgZH");
-	*/
+	AppData *app_data = app_data_get();
 	
+	int last_sync_rev = settings_load_last_sync_revision();
+	time_t last_sync_time = settings_load_last_sync_time();
 	
 	gchar *reply = conboy_http_get("http://127.0.0.1:8000/api/1.0/");
 	
-	g_printerr("\n%s\n", reply);
+	g_printerr("Reply from /api/1.0/:: %s\n", reply);
 	
 	gchar *api_ref = json_get_api_ref(reply);
 	
 	reply = conboy_http_get(api_ref);
 	
-	g_printerr("\%s\n", reply);
+	g_printerr("Reply from /root/:: %s\n", reply);
 	
+	/* Revision checks */
 	JsonUser *user = json_get_user(reply);
+	if (user->latest_sync_revision < last_sync_rev) {
+		g_printerr("ERROR: Server revision older than our revision. This should not happen.\n");
+		return;
+	}
 	
-	gchar *get_all_notes_url = g_strconcat(user->api_ref, "?include_notes=true", NULL);
+	/* Create list of all local notes */
+	/* Just copy NoteStore to normal list */
+	ConboyNoteStore *note_store = app_data->note_store;
+	GList *local_notes = NULL;
+	GtkTreeIter iter;
+	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(note_store), &iter)) do
+	{
+		ConboyNote *note;
+		gtk_tree_model_get(GTK_TREE_MODEL(note_store), &iter, NOTE_COLUMN, &note, -1);
+		local_notes = g_list_append(local_notes, note);
+	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(note_store), &iter));
+	
+	
+	/* Get all notes since last syncRef and save them. */
+	gchar get_all_notes_url[1024];
+	g_sprintf(get_all_notes_url, "%s?include_notes=true&since=%i", user->api_ref, last_sync_rev);
+	
 	gchar *all_notes = conboy_http_get(get_all_notes_url);
 	
 	g_printerr("****************\n");
@@ -241,17 +291,40 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	g_printerr("****************\n");
 	
 	
-	
 	JsonNoteList *note_list = json_get_note_list(all_notes);
-	g_printerr("LATEST_SYNC_REVISION: %i\n", note_list->latest_sync_revision);
+	last_sync_rev = note_list->latest_sync_revision;
+	
 	GSList *notes = note_list->notes;
 	while (notes != NULL) {
-		g_printerr("#######\n");
-		g_printerr("Title: %s\n", ((ConboyNote*)notes->data)->title);
-		g_printerr("%s\n", ((ConboyNote*)notes->data)->content);
-		g_printerr("#######\n");
+		ConboyNote *note = CONBOY_NOTE(notes->data);
+		g_printerr("Saving: %s\n", note->title);
+		conboy_storage_note_save(app_data->storage, note);
+		
+		/* Remove from list of local notes */
+		/* Find local note and remove from list */
+		local_notes = remove_by_guid(local_notes, note);
+		
 		notes = notes->next;
 	}
+	
+	/*
+	 * Remaining local notes are new on the client.
+	 * Send them to the server
+	 */
+
+	last_sync_rev = web_send_notes(local_notes, last_sync_rev + 1, last_sync_time);
+	
+	
+	
+	g_printerr("Saving last sync rev: %i\n", last_sync_rev);
+	settings_save_last_sync_revision(last_sync_rev);
+	settings_save_last_sync_time(time(NULL));
+	/*
+	while (local_notes) {
+		g_printerr("Remaining: %s\n", CONBOY_NOTE(local_notes->data)->title);
+		local_notes = local_notes->next;
+	}
+	*/
 	
 	
 }

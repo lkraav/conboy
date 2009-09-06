@@ -14,8 +14,8 @@ get_access_token(gchar *url, gchar **t_key, gchar **t_secret);
 gchar*
 get_all_notes(gboolean inc_notes);
 
-void
-web_send_note(ConboyNote *note, const gchar *base_url, const gchar *t_key, const gchar *t_secret);
+gint
+web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time);
 
 gchar*
 conboy_get_auth_link(const gchar *base_url);

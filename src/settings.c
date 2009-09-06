@@ -19,6 +19,33 @@
 #include "settings.h"
 #include "app_data.h"
 
+void
+settings_save_last_sync_time(time_t time)
+{
+	AppData *app_data = app_data_get();
+	gconf_client_set_int(app_data->client, SETTINGS_STORAGE_LAST_SYNC_TIME, time, NULL);
+}
+
+time_t
+settings_load_last_sync_time()
+{
+	AppData *app_data = app_data_get();
+	return (time_t) gconf_client_get_int(app_data->client, SETTINGS_STORAGE_LAST_SYNC_TIME, NULL);
+}
+
+void
+settings_save_last_sync_revision(gint revision)
+{
+	AppData *app_data = app_data_get();
+	gconf_client_set_int(app_data->client, SETTINGS_STORAGE_LAST_SYNC_REV, revision, NULL);
+}
+
+gint
+settings_load_last_sync_revision(void)
+{
+	AppData *app_data = app_data_get();
+	return gconf_client_get_int(app_data->client, SETTINGS_STORAGE_LAST_SYNC_REV, NULL);
+}
 
 void
 settings_save_storage_plugin_name(GConfClient *client, const gchar *name)

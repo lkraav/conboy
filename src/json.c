@@ -137,27 +137,25 @@ json_get_node_from_note(ConboyNote *note)
 	json_object_add_member(obj, JSON_OPEN_ON_STARTUP, node);
 	
 	node = json_node_new(JSON_NODE_VALUE);
-	/*json_node_set_boolean(node, note->pinned);*/
-	json_node_set_boolean(node, FALSE); /* TODO: Implement note->pinned */
+	json_node_set_boolean(node, note->pinned);
 	json_object_add_member(obj, JSON_PINNED, node);
 	
-	/*if (note->tags != NULL) {*/
 		
-		GList *tags = note->tags;
-		JsonArray *array = json_array_new();
-		
-		while (tags != NULL) {
-			gchar *tag = (gchar*)tags->data;
-			node = json_node_new(JSON_NODE_VALUE);
-			json_node_set_string(node, tag);
-			json_array_add_element(array, node);
-			tags = tags->next;
-		}
-		
-		node = json_node_new(JSON_NODE_ARRAY);
-		json_node_take_array(node, array);
-		json_object_add_member(obj, JSON_TAGS, node);
-	/*}*/
+	GList *tags = note->tags;
+	JsonArray *array = json_array_new();
+	
+	while (tags != NULL) {
+		gchar *tag = (gchar*)tags->data;
+		node = json_node_new(JSON_NODE_VALUE);
+		json_node_set_string(node, tag);
+		json_array_add_element(array, node);
+		tags = tags->next;
+	}
+	
+	node = json_node_new(JSON_NODE_ARRAY);
+	json_node_take_array(node, array);
+	json_object_add_member(obj, JSON_TAGS, node);
+	
 	
 	json_node_take_object(root, obj);
 	
@@ -224,6 +222,9 @@ json_get_note_from_node(JsonNode *node)
 	ConboyNote *note = conboy_note_new();
 	JsonObject *obj = json_node_get_object(node);
 	
+	/* Not sure if we need api-ref and href. If yes, we should
+	 * put them somewhere else. Not into ConboyNote */
+	
 	/*
 	member = json_object_get_member(obj, "api-ref");
 	save_some_where;
@@ -256,10 +257,8 @@ json_get_note_from_node(JsonNode *node)
 	member = json_object_get_member(obj, JSON_OPEN_ON_STARTUP);
 	if (member) note->open_on_startup = json_node_get_boolean(member);
 	
-	/*
 	member = json_object_get_member(obj, JSON_PINNED);
 	if (member) note->pinned = json_node_get_boolean(member);
-	*/
 	
 	member = json_object_get_member(obj, JSON_TAGS);
 	if (member) {
@@ -272,8 +271,39 @@ json_get_note_from_node(JsonNode *node)
 		g_list_free(tags);
 	}
 	
+	/*
+	 * Add additional things to create a full ConboyNote
+	 */
+	
 	/* Currently not specified for the JSON format. So we set it here. */
 	g_object_set(note, "note-version", 0.3, NULL);
+	
+	/* The JSON format transfers the content without title, but we need 
+	 * the title in the first row of the content. Also we need to add the
+	 * <note-content> tags */
+	gdouble version;
+	gchar tmp_version[10];
+	gchar *tmp_content;
+	gchar *tmp_title;
+	
+	g_object_get(note, "title", &tmp_title, "content", &tmp_content, "content-version", &version, NULL);
+	g_ascii_formatd(tmp_version, 10, "%.1f", version);
+	
+	gchar *full_content = g_strconcat(
+			"<note-content version=\"",
+			tmp_version,
+			"\">",
+			tmp_title,
+			"\n\n",
+			tmp_content,
+			"</note-content>",
+			NULL);
+			
+	g_object_set(note, "content", full_content, NULL);
+
+	g_free(full_content);
+	g_free(tmp_content);
+	g_free(tmp_title);
 	
 	return note;
 }

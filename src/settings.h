@@ -40,6 +40,8 @@
 #define SETTINGS_ACTIVE_PLUGINS      SETTINGS_ROOT"/active_plugins"
 #define SETTINGS_SYNC_BASE_URL       SETTINGS_ROOT"/sync_base_url"
 #define SETTINGS_STORAGE_PLUGIN_NAME SETTINGS_ROOT"/storage_plugin_name"
+#define SETTINGS_STORAGE_LAST_SYNC_REV SETTINGS_ROOT"/last_sync_rev"
+#define SETTINGS_STORAGE_LAST_SYNC_TIME SETTINGS_ROOT"/last_sync_time"
 
 typedef enum {
 	SETTINGS_SCROLLBAR_SIZE_SMALL,
@@ -57,6 +59,12 @@ typedef enum {
 	SETTINGS_COLOR_TYPE_LINKS
 } SettingsColorType;
 
+
+void settings_save_last_sync_time(time_t time);
+time_t settings_load_last_sync_time(void);
+
+void settings_save_last_sync_revision(gint revision);
+gint settings_load_last_sync_revision(void);
 
 void settings_save_storage_plugin_name(GConfClient *client, const gchar *name);
 gchar* settings_load_storage_plugin_name(GConfClient *client);
