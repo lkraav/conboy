@@ -173,7 +173,7 @@ get_date_string(time_t t)
 }
 
 
-GdkPixbuf *_icon = NULL; /* TODO: Should not be global */
+GdkPixbuf *_icon = NULL; /* TODO: Should not be global. Make it member of this Class. */
 /* this method retrieves the value for a particular column */
 static void
 conboy_note_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, GValue *value)
@@ -196,10 +196,6 @@ conboy_note_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, G
 	/* get the object from our parent's storage */
 	note = conboy_note_store_get_object(CONBOY_NOTE_STORE(self), iter);
 	
-	if (! CONBOY_IS_NOTE(note)) {
-		g_printerr("______ ERROR NOT A NOTE \n");
-	}
-
 	/* initialise our GValue to the required type */
 	g_value_init(value, conboy_note_store_get_column_type(GTK_TREE_MODEL (self), column));
 
@@ -241,7 +237,9 @@ conboy_note_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, G
 	}
 
 	/* release the reference gained from my_list_store_get_object() */
-	g_object_unref(note);
+	if (note) {
+		g_object_unref(note);
+	}
 }
 
 /*
@@ -406,5 +404,28 @@ conboy_note_store_set_storage(ConboyNoteStore *self, ConboyStorage *storage) {
 	
 	g_signal_connect(storage, "activated",   G_CALLBACK(on_storage_activated),   self);
 	g_signal_connect(storage, "deactivated", G_CALLBACK(on_storage_deactivated), self);
+}
+
+ConboyNote*
+conboy_note_store_get_by_guid(ConboyNoteStore *self, const gchar *guid)
+{
+	GtkTreeIter iter;
+	ConboyNote *result = NULL;
+	
+	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self), &iter)) do {
+		ConboyNote *note;
+		gtk_tree_model_get(GTK_TREE_MODEL(self), &iter, NOTE_COLUMN, &note, -1);
+		gchar *tmp_guid;
+		g_object_get(note, "guid", &tmp_guid, NULL);
+		if (strcmp(tmp_guid, guid) == 0) {
+			result = note;
+			g_free(tmp_guid);
+			break;
+		}
+		g_free(tmp_guid);
+		
+	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(self), &iter));
+
+	return result;
 }
 

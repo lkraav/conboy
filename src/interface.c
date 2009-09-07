@@ -300,6 +300,12 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 		g_printerr("Saving: %s\n", note->title);
 		conboy_storage_note_save(app_data->storage, note);
 		
+		/* If not yet in the note store, add this note */
+		if (!conboy_note_store_get_by_guid(app_data->note_store, note->guid)) {
+			g_printerr("INFO: Adding note '%s' to note store\n", note->title);
+			conboy_note_store_add(app_data->note_store, note, NULL);
+		}
+		
 		/* Remove from list of local notes */
 		/* Find local note and remove from list */
 		local_notes = remove_by_guid(local_notes, note);
