@@ -34,9 +34,9 @@
 #include <hildon/hildon-pannable-area.h>
 #endif
 
+#include "conboy_config.h"
 #include "callbacks.h"
 #include "metadata.h"
-#include "interface.h"
 #include "app_data.h"
 #include "settings.h"
 #include "conboy_note_buffer.h"
@@ -44,6 +44,8 @@
 #include "conboy_oauth.h"
 #include "note.h"
 #include "json.h"
+
+#include "interface.h"
 
 static void initialize_tags(GtkTextBuffer *buffer) {
 	/*
@@ -218,7 +220,7 @@ remove_by_guid(GList *list, ConboyNote *note_to_remove)
 	gchar *guid;
 	g_object_get(note_to_remove, "guid", &guid, NULL);
 	ConboyNote *found_note = NULL;
-	
+
 	GList *iter = list;
 	while (iter) {
 		ConboyNote *note = CONBOY_NOTE(iter->data);
@@ -231,9 +233,9 @@ remove_by_guid(GList *list, ConboyNote *note_to_remove)
 		if (found_note) break;
 		iter = iter->next;
 	}
-	
+
 	g_free(guid);
-	
+
 	if (found_note) {
 		g_printerr("Remove note\n");
 		return g_list_remove(list, found_note);
@@ -246,27 +248,27 @@ static void
 on_sync_but_clicked(GtkButton *but, gpointer user_data)
 {
 	AppData *app_data = app_data_get();
-	
+
 	int last_sync_rev = settings_load_last_sync_revision();
 	time_t last_sync_time = settings_load_last_sync_time();
-	
+
 	gchar *reply = conboy_http_get("http://127.0.0.1:8000/api/1.0/");
-	
+
 	g_printerr("Reply from /api/1.0/:: %s\n", reply);
-	
+
 	gchar *api_ref = json_get_api_ref(reply);
-	
+
 	reply = conboy_http_get(api_ref);
-	
+
 	g_printerr("Reply from /root/:: %s\n", reply);
-	
+
 	/* Revision checks */
 	JsonUser *user = json_get_user(reply);
 	if (user->latest_sync_revision < last_sync_rev) {
 		g_printerr("ERROR: Server revision older than our revision. This should not happen.\n");
 		return;
 	}
-	
+
 	/* Create list of all local notes */
 	/* Just copy NoteStore to normal list */
 	ConboyNoteStore *note_store = app_data->note_store;
@@ -278,50 +280,50 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 		gtk_tree_model_get(GTK_TREE_MODEL(note_store), &iter, NOTE_COLUMN, &note, -1);
 		local_notes = g_list_append(local_notes, note);
 	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(note_store), &iter));
-	
-	
+
+
 	/* Get all notes since last syncRef and save them. */
 	gchar get_all_notes_url[1024];
 	g_sprintf(get_all_notes_url, "%s?include_notes=true&since=%i", user->api_ref, last_sync_rev);
-	
+
 	gchar *all_notes = conboy_http_get(get_all_notes_url);
-	
+
 	g_printerr("****************\n");
 	g_printerr("%s\n", all_notes);
 	g_printerr("****************\n");
-	
-	
+
+
 	JsonNoteList *note_list = json_get_note_list(all_notes);
 	last_sync_rev = note_list->latest_sync_revision;
-	
+
 	GSList *notes = note_list->notes;
 	while (notes != NULL) {
 		ConboyNote *note = CONBOY_NOTE(notes->data);
 		g_printerr("Saving: %s\n", note->title);
 		conboy_storage_note_save(app_data->storage, note);
-		
+
 		/* If not yet in the note store, add this note */
 		if (!conboy_note_store_get_by_guid(app_data->note_store, note->guid)) {
 			g_printerr("INFO: Adding note '%s' to note store\n", note->title);
 			conboy_note_store_add(app_data->note_store, note, NULL);
 		}
-		
+
 		/* Remove from list of local notes */
 		/* Find local note and remove from list */
 		local_notes = remove_by_guid(local_notes, note);
-		
+
 		notes = notes->next;
 	}
-	
+
 	/*
 	 * Remaining local notes are new on the client.
 	 * Send them to the server
 	 */
 
 	last_sync_rev = web_send_notes(local_notes, last_sync_rev + 1, last_sync_time);
-	
-	
-	
+
+
+
 	g_printerr("Saving last sync rev: %i\n", last_sync_rev);
 	settings_save_last_sync_revision(last_sync_rev);
 	settings_save_last_sync_time(time(NULL));
@@ -331,8 +333,8 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 		local_notes = local_notes->next;
 	}
 	*/
-	
-	
+
+
 }
 
 /*
@@ -342,27 +344,27 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	gchar *tok = NULL;
 	gchar *sec = NULL;
 	gchar *lnk = NULL;
-	
+
 	Note *note = (Note*) user_data;
-	
-	
+
+
 	if (tok == NULL || sec == NULL) {
-		
+
 		lnk = get_auth_link("http://127.0.0.1:8000/oauth/request_token/", "http://127.0.0.1:8000/oauth/authenticate/", &tok, &sec);
 		GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, lnk);
 		g_printerr("Link:\n%s\n", lnk);
 		gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy (dialog);
-		
+
 		if (get_access_token("http://127.0.0.1:8000/oauth/access_token/", &tok, &sec)) {
 			g_printerr("Saving token & secret to gconf \n");
 			settings_save_oauth_access_token(tok);
 			settings_save_oauth_access_secret(sec);
 		}
 	}
-	
+
 	gchar *reply = get_all_notes("http://127.0.0.1:8000", TRUE, tok, sec);
-	
+
 	if (reply != NULL) {
 		GSList *notes = json_get_notes_from_string(reply);
 		while (notes != NULL) {
@@ -373,7 +375,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 			notes = notes->next;
 		}
 	}
-	
+
 }
 */
 
@@ -381,7 +383,7 @@ static void
 on_storage_activated (ConboyStorage *storage, UserInterface *ui)
 {
 	g_printerr("Storage activated\n");
-	
+
 	AppData *app_data = app_data_get();
 	ConboyNote *note = conboy_note_store_get_latest(app_data->note_store);
 	if (note != NULL) {
@@ -390,7 +392,7 @@ on_storage_activated (ConboyStorage *storage, UserInterface *ui)
 		/* TODO: Create new note */
 		gtk_text_buffer_set_text(ui->buffer, "", -1);
 	}
-	
+
 	gtk_widget_set_sensitive(GTK_WIDGET(ui->view), TRUE);
 	gtk_widget_set_sensitive(GTK_WIDGET(ui->toolbar), TRUE);
 }
@@ -399,29 +401,98 @@ static void
 on_storage_deactivated (ConboyStorage *storage, UserInterface *ui)
 {
 	g_printerr("Storage deactivated\n");
-	
+
 	if (gtk_text_buffer_get_modified(ui->buffer)) {
 		note_save(ui);
 	}
-	
+
 	/* Block automatic saving, set text, unblock saving */
 	g_signal_handlers_block_matched(ui->buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
 	gtk_text_buffer_set_text(ui->buffer, "No storage backend plugin loaded. Please configure one in 'Settings'.", -1);
 	g_signal_handlers_unblock_matched(ui->buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
-	
+
 	conboy_note_buffer_clear_active_tags(CONBOY_NOTE_BUFFER(ui->buffer));
-	
+
 	/*note_close();*/
-	
+
 	/*
 	AppData *app_data = app_data_get();
 	app_data->open_notes = NULL;
 	*/
-	
+
 	gtk_widget_set_sensitive(GTK_WIDGET(ui->view), FALSE);
 	gtk_widget_set_sensitive(GTK_WIDGET(ui->toolbar), FALSE);
 }
 
+enum Icon {
+	ICON_DEC_INDENT,
+	ICON_INC_INDENT,
+	ICON_LINK,
+	ICON_TEXT_STYLE,
+	ICON_DELETE,
+	ICON_SEARCH,
+	ICON_OPEN
+};
+
+static GtkWidget*
+add_icon(const gchar *filename, GtkToolButton *button)
+{
+	/* If we don't find the icons in these two paths, we return the stock button */
+	gchar *full_path = g_build_filename(PREFIX, "/share/icons/hicolor/48x48/hildon", filename, NULL);
+	if (!g_file_test(full_path, G_FILE_TEST_EXISTS)) {
+		g_printerr("not found: %s\n", full_path);
+		g_free(full_path);
+		full_path = g_build_filename("/home/conny/workspace/conboy/data/icons/48x48", filename, NULL);
+		if (!g_file_test(full_path, G_FILE_TEST_EXISTS)) {
+			g_free(full_path);
+			return GTK_WIDGET(button);
+		}
+	}
+
+	/* If we found the icon, we set it and return the button with icon */
+	GtkWidget *icon = gtk_image_new_from_file(full_path);
+	gtk_widget_show(icon);
+	gtk_tool_button_set_icon_widget(button, icon);
+	g_free(full_path);
+	return GTK_WIDGET(button);
+}
+
+static GtkWidget*
+create_tool_button(GtkAction *action, enum Icon icon)
+{
+	GtkToolButton *button = GTK_TOOL_BUTTON(gtk_action_create_tool_item(action));
+
+#ifdef HILDON_HAS_APP_MENU
+	switch (icon)
+	{
+		case ICON_INC_INDENT:
+			return add_icon("conboy-increase_indent.png", button);
+
+		case ICON_DEC_INDENT:
+			return add_icon("conboy-decrease_indent.png", button);
+
+		case ICON_LINK:
+			return add_icon("conboy-hyperlink.png", button);
+
+		case ICON_TEXT_STYLE:
+			return add_icon("conboy-text_transform.png", button);
+
+		case ICON_SEARCH:
+			return add_icon("general_search.png", button);
+
+		case ICON_OPEN:
+			return add_icon("general_toolbar_folder.png", button);
+
+		case ICON_DELETE:
+			return add_icon("general_delete.png", button);
+
+		default:
+			return GTK_WIDGET(button);
+	}
+#else
+	return GTK_WIDGET(button);
+#endif
+}
 
 /*
  * I'm not sure what is better:
@@ -508,7 +579,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	mainwin = hildon_window_new();
 	gtk_window_set_title(GTK_WINDOW(mainwin), "Conboy");
 	ui->window = HILDON_WINDOW(mainwin);
-	
+
 	screen = gdk_screen_get_default();
 
 	accel_group = gtk_accel_group_new();
@@ -738,18 +809,20 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	ui->toolbar = GTK_TOOLBAR(toolbar);
 
 	/***** TODO: Remove, only for testing *************/
-	
+
+
 	GtkWidget *sync_but = gtk_tool_button_new_from_stock(GTK_STOCK_CDROM);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(sync_but), 0);
-	
-	
-	
-	
+
+
+
+
+
 	/**********************/
-	
-	
+
+
 	/****/
-	button_dec_indent = gtk_action_create_tool_item(action_dec_indent);
+	button_dec_indent = create_tool_button(action_dec_indent, ICON_DEC_INDENT);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_dec_indent), -1);
 #ifdef HILDON_HAS_APP_MENU
 	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 105, -1);
@@ -757,33 +830,41 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 85, -1);
 #endif
 
-	button_inc_indent = gtk_action_create_tool_item(action_inc_indent);
+	button_inc_indent = create_tool_button(action_inc_indent, ICON_INC_INDENT);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_inc_indent), -1);
 
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
 
-	button_link = gtk_action_create_tool_item(action_link);
+	button_link = create_tool_button(action_link, ICON_LINK);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_link), -1);
 
-	button_style = gtk_action_create_tool_item(action_text_style);
+	button_style = create_tool_button(action_text_style, ICON_TEXT_STYLE);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_style), -1);
 
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
 
-	button_find = gtk_action_create_tool_item(action_find);
+	button_find = create_tool_button(action_find, ICON_SEARCH);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_find), -1);
 
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
 
-	button_delete = gtk_action_create_tool_item(action_delete);
+	button_delete = create_tool_button(action_delete, ICON_DELETE);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_delete), -1);
 
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
 
-	button_notes = gtk_action_create_tool_item(action_notes);
+	button_notes = create_tool_button(action_notes, ICON_OPEN);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_notes), -1);
 
 	gtk_widget_show_all(toolbar);
+
+	/*
+	 * TODO: REMOVE
+	 */
+	gtk_widget_hide(sync_but);
+	/*
+	 *
+	 */
 
 	if (app_data->portrait) {
 		gtk_widget_hide(toolbar);
@@ -817,7 +898,8 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	/* TEXT VIEW */
 	buffer = GTK_TEXT_BUFFER(conboy_note_buffer_new());
 #ifdef HILDON_HAS_APP_MENU
-	textview = hildon_text_view_new_with_buffer(buffer);
+	textview = hildon_text_view_new();
+	hildon_text_view_set_buffer(HILDON_TEXT_VIEW(textview), buffer);
 #else
 	textview = gtk_text_view_new_with_buffer(buffer);
 #endif
@@ -891,13 +973,13 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	        ui);
 
 	/* Action signals */
-	
+
 	g_printerr("TITLE: %s\n", note->title);
-	
+
 	g_signal_connect(sync_but, "clicked",
 			G_CALLBACK(on_sync_but_clicked),
 			ui);
-	
+
 	g_signal_connect(action_new, "activate",
 			G_CALLBACK(on_new_button_clicked),
 			ui);
@@ -1016,15 +1098,15 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	g_signal_connect((gpointer)find_bar, "close",
 			G_CALLBACK(on_find_bar_close),
 			ui);
-	
+
 	/* Listening to activation / deactivation of storage */
 	ConboyStorage *storage = app_data->storage;
 	g_signal_connect(app_data->storage, "activated",
 			G_CALLBACK(on_storage_activated), ui);
-	
+
 	g_signal_connect(app_data->storage, "deactivated",
 			G_CALLBACK(on_storage_deactivated), ui);
-	
+
 
 	/* Listen to changes in the settings */
 	/* TODO: Use an array instead of the list */
