@@ -58,7 +58,9 @@ AppData* app_data_get() {
 		}
 		
 		/* Dicover plugins */
+		g_printerr("INFO: Now looking for plugins\n");
 		ConboyPluginStore *plugin_store = conboy_plugin_store_new();
+		g_printerr("INFO: Plugin search finished\n");
 		
 		/* Create storage */
 		ConboyStorage *storage = conboy_storage_new();
