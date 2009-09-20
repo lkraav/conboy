@@ -22,6 +22,7 @@ desktop_DATA = conboy.desktop
 
 icon_26x26_DATA = icons/26x26/conboy.png icons/26x26/highlighter.png
 icon_40x40_DATA = icons/40x40/conboy.png
+icon_48x48_DATA = icons/48x48/conboy-decrease_indent.png icons/48x48/conboy-hyperlink.png icons/48x48/conboy-increase_indent.png icons/48x48/conboy-text_transform.png
 icon_scalable_DATA = icons/scalable/conboy.png
 
 backupdir=/etc/osso-backup/applications
