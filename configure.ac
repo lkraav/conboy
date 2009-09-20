@@ -77,6 +77,7 @@ AM_CONDITIONAL([WITH_MIDGARD], [test x$with_midgard = xyes])
 icon_26x26dir=$datadir/icons/hicolor/26x26/hildon
 icon_34x34dir=$datadir/icons/hicolor/34x34/hildon
 icon_40x40dir=$datadir/icons/hicolor/40x40/hildon
+icon_48x48dir=$datadir/icons/hicolor/48x48/hildon
 icon_50x50dir=$datadir/icons/hicolor/50x50/hildon
 icon_scalabledir=$datadir/icons/hicolor/scalable/hildon
 
@@ -134,6 +135,7 @@ AC_SUBST(hildoniconthemedir)
 AC_SUBST(icon_26x26dir)
 AC_SUBST(icon_34x34dir)
 AC_SUBST(icon_40x40dir)
+AC_SUBST(icon_48x48dir)
 AC_SUBST(icon_50x50dir)
 AC_SUBST(icon_scalabledir)
 
