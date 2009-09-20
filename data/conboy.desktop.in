@@ -12,6 +12,6 @@ X-Osso-Type=application/x-executable
 X-Osso-URI-Actions=conboy
 
 [X-Osso-URI-Action Handler conboy]
-Method=present_window
-Name=present_window
-
+Method=authenticated
+Name=authenticated
+TranslationDomain=conboy
