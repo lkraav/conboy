@@ -43,27 +43,30 @@ static void cleanup()
 	GtkTreeIter iter;
 	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
 	gtk_list_store_clear(GTK_LIST_STORE(app_data->note_store));
-	
+
 	/* Free AppData */
 	app_data_free();
 }
 
-static gint dbus_handler(const gchar *interface,
-                         const gchar *method,
-                         GArray *arguments,
-                         gpointer user_data,
-                         osso_rpc_t *retval)
+static gint
+dbus_handler(const gchar *interface, const gchar *method, GArray *arguments, gpointer user_data, osso_rpc_t *retval)
 {
-	if (g_strcasecmp(method, "present_window") == 0) {
-		
+	g_printerr("Method: %s\n", method);
+	GtkWindow *win = GTK_WINDOW(user_data);
+	gtk_window_present(win);
+
+	if (g_strcasecmp(method, "authenticated") == 0) {
+
 		/*
 		 * TODO: Implement something that checks
 		 * whether the config/auth window is open
 		 * and if yes, that it is authorized.
 		 * Change the UI and so on...
 		 */
-		
-		
+
+		g_printerr("___ CORRECTLY AUTHENTICATED ____");
+
+
 	}
 	return OSSO_OK;
 }
@@ -78,7 +81,7 @@ main (int argc, char *argv[])
 
   /* Init i18n */
   locale_init();
-  
+
   /* Init GTK */
 #ifdef HILDON_HAS_APP_MENU
   g_printerr("HILDON INIT \n");
@@ -86,10 +89,12 @@ main (int argc, char *argv[])
 #else
   gtk_init(&argc, &argv);
 #endif
-  
+
+  g_printerr("After init\n");
 
   /* Call this to initialize it */
   app_data = app_data_get();
+  g_printerr("After app_data_get()\n");
 
   /* Initialize maemo application */
   g_printerr("Starting %s, Version %s \n", APP_NAME, VERSION);
@@ -103,18 +108,12 @@ main (int argc, char *argv[])
   /* Create the Hildon program and setup the title */
   program = HILDON_PROGRAM(hildon_program_get_instance());
   g_set_application_name("Conboy");
-  
-  
-  /****************/
-  
-  
-  
-  /*****************/
-  
 
 
+  /* Ignore settings for now. Probably remove in future. With StackableWindows
+   * it doesn't make much sens to first show the search window.
   if (settings_load_startup_window() == SETTINGS_STARTUP_WINDOW_NOTE) {
-	  
+
 	  note = conboy_note_store_get_latest(app_data->note_store);
 	  if (note == NULL) {
 		  note = conboy_note_new();
@@ -123,12 +122,25 @@ main (int argc, char *argv[])
   } else {
 	  search_window_open();
   }
+  */
 
-  
+  /* Open latest note or new one */
+  note = conboy_note_store_get_latest(app_data->note_store);
+  if (note == NULL) {
+	  note = conboy_note_new();
+  }
+  note_show(note);
+
+  /* Register URL listener */
+   if (osso_rpc_set_cb_f(app_data->osso_ctx, APP_SERVICE, APP_METHOD, APP_SERVICE, dbus_handler, app_data->note_window->window) != OSSO_OK) {
+       g_printerr("Failed to set callback\n");
+   }
+
+
   gtk_main();
 
   cleanup();
-  
+
   /* Deinitialize OSSO */
   osso_deinitialize(app_data->osso_ctx);
 
