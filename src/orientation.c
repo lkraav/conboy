@@ -1,4 +1,8 @@
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #ifdef HILDON_HAS_APP_MENU
 
 #include <hildon/hildon.h>
