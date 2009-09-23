@@ -1,0 +1,146 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-21 09:24+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Anna Karwowska <anha85@vp.pl>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/interface.c:201 ../src/interface.c:303 ../src/interface.c:341
+msgid "Bold"
+msgstr "Pogrubienie"
+
+#: ../src/interface.c:202
+msgid "Bullets"
+msgstr "wypunktowanie"
+
+#: ../src/interface.c:203
+msgid "Decrease Indent"
+msgstr "Zmniejsz wcięcie"
+
+#: ../src/interface.c:204
+msgid "Delete Note"
+msgstr "Usuń notatkę"
+
+#: ../src/interface.c:205 ../src/interface.c:307 ../src/interface.c:345
+msgid "Fixed Width"
+msgstr "Stała szerokość"
+
+#: ../src/interface.c:206 ../src/interface.c:306 ../src/interface.c:344
+msgid "Highlight"
+msgstr "Wyróżnienie"
+
+#: ../src/interface.c:207
+msgid "Increase Indent"
+msgstr "Zwiększ wcięcie"
+
+#: ../src/interface.c:208
+msgid "Link"
+msgstr "Link"
+
+#: ../src/interface.c:209
+msgid "New Note"
+msgstr "Nowa notatka"
+
+#: ../src/interface.c:210
+msgid "Open"
+msgstr "Otwórz"
+
+#: ../src/interface.c:211
+msgid "Close All Notes"
+msgstr "Zamknij wszystkie notatki"
+
+#: ../src/interface.c:212 ../src/interface.c:304 ../src/interface.c:342
+msgid "Italic"
+msgstr "Kursywa"
+
+#: ../src/interface.c:213 ../src/interface.c:305 ../src/interface.c:343
+msgid "Strikeout"
+msgstr "Przekreślenie"
+
+#: ../src/interface.c:214
+msgid "Style"
+msgstr "Styl"
+
+#: ../src/interface.c:215
+msgid "Zoom In"
+msgstr "Powiększenie"
+
+#: ../src/interface.c:216
+msgid "Zoom Out"
+msgstr "Pomniejsz"
+
+#: ../src/interface.c:217
+msgid "Find In Note"
+msgstr "Znajdź w tej notatce"
+
+#: ../src/interface.c:219 ../src/interface.c:308 ../src/interface.c:346
+msgid "Small"
+msgstr "Mały"
+
+#: ../src/interface.c:220
+msgid "Normal"
+msgstr "Normalny"
+
+#: ../src/interface.c:221 ../src/interface.c:309 ../src/interface.c:347
+msgid "Large"
+msgstr "Duży"
+
+#: ../src/interface.c:222 ../src/interface.c:310 ../src/interface.c:348
+msgid "Huge"
+msgstr "Wielki"
+
+#: ../src/interface.c:397
+msgid "Text Style"
+msgstr "Styl czcionki"
+
+#: ../src/interface.c:466 ../src/search_window.c:267
+msgid "Search:"
+msgstr "Szukaj:"
+
+#: ../src/search_window.c:257
+msgid "Search All Notes"
+msgstr "Szukaj w notatkach"
+
+#: ../src/search_window.c:327
+msgid "Note"
+msgstr "Notatka"
+
+#: ../src/search_window.c:346
+msgid "Last Changed"
+msgstr "Ostatnio zmienione"
+
+#: ../src/callbacks.c:590
+msgid "Really delete this note?"
+msgstr "Czy na pewno chcesz usunąć tą notatkę?"
+
+#: ../src/callbacks.c:592
+msgid "If you delete a note it is permanently lost."
+msgstr "Usunięcie spowoduje bezpowrotną utratę notatki"
+
+#: ../src/note.c:341
+#, c-format
+msgid "New Note %i" 
+msgstr "Nowa notatka %i"
+
+#: ../src/note.c:344
+msgid "Describe your new note here."
+msgstr "Treść nowej notatki"
+
+#: ../src/search_window.c:284
+msgid "Sort By Title"
+msgstr "Sortuj według nazwy"
+
+#: ../src/search_window.c:285
+msgid "Sort By Date"
+msgstr "Sortuj według daty"
