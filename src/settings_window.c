@@ -24,6 +24,7 @@
 #include <tablet-browser-interface.h>
 #include <dbus/dbus-protocol.h>
 #include <hildon/hildon-note.h>
+#include <string.h>
 
 #ifdef HILDON_HAS_APP_MENU
 #include <hildon/hildon-gtk.h>
@@ -49,30 +50,6 @@ typedef struct
 	GtkWidget *auth_button;
 } SettingsWidget;
 
-
-
-/********** Plugins Settings Widget *************/
-
-static GtkWidget*
-plugins_settings_widget_create()
-{
-	GtkWidget *result = conboy_plugin_manager_new();
-	return result;
-}
-
-
-
-/************************************************/
-
-
-
-/********** Synchsettings Widget **********/
-static void
-on_auth_but_clicked(GtkButton *button, gpointer user_data)
-{
-
-
-}
 
 /**
  * Opens yes/no dialog which supports markup in message.
@@ -116,117 +93,6 @@ create_confirmation_dialog(GtkWindow *parent, const gchar *message)
 	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), label);
 
 	return dialog;
-}
-
-
-
-static void
-on_clean_but_clicked(GtkButton *button, gpointer user_data)
-{
-	g_printerr("Clean but\n");
-}
-
-static GtkWidget*
-sync_settings_widget_create()
-{
-	GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
-	gtk_widget_show(vbox);
-
-	GtkWidget *label = gtk_label_new("");
-	/*
-	gchar *text =
-		"1) Enter URL of your sync service into the field below. An"
-		"example would be http://example.com:8000\n"
-		"2) Press the authenticate button. If the URL is correct, a"
-		"browser window will open and ask for your permission to share"
-		"your notes. If not already logged in, you first have to log in.\n"
-		"3) After granting access on the website this window should be opened"
-		"again. Synchronization is now configured";
-	gtk_label_set_line_wrap(label, TRUE);
-	gtk_label_set_markup(label, text);
-	*/
-	gtk_widget_show(label);
-	gtk_container_add(GTK_CONTAINER(vbox), label);
-
-	GtkWidget *hbox = gtk_hbox_new(FALSE, 0);
-	gtk_widget_show(hbox);
-	gtk_container_add(GTK_CONTAINER(vbox), hbox);
-
-	GtkWidget *url_label = gtk_label_new("URL:");
-	gtk_widget_show(url_label);
-	gtk_box_pack_start(GTK_BOX(hbox), url_label, FALSE, FALSE, 0);
-
-	GtkWidget *url_entry = gtk_entry_new();
-	gtk_widget_set_size_request(url_entry, 600, -1);
-	gtk_widget_show(url_entry);
-	gtk_box_pack_start(GTK_BOX(hbox), url_entry, TRUE, TRUE, 0);
-
-	GtkWidget *auth_but = gtk_button_new_with_label("Authenticate");
-	gtk_widget_show(auth_but);
-	gtk_box_pack_start(GTK_BOX(hbox), auth_but, FALSE, FALSE, 0);
-
-	GtkWidget *clean_but = gtk_button_new_with_label("Clean");
-	gtk_widget_show(clean_but);
-	gtk_box_pack_start(GTK_BOX(hbox), clean_but, FALSE, FALSE, 0);
-
-	g_signal_connect(auth_but, "clicked", G_CALLBACK(on_auth_but_clicked), url_entry);
-	g_signal_connect(clean_but, "clicked", G_CALLBACK(on_clean_but_clicked), NULL);
-
-	/* Load url */
-	gchar *url = settings_load_sync_base_url();
-	gtk_entry_set_text(GTK_ENTRY(url_entry), url);
-	g_free(url);
-
-	return vbox;
-}
-/*******************************************/
-
-static void
-on_sync_but_clicked(GtkButton *button, gpointer user_data)
-{
-	GtkWindow *parent = GTK_WINDOW(user_data);
-
-	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Synchronization settings"),
-				parent,
-				GTK_DIALOG_MODAL,
-				NULL);
-
-
-	GtkWidget *content_area = GTK_DIALOG(dialog)->vbox;
-	GtkWidget *content_widget = sync_settings_widget_create();
-
-	/* Add the widget to the dialog */
-	gtk_box_pack_start(GTK_BOX(content_area), content_widget, TRUE, TRUE, 10);
-
-	/* When a button (ok/cancel/etc.) is clicked or the dialog is closed - destroy it */
-	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
-
-	gtk_dialog_run(GTK_DIALOG(dialog));
-
-}
-
-static void
-on_plugin_but_clicked(GtkButton *button, gpointer user_data)
-{
-	GtkWindow *parent = GTK_WINDOW(user_data);
-
-	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Plug-ins settings"),
-				parent,
-				GTK_DIALOG_MODAL,
-				NULL);
-
-
-	GtkWidget *content_area = GTK_DIALOG(dialog)->vbox;
-	GtkWidget *content_widget = plugins_settings_widget_create();
-
-	/* Add the widget to the dialog */
-	gtk_box_pack_start(GTK_BOX(content_area), content_widget, TRUE, TRUE, 10);
-
-	/* When a button (ok/cancel/etc.) is clicked or the dialog is closed - destroy it */
-	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
-
-	gtk_dialog_run(GTK_DIALOG(dialog));
-
 }
 
 static void
@@ -275,7 +141,12 @@ static void
 on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 {
 
+#ifdef HILDON_HAS_APP_MENU
 	const gchar *url = hildon_entry_get_text(HILDON_ENTRY(widget->url_entry));
+#else
+	const gchar *url = gtk_entry_get_text(GTK_ENTRY(widget->url_entry));
+#endif
+	
 	GtkWindow *parent = GTK_WINDOW(widget->window);
 
 	if (url == NULL) {
@@ -319,7 +190,6 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 	gtk_dialog_run(GTK_DIALOG(dialog));
 
-	gchar *message;
 	if (conboy_get_access_token()) {
 		/* Disable Authenticate button */
 		gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
@@ -367,14 +237,22 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	widget->window = GTK_WIDGET(parent);
 
 	/* Scrolling / Panning */
+#ifdef HILDON_HAS_APP_MENU
 	pannable = hildon_pannable_area_new();
+#else
+	pannable = gtk_scrolled_window_new(NULL, NULL);
+#endif
 	g_object_set(pannable, "hscrollbar-policy", GTK_POLICY_NEVER, NULL);
 	gtk_widget_show(pannable);
 
 	/* Config vbox */
 	config_vbox = gtk_vbox_new(FALSE, 20);
 	gtk_widget_show(config_vbox);
+#ifdef HILDON_HAS_APP_MENU
 	hildon_pannable_area_add_with_viewport(HILDON_PANNABLE_AREA(pannable), config_vbox);
+#else
+	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(pannable), config_vbox);
+#endif
 
 	/* Container for "scrollbar size" and for "on startup" */
 	hbox = gtk_hbox_new(FALSE, 0);
@@ -518,13 +396,21 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_widget_show(sync_hbox);
 	gtk_box_pack_start(GTK_BOX(config_vbox), sync_hbox, TRUE, TRUE, 0);
 
+#ifdef HILDON_HAS_APP_MENU
 	GtkWidget *sync_entry = hildon_entry_new(HILDON_SIZE_FINGER_HEIGHT);
-	widget->url_entry = sync_entry;
 	hildon_entry_set_placeholder(HILDON_ENTRY(sync_entry), "http://example.com:8080");
+#else
+	GtkWidget *sync_entry = gtk_entry_new();
+#endif
+	widget->url_entry = sync_entry;
 	gtk_widget_show(sync_entry);
 	gtk_box_pack_start(GTK_BOX(sync_hbox), sync_entry, TRUE, TRUE, 0);
 
+#ifdef HILDON_HAS_APP_MENU
 	GtkWidget *sync_auth_but = hildon_gtk_button_new(HILDON_SIZE_FINGER_HEIGHT);
+#else
+	GtkWidget *sync_auth_but = gtk_button_new();
+#endif
 	widget->auth_button = sync_auth_but;
 	gtk_button_set_label(GTK_BUTTON(sync_auth_but), "Authenticate");
 	gtk_widget_show(sync_auth_but);
@@ -683,7 +569,11 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 
 	/* Sync URL */
 	if (settings_load_sync_base_url() != NULL) {
+#ifdef HILDON_HAS_APP_MENU
 		hildon_entry_set_text(HILDON_ENTRY(sync_entry), settings_load_sync_base_url());
+#else
+		gtk_entry_set_text(GTK_ENTRY(sync_entry), settings_load_sync_base_url());
+#endif
 		gtk_widget_set_sensitive(GTK_WIDGET(sync_auth_but), FALSE);
 	}
 
@@ -714,10 +604,19 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 
 void settings_window_open(GtkWindow *parent)
 {
+#ifdef HILDON_HAS_APP_MENU
 	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Settings"),
 			parent,
 			GTK_DIALOG_MODAL,
 			NULL);
+#else
+	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Settings"),
+			parent,
+			GTK_DIALOG_MODAL,
+			GTK_STOCK_OK,
+			GTK_RESPONSE_OK,
+			NULL);
+#endif
 
 	GtkWidget *content_area = GTK_DIALOG(dialog)->vbox;
 	GtkWidget *content_widget = settings_widget_create(GTK_WINDOW(dialog));

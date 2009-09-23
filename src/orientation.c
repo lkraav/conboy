@@ -1,4 +1,6 @@
 
+#ifdef HILDON_HAS_APP_MENU
+
 #include <hildon/hildon.h>
 #include <mce/dbus-names.h>
 #include <mce/mode-names.h>
@@ -92,3 +94,4 @@ orientation_init(AppData *app_data)
 	dbus_connection_add_filter(con, dbus_handle_mce_message, NULL, NULL);
 }
 
+#endif /* HILDON_HAS_APP_MENU */

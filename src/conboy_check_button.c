@@ -1,4 +1,5 @@
 
+#ifdef HILDON_HAS_APP_MENU
 
 #include "conboy_check_button.h"
 
@@ -255,3 +256,5 @@ conboy_check_button_init (ConboyCheckButton *button)
 
     conboy_check_button_apply_style (GTK_WIDGET (button));
 }
+
+#endif

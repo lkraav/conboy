@@ -160,7 +160,6 @@ gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer
 {
 	GtkWidget *window = GTK_WIDGET(user_data);
 	AppData *app_data = app_data_get();
-	GList *open_windows;
 
 	switch (event->keyval) {
 
@@ -362,7 +361,11 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	GHashTable *search_result;
 	GtkAction *new_note_action;
 	GtkWidget *menu_new_note;
+#ifdef HILDON_HAS_APP_MENU
 	win = hildon_stackable_window_new();
+#else
+	win = hildon_window_new();
+#endif
 	gtk_window_set_title(GTK_WINDOW(win), _("Search All Notes"));
 	screen = gdk_screen_get_default();
 	search_result = g_hash_table_new(NULL, NULL);

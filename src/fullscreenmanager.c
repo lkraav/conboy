@@ -670,8 +670,6 @@ fullscreen_ui_create(FullscreenManager * manager)
 
     gtk_window_set_resizable(GTK_WINDOW(win), FALSE);
 
-    gtk_window_set_opacity(GTK_WINDOW(win), 0.5);
-
 #ifdef USE_HILDON
     GtkWidget *icon = gtk_image_new_from_icon_name ("general_fullsize",
                                                     icon_size_64);

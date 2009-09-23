@@ -554,7 +554,11 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	PangoFontDescription *font;
 	AppData *app_data = app_data_get();
 
+#ifdef HILDON_HAS_APP_MENU
 	mainwin = hildon_stackable_window_new();
+#else
+	mainwin = hildon_window_new();
+#endif
 	gtk_window_set_title(GTK_WINDOW(mainwin), "Conboy");
 	ui->window = HILDON_WINDOW(mainwin);
 

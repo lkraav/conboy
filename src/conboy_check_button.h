@@ -1,5 +1,8 @@
+#ifdef HILDON_HAS_APP_MENU
+
 #ifndef __CONBOY_CHECK_BUTTON_H__
 #define __CONBOY_CHECK_BUTTON_H__
+
 
 
 #include <hildon/hildon-button.h>
@@ -38,3 +41,5 @@ void		conboy_check_button_toggled		(ConboyCheckButton *button);
 
 
 #endif /* __CONBOY_CHECK_BUTTON_H__ */
+
+#endif /* HILDON_HAS_APP_MENU */
