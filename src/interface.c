@@ -44,6 +44,7 @@
 #include "conboy_oauth.h"
 #include "note.h"
 #include "json.h"
+#include "ui_helper.h"
 
 #include "interface.h"
 
@@ -250,12 +251,15 @@ remove_by_guid(GList *list, ConboyNote *note_to_remove)
 static void
 on_sync_but_clicked(GtkButton *but, gpointer user_data)
 {
+	AppData *app_data = app_data_get();
+	
 	gchar *url = settings_load_sync_base_url();
-	if (url == NULL) {
+	if (url == NULL || strcmp(url, "") == 0) {
+		GtkWidget *dia = ui_helper_create_confirmation_dialog(GTK_WINDOW(app_data->note_window->window), "Please first set a URL in the settings");
+		gtk_dialog_run(GTK_DIALOG(dia));
+		gtk_widget_destroy(dia);
 		return;
 	}
-
-	AppData *app_data = app_data_get();
 
 	int last_sync_rev = settings_load_last_sync_revision();
 	time_t last_sync_time = settings_load_last_sync_time();
@@ -265,8 +269,11 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	gchar *reply = conboy_http_get(request);
 
 	if (reply == NULL) {
-		/* TODO: Write generic function which opens dialog with given error message */
-		g_printerr("ERROR: No reply from: %s\n", request);
+		gchar *msg = g_strconcat("Got no reply from: \n", request, NULL);
+		GtkWidget *dia = ui_helper_create_confirmation_dialog(GTK_WINDOW(app_data->note_window->window), msg);
+		gtk_dialog_run(GTK_DIALOG(dia));
+		gtk_widget_destroy(dia);
+		g_free(msg);
 		return;
 	}
 
@@ -584,7 +591,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	action_new = GTK_ACTION(gtk_action_new("new", _("New Note"), NULL, NULL));
 	action_notes = GTK_ACTION(gtk_action_new("open", _("Open Note"), NULL, GTK_STOCK_OPEN));
 	action_settings = GTK_ACTION(gtk_action_new("settings", _("Settings"), NULL, NULL));
-	action_quit = GTK_ACTION(gtk_action_new("quit", _("Close All Notes"), NULL, NULL));
+	action_quit = GTK_ACTION(gtk_action_new("quit", _("Quit"), NULL, NULL));
 	action_italic = GTK_ACTION(gtk_toggle_action_new("italic", _("Italic"), NULL, GTK_STOCK_ITALIC));
 	action_strike = GTK_ACTION(gtk_toggle_action_new("strikethrough", _("Strikeout"), NULL, NULL));
 	action_text_style = GTK_ACTION(gtk_action_new("style", _("Style"), NULL, GTK_STOCK_SELECT_FONT));
@@ -775,6 +782,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	menu_text_style = gtk_menu_item_new_with_label(_("Text Style"));
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_text_style), text_style_menu);
 	menu_settings = gtk_action_create_menu_item(action_settings);
+	menu_sync = gtk_action_create_menu_item(action_sync);
 	menu_quit = gtk_action_create_menu_item(action_quit);
 
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_new);
@@ -783,7 +791,10 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_settings);
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
+	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_sync);
+	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_quit);
+	
 
 	/* Must be at the end of the menu definition */
 	hildon_window_set_menu(HILDON_WINDOW(mainwin), GTK_MENU(main_menu));

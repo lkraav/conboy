@@ -39,6 +39,8 @@
 #include "app_data.h"
 #include "conboy_plugin_manager.h"
 #include "conboy_check_button.h"
+#include "ui_helper.h"
+
 #include "settings_window.h"
 
 
@@ -51,49 +53,7 @@ typedef struct
 } SettingsWidget;
 
 
-/**
- * Opens yes/no dialog which supports markup in message.
- *
- * return true on yes, false on no. Defaults to no
- */
-static GtkWidget*
-create_yes_no_dialog(GtkWindow *parent, const gchar *message)
-{
-	GtkWidget *dialog = gtk_dialog_new_with_buttons(
-			"",
-			parent,
-			GTK_DIALOG_MODAL,
-			GTK_STOCK_YES, GTK_RESPONSE_YES,
-			GTK_STOCK_NO, GTK_RESPONSE_NO,
-			NULL);
 
-	GtkWidget *label = gtk_label_new("");
-	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-	gtk_label_set_markup(GTK_LABEL(label), message);
-	gtk_widget_show(label);
-	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), label);
-
-	return dialog;
-}
-
-static GtkWidget*
-create_confirmation_dialog(GtkWindow *parent, const gchar *message)
-{
-	GtkWidget *dialog = gtk_dialog_new_with_buttons(
-			"",
-			parent,
-			GTK_DIALOG_MODAL,
-			GTK_STOCK_OK, GTK_RESPONSE_OK,
-			NULL);
-
-	GtkWidget *label = gtk_label_new("");
-	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-	gtk_label_set_markup(GTK_LABEL(label), message);
-	gtk_widget_show(label);
-	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), label);
-
-	return dialog;
-}
 
 static void
 on_scroll_but_toggled(GtkToggleButton *button, gpointer user_data)
@@ -155,11 +115,11 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 
 	gchar *old_url = settings_load_sync_base_url();
 
-	if (old_url != NULL && strcmp(url, old_url) != 0) {
-		GtkWidget *dialog = hildon_note_new_confirmation(parent, "blabla"); /*create_yes_no_dialog(parent, "Really reset the sync settings?");*/
+	if (old_url != NULL && strcmp(old_url, "") != 0 && strcmp(url, old_url) != 0) {
+		GtkWidget *dialog = hildon_note_new_confirmation(parent, "Really reset the sync settings?"); /*create_yes_no_dialog(parent, "Really reset the sync settings?");*/
 		int ret = gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy(dialog);
-		if (ret != GTK_RESPONSE_YES) {
+		if (ret != GTK_RESPONSE_OK) {
 			return;
 		}
 	}
@@ -169,7 +129,7 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 	gchar *link = conboy_get_auth_link(url);
 
 	if (link == NULL) {
-		GtkWidget *dialog = create_confirmation_dialog(parent, "Could not connect to host.");
+		GtkWidget *dialog = ui_helper_create_confirmation_dialog(parent, "Could not connect to host.");
 		gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy(dialog);
 		return;
@@ -186,7 +146,7 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 
 	g_printerr("Opening browser with URL: >%s<\n", link);
 
-	GtkWidget *dialog = create_confirmation_dialog(parent, "Click OK after authenticating on the website.");
+	GtkWidget *dialog = ui_helper_create_confirmation_dialog(parent, "Click OK after authenticating on the website.");
 	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 	gtk_dialog_run(GTK_DIALOG(dialog));
 
@@ -194,13 +154,13 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 		/* Disable Authenticate button */
 		gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
 		/* Popup dialog */
-		GtkWidget *ok_dialog = create_confirmation_dialog(parent, "You're authenticated. Everything is good :)");
+		GtkWidget *ok_dialog = ui_helper_create_confirmation_dialog(parent, "You're authenticated. Everything is good :)");
 		g_signal_connect(ok_dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 		gtk_dialog_run(GTK_DIALOG(ok_dialog));
 		gtk_widget_destroy(ok_dialog);
 
 	} else {
-		GtkWidget *fail_dialog = create_confirmation_dialog(parent, "Something went wrong. Not good :(");
+		GtkWidget *fail_dialog = ui_helper_create_confirmation_dialog(parent, "Something went wrong. Not good :(");
 		g_signal_connect(fail_dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 		gtk_dialog_run(GTK_DIALOG(fail_dialog));
 		gtk_widget_destroy(fail_dialog);
@@ -220,7 +180,6 @@ static
 GtkWidget *settings_widget_create(GtkWindow *parent)
 {
 	GtkWidget *pannable;
-	GtkWidget *viewport;
 	GtkWidget *config_vbox;
 	GtkWidget *hbox;
 #ifndef HILDON_HAS_APP_MENU
