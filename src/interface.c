@@ -108,18 +108,18 @@ on_orientation_changed(GdkScreen *screen, GHashTable *hash)
 
 	GtkWidget *toolbar = g_hash_table_lookup(hash, "toolbar");
 	GtkWidget *menu_open = g_hash_table_lookup(hash, "menu_open");
-	GtkWidget *text_view = app_data->note_window->view;
+	GtkTextView *text_view = app_data->note_window->view;
 
 	app_data->portrait = is_portrait_mode();
 
 	if (app_data->portrait) {
 		gtk_widget_hide(toolbar);
 		gtk_widget_show(menu_open);
-		gtk_widget_set_sensitive(text_view, FALSE);
+		gtk_text_view_set_editable(text_view, FALSE);
 	} else {
 		gtk_widget_show(toolbar);
 		gtk_widget_hide(menu_open);
-		gtk_widget_set_sensitive(text_view, TRUE);
+		gtk_text_view_set_editable(text_view, TRUE);
 	}
 }
 
