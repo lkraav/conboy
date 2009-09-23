@@ -25,11 +25,12 @@
 #include "app_data.h"
 #include "settings.h"
 #include "search_window.h"
-/*#include "json.h"*/
 #include "conboy_note.h"
 #include "conboy_plugin_info.h"
 #include "conboy_plugin.h"
 #include "conboy_note_store.h"
+#include "orientation.h"
+#include "fullscreenmanager.h"
 
 
 #define APP_NAME "conboy"
@@ -124,6 +125,10 @@ main (int argc, char *argv[])
   }
   */
 
+#ifdef HILDON_HAS_APP_MENU
+  orientation_init(app_data);
+#endif
+
   /* Open latest note or new one */
   note = conboy_note_store_get_latest(app_data->note_store);
   if (note == NULL) {
@@ -132,10 +137,19 @@ main (int argc, char *argv[])
   note_show(note);
 
   /* Register URL listener */
-   if (osso_rpc_set_cb_f(app_data->osso_ctx, APP_SERVICE, APP_METHOD, APP_SERVICE, dbus_handler, app_data->note_window->window) != OSSO_OK) {
-       g_printerr("Failed to set callback\n");
-   }
+  if (osso_rpc_set_cb_f(app_data->osso_ctx, APP_SERVICE, APP_METHOD, APP_SERVICE, dbus_handler, app_data->note_window->window) != OSSO_OK) {
+      g_printerr("Failed to set callback\n");
+  }
 
+  /* EXPERIEMNT */
+  /*
+  gtk_widget_hide(GTK_WIDGET(app_data->note_window->toolbar));
+
+  FullscreenManager *mgr = fullscreen_create_manager(GTK_WINDOW(app_data->note_window->window));
+  fullscreen_enable(mgr);
+  */
+
+  /****/
 
   gtk_main();
 

@@ -23,16 +23,33 @@
 #include <hildon/hildon-color-button.h>
 #include <tablet-browser-interface.h>
 #include <dbus/dbus-protocol.h>
+#include <hildon/hildon-note.h>
 
 #ifdef HILDON_HAS_APP_MENU
 #include <hildon/hildon-gtk.h>
 #include <hildon/hildon-check-button.h>
+#include <hildon/hildon-pannable-area.h>
+#include <hildon/hildon-entry.h>
+#include <hildon/hildon-button.h>
 #endif
 
-#include "settings_window.h"
+
 #include "settings.h"
 #include "app_data.h"
 #include "conboy_plugin_manager.h"
+#include "conboy_check_button.h"
+#include "settings_window.h"
+
+
+
+typedef struct
+{
+	GtkWidget *window;
+	GtkWidget *url_entry;
+	GtkWidget *auth_button;
+} SettingsWidget;
+
+
 
 /********** Plugins Settings Widget *************/
 
@@ -53,40 +70,55 @@ plugins_settings_widget_create()
 static void
 on_auth_but_clicked(GtkButton *button, gpointer user_data)
 {
-	g_printerr("Auth but\n");
-	
-	GtkEntry *entry = GTK_ENTRY(user_data);
-	const gchar *url = gtk_entry_get_text(entry);
-	
-	settings_save_sync_base_url(url);
-	
-	gchar *link = conboy_get_auth_link(url);
-	
-	/* Open link in browser */
-	AppData *app_data = app_data_get();
-	osso_rpc_run_with_defaults(app_data->osso_ctx, "osso_browser",
-			OSSO_BROWSER_OPEN_NEW_WINDOW_REQ, NULL, 
-			DBUS_TYPE_STRING, link, DBUS_TYPE_INVALID);
 
-	g_printerr("Opening browser with URL: >%s<\n", link);
-	
-	GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Click ok after authenticating on the website.");
-	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
-	gtk_dialog_run(GTK_DIALOG(dialog));
-	
-	if (conboy_get_access_token()) {
-		/* Disable Authenticate button and URL field */
-		/* Enable Clean button */
-		GtkWidget *ok_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "You're authenticated. Everything is good :)");
-		g_signal_connect(ok_dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
-		gtk_dialog_run(GTK_DIALOG(ok_dialog));
-	} else {
-		GtkWidget *fail_dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Something went wrong. Not good :(");
-		g_signal_connect(fail_dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
-		gtk_dialog_run(GTK_DIALOG(fail_dialog));
-	}
-	
+
 }
+
+/**
+ * Opens yes/no dialog which supports markup in message.
+ *
+ * return true on yes, false on no. Defaults to no
+ */
+static GtkWidget*
+create_yes_no_dialog(GtkWindow *parent, const gchar *message)
+{
+	GtkWidget *dialog = gtk_dialog_new_with_buttons(
+			"",
+			parent,
+			GTK_DIALOG_MODAL,
+			GTK_STOCK_YES, GTK_RESPONSE_YES,
+			GTK_STOCK_NO, GTK_RESPONSE_NO,
+			NULL);
+
+	GtkWidget *label = gtk_label_new("");
+	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+	gtk_label_set_markup(GTK_LABEL(label), message);
+	gtk_widget_show(label);
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), label);
+
+	return dialog;
+}
+
+static GtkWidget*
+create_confirmation_dialog(GtkWindow *parent, const gchar *message)
+{
+	GtkWidget *dialog = gtk_dialog_new_with_buttons(
+			"",
+			parent,
+			GTK_DIALOG_MODAL,
+			GTK_STOCK_OK, GTK_RESPONSE_OK,
+			NULL);
+
+	GtkWidget *label = gtk_label_new("");
+	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+	gtk_label_set_markup(GTK_LABEL(label), message);
+	gtk_widget_show(label);
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), label);
+
+	return dialog;
+}
+
+
 
 static void
 on_clean_but_clicked(GtkButton *button, gpointer user_data)
@@ -99,7 +131,7 @@ sync_settings_widget_create()
 {
 	GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(vbox);
-	
+
 	GtkWidget *label = gtk_label_new("");
 	/*
 	gchar *text =
@@ -115,36 +147,36 @@ sync_settings_widget_create()
 	*/
 	gtk_widget_show(label);
 	gtk_container_add(GTK_CONTAINER(vbox), label);
-	
+
 	GtkWidget *hbox = gtk_hbox_new(FALSE, 0);
 	gtk_widget_show(hbox);
 	gtk_container_add(GTK_CONTAINER(vbox), hbox);
-	
+
 	GtkWidget *url_label = gtk_label_new("URL:");
 	gtk_widget_show(url_label);
 	gtk_box_pack_start(GTK_BOX(hbox), url_label, FALSE, FALSE, 0);
-	
+
 	GtkWidget *url_entry = gtk_entry_new();
 	gtk_widget_set_size_request(url_entry, 600, -1);
 	gtk_widget_show(url_entry);
 	gtk_box_pack_start(GTK_BOX(hbox), url_entry, TRUE, TRUE, 0);
-	
+
 	GtkWidget *auth_but = gtk_button_new_with_label("Authenticate");
 	gtk_widget_show(auth_but);
 	gtk_box_pack_start(GTK_BOX(hbox), auth_but, FALSE, FALSE, 0);
-	
+
 	GtkWidget *clean_but = gtk_button_new_with_label("Clean");
 	gtk_widget_show(clean_but);
 	gtk_box_pack_start(GTK_BOX(hbox), clean_but, FALSE, FALSE, 0);
-	
+
 	g_signal_connect(auth_but, "clicked", G_CALLBACK(on_auth_but_clicked), url_entry);
 	g_signal_connect(clean_but, "clicked", G_CALLBACK(on_clean_but_clicked), NULL);
-	
+
 	/* Load url */
 	gchar *url = settings_load_sync_base_url();
 	gtk_entry_set_text(GTK_ENTRY(url_entry), url);
 	g_free(url);
-	
+
 	return vbox;
 }
 /*******************************************/
@@ -153,15 +185,13 @@ static void
 on_sync_but_clicked(GtkButton *button, gpointer user_data)
 {
 	GtkWindow *parent = GTK_WINDOW(user_data);
-	
+
 	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Synchronization settings"),
 				parent,
 				GTK_DIALOG_MODAL,
-				GTK_STOCK_OK,
-				GTK_RESPONSE_OK,
 				NULL);
-	
-	
+
+
 	GtkWidget *content_area = GTK_DIALOG(dialog)->vbox;
 	GtkWidget *content_widget = sync_settings_widget_create();
 
@@ -172,22 +202,20 @@ on_sync_but_clicked(GtkButton *button, gpointer user_data)
 	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 
 	gtk_dialog_run(GTK_DIALOG(dialog));
-	
+
 }
 
 static void
 on_plugin_but_clicked(GtkButton *button, gpointer user_data)
 {
 	GtkWindow *parent = GTK_WINDOW(user_data);
-		
+
 	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Plug-ins settings"),
 				parent,
 				GTK_DIALOG_MODAL,
-				GTK_STOCK_OK,
-				GTK_RESPONSE_OK,
 				NULL);
-	
-	
+
+
 	GtkWidget *content_area = GTK_DIALOG(dialog)->vbox;
 	GtkWidget *content_widget = plugins_settings_widget_create();
 
@@ -198,7 +226,7 @@ on_plugin_but_clicked(GtkButton *button, gpointer user_data)
 	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 
 	gtk_dialog_run(GTK_DIALOG(dialog));
-	
+
 }
 
 static void
@@ -243,9 +271,86 @@ on_color_but_changed(HildonColorButton *button, SettingsColorType *type)
 	settings_save_color(&color, GPOINTER_TO_INT(type));
 }
 
-static
-GtkWidget *settings_widget_create()
+static void
+on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 {
+
+	const gchar *url = hildon_entry_get_text(HILDON_ENTRY(widget->url_entry));
+	GtkWindow *parent = GTK_WINDOW(widget->window);
+
+	if (url == NULL) {
+		return;
+	}
+
+	gchar *old_url = settings_load_sync_base_url();
+
+	if (old_url != NULL && strcmp(url, old_url) != 0) {
+		GtkWidget *dialog = hildon_note_new_confirmation(parent, "blabla"); /*create_yes_no_dialog(parent, "Really reset the sync settings?");*/
+		int ret = gtk_dialog_run(GTK_DIALOG(dialog));
+		gtk_widget_destroy(dialog);
+		if (ret != GTK_RESPONSE_YES) {
+			return;
+		}
+	}
+
+	/* DO auth stuff */
+
+	gchar *link = conboy_get_auth_link(url);
+
+	if (link == NULL) {
+		GtkWidget *dialog = create_confirmation_dialog(parent, "Could not connect to host.");
+		gtk_dialog_run(GTK_DIALOG(dialog));
+		gtk_widget_destroy(dialog);
+		return;
+	}
+
+	/* If successfull, save url */
+	settings_save_sync_base_url(url);
+
+	/* Open link in browser */
+	AppData *app_data = app_data_get();
+	osso_rpc_run_with_defaults(app_data->osso_ctx, "osso_browser",
+			OSSO_BROWSER_OPEN_NEW_WINDOW_REQ, NULL,
+			DBUS_TYPE_STRING, link, DBUS_TYPE_INVALID);
+
+	g_printerr("Opening browser with URL: >%s<\n", link);
+
+	GtkWidget *dialog = create_confirmation_dialog(parent, "Click OK after authenticating on the website.");
+	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+
+	gchar *message;
+	if (conboy_get_access_token()) {
+		/* Disable Authenticate button */
+		gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
+		/* Popup dialog */
+		GtkWidget *ok_dialog = create_confirmation_dialog(parent, "You're authenticated. Everything is good :)");
+		g_signal_connect(ok_dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+		gtk_dialog_run(GTK_DIALOG(ok_dialog));
+		gtk_widget_destroy(ok_dialog);
+
+	} else {
+		GtkWidget *fail_dialog = create_confirmation_dialog(parent, "Something went wrong. Not good :(");
+		g_signal_connect(fail_dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+		gtk_dialog_run(GTK_DIALOG(fail_dialog));
+		gtk_widget_destroy(fail_dialog);
+		settings_save_sync_base_url("");
+	}
+
+
+}
+
+static void
+on_sync_entry_changed(GtkEntry *entry, GtkWidget *button)
+{
+	gtk_widget_set_sensitive(button, TRUE);
+}
+
+static
+GtkWidget *settings_widget_create(GtkWindow *parent)
+{
+	GtkWidget *pannable;
+	GtkWidget *viewport;
 	GtkWidget *config_vbox;
 	GtkWidget *hbox;
 #ifndef HILDON_HAS_APP_MENU
@@ -258,9 +363,18 @@ GtkWidget *settings_widget_create()
 	GtkWidget *link_color_hbox, *link_color_but, *link_color_label;
 	GdkColor color;
 
+	SettingsWidget *widget = g_new0(SettingsWidget, 1);
+	widget->window = GTK_WIDGET(parent);
+
+	/* Scrolling / Panning */
+	pannable = hildon_pannable_area_new();
+	g_object_set(pannable, "hscrollbar-policy", GTK_POLICY_NEVER, NULL);
+	gtk_widget_show(pannable);
+
 	/* Config vbox */
 	config_vbox = gtk_vbox_new(FALSE, 20);
 	gtk_widget_show(config_vbox);
+	hildon_pannable_area_add_with_viewport(HILDON_PANNABLE_AREA(pannable), config_vbox);
 
 	/* Container for "scrollbar size" and for "on startup" */
 	hbox = gtk_hbox_new(FALSE, 0);
@@ -307,6 +421,7 @@ GtkWidget *settings_widget_create()
 #endif
 	gtk_widget_show(GTK_WIDGET(view_button_box));
 	gtk_container_add(GTK_CONTAINER(view_box), view_button_box);
+
 
 #ifdef HILDON_HAS_APP_MENU
 	/* TODO: Write a bug report. This should be only 2 lines instaed of 6 */
@@ -398,23 +513,131 @@ GtkWidget *settings_widget_create()
 	gtk_widget_set_size_request(GTK_WIDGET(link_color_but), 70, 70);
 	#endif
 
-	/* Adding buttons for sync and plugins */
-	GtkWidget *but_hbox = gtk_hbox_new(TRUE, 0);
-	gtk_widget_show(but_hbox);
-	gtk_container_add(GTK_CONTAINER(config_vbox), but_hbox);
-	
-	GtkWidget *sync_but = gtk_button_new_with_label("Synchonization");
-	gtk_widget_set_size_request(sync_but, -1, 70);
-	gtk_widget_show(sync_but);
-	
-	GtkWidget *plugin_but = gtk_button_new_with_label("Plug-ins");
-	gtk_widget_set_size_request(plugin_but, -1, 70);
-	gtk_widget_show(plugin_but);
-	
-	gtk_container_add(GTK_CONTAINER(but_hbox), sync_but);
-	gtk_container_add(GTK_CONTAINER(but_hbox), plugin_but);
-	
-	
+	/* Adding sync section */
+	GtkWidget *sync_hbox = gtk_hbox_new(FALSE, 0);
+	gtk_widget_show(sync_hbox);
+	gtk_box_pack_start(GTK_BOX(config_vbox), sync_hbox, TRUE, TRUE, 0);
+
+	GtkWidget *sync_entry = hildon_entry_new(HILDON_SIZE_FINGER_HEIGHT);
+	widget->url_entry = sync_entry;
+	hildon_entry_set_placeholder(HILDON_ENTRY(sync_entry), "http://example.com:8080");
+	gtk_widget_show(sync_entry);
+	gtk_box_pack_start(GTK_BOX(sync_hbox), sync_entry, TRUE, TRUE, 0);
+
+	GtkWidget *sync_auth_but = hildon_gtk_button_new(HILDON_SIZE_FINGER_HEIGHT);
+	widget->auth_button = sync_auth_but;
+	gtk_button_set_label(GTK_BUTTON(sync_auth_but), "Authenticate");
+	gtk_widget_show(sync_auth_but);
+	gtk_box_pack_start(GTK_BOX(sync_hbox), sync_auth_but, FALSE, FALSE, 0);
+
+	/* Adding plugin section */
+	/*
+	GtkWidget *plugin_hbox = gtk_hbox_new(FALSE, 0);
+	gtk_widget_show(plugin_hbox);
+	gtk_box_pack_start(GTK_BOX(config_vbox), plugin_hbox, TRUE, TRUE, 0);
+
+	GtkWidget *plugin_manager = conboy_plugin_manager_new();
+	gtk_widget_show(plugin_manager);
+	gtk_box_pack_start(GTK_BOX(plugin_hbox), plugin_manager, TRUE, TRUE, 0);
+	*/
+
+	/* TODO: Current plugin manager does not look nice on Fremantle. Below is a demo
+	 * on how it should look. Implement this for PluginManager.
+	 */
+#ifdef XXX
+	/* Touch test */
+	GtkWidget *test_vbox = gtk_vbox_new(FALSE, 0);
+	gtk_widget_show(test_vbox);
+	gtk_box_pack_start(GTK_BOX(config_vbox), test_vbox, TRUE, TRUE, 0);
+
+	/* Heading */
+	GtkWidget *heading = gtk_label_new("Plugins");
+	gtk_widget_show(heading);
+	/*gtk_label_set_justify(GTK_LABEL(heading), GTK_JUSTIFY_LEFT);*/
+	gtk_misc_set_alignment(GTK_MISC(heading), 0, -1);
+	gtk_box_pack_start(GTK_BOX(test_vbox), heading, TRUE, TRUE, 0);
+
+	/* Test row 1 */
+	GtkWidget *test_hbox1 = gtk_hbox_new(FALSE, 0);
+	gtk_widget_show(test_hbox1);
+	gtk_box_pack_start(GTK_BOX(test_vbox), test_hbox1, TRUE, TRUE, 0);
+
+	/*GtkWidget *but1 = hildon_button_new(HILDON_SIZE_FINGER_HEIGHT, HILDON_BUTTON_ARRANGEMENT_VERTICAL);
+	GtkWidget *chk1 = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_tickmark_checked.png");
+	hildon_button_set_image(HILDON_BUTTON(but1), chk1);
+	hildon_button_set_image_alignment(HILDON_BUTTON(but1), 0, 0.5);
+	hildon_button_set_text(HILDON_BUTTON(but1), "Xml Backend", "Loads and saves data using xml");
+	hildon_button_set_alignment(HILDON_BUTTON(but1), 0, -1, 0, -1);*/
+
+
+	GtkWidget *but1 = conboy_check_button_new(HILDON_SIZE_FINGER_HEIGHT, HILDON_BUTTON_ARRANGEMENT_VERTICAL);
+	gtk_widget_show(but1);
+	hildon_button_set_text(HILDON_BUTTON(but1), "Xml Backend", "Loads and saves data using xml");
+	conboy_check_button_set_active(CONBOY_CHECK_BUTTON(but1), TRUE);
+
+
+	/*
+	HildonCheckButton *but1 = hildon_check_button_new(HILDON_SIZE_FINGER_HEIGHT);
+	hildon_check_button_set_active(but1, TRUE);
+	gtk_button_set_label(but1, "bla");
+
+	GtkWidget *but_child = gtk_bin_get_child(GTK_BIN(but1));
+	g_printerr("Type: %s\n", g_type_name(G_TYPE_FROM_INSTANCE(but_child)));
+	GtkWidget *next_child = gtk_bin_get_child(GTK_BIN(but_child));
+	g_printerr("Type: %s\n", g_type_name(G_TYPE_FROM_INSTANCE(next_child)));
+
+	GtkLabel *add = gtk_label_new("Crap Crap");
+	gtk_widget_show(add);
+	gtk_box_pack_start(GTK_BOX(next_child), add, FALSE, FALSE, 0);
+*/
+	gtk_widget_show(but1);
+	gtk_box_pack_start(GTK_BOX(test_hbox1), but1, TRUE, TRUE, 0);
+
+
+
+	GtkWidget *inf1 = hildon_gtk_button_new(HILDON_SIZE_FINGER_HEIGHT);
+	GtkWidget *inf1_img = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_information.png");
+	gtk_button_set_image(GTK_BUTTON(inf1), inf1_img);
+	gtk_widget_show(inf1);
+	gtk_box_pack_start(GTK_BOX(test_hbox1), inf1, FALSE, FALSE, 0);
+
+	GtkWidget *cnf1 = hildon_gtk_button_new(HILDON_SIZE_FINGER_HEIGHT);
+	GtkWidget *cnf1_img = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_settings.png");
+	gtk_button_set_image(GTK_BUTTON(cnf1), cnf1_img);
+	gtk_widget_show(cnf1);
+	gtk_box_pack_start(GTK_BOX(test_hbox1), cnf1, FALSE, FALSE, 0);
+	/* End row 1 */
+
+	/* Test row 2 */
+	GtkWidget *test_hbox2 = gtk_hbox_new(FALSE, 0);
+	gtk_widget_show(test_hbox2);
+	gtk_box_pack_start(GTK_BOX(test_vbox), test_hbox2, TRUE, TRUE, 0);
+
+	GtkWidget *but2 = hildon_button_new(HILDON_SIZE_FINGER_HEIGHT, HILDON_BUTTON_ARRANGEMENT_VERTICAL);
+	GtkWidget *chk2 = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_tickmark_unchecked.png");
+	hildon_button_set_image(HILDON_BUTTON(but2), chk2);
+	hildon_button_set_image_alignment(HILDON_BUTTON(but2), 0, 0.5);
+	hildon_button_set_text(HILDON_BUTTON(but2), "Midgard Backend", "Loads and saves data using a Midgard database");
+	hildon_button_set_alignment(HILDON_BUTTON(but2), 0, -1, 0, -1);
+	gtk_widget_show(but2);
+	gtk_box_pack_start(GTK_BOX(test_hbox2), but2, TRUE, TRUE, 0);
+
+	GtkWidget *inf2 = hildon_gtk_button_new(HILDON_SIZE_FINGER_HEIGHT);
+	GtkWidget *inf2_img = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_information.png");
+	gtk_button_set_image(GTK_BUTTON(inf2), inf2_img);
+	gtk_widget_show(inf2);
+	gtk_box_pack_start(GTK_BOX(test_hbox2), inf2, FALSE, FALSE, 0);
+
+	GtkWidget *cnf2 = hildon_gtk_button_new(HILDON_SIZE_FINGER_HEIGHT);
+	GtkWidget *cnf2_img = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_settings.png");
+	gtk_button_set_image(GTK_BUTTON(cnf2), cnf2_img);
+	gtk_widget_show(cnf2);
+	gtk_box_pack_start(GTK_BOX(test_hbox2), cnf2, FALSE, FALSE, 0);
+	/* End row 2 */
+
+
+#endif
+
 	/*
 	 * Set initial values from gconf
 	 */
@@ -429,11 +652,13 @@ GtkWidget *settings_widget_create()
 #endif
 
 	/* On Startup */
+#ifdef XXX
 	if (settings_load_startup_window() == SETTINGS_STARTUP_WINDOW_NOTE) {
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(view_but1), TRUE);
 	} else {
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(view_but2), TRUE);
 	}
+#endif
 
 	/* Use custom colors */
 	gboolean custom_colors = settings_load_use_costum_colors();
@@ -456,6 +681,12 @@ GtkWidget *settings_widget_create()
 	settings_load_color(&color, SETTINGS_COLOR_TYPE_LINKS);
 	hildon_color_button_set_color(HILDON_COLOR_BUTTON(link_color_but), &color);
 
+	/* Sync URL */
+	if (settings_load_sync_base_url() != NULL) {
+		hildon_entry_set_text(HILDON_ENTRY(sync_entry), settings_load_sync_base_url());
+		gtk_widget_set_sensitive(GTK_WIDGET(sync_auth_but), FALSE);
+	}
+
 
 	/* Connect signals */
 #ifndef HILDON_HAS_APP_MENU
@@ -466,9 +697,18 @@ GtkWidget *settings_widget_create()
 	g_signal_connect(text_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_TEXT));
 	g_signal_connect(link_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_LINKS));
 	g_signal_connect(back_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_BACKGROUND));
+
+	g_signal_connect(sync_auth_but, "clicked", G_CALLBACK(on_sync_auth_but_clicked), widget);
+	g_signal_connect(sync_entry, "changed", G_CALLBACK(on_sync_entry_changed), sync_auth_but);
+	/*
 	g_signal_connect(sync_but, "clicked", G_CALLBACK(on_sync_but_clicked), NULL);
 	g_signal_connect(plugin_but, "clicked", G_CALLBACK(on_plugin_but_clicked), NULL);
-	return config_vbox;
+	*/
+
+
+	/* Set to something big to make sure the maximum dialog area is used */
+	gtk_widget_set_size_request(pannable, -1, 800);
+	return pannable;
 }
 
 
@@ -477,12 +717,10 @@ void settings_window_open(GtkWindow *parent)
 	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Settings"),
 			parent,
 			GTK_DIALOG_MODAL,
-			GTK_STOCK_OK,
-			GTK_RESPONSE_OK,
 			NULL);
 
 	GtkWidget *content_area = GTK_DIALOG(dialog)->vbox;
-	GtkWidget *content_widget = settings_widget_create();
+	GtkWidget *content_widget = settings_widget_create(GTK_WINDOW(dialog));
 
 	/* Add the widget to the dialog */
 	gtk_box_pack_start(GTK_BOX(content_area), content_widget, TRUE, TRUE, 10);

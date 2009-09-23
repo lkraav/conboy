@@ -130,7 +130,7 @@ void note_save(UserInterface *ui)
 	AppData *app_data = app_data_get();
 	GtkTextBuffer *buffer = ui->buffer;
 	ConboyNote *note = ui->note;
-	
+
 	/* If note is empty, don't save */
 	gtk_text_buffer_get_bounds(buffer, &start, &end);
 	content = gtk_text_iter_get_text(&start, &end);
@@ -182,13 +182,13 @@ void note_save(UserInterface *ui)
 	if (note->y == 0) {
 		g_object_set(note, "y", 1, NULL);
 	}
-	
+
 	/* Clear note content, then set it with fresh data from the text buffer */
 	g_object_set(note, "content", conboy_note_buffer_get_xml(CONBOY_NOTE_BUFFER(buffer)), NULL);
 
 	/* Save the complete note */
 	conboy_storage_note_save(app_data->storage, note);
-	
+
 	/* If first save, add to list of all notes */
 	if (!conboy_note_store_find(app_data->note_store, note)) {
 		conboy_note_store_add(app_data->note_store, note, NULL);
@@ -205,28 +205,31 @@ void note_close_window(UserInterface *ui)
 	HildonProgram *program = hildon_program_get_instance();
 	HildonWindow *window = ui->window;
 	AppData *app_data = app_data_get();
+
+	gtk_main_quit();
+
+	/*
 	guint count = g_list_length(app_data->open_notes);
 	GList  *listeners = ui->listeners;
-	
+
 	if (count > 1) {
 		hildon_program_remove_window(program, window);
-		
-		/* Remove the listeners */
+
 		while (listeners != NULL) {
 			gconf_client_notify_remove(app_data->client, GPOINTER_TO_INT(listeners->data));
 			listeners = listeners->next;
 		}
-		
+
 		gtk_widget_destroy(GTK_WIDGET(window));
 		g_list_free(ui->listeners);
 		g_free(ui);
 		ui = g_new0(UserInterface, 1);
 		app_data->open_windows = g_list_remove(app_data->open_windows, ui);
-		/* Don't free note, because we reuse this in the menu with the available notes and when reopening */
 	} else {
 		g_printerr("####################### QUIT ###################\n");
 		gtk_main_quit();
 	}
+	*/
 }
 
 
@@ -238,13 +241,13 @@ void note_delete(ConboyNote *note)
 	if (!conboy_storage_note_delete(app_data->storage, note)) {
 		g_printerr("ERROR: The note with the guid %s could not be deleted \n", note->guid);
 	}
-		
+
 	/* Remove from list store */
 	conboy_note_store_remove(app_data->note_store, note);
 
 }
 
-
+/*
 gboolean note_is_open(UserInterface *ui)
 {
 	AppData *app_data = app_data_get();
@@ -255,8 +258,9 @@ gboolean note_is_open(UserInterface *ui)
 		return TRUE;
 	}
 }
+*/
 
-/** 
+/**
  * TODO: This should be a function of NoteListStore.
  *  note_list_store_containts(note)
  */
@@ -293,13 +297,13 @@ void note_show(ConboyNote *note)
 		return;
 	}
 	*/
-	
-	
+
+
 
 	if (app_data->note_window == NULL) {
 		g_printerr("##### Creating Mainwin\n");
 		app_data->note_window = create_mainwin(note);
-		
+
 		/* Set window width/height, otherwise scroll to cursor doesn't work correctly */
 		gtk_window_set_default_size(GTK_WINDOW(app_data->note_window->window), 720, 420);
 
@@ -310,19 +314,19 @@ void note_show(ConboyNote *note)
 			gtk_window_unfullscreen(GTK_WINDOW(app_data->note_window->window));
 		}
 	}
-	
+
 	UserInterface *ui = app_data->note_window;
 	buffer = ui->buffer;
 	window = GTK_WINDOW(ui->window);
-	
+
 	if (!GTK_IS_TEXT_BUFFER(buffer)) {
 		g_printerr("NO BUFFER\n");
 	}
-	
+
 	if (!GTK_IS_WINDOW(window)) {
 		g_printerr("NO WINDOW\n");
 	}
-	
+
 
 	hildon_program_add_window(app_data->program, HILDON_WINDOW(window));
 
@@ -338,8 +342,10 @@ void note_show(ConboyNote *note)
 	*/
 	conboy_note_window_show_note(ui, note);
 
+	/*
 	app_data->open_notes = g_list_append(app_data->open_notes, note);
 	app_data->open_windows = g_list_append(app_data->open_notes, note);
+	*/
 
 	/* Format note title and update window title */
 	note_format_title(buffer);

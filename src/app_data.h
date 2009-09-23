@@ -11,18 +11,18 @@
 
 typedef struct
 {
-	GList         *open_notes;
-	GList		  *open_windows;
+	/*GList         *open_notes;*/
+	/*GList		  *open_windows;*/
 	GConfClient   *client;
 	HildonProgram *program;
 	gboolean	   fullscreen;
 	gboolean       portrait;
 	HildonWindow  *search_window;
+	UserInterface  *note_window;
 	ConboyNoteStore *note_store;
 	xmlTextReader *reader;
 	osso_context_t *osso_ctx;
 	ConboyStorage  *storage;
-	UserInterface  *note_window;
 	ConboyPluginStore *plugin_store;
 } AppData;
 

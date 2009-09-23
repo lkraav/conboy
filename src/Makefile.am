@@ -59,7 +59,15 @@ conboy_SOURCES = \
         conboy_note_buffer.h \
         conboy_note_buffer.c \
         conboy_plugin_store.h \
-        conboy_plugin_store.c
+        conboy_plugin_store.c \
+        conboy_check_button.h \
+        conboy_check_button.c \
+        conboy_check_mark.h \
+        conboy_check_mark.c \
+        orientation.h \
+        orientation.c \
+        fullscreenmanager.h \
+        fullscreenmanager.c
         
 
 #libconboy_applet_la_SOURCES = \

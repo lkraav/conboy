@@ -185,15 +185,21 @@ on_window_delete		               (GtkObject		*window,
 										gpointer		 user_data)
 {
 	UserInterface *ui = (UserInterface*)user_data;
+	/*
 	g_printerr("Window delete \n");
+	*/
 	note_save(ui);
+	gtk_main_quit();
+	/*
 	note_close_window(ui);
+	*/
 	return TRUE; /* True to stop other handler from being invoked */
 }
 
 void on_quit_button_clicked(GtkAction *action, gpointer user_data)
 {
-	UserInterface *ui;
+	UserInterface *ui = (UserInterface*)user_data;
+	/*
 	GList *open_windows = app_data_get()->open_windows;
 
 	while (open_windows != NULL) {
@@ -202,6 +208,8 @@ void on_quit_button_clicked(GtkAction *action, gpointer user_data)
 		note_close_window(ui);
 		open_windows = g_list_next(open_windows);
 	}
+	*/
+	note_save(ui);
 
 	gtk_main_quit();
 }
@@ -758,6 +766,14 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 		app_data->fullscreen = !app_data->fullscreen;
 
 		/* Set all open windows to fullscreen or unfullscreen */
+
+		if (app_data->fullscreen) {
+			gtk_window_fullscreen(GTK_WINDOW(app_data->note_window->window));
+		} else {
+			gtk_window_unfullscreen(GTK_WINDOW(app_data->note_window->window));
+		}
+
+		/*
 		open_windows = app_data->open_windows;
 		while (open_windows != NULL) {
 			UserInterface *open_window = (UserInterface*)open_windows->data;
@@ -768,6 +784,7 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 			}
 			open_windows = open_windows->next;
 		}
+		*/
 		/* Set search window to fullscreen or unfullscreen */
 		if (app_data->search_window != NULL) {
 			if (app_data->fullscreen) {

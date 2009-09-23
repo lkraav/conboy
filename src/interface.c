@@ -108,15 +108,18 @@ on_orientation_changed(GdkScreen *screen, GHashTable *hash)
 
 	GtkWidget *toolbar = g_hash_table_lookup(hash, "toolbar");
 	GtkWidget *menu_open = g_hash_table_lookup(hash, "menu_open");
+	GtkWidget *text_view = app_data->note_window->view;
 
 	app_data->portrait = is_portrait_mode();
 
 	if (app_data->portrait) {
 		gtk_widget_hide(toolbar);
 		gtk_widget_show(menu_open);
+		gtk_widget_set_sensitive(text_view, FALSE);
 	} else {
 		gtk_widget_show(toolbar);
 		gtk_widget_hide(menu_open);
+		gtk_widget_set_sensitive(text_view, TRUE);
 	}
 }
 
@@ -247,12 +250,25 @@ remove_by_guid(GList *list, ConboyNote *note_to_remove)
 static void
 on_sync_but_clicked(GtkButton *but, gpointer user_data)
 {
+	gchar *url = settings_load_sync_base_url();
+	if (url == NULL) {
+		return;
+	}
+
 	AppData *app_data = app_data_get();
 
 	int last_sync_rev = settings_load_last_sync_revision();
 	time_t last_sync_time = settings_load_last_sync_time();
 
-	gchar *reply = conboy_http_get("http://127.0.0.1:8000/api/1.0/");
+	gchar *request = g_strconcat(url, "/api/1.0/", NULL);
+
+	gchar *reply = conboy_http_get(request);
+
+	if (reply == NULL) {
+		/* TODO: Write generic function which opens dialog with given error message */
+		g_printerr("ERROR: No reply from: %s\n", request);
+		return;
+	}
 
 	g_printerr("Reply from /api/1.0/:: %s\n", reply);
 
@@ -260,11 +276,18 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 
 	reply = conboy_http_get(api_ref);
 
+	if (reply == NULL) {
+		/* TODO: Open error dialog */
+		g_printerr("ERROR: No reply from: %s\n", api_ref);
+		return;
+	}
+
 	g_printerr("Reply from /root/:: %s\n", reply);
 
 	/* Revision checks */
 	JsonUser *user = json_get_user(reply);
 	if (user->latest_sync_revision < last_sync_rev) {
+		/* TODO: Open error dialog */
 		g_printerr("ERROR: Server revision older than our revision. This should not happen.\n");
 		return;
 	}
@@ -303,6 +326,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 		conboy_storage_note_save(app_data->storage, note);
 
 		/* If not yet in the note store, add this note */
+		/* TODO: If note is newer, send signal, that the note store updates it */
 		if (!conboy_note_store_get_by_guid(app_data->note_store, note->guid)) {
 			g_printerr("INFO: Adding note '%s' to note store\n", note->title);
 			conboy_note_store_add(app_data->note_store, note, NULL);
@@ -327,57 +351,9 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	g_printerr("Saving last sync rev: %i\n", last_sync_rev);
 	settings_save_last_sync_revision(last_sync_rev);
 	settings_save_last_sync_time(time(NULL));
-	/*
-	while (local_notes) {
-		g_printerr("Remaining: %s\n", CONBOY_NOTE(local_notes->data)->title);
-		local_notes = local_notes->next;
-	}
-	*/
-
 
 }
 
-/*
-static void
-on_sync_but_clicked(GtkButton *but, gpointer user_data)
-{
-	gchar *tok = NULL;
-	gchar *sec = NULL;
-	gchar *lnk = NULL;
-
-	Note *note = (Note*) user_data;
-
-
-	if (tok == NULL || sec == NULL) {
-
-		lnk = get_auth_link("http://127.0.0.1:8000/oauth/request_token/", "http://127.0.0.1:8000/oauth/authenticate/", &tok, &sec);
-		GtkWidget *dialog = gtk_message_dialog_new(NULL, GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, lnk);
-		g_printerr("Link:\n%s\n", lnk);
-		gtk_dialog_run(GTK_DIALOG(dialog));
-		gtk_widget_destroy (dialog);
-
-		if (get_access_token("http://127.0.0.1:8000/oauth/access_token/", &tok, &sec)) {
-			g_printerr("Saving token & secret to gconf \n");
-			settings_save_oauth_access_token(tok);
-			settings_save_oauth_access_secret(sec);
-		}
-	}
-
-	gchar *reply = get_all_notes("http://127.0.0.1:8000", TRUE, tok, sec);
-
-	if (reply != NULL) {
-		GSList *notes = json_get_notes_from_string(reply);
-		while (notes != NULL) {
-			Note *note = (Note*)notes->data;
-			g_printerr("Title: %s\n", note->title);
-			g_printerr("GUID : %s\n", note->guid);
-			g_printerr("-------\n");
-			notes = notes->next;
-		}
-	}
-
-}
-*/
 
 static void
 on_storage_activated (ConboyStorage *storage, UserInterface *ui)
@@ -527,6 +503,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	GtkWidget *menu_font_large;
 	GtkWidget *menu_font_huge;
 	GtkWidget *menu_open;
+	GtkWidget *menu_sync;
 
 	GtkWidget *toolbar;
 	GtkWidget *find_bar;
@@ -564,6 +541,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	GtkAction *action_font_large;
 	GtkAction *action_font_huge;
 	GtkAction *action_find;
+	GtkAction *action_sync;
 
 	GtkActionGroup *action_group;
 
@@ -576,7 +554,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	PangoFontDescription *font;
 	AppData *app_data = app_data_get();
 
-	mainwin = hildon_window_new();
+	mainwin = hildon_stackable_window_new();
 	gtk_window_set_title(GTK_WINDOW(mainwin), "Conboy");
 	ui->window = HILDON_WINDOW(mainwin);
 
@@ -609,6 +587,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	action_zoom_in = GTK_ACTION(gtk_action_new("zoom_in", _("Zoom In"), NULL, GTK_STOCK_ZOOM_IN));
 	action_zoom_out = GTK_ACTION(gtk_action_new("zoom_out", _("Zoom Out"), NULL, GTK_STOCK_ZOOM_OUT));
 	action_find = GTK_ACTION(gtk_action_new("find", _("Find In Note"), NULL, GTK_STOCK_FIND));
+	action_sync = GTK_ACTION(gtk_action_new("sync", _("Synchronize"), NULL, NULL));
 	/* TODO: Use an enum instead of 0 to 3 */
 	action_font_small = GTK_ACTION(gtk_radio_action_new("size:small", _("Small"), NULL, NULL, 0));
 	action_font_normal = GTK_ACTION(gtk_radio_action_new("size:normal", _("Normal"), NULL, NULL, 1));
@@ -616,7 +595,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	action_font_huge = GTK_ACTION(gtk_radio_action_new("size:huge", _("Huge"), NULL, NULL, 3));
 
 	gtk_action_set_sensitive(action_link, FALSE);
-	gtk_action_set_sensitive(action_inc_indent, FALSE);
+	/*gtk_action_set_sensitive(action_inc_indent, FALSE);*/
 	gtk_action_set_sensitive(action_dec_indent, FALSE);
 
 	/* Build the radio action group */
@@ -693,7 +672,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	set_item_label(GTK_CONTAINER(menu_bold),       "<b>", _("Bold"), "</b>");
 	set_item_label(GTK_CONTAINER(menu_italic),     "<i>", _("Italic"), "</i>");
 	set_item_label(GTK_CONTAINER(menu_strike),     "<s>", _("Strikeout"), "</s>");
-	set_item_label(GTK_CONTAINER(menu_highlight),  "<span background=\"yellow\">", _("Highlight"), "</span>");
+	set_item_label(GTK_CONTAINER(menu_highlight),  "<span background=\"yellow\" foreground=\"black\">", _("Highlight"), "</span>");
 	set_item_label(GTK_CONTAINER(menu_fixed),      "<tt>", _("Fixed Width"), "</tt>");
 	set_item_label(GTK_CONTAINER(menu_font_small), "<span size=\"small\">", _("Small"), "</span>");
 	set_item_label(GTK_CONTAINER(menu_font_large), "<span size=\"large\">", _("Large"), "</span>");
@@ -762,17 +741,20 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	menu_new = gtk_button_new();
 	menu_open = gtk_button_new();
 	menu_settings = gtk_button_new();
+	menu_sync = gtk_button_new();
 	menu_quit = gtk_button_new();
 
 	gtk_action_connect_proxy(action_new, menu_new);
 	gtk_action_connect_proxy(action_notes, menu_open);
 	gtk_action_connect_proxy(action_settings, menu_settings);
+	gtk_action_connect_proxy(action_sync, menu_sync);
 	gtk_action_connect_proxy(action_quit, menu_quit);
 
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_new));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_open));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_settings));
-	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_quit));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_sync));
+	/*hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_quit));*/
 
 	if (app_data->portrait) {
 		gtk_widget_hide(menu_settings);
@@ -808,20 +790,6 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	toolbar = gtk_toolbar_new();
 	ui->toolbar = GTK_TOOLBAR(toolbar);
 
-	/***** TODO: Remove, only for testing *************/
-
-
-	GtkWidget *sync_but = gtk_tool_button_new_from_stock(GTK_STOCK_CDROM);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(sync_but), 0);
-
-
-
-
-
-	/**********************/
-
-
-	/****/
 	button_dec_indent = create_tool_button(action_dec_indent, ICON_DEC_INDENT);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_dec_indent), -1);
 #ifdef HILDON_HAS_APP_MENU
@@ -857,14 +825,6 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_notes), -1);
 
 	gtk_widget_show_all(toolbar);
-
-	/*
-	 * TODO: REMOVE
-	 */
-	gtk_widget_hide(sync_but);
-	/*
-	 *
-	 */
 
 	if (app_data->portrait) {
 		gtk_widget_hide(toolbar);
@@ -974,12 +934,6 @@ UserInterface* create_mainwin(ConboyNote *note) {
 
 	/* Action signals */
 
-	g_printerr("TITLE: %s\n", note->title);
-
-	g_signal_connect(sync_but, "clicked",
-			G_CALLBACK(on_sync_but_clicked),
-			ui);
-
 	g_signal_connect(action_new, "activate",
 			G_CALLBACK(on_new_button_clicked),
 			ui);
@@ -1015,7 +969,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 
 	g_signal_connect(action_quit, "activate",
 			G_CALLBACK(on_quit_button_clicked),
-			NULL);
+			ui);
 
 	g_signal_connect(action_settings, "activate",
 			G_CALLBACK(on_settings_button_clicked),
@@ -1023,11 +977,11 @@ UserInterface* create_mainwin(ConboyNote *note) {
 
 	g_signal_connect(action_inc_indent, "activate",
 			G_CALLBACK(on_inc_indent_button_clicked),
-			buffer);
+			ui);
 
 	g_signal_connect(action_dec_indent, "activate",
 			G_CALLBACK(on_dec_indent_button_clicked),
-			buffer);
+			ui);
 
 	g_signal_connect(action_link, "activate",
 			G_CALLBACK(on_link_button_clicked),
@@ -1055,6 +1009,10 @@ UserInterface* create_mainwin(ConboyNote *note) {
 
 	g_signal_connect(action_find, "activate",
 			G_CALLBACK(on_find_button_clicked),
+			ui);
+
+	g_signal_connect(action_sync, "activate",
+			G_CALLBACK(on_sync_but_clicked),
 			ui);
 
 

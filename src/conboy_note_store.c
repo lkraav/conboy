@@ -75,7 +75,7 @@ conboy_note_store_init (ConboyNoteStore *self)
 	/* initialise the underlying storage for the GtkListStore */
 	GType types[] = { CONBOY_TYPE_NOTE };
 	gtk_list_store_set_column_types(GTK_LIST_STORE(self), 1, types);
-	
+
 	self->storage = NULL;
 }
 
@@ -124,7 +124,7 @@ conboy_note_store_get_object(ConboyNoteStore *self, GtkTreeIter *iter)
 	/* retreive the object using our parent's interface, take our own
 	 * reference to it */
 	parent_iface.get_value(GTK_TREE_MODEL(self), iter, 0, &value);
-	
+
 	note = CONBOY_NOTE(g_value_dup_object(&value));
 
 	g_value_unset(&value);
@@ -181,7 +181,7 @@ conboy_note_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, G
 	ConboyNote *note;
 	if (_icon == NULL) {
 #ifdef HILDON_HAS_APP_MENU
-		_icon = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/40x40/hildon/conboy.png", NULL);
+		_icon = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/48x48/hildon/conboy.png", NULL);
 #else
 		_icon = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/26x26/hildon/conboy.png", NULL);
 #endif
@@ -195,7 +195,7 @@ conboy_note_store_get_value(GtkTreeModel *self, GtkTreeIter *iter, int column, G
 
 	/* get the object from our parent's storage */
 	note = conboy_note_store_get_object(CONBOY_NOTE_STORE(self), iter);
-	
+
 	/* initialise our GValue to the required type */
 	g_value_init(value, conboy_note_store_get_column_type(GTK_TREE_MODEL (self), column));
 
@@ -384,24 +384,24 @@ on_storage_deactivated(ConboyStorage *storage, ConboyNoteStore *self)
 
 void
 conboy_note_store_set_storage(ConboyNoteStore *self, ConboyStorage *storage) {
-	
+
 	g_return_if_fail(self != NULL);
 	g_return_if_fail(storage != NULL);
-	
+
 	g_return_if_fail(CONBOY_IS_NOTE_STORE(self));
 	g_return_if_fail(CONBOY_IS_STORAGE(storage));
-	
+
 	g_printerr("filling note store\n");
-	
+
 	self->storage = storage;
 	g_object_ref(storage);
-	
+
 	GSList *notes = conboy_storage_note_list(storage);
 	while (notes) {
 		conboy_note_store_add(self, notes->data, NULL);
 		notes = notes->next;
 	}
-	
+
 	g_signal_connect(storage, "activated",   G_CALLBACK(on_storage_activated),   self);
 	g_signal_connect(storage, "deactivated", G_CALLBACK(on_storage_deactivated), self);
 }
@@ -411,7 +411,7 @@ conboy_note_store_get_by_guid(ConboyNoteStore *self, const gchar *guid)
 {
 	GtkTreeIter iter;
 	ConboyNote *result = NULL;
-	
+
 	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self), &iter)) do {
 		ConboyNote *note;
 		gtk_tree_model_get(GTK_TREE_MODEL(self), &iter, NOTE_COLUMN, &note, -1);
@@ -423,7 +423,7 @@ conboy_note_store_get_by_guid(ConboyNoteStore *self, const gchar *guid)
 			break;
 		}
 		g_free(tmp_guid);
-		
+
 	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(self), &iter));
 
 	return result;

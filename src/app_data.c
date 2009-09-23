@@ -56,12 +56,12 @@ AppData* app_data_get() {
 		if (!g_file_test(path, G_FILE_TEST_EXISTS)) {
 			g_mkdir(path, 0700);
 		}
-		
+
 		/* Dicover plugins */
 		g_printerr("INFO: Now looking for plugins\n");
 		ConboyPluginStore *plugin_store = conboy_plugin_store_new();
 		g_printerr("INFO: Plugin search finished\n");
-		
+
 		/* Create storage */
 		ConboyStorage *storage = conboy_storage_new();
 		conboy_storage_set_plugin_store(storage, plugin_store);
@@ -74,14 +74,14 @@ AppData* app_data_get() {
 
 		_app_data = g_new(AppData, 1);
 		_app_data->note_store = note_store;
-		_app_data->open_notes = NULL;
+		/*_app_data->open_notes = NULL;*/
 		_app_data->client = client;
 		_app_data->program = hildon_program_get_instance();
 		_app_data->fullscreen = FALSE;
 		_app_data->portrait = is_portrait_mode();
 		_app_data->search_window = NULL;
 		_app_data->reader = NULL;
-		_app_data->storage = storage; 
+		_app_data->storage = storage;
 		_app_data->note_window = NULL;
 		_app_data->plugin_store = plugin_store;
 
@@ -96,7 +96,7 @@ void app_data_free()
 	AppData *app_data = app_data_get();
 
 	g_object_unref(app_data->client);
-	g_list_free(app_data->open_notes);
+	/*g_list_free(app_data->open_notes);*/
 	if (app_data->search_window != NULL) {
 		gtk_widget_destroy(GTK_WIDGET(app_data->search_window));
 	}
