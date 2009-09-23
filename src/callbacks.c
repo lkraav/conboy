@@ -224,14 +224,20 @@ void
 on_new_button_clicked					(GtkAction		*action,
 										 gpointer		 user_data)
 {
+	AppData *app_data = app_data_get();
+	
 	ConboyNote *note = conboy_note_new();
-
-	gchar *xml =
-		"<note-content version=\"0.1\">New Note XX\n\n"
-		"Describe your new note here.</note-content>";
-
-	g_object_set(note, "title", "New Note", "content", xml, NULL);
-
+	
+	int num = conboy_note_store_get_length(app_data->note_store) + 1;
+	gchar title[100];
+	gchar xml[200];
+	g_sprintf(title, "New Note %i", num);
+	g_sprintf(xml, "<note-content version=\"0.1\">%s\n\n%s</note-content>",
+			title,
+			_("Describe your new note here."));
+	
+	g_object_set(note, "title", title, "content", xml, NULL);
+	
 	note_show(note);
 }
 

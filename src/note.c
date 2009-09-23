@@ -290,16 +290,6 @@ void note_show(ConboyNote *note)
 	GtkTextBuffer *buffer;
 	GtkWindow *window;
 
-	/* If the note it already open, we bring this note to the foreground and return */
-	/*
-	if (note_is_open(note)) {
-		note_set_focus(note);
-		return;
-	}
-	*/
-
-
-
 	if (app_data->note_window == NULL) {
 		g_printerr("##### Creating Mainwin\n");
 		app_data->note_window = create_mainwin(note);
@@ -333,19 +323,7 @@ void note_show(ConboyNote *note)
 	/* Block signals on TextBuffer until we are done with initializing the content. This is to prevent saves etc. */
 	g_signal_handlers_block_matched(buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
 
-	/*
-	if (note_exists(note)) {
-		note_show_existing(note);
-	} else {
-		note_show_new(note);
-	}
-	*/
 	conboy_note_window_show_note(ui, note);
-
-	/*
-	app_data->open_notes = g_list_append(app_data->open_notes, note);
-	app_data->open_windows = g_list_append(app_data->open_notes, note);
-	*/
 
 	/* Format note title and update window title */
 	note_format_title(buffer);
