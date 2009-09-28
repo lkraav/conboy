@@ -21,6 +21,9 @@
 #include <hildon/hildon-program.h>
 #include <gtk/gtkmain.h>
 #include <libosso.h>
+#include <gdk/gdkx.h>
+#include <X11/Xatom.h>
+
 
 #include "app_data.h"
 #include "settings.h"
@@ -71,6 +74,23 @@ dbus_handler(const gchar *interface, const gchar *method, GArray *arguments, gpo
 	}
 	return OSSO_OK;
 }
+
+static void
+ungrab_volume_keys(GtkWidget *window)
+{
+#ifdef HILDON_HAS_APP_MENU
+    /* Tell maemo-status-volume daemon to ungrab keys */
+    unsigned long val = 1; /* ungrab, use 0 to grab */
+    Atom atom;
+    GdkDisplay *display = NULL;
+    display = gdk_drawable_get_display (GDK_DRAWABLE(window->window));
+    atom = gdk_x11_get_xatom_by_name_for_display (display, "_HILDON_ZOOM_KEY_ATOM");
+    XChangeProperty (GDK_DISPLAY_XDISPLAY (display),
+                     GDK_WINDOW_XID (GDK_DRAWABLE(window->window)), atom, XA_INTEGER, 32,
+                     PropModeReplace, (unsigned char *) &val, 1);
+#endif
+}
+
 
 
 int
@@ -135,6 +155,9 @@ main (int argc, char *argv[])
 	  note = conboy_note_new();
   }
   note_show(note);
+
+  /* Use +/- keys for zooming */
+  ungrab_volume_keys(GTK_WIDGET(app_data->note_window->window));
 
   /* Register URL listener */
   if (osso_rpc_set_cb_f(app_data->osso_ctx, APP_SERVICE, APP_METHOD, APP_SERVICE, dbus_handler, app_data->note_window->window) != OSSO_OK) {
