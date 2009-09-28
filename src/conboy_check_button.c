@@ -88,6 +88,8 @@
  * </example>
  */
 
+#ifdef HILDON_HAS_APP_MENU
+
 #include                                        <hildon/hildon-enum-types.h>
 #include                                        <hildon/hildon-gtk.h>
 #include                                        "conboy_check_button.h"
@@ -1029,3 +1031,4 @@ conboy_check_button_construct_child                   (ConboyCheckButton *button
     gtk_widget_show_all (GTK_WIDGET (priv->alignment));
 }
 
+#endif /* HILDON_HAS_APP_MENU */

@@ -16,6 +16,8 @@
  *
  */
 
+#ifdef HILDON_HAS_APP_MENU
+
 #ifndef                                         __CONBOY_CHECK_BUTTON_H__
 #define                                         __CONBOY_CHECK_BUTTON_H__
 
@@ -190,3 +192,5 @@ conboy_check_button_get_style                         (ConboyCheckButton *button
 G_END_DECLS
 
 #endif /* __CONBOY_CHECK_BUTTON_H__ */
+
+#endif /* HILDON_HAS_APP_MENU */
