@@ -26,6 +26,7 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
+#include <glib/gprintf.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-find-toolbar.h>
 #include <hildon/hildon-helper.h>
@@ -253,11 +254,19 @@ remove_by_guid(GList *list, ConboyNote *note_to_remove)
 static void
 on_sync_but_clicked(GtkButton *but, gpointer user_data)
 {
+	
+	/*
+	 * TODO:
+	 * - Before sync. Close open note and remember GUID
+	 * - After sync. Get note by GUID and show
+	 */
+	
 	AppData *app_data = app_data_get();
+	GtkWindow *parent = GTK_WINDOW(app_data->note_window->window);
 
 	gchar *url = settings_load_sync_base_url();
 	if (url == NULL || strcmp(url, "") == 0) {
-		GtkWidget *dia = ui_helper_create_confirmation_dialog(GTK_WINDOW(app_data->note_window->window), "Please first set a URL in the settings");
+		GtkWidget *dia = ui_helper_create_confirmation_dialog(parent, "Please first set a URL in the settings");
 		gtk_dialog_run(GTK_DIALOG(dia));
 		gtk_widget_destroy(dia);
 		return;
@@ -272,32 +281,36 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 
 	if (reply == NULL) {
 		gchar *msg = g_strconcat("Got no reply from: \n", request, NULL);
-		GtkWidget *dia = ui_helper_create_confirmation_dialog(GTK_WINDOW(app_data->note_window->window), msg);
+		GtkWidget *dia = ui_helper_create_confirmation_dialog(parent, msg);
 		gtk_dialog_run(GTK_DIALOG(dia));
 		gtk_widget_destroy(dia);
 		g_free(msg);
 		return;
 	}
 
-	g_printerr("Reply from /api/1.0/:: %s\n", reply);
+	/*g_printerr("Reply from /api/1.0/:: %s\n", reply);*/
 
 	gchar *api_ref = json_get_api_ref(reply);
 
 	reply = conboy_http_get(api_ref);
 
 	if (reply == NULL) {
-		/* TODO: Open error dialog */
-		g_printerr("ERROR: No reply from: %s\n", api_ref);
+		gchar *msg = g_strconcat("Got no reply from: \n", api_ref, NULL);
+		GtkWidget *dia = ui_helper_create_confirmation_dialog(parent, msg);
+		gtk_dialog_run(GTK_DIALOG(dia));
+		gtk_widget_destroy(dia);
+		g_free(msg);
 		return;
 	}
 
-	g_printerr("Reply from /root/:: %s\n", reply);
+	/*g_printerr("Reply from /root/:: %s\n", reply);*/
 
 	/* Revision checks */
 	JsonUser *user = json_get_user(reply);
 	if (user->latest_sync_revision < last_sync_rev) {
-		/* TODO: Open error dialog */
-		g_printerr("ERROR: Server revision older than our revision. This should not happen.\n");
+		GtkWidget *dia = ui_helper_create_confirmation_dialog(parent, "Server revision older than our revision.");
+		gtk_dialog_run(GTK_DIALOG(dia));
+		gtk_widget_destroy(dia);
 		return;
 	}
 
@@ -318,15 +331,21 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	gchar get_all_notes_url[1024];
 	g_sprintf(get_all_notes_url, "%s?include_notes=true&since=%i", user->api_ref, last_sync_rev);
 
+	/* TODO: This can take some time */
 	gchar *all_notes = conboy_http_get(get_all_notes_url);
 
+	/*
 	g_printerr("****************\n");
 	g_printerr("%s\n", all_notes);
 	g_printerr("****************\n");
+	*/
 
-
+	
 	JsonNoteList *note_list = json_get_note_list(all_notes);
 	last_sync_rev = note_list->latest_sync_revision;
+	
+	int added_notes = 0;
+	int changed_notes = 0;
 
 	GSList *notes = note_list->notes;
 	while (notes != NULL) {
@@ -336,9 +355,17 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 
 		/* If not yet in the note store, add this note */
 		/* TODO: If note is newer, send signal, that the note store updates it */
-		if (!conboy_note_store_get_by_guid(app_data->note_store, note->guid)) {
+		if (!conboy_note_store_find_by_guid(app_data->note_store, note->guid)) {
 			g_printerr("INFO: Adding note '%s' to note store\n", note->title);
 			conboy_note_store_add(app_data->note_store, note, NULL);
+			added_notes++;
+		} else {
+			g_printerr("INFO: Updating note '%s' in note store\n", note->title);
+			ConboyNote *old_note = conboy_note_store_find_by_guid(app_data->note_store, note->guid);
+			conboy_note_store_remove(app_data->note_store, old_note);
+			conboy_note_store_add(app_data->note_store, note, NULL); /* maybe copy only content from new to old note */
+			/*conboy_note_store_note_changed(app_data->note_store, note);*/
+			changed_notes++;
 		}
 
 		/* Remove from list of local notes */
@@ -352,10 +379,9 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	 * Remaining local notes are new on the client.
 	 * Send them to the server
 	 */
-
+	int notes_to_send = g_list_length(local_notes);
+	
 	last_sync_rev = web_send_notes(local_notes, last_sync_rev + 1, last_sync_time);
-
-
 
 	g_printerr("Saving last sync rev: %i\n", last_sync_rev);
 	settings_save_last_sync_revision(last_sync_rev);
@@ -419,6 +445,7 @@ enum Icon {
 	ICON_OPEN
 };
 
+#ifdef HILDON_HAS_APP_MENU
 static GtkWidget*
 add_icon(const gchar *filename, GtkToolButton *button)
 {
@@ -441,6 +468,7 @@ add_icon(const gchar *filename, GtkToolButton *button)
 	g_free(full_path);
 	return GTK_WIDGET(button);
 }
+#endif
 
 static GtkWidget*
 create_tool_button(GtkAction *action, enum Icon icon)
@@ -1095,10 +1123,10 @@ UserInterface* create_mainwin(ConboyNote *note) {
 
 	/* Listening to activation / deactivation of storage */
 	ConboyStorage *storage = app_data->storage;
-	g_signal_connect(app_data->storage, "activated",
+	g_signal_connect(storage, "activated",
 			G_CALLBACK(on_storage_activated), ui);
 
-	g_signal_connect(app_data->storage, "deactivated",
+	g_signal_connect(storage, "deactivated",
 			G_CALLBACK(on_storage_deactivated), ui);
 
 

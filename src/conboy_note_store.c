@@ -407,7 +407,7 @@ conboy_note_store_set_storage(ConboyNoteStore *self, ConboyStorage *storage) {
 }
 
 ConboyNote*
-conboy_note_store_get_by_guid(ConboyNoteStore *self, const gchar *guid)
+conboy_note_store_find_by_guid(ConboyNoteStore *self, const gchar *guid)
 {
 	GtkTreeIter iter;
 	ConboyNote *result = NULL;
@@ -428,4 +428,5 @@ conboy_note_store_get_by_guid(ConboyNoteStore *self, const gchar *guid)
 
 	return result;
 }
+
 
