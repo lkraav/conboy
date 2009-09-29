@@ -4,7 +4,7 @@ AC_INIT(src/main.c)
 AM_CONFIG_HEADER(config.h)
 
 PACKAGE=conboy
-VERSION=0.5.9
+VERSION=0.6.0-alpha1
 
 AM_INIT_AUTOMAKE($PACKAGE,$VERSION)
 
@@ -139,7 +139,7 @@ pluginsdatadir=/usr/share/conboy
 AC_SUBST(plugindatadir)
 
 # Localization-related
-#AC_PROG_INTLTOOL([0.23])
+AC_PROG_INTLTOOL([0.23])
 GETTEXT_PACKAGE=conboy
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED( GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Name of gettext package ])
@@ -177,6 +177,4 @@ AC_OUTPUT([
     src/plugins/Makefile
     src/plugins/storage_xml/Makefile
     src/plugins/storage_midgard/Makefile
-    src/plugins/storage_xml/conboy_storage_xml.plugin
-    src/plugins/storage_midgard/conboy_storage_midgard.plugin
 ])
