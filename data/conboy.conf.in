@@ -1,0 +1,5 @@
+<backup-configuration>
+  <locations>
+    <location type="dir" category="@BACKUP_CATEGORY@">/home/user/.conboy</location>
+  </locations>
+</backup-configuration>

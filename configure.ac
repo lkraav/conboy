@@ -60,6 +60,29 @@ AC_SUBST(OAUTH_LIBS)
 
 PKG_CHECK_MODULES(OSSOSETTINGS, osso-af-settings >= 0.8.4)
 
+# Find out maemo version
+PKG_CHECK_EXISTS(maemo-version, [
+  VERSION=`pkg-config --modversion maemo-version`
+  AC_MSG_NOTICE([Configuring for Maemo $VERSION])
+  CFLAGS="$CFLAGS -DMAEMO_VERSION=\\\"$VERSION\\\""
+  MAJOR=`echo $VERSION | cut -b1 -`
+  CFLAGS="$CFLAGS -DMAEMO_VERSION_MAJOR=$MAJOR"
+], [
+  AC_MSG_ERROR([maemo-version not found])
+])
+
+# Fremantle uses different categories for backup then Diablo
+if [[ "$MAJOR" == "5" ]]; then
+  BACKUP_CATEGORY=other
+else
+  BACKUP_CATEGORY=documents
+fi
+
+AC_MSG_NOTICE([Using backup category "$BACKUP_CATEGORY"])
+
+AC_SUBST(BACKUP_CATEGORY)
+
+
 AC_MSG_CHECKING([whether to build Midgard storage plugin])
 AC_ARG_WITH([midgard],[AS_HELP_STRING([--without-midgard], [disable Midgard storage])],
             [], [with_midgard=yes])
@@ -150,6 +173,7 @@ AC_OUTPUT([
     po/Makefile
     data/de.zwong.conboy.service
     data/conboy.desktop
+    data/conboy.conf
     src/plugins/Makefile
     src/plugins/storage_xml/Makefile
     src/plugins/storage_midgard/Makefile
