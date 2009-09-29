@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Schema xmlns="http://www.midgard-project.org/repligard/1.4">
+
+    <type name="org_gnome_tomboy_sync" table="org_gnome_tomboy_sync">
+        <property name="id" type="unsigned integer" primaryfield="id">
+            <description>Local non-replication-safe database identifier</description>
+        </property>
+        <property name="tomboyuuid"     type="string" index="yes"/>
+        <property name="person"   type="unsigned integer" link="midgard_person:id" parentfield="person"/>
+    </type>
+
+    <type name="org_gnome_tomboy_note" table="org_gnome_tomboy_note">
+        <property name="id" type="unsigned integer" primaryfield="id">
+            <description>Local non-replication-safe database identifier</description>
+        </property>
+        <property name="title" type="string" index="yes">
+            <description>Title of the Tomboy note</description>
+        </property>
+        <property name="text" type="longtext">
+            <description>Contents of the note in Tomboy XML format</description>
+        </property>
+        <property name="openonstartup" type="boolean">
+            <description>Whether the note should be opened at application start</description>
+        </property>
+        <property name="latestsync" type="integer">
+            <description>Latest synchronization sequence</description>
+        </property>
+        <property name="tomboyuuid" type="string" index="yes"/>
+
+        <!-- Cursor position might be possible to map to web application also -->
+        <property name="cursorposition" type="integer"/>
+        <!-- The data below mostly maps only to desktop usage -->
+        <property name="width"    type="integer"/>
+        <property name="height"   type="integer"/>
+        <property name="x"        type="integer"/>
+        <property name="y"        type="integer"/>
+
+
+  </type>
+</Schema>
