@@ -225,9 +225,9 @@ on_new_button_clicked					(GtkAction		*action,
 										 gpointer		 user_data)
 {
 	AppData *app_data = app_data_get();
-	
+
 	ConboyNote *note = conboy_note_new();
-	
+
 	int num = conboy_note_store_get_length(app_data->note_store) + 1;
 	gchar title[100];
 	gchar xml[200];
@@ -235,9 +235,9 @@ on_new_button_clicked					(GtkAction		*action,
 	g_sprintf(xml, "<note-content version=\"0.1\">%s\n\n%s</note-content>",
 			title,
 			_("Describe your new note here."));
-	
+
 	g_object_set(note, "title", title, "content", xml, NULL);
-	
+
 	note_show(note);
 }
 
@@ -1291,9 +1291,7 @@ void on_find_button_clicked(GtkAction *action, gpointer user_data)
 		ui->find_bar_is_visible = FALSE;
 	} else {
 		gtk_widget_show_all(GTK_WIDGET(ui->find_bar));
-		/* TODO: Select search string for overwriting and
-		 * set focus */
-		/*gtk_widget_grab_focus(GTK_WIDGET(ui->find_bar));*/
+		hildon_find_toolbar_highlight_entry(ui->find_bar, TRUE);
 		ui->find_bar_is_visible = TRUE;
 	}
 }

@@ -1,7 +1,7 @@
 /* This file is part of Conboy.
  *
  * Copyright (C) 2009 Cornelius Hald
- * 
+ *
  * This file is based on gedit-plugin-manager.c from gedit (GPLv2)
  * Copyright (C) 2002 Paolo Maggi and James Willcox
  * Copyright (C) 2003-2006 Paolo Maggi
@@ -31,6 +31,7 @@
 #include "conboy_plugin_info.h"
 #include "conboy_config.h"
 #include "app_data.h"
+#include "conboy_plugin_manager_row.h"
 
 #include "conboy_plugin_manager.h"
 
@@ -49,6 +50,9 @@ enum
 
 struct _ConboyPluginManagerPrivate
 {
+	GList		*rows;
+
+	/* Diablo stuff */
 	GtkWidget	*tree;
 	GtkWidget	*about_button;
 	GtkWidget	*configure_button;
@@ -58,11 +62,11 @@ struct _ConboyPluginManagerPrivate
 
 G_DEFINE_TYPE(ConboyPluginManager, conboy_plugin_manager, GTK_TYPE_VBOX)
 
-static ConboyPluginInfo *plugin_manager_get_selected_plugin (ConboyPluginManager *pm); 
+static ConboyPluginInfo *plugin_manager_get_selected_plugin (ConboyPluginManager *pm);
 static void plugin_manager_toggle_active (ConboyPluginManager *pm, GtkTreeIter *iter, GtkTreeModel *model);
 static void conboy_plugin_manager_finalize (GObject *object);
 
-static void 
+static void
 conboy_plugin_manager_class_init (ConboyPluginManagerClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -96,7 +100,7 @@ about_button_cb (GtkWidget *button, ConboyPluginManager *pm)
 		/*"logo-icon-name", conboy_plugin_info_get_icon_name (info),*/
 		"version", conboy_plugin_info_get_version (info),
 		NULL);
-	
+
 	gtk_window_set_destroy_with_parent (GTK_WINDOW (pm->priv->about), TRUE);
 
 	g_signal_connect (pm->priv->about,
@@ -115,19 +119,19 @@ about_button_cb (GtkWidget *button, ConboyPluginManager *pm)
 static void
 configure_button_cb (GtkWidget *button, ConboyPluginManager *pm)
 {
-	
+
 	g_printerr("INFO: configure button pressed\n");
 	g_return_if_fail(pm != NULL);
 	g_return_if_fail(CONBOY_IS_PLUGIN_MANAGER(pm));
-	
+
 	ConboyPluginInfo *info = plugin_manager_get_selected_plugin (pm);
-	
-	
+
+
 	if (!conboy_plugin_info_is_configurable(info)) {
 		g_printerr("ERROR: Plugin is not configurable");
 		return;
 	}
-	
+
 	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Plugin settings"),
 			NULL,
 			GTK_DIALOG_MODAL,
@@ -136,12 +140,12 @@ configure_button_cb (GtkWidget *button, ConboyPluginManager *pm)
 			NULL);
 
 	GtkWidget *content_area = GTK_DIALOG(dialog)->vbox;
-	
+
 	if (info->plugin == NULL) {
 		g_printerr("ERROR: PLUGIN IS NULL\n");
 		return;
 	}
-	
+
 	GtkWidget *settings = conboy_plugin_get_settings_widget(info->plugin);
 	if (settings == NULL) {
 		g_printerr("ERROR: Settings widget it NULL\n");
@@ -167,7 +171,7 @@ plugin_manager_view_info_cell_cb (GtkTreeViewColumn *tree_column,
 {
 	ConboyPluginInfo *info;
 	gchar *text;
-	
+
 	g_return_if_fail (tree_model != NULL);
 	g_return_if_fail (tree_column != NULL);
 
@@ -258,17 +262,41 @@ row_activated_cb (GtkTreeView       *tree_view,
 static void
 conboy_plugin_activated_deactivated_cb (ConboyPluginStore *store, ConboyPluginInfo *info, ConboyPluginManager *pm)
 {
+#ifdef HILDON_HAS_APP_MENU
+
+	ConboyPluginManagerPrivate *priv = CONBOY_PLUGIN_MANAGER_GET_PRIVATE(pm);
+
+
+	/* Find row */
+	/*
+	ConboyPluginManagerRow *affected_row = NULL;
+	GList *rows = priv->rows;
+	while (rows) {
+		ConboyPluginManagerRow *row = CONBOY_PLUGIN_MANAGER_ROW(rows->data);
+		if (row->plugin_info == info) {
+			affected_row = row;
+			break;
+		}
+		rows = rows->next;
+	}
+
+	g_return_if_fail(affected_row != NULL);
+
+	conboy_plugin_manager_row_set_active(affected_row, conboy_plugin_info_is_active(info));
+*/
+
+#else
 	GtkTreeModel *model;
 	GtkTreeIter iter;
-	
+
 	g_return_if_fail(info != NULL);
 	g_return_if_fail(pm != NULL);
-	
+
 	g_return_if_fail(CONBOY_IS_PLUGIN_INFO(info));
 	g_return_if_fail(CONBOY_IS_PLUGIN_MANAGER(pm));
-	
+
 	model = gtk_tree_view_get_model(GTK_TREE_VIEW(pm->priv->tree));
-	
+
 	gtk_tree_model_get_iter_first(model, &iter);
 
 	/* Iterate over all rows. Once we found the row containing the given ConboyPluginInfo
@@ -281,9 +309,10 @@ conboy_plugin_activated_deactivated_cb (ConboyPluginStore *store, ConboyPluginIn
 		}
 	}
 	while (gtk_tree_model_iter_next(model, &iter));
-	
+
 	/* Set the active flag. This will reflect in the UI */
 	gtk_list_store_set(GTK_LIST_STORE(model), &iter, ACTIVE_COLUMN, conboy_plugin_info_is_active (info), -1);
+#endif
 }
 
 static void
@@ -294,7 +323,7 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 	GtkTreeIter iter;
 
 	AppData *app_data = app_data_get();
-	
+
 	plugins = conboy_plugin_store_get_plugin_infos(app_data->plugin_store);
 
 	model = GTK_LIST_STORE (gtk_tree_view_get_model (GTK_TREE_VIEW (pm->priv->tree)));
@@ -308,7 +337,7 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 				    AVAILABLE_COLUMN, conboy_plugin_info_is_available (info),
 				    INFO_COLUMN, info,
 				    -1);
-		
+
 		plugins = plugins->next;
 	}
 
@@ -319,7 +348,7 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 
 		selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (pm->priv->tree));
 		g_return_if_fail (selection != NULL);
-		
+
 		gtk_tree_selection_select_iter (selection, &iter);
 
 		gtk_tree_model_get (GTK_TREE_MODEL (model), &iter,
@@ -334,7 +363,7 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
  * TODO: Add here to code to load a plugin if we decided to
  * load them during runtime - which we should if we want that
  * a plugin can offer a Settings-Dialog.
- * 
+ *
  * Or add code here to save to GConf which plugins are active
  */
 static void
@@ -344,7 +373,7 @@ plugin_manager_set_active (ConboyPluginManager *pm,
 			   gboolean            active)
 {
 	ConboyPluginInfo *info;
-	
+
 	gtk_tree_model_get (model, iter, INFO_COLUMN, &info, -1);
 
 	g_return_if_fail (info != NULL);
@@ -352,7 +381,7 @@ plugin_manager_set_active (ConboyPluginManager *pm,
 	if (active) {
 		/* activate the plugin */
 		conboy_plugin_info_activate_plugin(info);
-		
+
 	} else {
 		/* deactivate the plugin */
 		conboy_plugin_info_deactivate_plugin(info);
@@ -366,7 +395,7 @@ plugin_manager_toggle_active (ConboyPluginManager *pm,
 			      GtkTreeModel       *model)
 {
 	gboolean active;
-	
+
 	/*conboy_debug (DEBUG_PLUGINS);*/
 	g_printerr("plugin_manager_toggle_active\n");
 
@@ -395,7 +424,7 @@ plugin_manager_get_selected_plugin (ConboyPluginManager *pm)
 	{
 		gtk_tree_model_get (model, &iter, INFO_COLUMN, &info, -1);
 	}
-	
+
 	return info;
 }
 
@@ -550,9 +579,9 @@ create_tree_popup_menu (ConboyPluginManager *pm)
 	g_signal_connect (item, "activate",
 			  G_CALLBACK (disable_all_menu_cb), pm);
 	gtk_menu_shell_append (GTK_MENU_SHELL (menu), item);
-	
+
 	gtk_widget_show_all (menu);
-	
+
 	return menu;
 }
 */
@@ -573,7 +602,7 @@ show_tree_popup_menu (GtkTreeView        *tree,
 		gtk_widget_destroy (pm->priv->popup_menu);
 
 	/*pm->priv->popup_menu = create_tree_popup_menu (pm);*/
-	
+
 	gtk_menu_attach_to_widget (GTK_MENU (pm->priv->popup_menu),
 				   GTK_WIDGET (pm),
 				   (GtkMenuDetachFunc) tree_popup_menu_detach);
@@ -626,21 +655,21 @@ button_press_event_cb (GtkWidget          *tree,
 
 	if (!handled)
 		return FALSE;
-		
+
 	/* The selection is fully updated by now */
 	show_tree_popup_menu (GTK_TREE_VIEW (tree), pm, event);
 	return TRUE;
 }
 
 
-static gint 
+static gint
 model_name_sort_func (GtkTreeModel *model,
 		      GtkTreeIter  *iter1,
 		      GtkTreeIter  *iter2,
 		      gpointer      user_data)
 {
 	ConboyPluginInfo *info1, *info2;
-	
+
 	gtk_tree_model_get (model, iter1, INFO_COLUMN, &info1, -1);
 	gtk_tree_model_get (model, iter2, INFO_COLUMN, &info2, -1);
 
@@ -698,15 +727,15 @@ plugin_manager_construct_tree (ConboyPluginManager *pm)
 	gtk_tree_view_column_set_cell_data_func (column, cell,
 						 plugin_manager_view_icon_cell_cb,
 						 pm, NULL);*/
-	
+
 	cell = gtk_cell_renderer_text_new ();
 	gtk_tree_view_column_pack_start (column, cell, TRUE);
 	g_object_set (cell, "ellipsize", PANGO_ELLIPSIZE_END, NULL);
 	gtk_tree_view_column_set_cell_data_func (column, cell,
 						 plugin_manager_view_info_cell_cb,
 						 pm, NULL);
-	
-	
+
+
 	gtk_tree_view_column_set_spacing (column, 6);
 	gtk_tree_view_append_column (GTK_TREE_VIEW (pm->priv->tree), column);
 
@@ -731,7 +760,7 @@ plugin_manager_construct_tree (ConboyPluginManager *pm)
 			  "cursor_changed",
 			  G_CALLBACK (cursor_changed_cb),
 			  pm);
-	
+
 	g_signal_connect (pm->priv->tree,
 			  "row_activated",
 			  G_CALLBACK (row_activated_cb),
@@ -741,14 +770,38 @@ plugin_manager_construct_tree (ConboyPluginManager *pm)
 			  "button-press-event",
 			  G_CALLBACK (button_press_event_cb),
 			  pm);
-	
+
 	gtk_widget_show (pm->priv->tree);
 }
 
 
-static void 
+static void
 conboy_plugin_manager_init (ConboyPluginManager *pm)
 {
+#ifdef HILDON_HAS_APP_MENU
+
+	pm->priv = CONBOY_PLUGIN_MANAGER_GET_PRIVATE (pm);
+	pm->priv->rows = NULL;
+
+	AppData *app_data = app_data_get();
+	ConboyPluginStore *plugin_store = app_data->plugin_store;
+
+	GList *infos = conboy_plugin_store_get_plugin_infos(plugin_store);
+
+	while (infos) {
+		/* Create row */
+		ConboyPluginInfo *info = CONBOY_PLUGIN_INFO(infos->data);
+		GtkWidget *row = conboy_plugin_manager_row_new(info);
+		gtk_widget_show(row);
+		gtk_box_pack_start(GTK_BOX(pm), row, TRUE, TRUE, 0);
+		pm->priv->rows = g_list_prepend(pm->priv->rows, row);
+
+		infos = infos->next;
+	}
+
+
+
+#else
 	GtkWidget *label;
 	GtkWidget *alignment;
 	GtkWidget *viewport;
@@ -766,18 +819,18 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 	g_free (markup);
 	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
 	gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
-	
+
 	gtk_box_pack_start (GTK_BOX (pm), label, FALSE, TRUE, 0);
-	
+
 	alignment = gtk_alignment_new (0., 0., 1., 1.);
 	gtk_alignment_set_padding (GTK_ALIGNMENT (alignment), 0, 0, 12, 0);
 	gtk_box_pack_start (GTK_BOX (pm), alignment, TRUE, TRUE, 0);
-	
+
 	viewport = gtk_scrolled_window_new (NULL, NULL);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (viewport),
 					GTK_POLICY_AUTOMATIC,
 					GTK_POLICY_AUTOMATIC);
-	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (viewport), 
+	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (viewport),
 					     GTK_SHADOW_IN);
 	gtk_container_add (GTK_CONTAINER (alignment), viewport);
 
@@ -810,24 +863,25 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 			  pm);
 
 	plugin_manager_construct_tree (pm);
-	
-	
+
+
 	AppData *app_data = app_data_get();
 	ConboyPluginStore *plugin_store = app_data->plugin_store;
-	
+
 	g_signal_connect(plugin_store, "plugin-activated",   G_CALLBACK(conboy_plugin_activated_deactivated_cb), pm);
 	g_signal_connect(plugin_store, "plugin-deactivated", G_CALLBACK(conboy_plugin_activated_deactivated_cb), pm);
-	
+
 	plugin_manager_populate_lists(pm);
-	
+
 	gtk_widget_show_all(GTK_WIDGET(pm));
+#endif
 }
 
 static void
 conboy_plugin_manager_finalize (GObject *object)
 {
 	ConboyPluginManager *pm = CONBOY_PLUGIN_MANAGER (object);
-	
+
 	AppData *app_data = app_data_get();
 	ConboyPluginStore *plugin_store = app_data->plugin_store;
 	g_signal_handlers_disconnect_by_func(plugin_store, conboy_plugin_activated_deactivated_cb, pm);
@@ -838,6 +892,6 @@ conboy_plugin_manager_finalize (GObject *object)
 
 GtkWidget *conboy_plugin_manager_new (void)
 {
-	return g_object_new (CONBOY_TYPE_PLUGIN_MANAGER,0);
+	return g_object_new (CONBOY_TYPE_PLUGIN_MANAGER, NULL);
 }
 

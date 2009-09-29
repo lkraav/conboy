@@ -28,7 +28,7 @@ static void
 conboy_plugin_info_class_dispose (GObject *object)
 {
 	ConboyPluginInfo *self = CONBOY_PLUGIN_INFO(object);
-	
+
 	if (self->plugin != NULL) {
 		g_object_unref(self->plugin);
 	}
@@ -43,7 +43,7 @@ conboy_plugin_info_class_dispose (GObject *object)
 	g_strfreev (self->authors);
 
 	/* TODO: Not sure that I should free self here */
-	/*g_free (self);*/	
+	/*g_free (self);*/
 }
 
 
@@ -63,12 +63,12 @@ static void
 conboy_plugin_info_class_init (ConboyPluginInfoClass *klass)
 {
 	G_OBJECT_CLASS(klass)->dispose = conboy_plugin_info_class_dispose;
-	
+
 	klass->plugin_activate    = NULL;
 	klass->plugin_deactivate  = NULL;
 	klass->plugin_activated   = NULL;
 	klass->plugin_deactivated = NULL;
-	
+
 	signals[PLUGIN_ACTIVATE] =
 		g_signal_new(
 				"plugin-activate",
@@ -79,7 +79,7 @@ conboy_plugin_info_class_init (ConboyPluginInfoClass *klass)
 				g_cclosure_marshal_VOID__VOID,
 				G_TYPE_NONE,
 				0);
-	
+
 	signals[PLUGIN_DEACTIVATE] =
 			g_signal_new(
 				"plugin-deactivate",
@@ -90,7 +90,7 @@ conboy_plugin_info_class_init (ConboyPluginInfoClass *klass)
 				g_cclosure_marshal_VOID__VOID,
 				G_TYPE_NONE,
 				0);
-		
+
 	signals[PLUGIN_ACTIVATED] =
 			g_signal_new(
 				"plugin-activated",
@@ -101,7 +101,7 @@ conboy_plugin_info_class_init (ConboyPluginInfoClass *klass)
 				g_cclosure_marshal_VOID__VOID,
 				G_TYPE_NONE,
 				0);
-		
+
 	signals[PLUGIN_DEACTIVATED] =
 			g_signal_new(
 				"plugin-deactivated",
@@ -112,14 +112,14 @@ conboy_plugin_info_class_init (ConboyPluginInfoClass *klass)
 				g_cclosure_marshal_VOID__VOID,
 				G_TYPE_NONE,
 				0);
-		
+
 }
 
 static void
 conboy_plugin_info_init (ConboyPluginInfo *self)
 {
 	g_return_if_fail(CONBOY_PLUGIN_INFO(self));
-	
+
 	self->authors = NULL;
 	self->available = FALSE;
 	self->copyright = NULL;
@@ -134,7 +134,7 @@ conboy_plugin_info_init (ConboyPluginInfo *self)
 
 /*
  * Implementation
- */ 
+ */
 
 /**
  * conboy_plugin_info_new:
@@ -156,7 +156,7 @@ conboy_plugin_info_new (const gchar *file)
 	g_print("Loading plugin: %s\n", file);
 
 	info = g_object_new(CONBOY_TYPE_PLUGIN_INFO, NULL);
-	
+
 	info->file = g_strdup (file);
 
 	plugin_file = g_key_file_new ();
@@ -166,7 +166,7 @@ conboy_plugin_info_new (const gchar *file)
 		return NULL;
 	}
 
-	
+
 	/* Get module name */
 	str = g_key_file_get_string (plugin_file, PLUGIN_GROUP, PLUGIN_MODULE, NULL);
 
@@ -186,8 +186,8 @@ conboy_plugin_info_new (const gchar *file)
 		g_warning ("ERROR: Could not find 'Name' in %s", file);
 		return NULL;
 	}
-	
-	
+
+
 	/* Get Kind */
 	str = g_key_file_get_string (plugin_file, PLUGIN_GROUP, PLUGIN_KIND, NULL);
 	if (str) {
@@ -197,7 +197,7 @@ conboy_plugin_info_new (const gchar *file)
 		return NULL;
 	}
 
-	
+
 	/* Get Description */
 	str = g_key_file_get_locale_string (plugin_file, PLUGIN_GROUP, PLUGIN_DESCRIPTION, NULL, NULL);
 	if (str) {
@@ -222,7 +222,7 @@ conboy_plugin_info_new (const gchar *file)
 		g_printerr("Could not find '%s' in %s\n", PLUGIN_COPYRIGHT, file);
 	}
 
-	
+
 	/* Get Version */
 	str = g_key_file_get_string (plugin_file, PLUGIN_GROUP, PLUGIN_VERSION, NULL);
 	if (str) {
@@ -230,11 +230,11 @@ conboy_plugin_info_new (const gchar *file)
 	} else {
 		g_printerr("Could not find '%s' in %s\n", PLUGIN_VERSION, file);
 	}
-	
+
 	g_key_file_free (plugin_file);
-	
+
 	info->available = TRUE;
-	
+
 	return info;
 }
 
@@ -290,7 +290,7 @@ const gchar*
 conboy_plugin_info_get_kind (ConboyPluginInfo *info)
 {
 	g_return_val_if_fail (info != NULL, NULL);
-	
+
 	return info->kind;
 }
 
@@ -306,7 +306,6 @@ gboolean
 conboy_plugin_info_is_active (ConboyPluginInfo *info)
 {
 	g_return_val_if_fail (info != NULL, FALSE);
-	g_printerr("Is active: %i\n", (info->available && info->plugin != NULL));
 	return info->available && info->plugin != NULL;
 }
 
@@ -325,37 +324,37 @@ conboy_plugin_info_activate_plugin (ConboyPluginInfo *info)
 	g_return_val_if_fail(info != NULL, NULL);
 	g_return_val_if_fail(info->file != NULL, NULL);
 	g_return_val_if_fail(info->module_name != NULL, NULL);
-	
+
 	if (info->plugin != NULL) {
 		g_printerr("ERROR: Plugin is already active\n");
 		return FALSE;
 	}
-	
+
 	ConboyPlugin *result = NULL;
-	
+
 	gchar *dir = g_path_get_dirname(info->file);
 	gchar *filename = g_strconcat("lib", info->module_name, ".la", NULL);
 	gchar *path = g_build_filename(dir, filename, NULL);
 	g_printerr("INFO: Trying to create plugin from: %s\n", path);
-	
+
 	g_signal_emit_by_name(info, "plugin-activate");
-	
+
 	result = conboy_plugin_new_from_path(path);
-	
+
 	if (result != NULL) {
 		info->plugin = result;
-		
+
 		/* Emmit signal */
 		/* Signals are synchronous, so if we call something after
 		 * g_signal_emit, we know that all signal handlers
 		 * already finished at this point */
 		g_signal_emit_by_name(info, "plugin-activated");
 	}
-	
+
 	g_free(dir);
 	g_free(filename);
 	g_free(path);
-	
+
 	return (CONBOY_PLUGIN(result));
 }
 
@@ -364,7 +363,7 @@ conboy_plugin_info_deactivate_plugin (ConboyPluginInfo *info)
 {
 	g_return_val_if_fail(info != NULL, FALSE);
 	g_return_val_if_fail(CONBOY_IS_PLUGIN_INFO(info), FALSE);
-	
+
 	if (info->plugin == NULL || !CONBOY_IS_PLUGIN(info->plugin)) {
 		g_printerr("ERROR: Plugin not active. Cannot be deactivated\n");
 		return FALSE;
@@ -373,14 +372,14 @@ conboy_plugin_info_deactivate_plugin (ConboyPluginInfo *info)
 	/* We emit the signal before destroying the plugin, so that
 	 * listeners have a change to react, e.g. save notes. */
 	g_signal_emit_by_name(info, "plugin-deactivate");
-	
-	
+
+
 	g_printerr("## NOW KILLING THE PLUGIN\n");
 	g_object_unref(info->plugin);
 	g_printerr("## NOW AFTER KILLING THE PLUGIN\n");
 	info->plugin = NULL;
-	
+
 	g_signal_emit_by_name(info, "plugin-deactivated");
-	
+
 	return TRUE;
 }

@@ -29,6 +29,8 @@
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-find-toolbar.h>
 #include <hildon/hildon-helper.h>
+#include <gdk/gdkx.h>
+#include <X11/Xatom.h>
 #ifdef HILDON_HAS_APP_MENU
 #include <hildon/hildon-text-view.h>
 #include <hildon/hildon-pannable-area.h>
@@ -252,7 +254,7 @@ static void
 on_sync_but_clicked(GtkButton *but, gpointer user_data)
 {
 	AppData *app_data = app_data_get();
-	
+
 	gchar *url = settings_load_sync_base_url();
 	if (url == NULL || strcmp(url, "") == 0) {
 		GtkWidget *dia = ui_helper_create_confirmation_dialog(GTK_WINDOW(app_data->note_window->window), "Please first set a URL in the settings");
@@ -477,6 +479,22 @@ create_tool_button(GtkAction *action, enum Icon icon)
 #endif
 }
 
+static void
+ungrab_volume_keys(GtkWidget *window)
+{
+#ifdef HILDON_HAS_APP_MENU
+    /* Tell maemo-status-volume daemon to ungrab keys */
+    unsigned long val = 1; /* ungrab, use 0 to grab */
+    Atom atom;
+    GdkDisplay *display = NULL;
+    display = gdk_drawable_get_display (GDK_DRAWABLE(window->window));
+    atom = gdk_x11_get_xatom_by_name_for_display (display, "_HILDON_ZOOM_KEY_ATOM");
+    XChangeProperty (GDK_DISPLAY_XDISPLAY (display),
+                     GDK_WINDOW_XID (GDK_DRAWABLE(window->window)), atom, XA_INTEGER, 32,
+                     PropModeReplace, (unsigned char *) &val, 1);
+#endif
+}
+
 /*
  * I'm not sure what is better:
  * 1) Declaring all as GtkWidget, so that Fremantle and Diablo code can share these.
@@ -567,6 +585,9 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	mainwin = hildon_window_new();
 #endif
 	gtk_window_set_title(GTK_WINDOW(mainwin), "Conboy");
+	/* Before ungrabbing the keys, we need to show it */
+	gtk_widget_show(mainwin);
+	ungrab_volume_keys(mainwin);
 	ui->window = HILDON_WINDOW(mainwin);
 
 	screen = gdk_screen_get_default();
@@ -794,7 +815,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_sync);
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_quit);
-	
+
 
 	/* Must be at the end of the menu definition */
 	hildon_window_set_menu(HILDON_WINDOW(mainwin), GTK_MENU(main_menu));

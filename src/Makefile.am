@@ -69,7 +69,9 @@ conboy_SOURCES = \
         fullscreenmanager.h \
         fullscreenmanager.c \
         ui_helper.h \
-        ui_helper.c
+        ui_helper.c \
+        conboy_plugin_manager_row.h \
+        conboy_plugin_manager_row.c
         
 
 #libconboy_applet_la_SOURCES = \

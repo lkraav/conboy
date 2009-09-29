@@ -106,7 +106,7 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 #else
 	const gchar *url = gtk_entry_get_text(GTK_ENTRY(widget->url_entry));
 #endif
-	
+
 	GtkWindow *parent = GTK_WINDOW(widget->window);
 
 	if (url == NULL) {
@@ -389,6 +389,11 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	/* TODO: Current plugin manager does not look nice on Fremantle. Below is a demo
 	 * on how it should look. Implement this for PluginManager.
 	 */
+
+	GtkWidget *plugin_manager = conboy_plugin_manager_new();
+	gtk_widget_show(plugin_manager);
+	gtk_box_pack_start(GTK_BOX(config_vbox), plugin_manager, FALSE, FALSE, 0);
+
 #ifdef XXX
 	/* Touch test */
 	GtkWidget *test_vbox = gtk_vbox_new(FALSE, 0);
@@ -407,38 +412,12 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_widget_show(test_hbox1);
 	gtk_box_pack_start(GTK_BOX(test_vbox), test_hbox1, TRUE, TRUE, 0);
 
-	/*GtkWidget *but1 = hildon_button_new(HILDON_SIZE_FINGER_HEIGHT, HILDON_BUTTON_ARRANGEMENT_VERTICAL);
-	GtkWidget *chk1 = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_tickmark_checked.png");
-	hildon_button_set_image(HILDON_BUTTON(but1), chk1);
-	hildon_button_set_image_alignment(HILDON_BUTTON(but1), 0, 0.5);
-	hildon_button_set_text(HILDON_BUTTON(but1), "Xml Backend", "Loads and saves data using xml");
-	hildon_button_set_alignment(HILDON_BUTTON(but1), 0, -1, 0, -1);*/
-
-
 	GtkWidget *but1 = conboy_check_button_new(HILDON_SIZE_FINGER_HEIGHT, HILDON_BUTTON_ARRANGEMENT_VERTICAL);
 	gtk_widget_show(but1);
-	hildon_button_set_text(HILDON_BUTTON(but1), "Xml Backend", "Loads and saves data using xml");
+	conboy_check_button_set_text(CONBOY_CHECK_BUTTON(but1), "Xml Backend", "Loads and saves data using xml");
 	conboy_check_button_set_active(CONBOY_CHECK_BUTTON(but1), TRUE);
-
-
-	/*
-	HildonCheckButton *but1 = hildon_check_button_new(HILDON_SIZE_FINGER_HEIGHT);
-	hildon_check_button_set_active(but1, TRUE);
-	gtk_button_set_label(but1, "bla");
-
-	GtkWidget *but_child = gtk_bin_get_child(GTK_BIN(but1));
-	g_printerr("Type: %s\n", g_type_name(G_TYPE_FROM_INSTANCE(but_child)));
-	GtkWidget *next_child = gtk_bin_get_child(GTK_BIN(but_child));
-	g_printerr("Type: %s\n", g_type_name(G_TYPE_FROM_INSTANCE(next_child)));
-
-	GtkLabel *add = gtk_label_new("Crap Crap");
-	gtk_widget_show(add);
-	gtk_box_pack_start(GTK_BOX(next_child), add, FALSE, FALSE, 0);
-*/
 	gtk_widget_show(but1);
 	gtk_box_pack_start(GTK_BOX(test_hbox1), but1, TRUE, TRUE, 0);
-
-
 
 	GtkWidget *inf1 = hildon_gtk_button_new(HILDON_SIZE_FINGER_HEIGHT);
 	GtkWidget *inf1_img = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_information.png");
@@ -458,12 +437,8 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_widget_show(test_hbox2);
 	gtk_box_pack_start(GTK_BOX(test_vbox), test_hbox2, TRUE, TRUE, 0);
 
-	GtkWidget *but2 = hildon_button_new(HILDON_SIZE_FINGER_HEIGHT, HILDON_BUTTON_ARRANGEMENT_VERTICAL);
-	GtkWidget *chk2 = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_tickmark_unchecked.png");
-	hildon_button_set_image(HILDON_BUTTON(but2), chk2);
-	hildon_button_set_image_alignment(HILDON_BUTTON(but2), 0, 0.5);
-	hildon_button_set_text(HILDON_BUTTON(but2), "Midgard Backend", "Loads and saves data using a Midgard database");
-	hildon_button_set_alignment(HILDON_BUTTON(but2), 0, -1, 0, -1);
+	GtkWidget *but2 = conboy_check_button_new(HILDON_SIZE_FINGER_HEIGHT, HILDON_BUTTON_ARRANGEMENT_VERTICAL);
+	conboy_check_button_set_text(HILDON_BUTTON(but2), "Midgard Backend", "Loads and saves data using a Midgard database");
 	gtk_widget_show(but2);
 	gtk_box_pack_start(GTK_BOX(test_hbox2), but2, TRUE, TRUE, 0);
 
@@ -553,7 +528,6 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	g_signal_connect(sync_but, "clicked", G_CALLBACK(on_sync_but_clicked), NULL);
 	g_signal_connect(plugin_but, "clicked", G_CALLBACK(on_plugin_but_clicked), NULL);
 	*/
-
 
 	/* Set to something big to make sure the maximum dialog area is used */
 	gtk_widget_set_size_request(pannable, -1, 800);
