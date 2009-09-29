@@ -1,5 +1,9 @@
 
+
+
 #include "localisation.h"
+
+#ifdef HILDON_HAS_APP_MENU
 
 #include <hildon/hildon-gtk.h>
 
@@ -282,3 +286,5 @@ conboy_plugin_manager_row_init (ConboyPluginManagerRow *self)
 	g_signal_connect(info_but, "clicked", G_CALLBACK(on_info_button_clicked), self);
 
 }
+
+#endif /* #ifdef HILDON_HAS_APP_MENU */
