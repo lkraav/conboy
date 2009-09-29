@@ -21,6 +21,8 @@
 #include "../../conboy_storage_plugin.h"
 #include "conboy_midgard_storage_plugin.h"
 
+#define CONBOY_MIDGARD_NOTE_NAME "org_gnome_tomboy_note"
+
 static MidgardConnection *mgd_global = NULL;
 
 G_DEFINE_TYPE(ConboyMidgardStoragePlugin, conboy_midgard_storage_plugin, CONBOY_TYPE_STORAGE_PLUGIN);
@@ -34,7 +36,7 @@ _conboy_midgard_storage_plugin_note_load (ConboyStoragePlugin *self, const gchar
 	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);
 	
 	/* Get Midgard object and its properties */
-	MidgardObject *mgdobject = midgard_object_new (mgd_global, "org_gnome_tomboy_note", uuid);
+	MidgardObject *mgdobject = midgard_object_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME, uuid);
 
 	gchar *guid = NULL;
 	gchar *content = NULL;
@@ -72,9 +74,49 @@ _conboy_midgard_storage_plugin_note_save (ConboyStoragePlugin *self, ConboyNote 
 	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);
 	g_return_val_if_fail(CONBOY_IS_NOTE(note), FALSE);
 
-	/* TODO: Write note to midgard */
+	MidgardObject *mgdobject = CONBOY_MIDGARD_STORAGE_PLUGIN (self)->object;
+	
+	gchar *guid = NULL;
+	gchar *title = NULL;
+	gchar *content = NULL;
 
-	return FALSE;
+	/* Get note properties */
+	g_object_get (note, 
+			"title", &title,
+			"content", &content, NULL);
+
+	/* Set Midgard object properties */
+	g_object_set (mgdobject, 
+			"title", title,
+			"text", content, NULL);
+
+	g_free (title);
+	g_free (content);
+
+	/* Get guid to check if to create or update */
+	g_object_get (mgdobject, "guid", &guid, NULL);
+
+	gboolean created = FALSE;
+	/* Create case */
+	if (!guid || (guid && *guid == '\0')) {
+		
+		created = midgard_object_create (mgdobject);
+
+		g_free (guid);
+
+		if (created) {
+
+			g_object_get (mgdobject, "guid", &guid, NULL);
+			g_object_set (note, "guid", guid, NULL);
+			g_free (guid);
+
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+	return midgard_object_update (mgdobject);
 }
 
 static gboolean 
@@ -86,32 +128,70 @@ _conboy_midgard_storage_plugin_note_delete (ConboyStoragePlugin *self, ConboyNot
 	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);
 	g_return_val_if_fail(CONBOY_IS_NOTE(note), FALSE);
 
-	/* TODO: Delete note from midgard */
-	return FALSE;
+	MidgardObject *mgdobject = CONBOY_MIDGARD_STORAGE_PLUGIN (self)->object;
+
+	/* Use this one if you want to have possibility to undelete */
+	/* return midgard_object_delete (mgdobject); */
+
+	return midgard_object_purge (mgdobject);
 }
 
 static GSList*
 _conboy_midgard_storage_plugin_note_list (ConboyStoragePlugin *self)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
-
 	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);	
 
-	/* TODO: Return notes */	
+	MidgardQueryBuilder *builder = midgard_query_builder_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME);
+	guint n_objects;
+	GObject **objects = midgard_query_builder_execute (builder, &n_objects);
 
-	return NULL;
+	g_object_unref (builder);
+
+	if (!objects) 
+		return NULL;
+	
+	GSList *slist = NULL;
+	guint i = 0;
+
+	for (i = 0; i < n_objects; i++) {
+
+		slist = g_slist_prepend (slist, (gpointer) objects[i]);
+	}
+
+	g_free (objects);
+
+	return g_slist_reverse (slist);
 }
 
 static GSList*
 _conboy_midgard_storage_plugin_note_list_ids (ConboyStoragePlugin *self)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
-
 	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);	
 
-	/* TODO: Return notes' IDS */
+	MidgardQueryBuilder *builder = midgard_query_builder_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME);
+	guint n_objects;
+	GObject **objects = midgard_query_builder_execute (builder, &n_objects);
 
-	return NULL;
+	g_object_unref (builder);
+
+	if (!objects) 
+		return NULL;
+	
+	GSList *slist = NULL;
+	guint i = 0;
+	gchar *guid;
+
+	for (i = 0; i < n_objects; i++) {
+
+		g_object_get (objects[i], "guid", &guid, NULL);
+		slist = g_slist_prepend (slist, (gpointer) guid);
+	}
+
+	g_free (objects);
+
+	return g_slist_reverse (slist);
 }
 
 static GtkWidget*
