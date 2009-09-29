@@ -251,26 +251,56 @@ remove_by_guid(GList *list, ConboyNote *note_to_remove)
 	}
 }
 
-static void
-on_sync_but_clicked(GtkButton *but, gpointer user_data)
+typedef struct
 {
+	GtkDialog *dialog;
+	GtkProgressBar *bar;
+	GtkVBox   *box;
+	GtkLabel *label;
+	GtkButton *button;
+} DialogData;
+
+static void
+show_message (DialogData *data, gchar *msg)
+{
+	gdk_threads_enter();
 	
-	/*
-	 * TODO:
-	 * - Before sync. Close open note and remember GUID
-	 * - After sync. Get note by GUID and show
-	 */
+	gtk_widget_hide(GTK_WIDGET(data->bar));
+	gtk_label_set_markup(data->label, msg);
+	gtk_widget_set_sensitive(GTK_WIDGET(data->button), TRUE);
+	
+	gdk_threads_leave();
+}
+
+static void
+pulse_bar (GtkProgressBar *bar)
+{
+	gdk_threads_enter();
+	gtk_progress_bar_pulse(bar);
+	gdk_threads_leave();
+}
+
+
+static void
+do_sync (gpointer *user_data)
+{
+	DialogData *data = (DialogData*)user_data;
+	GtkProgressBar *bar = data->bar;
+	GtkDialog *dia = data->dialog;
+	GtkLabel *label = data->label;
+	
+	
+	pulse_bar(bar);
+	
 	
 	AppData *app_data = app_data_get();
-	GtkWindow *parent = GTK_WINDOW(app_data->note_window->window);
 
 	gchar *url = settings_load_sync_base_url();
 	if (url == NULL || strcmp(url, "") == 0) {
-		GtkWidget *dia = ui_helper_create_confirmation_dialog(parent, "Please first set a URL in the settings");
-		gtk_dialog_run(GTK_DIALOG(dia));
-		gtk_widget_destroy(dia);
+		show_message(data, "Please first set a URL in the settings");
 		return;
 	}
+	pulse_bar(bar);
 
 	int last_sync_rev = settings_load_last_sync_revision();
 	time_t last_sync_time = settings_load_last_sync_time();
@@ -281,12 +311,11 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 
 	if (reply == NULL) {
 		gchar *msg = g_strconcat("Got no reply from: \n", request, NULL);
-		GtkWidget *dia = ui_helper_create_confirmation_dialog(parent, msg);
-		gtk_dialog_run(GTK_DIALOG(dia));
-		gtk_widget_destroy(dia);
+		show_message(data, msg);
 		g_free(msg);
 		return;
 	}
+	pulse_bar(bar);
 
 	/*g_printerr("Reply from /api/1.0/:: %s\n", reply);*/
 
@@ -296,23 +325,21 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 
 	if (reply == NULL) {
 		gchar *msg = g_strconcat("Got no reply from: \n", api_ref, NULL);
-		GtkWidget *dia = ui_helper_create_confirmation_dialog(parent, msg);
-		gtk_dialog_run(GTK_DIALOG(dia));
-		gtk_widget_destroy(dia);
+		show_message(data, msg);
 		g_free(msg);
 		return;
 	}
+	pulse_bar(bar);
 
 	/*g_printerr("Reply from /root/:: %s\n", reply);*/
 
 	/* Revision checks */
 	JsonUser *user = json_get_user(reply);
 	if (user->latest_sync_revision < last_sync_rev) {
-		GtkWidget *dia = ui_helper_create_confirmation_dialog(parent, "Server revision older than our revision.");
-		gtk_dialog_run(GTK_DIALOG(dia));
-		gtk_widget_destroy(dia);
+		show_message(data, "Server revision older than our revision.");
 		return;
 	}
+	pulse_bar(bar);
 
 	/* Create list of all local notes */
 	/* Just copy NoteStore to normal list */
@@ -324,6 +351,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 		ConboyNote *note;
 		gtk_tree_model_get(GTK_TREE_MODEL(note_store), &iter, NOTE_COLUMN, &note, -1);
 		local_notes = g_list_append(local_notes, note);
+		pulse_bar(bar);
 	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(note_store), &iter));
 
 
@@ -333,7 +361,8 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 
 	/* TODO: This can take some time */
 	gchar *all_notes = conboy_http_get(get_all_notes_url);
-
+	pulse_bar(bar);
+	
 	/*
 	g_printerr("****************\n");
 	g_printerr("%s\n", all_notes);
@@ -343,6 +372,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	
 	JsonNoteList *note_list = json_get_note_list(all_notes);
 	last_sync_rev = note_list->latest_sync_revision;
+	pulse_bar(bar);
 	
 	int added_notes = 0;
 	int changed_notes = 0;
@@ -372,6 +402,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 		/* Find local note and remove from list */
 		local_notes = remove_by_guid(local_notes, note);
 
+		pulse_bar(bar);
 		notes = notes->next;
 	}
 
@@ -379,14 +410,72 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	 * Remaining local notes are new on the client.
 	 * Send them to the server
 	 */
-	int notes_to_send = g_list_length(local_notes);
-	
+	pulse_bar(bar);
 	last_sync_rev = web_send_notes(local_notes, last_sync_rev + 1, last_sync_time);
-
+	pulse_bar(bar);
 	g_printerr("Saving last sync rev: %i\n", last_sync_rev);
 	settings_save_last_sync_revision(last_sync_rev);
 	settings_save_last_sync_time(time(NULL));
+	
+	gchar msg[1000];
+	g_sprintf(msg, "<b>%s</b>\n\n%s: %i\n%s: %i\n%s: %i",
+			"Synchonization completed",
+			"Added notes", added_notes,
+			"Changed notes", changed_notes,
+			"Deleted notes", 0);
+			
+	show_message(data, msg);
+	
+}
 
+static void
+on_sync_but_clicked(GtkButton *but, gpointer user_data)
+{
+	
+	/*
+	 * TODO:
+	 * - Before sync. Close open note and remember GUID
+	 * - After sync. Get note by GUID and show
+	 */
+	
+	AppData *app_data = app_data_get();
+	GtkWindow *parent = GTK_WINDOW(app_data->note_window->window);
+	
+	GtkWidget *dia = gtk_dialog_new();
+	gtk_window_set_modal(GTK_WINDOW(dia), TRUE);
+	gtk_window_set_transient_for(GTK_WINDOW(dia), parent);
+	gtk_window_set_default_size(GTK_WINDOW(dia), 400, -1);
+	
+	GtkWidget *button = gtk_dialog_add_button(GTK_DIALOG(dia), GTK_STOCK_OK, GTK_RESPONSE_OK);
+	gtk_widget_set_sensitive(button, FALSE);
+	
+	GtkWidget *txt = gtk_label_new("");
+	gtk_label_set_markup(GTK_LABEL(txt), "<b> Synchronization ongoing </b>");
+	gtk_label_set_line_wrap(GTK_LABEL(txt), TRUE);
+	gtk_widget_show(txt);
+	
+	GtkWidget *bar = gtk_progress_bar_new();
+	gtk_widget_show(bar);
+	
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dia)->vbox), bar, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dia)->vbox), txt, TRUE, TRUE, 0);
+	
+	g_signal_connect(dia, "response", G_CALLBACK(gtk_widget_destroy), NULL);
+	
+	gtk_widget_show(dia);
+	
+	
+	DialogData *dialog_data = g_new0(DialogData, 1);
+	dialog_data->dialog = GTK_DIALOG(dia);
+	dialog_data->bar = GTK_PROGRESS_BAR(bar);
+	dialog_data->label = GTK_LABEL(txt);
+	dialog_data->button = GTK_BUTTON(button);
+	
+	if (!g_thread_create(do_sync, dialog_data, FALSE, NULL)) {
+		g_printerr("ERROR: Cannot create a thread\n");
+		return;
+	}
+	
 }
 
 

@@ -81,6 +81,9 @@ main (int argc, char *argv[])
 
   /* Init i18n */
   locale_init();
+  
+  /* Init threads */
+  g_thread_init(NULL);
 
   /* Init GTK */
 #ifdef HILDON_HAS_APP_MENU
