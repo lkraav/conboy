@@ -16,6 +16,10 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
 #ifdef HILDON_HAS_APP_MENU
 
 #ifndef                                         __CONBOY_CHECK_BUTTON_H__

@@ -88,6 +88,10 @@
  * </example>
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
 #ifdef HILDON_HAS_APP_MENU
 
 #include                                        <hildon/hildon-enum-types.h>
