@@ -21,6 +21,8 @@
 #include "../../conboy_storage_plugin.h"
 #include "conboy_midgard_storage_plugin.h"
 
+static MidgardConnection *mgd_global = NULL;
+
 G_DEFINE_TYPE(ConboyMidgardStoragePlugin, conboy_midgard_storage_plugin, CONBOY_TYPE_STORAGE_PLUGIN);
 
 static ConboyNote*
@@ -31,9 +33,34 @@ _conboy_midgard_storage_plugin_note_load (ConboyStoragePlugin *self, const gchar
 	
 	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);
 	
-	/* TODO: Read note from midgard */
+	/* Get Midgard object and its properties */
+	MidgardObject *mgdobject = midgard_object_new (mgd_global, "org_gnome_tomboy_note", uuid);
+
+	gchar *guid = NULL;
+	gchar *content = NULL;
+	gchar *title = NULL;
+
+	g_object_get (mgdobject, 
+			"guid", &guid,
+			"title", &title,
+			"text", &content, NULL);
 	
-	return NULL;
+	/* Create new conboy instance */
+	ConboyNote *note = conboy_note_new();
+
+	/* and copy properties */
+	g_object_get (note, 
+			"guid", guid,
+			"title", title,
+			"content", content, NULL);
+
+	g_free (guid);
+	g_free (content);
+	g_free (title);
+
+	CONBOY_MIDGARD_STORAGE_PLUGIN (self)->object = mgdobject;
+
+	return note;
 }
 
 static gboolean
@@ -182,6 +209,16 @@ conboy_midgard_storage_plugin_class_init (ConboyMidgardStoragePluginClass *klass
 	storage_plugin_class->list_ids = _conboy_midgard_storage_plugin_note_list_ids;
 	
 	plugin_class->get_widget 		= _conboy_midgard_storage_plugin_get_widget;
+
+	/* Initialize config for SQLite */
+
+	/* Initialize connection for given config */
+
+	/* Set connection global */
+
+	/* Check if database already exists */
+
+	/* Create base storage and one required for note */
 }
 
 static void
