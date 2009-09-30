@@ -446,7 +446,8 @@ json_get_user(const gchar* json_string)
 		result->api_ref = json_node_dup_string(node);
 
 	} else {
-		if (error != NULL) g_printerr("ERROR: %s\n", error->message);
+		g_printerr("ERROR: %s\n", error->message);
+		g_error_free(error);
 	}
 
 	g_object_unref(G_OBJECT(parser));

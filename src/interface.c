@@ -411,7 +411,7 @@ do_sync (gpointer *user_data)
 	 */
 	pulse_bar(bar);
 	GError *error = NULL;
-	int sync_rev = web_send_notes(local_notes, last_sync_rev + 1, last_sync_time, &error);
+	int sync_rev = web_send_notes(local_notes, user->api_ref, last_sync_rev + 1, last_sync_time, &error);
 	pulse_bar(bar);
 	
 	gchar msg[1000];

@@ -11,12 +11,7 @@
 #include "settings.h"
 #include "note.h"
 #include "json.h"
-/*
-#define request_token_uri "http://127.0.0.1:8000/oauth/request_token/"
-#define access_token_uri  "http://127.0.0.1:8000/oauth/access_token/"
-#define get_all_notes_uri "http://127.0.0.1:8000/api/1.0/root/notes/?include_notes=true"
-#define send_note_uri     "http://127.0.0.1:8000/api/1.0/root/notes/"
-*/
+
 
 #define c_key    "root"  /*< consumer key */
 #define c_secret "klaus" /*/< consumer secret */
@@ -327,34 +322,11 @@ conboy_http_get(const gchar *url) {
 
 	return reply;
 }
-/*
-gchar*
-get_all_notes(gboolean inc_notes)
-{
-	gchar *base_url = settings_load_sync_base_url();
-	gchar *t_key = settings_load_oauth_access_token();
-	gchar *t_secret = settings_load_oauth_access_secret();
 
-	gchar *url;
-	if (inc_notes) {
-		url = g_strconcat(base_url, "/api/1.0/root/notes/?include_notes=true", NULL);
-	} else {
-		url = g_strconcat(base_url, "/api/1.0/root/notes/", NULL);
-	}
-
-	gchar *req_url = oauth_sign_url2(url, NULL, OA_HMAC, "GET", c_key, c_secret, t_key, t_secret);
-	g_printerr("%s\n", req_url);
-	gchar *reply = oauth_http_get(req_url, NULL);
-	g_printerr("Get All Notes Reply: >%s< \n", reply);
-	g_free(url);
-	return reply;
-}
-*/
 
 gint
-web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time, GError **error)
+web_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_sync_time, GError **error)
 {
-	gchar *base_url = settings_load_sync_base_url();
 	gchar *t_key = settings_load_oauth_access_token();
 	gchar *t_secret = settings_load_oauth_access_secret();
 
@@ -402,10 +374,10 @@ web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time, GError **
 
 	gchar *oauth_args = "";
 
-	gchar *uri = g_strconcat(base_url, "/api/1.0/root/notes/", NULL); /* TODO: /root/notes is hardcoded not good */
+	/*gchar *uri = g_strconcat(base_url, "/api/1.0/root/notes/", NULL); */
 
 
-	gchar *req_url = oauth_sign_url2(uri, &oauth_args, OA_HMAC, "PUT", c_key, c_secret, t_key, t_secret);
+	gchar *req_url = oauth_sign_url2(url, &oauth_args, OA_HMAC, "PUT", c_key, c_secret, t_key, t_secret);
 
 	gchar *reply = http_put(req_url, oauth_args, json_string);
 
@@ -413,11 +385,7 @@ web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time, GError **
 	g_printerr("Reply from Snowy:\n");
 	g_printerr("%s\n", reply);
 
-	/*
-	 * TODO: Parse answer and see if expected_rev fits or not
-	 * If not return expected_rev - 1.
-	 */
-	
+	/* Parse answer and see if expected_rev fits or not */
 	JsonNoteList *note_list = json_get_note_list(reply);
 	
 	if (note_list == NULL) {
@@ -434,54 +402,3 @@ web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time, GError **
 	return expected_rev;
 }
 
-
-
-
-/*
-void
-web_send_note(ConboyNote *note, gint expected_rev)
-{
-	gchar *base_url = settings_load_sync_base_url();
-	gchar *t_key = settings_load_oauth_access_token();
-	gchar *t_secret = settings_load_oauth_access_secret();
-
-	JsonNode *result = json_node_new(JSON_NODE_OBJECT);
-
-	JsonObject *obj = json_object_new();
-
-	JsonNode *note_node = json_get_node_from_note(note);
-
-	JsonArray *array = json_array_new();
-	json_array_add_element(array, note_node);
-
-	JsonNode *node = json_node_new(JSON_NODE_ARRAY);
-	json_node_set_array(node, array);
-	json_object_add_member(obj, "note-changes", node);
-
-	node = json_node_new(JSON_NODE_VALUE);
-	json_node_set_int(node, expected_rev);
-	json_object_add_member(obj, "latest-sync-revision", node);
-
-	json_node_take_object(result, obj);
-
-
-	gchar *json_string = json_node_to_string(result, FALSE);
-
-
-
-
-	gchar *oauth_args = "";
-
-	gchar *uri = g_strconcat(base_url, "/api/1.0/root/notes/", NULL);
-
-
-	gchar *req_url = oauth_sign_url2(uri, &oauth_args, OA_HMAC, "PUT", c_key, c_secret, t_key, t_secret);
-
-	gchar *reply = http_put(req_url, oauth_args, json_string);
-
-
-	g_printerr("Reply from Snowy:\n");
-	g_printerr("%s\n", reply);
-
-}
-*/
