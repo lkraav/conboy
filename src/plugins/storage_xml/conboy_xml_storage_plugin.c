@@ -22,6 +22,7 @@
 #include <string.h>
 #include <glib/gprintf.h>
 
+#include "../../metadata.h"
 #include "../../conboy_note.h"
 #include "../../conboy_storage_plugin.h"
 #include "conboy_xml_storage_plugin.h"
@@ -295,7 +296,6 @@ load (ConboyStoragePlugin *self, const gchar *guid)
 	gchar *filename;
 	xmlTextReader *reader;
 	
-	
 	filename = g_strconcat(CONBOY_XML_STORAGE_PLUGIN(self)->path, guid, ".note", NULL);
 	
 	reader = xmlReaderForFile(filename, NULL, 0);
@@ -323,47 +323,53 @@ load (ConboyStoragePlugin *self, const gchar *guid)
 	
 }
 
+
 static gboolean
 save (ConboyStoragePlugin *self, ConboyNote *note)
 {
+	g_printerr("save() called on XmlStoragePlugin\n");
+	
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(note != NULL, FALSE);
 
 	g_return_val_if_fail(CONBOY_IS_XML_STORAGE_PLUGIN(self), FALSE);
 	g_return_val_if_fail(CONBOY_IS_NOTE(note), FALSE);
 
-	/* TODO */
-	/* Write note to xml file */
-	g_printerr("Called 'save' on ConboyXmlStoragePlugin\n");
+	g_assert(note->guid != NULL);
 	
 	xmlTextWriter *writer;
 	gchar *filename;
+	gchar *content;
 	
-	g_assert(note->guid != NULL);
+	/* Get content and version */
+	g_object_get(note, "content", &content, NULL);
 	
+	/* Create filename */
 	filename = g_strconcat(CONBOY_XML_STORAGE_PLUGIN(self)->path, note->guid, ".note", NULL);
-	
+
+	/* Create xml writer */
 	writer = xmlNewTextWriterFilename(filename, 0);
 	if (writer == NULL) {
 		g_printerr("ERROR: XmlWriter is NULL \n");
 		return FALSE;
 	}
 	
+	/* Write the complete header */
 	write_header(writer, note);
-	gchar *content;
-	g_object_get(note, "content", &content, NULL);
-	xmlTextWriterWriteRaw(writer, note->content);
-	xmlTextWriterEndElement(writer); /* close <text> */
+	
+	/* Write the complete content */
+	xmlTextWriterWriteRaw(writer, content);
+	
+	xmlTextWriterEndElement(writer); /*</text> */
 	g_free(content);
+	
+	/* Write the complete footer */
 	write_footer(writer, note);
 	
 	xmlFreeTextWriter(writer);
 	g_free(filename);
 	
 	return TRUE;
-	
-
-	
 }
 
 static gboolean 

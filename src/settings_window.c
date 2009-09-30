@@ -119,7 +119,12 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 		GtkWidget *dialog = hildon_note_new_confirmation(parent, "Really reset the sync settings?"); /*create_yes_no_dialog(parent, "Really reset the sync settings?");*/
 		int ret = gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy(dialog);
-		if (ret != GTK_RESPONSE_OK) {
+		if (ret == GTK_RESPONSE_OK) {
+			/* Reset settings */
+			settings_save_last_sync_revision(0);
+			settings_save_last_sync_time(0);
+			settings_save_sync_base_url("");
+		} else {
 			return;
 		}
 	}

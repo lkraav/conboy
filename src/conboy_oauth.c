@@ -416,6 +416,7 @@ web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time)
 
 	/*
 	 * TODO: Parse answer and see if expected_rev fits or not
+	 * If not return expected_rev - 1.
 	 */
 	return expected_rev;
 }

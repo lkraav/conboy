@@ -39,31 +39,31 @@
 static gchar*
 remove_xml_tag_and_title(const gchar* content)
 {
-
-	AppData *app_data = app_data_get();
-
-	if (app_data->reader == NULL) {
-		app_data->reader = xmlReaderForMemory(content, strlen(content), "", "UTF-8", 0);
-	}
-
-	if (xmlReaderNewMemory(app_data->reader, content, strlen(content), "", "UTF-8", 0) != 0) {
-		g_printerr("ERROR: Cannot reuse xml parser. \n");
-		g_assert_not_reached();
-	}
-
-	/* Remove xml tags */
-	xmlTextReaderRead(app_data->reader);
-	gchar *result = xmlTextReaderReadInnerXml(app_data->reader);
+	/* Using xmlTextReaderReadInnerXml() does not work, because the <note-content> node
+	 * is missing the xmlns:link and xmlns:size attributes. We could add these first,
+	 * but that would mean to use a XmlTextWriter, add those attributes and then use a
+	 * XmlTextReader to remove them again.
+	 * 
+	 * So we just go with normal string processing here.
+	 */
+	gchar *result;
+	
+	/* Remove <note-content> tags */
+	gchar **tokens1 = g_strsplit(content, ">", 2);
+	gchar **tokens2 = g_strsplit(tokens1[1], "</note-content>", 2);
+	gchar *without_tags = g_strdup(tokens2[0]);
+	g_strfreev(tokens1);
+	g_strfreev(tokens2);
 
 	/* Remove first 2 lines */
-	gchar **parts = g_strsplit(result, "\n", 3);
-
-	g_free(result);
+	gchar **parts = g_strsplit(without_tags, "\n", 3);
+	g_free(without_tags);
 
 	if (parts[0] == NULL) {
-		g_printerr("PARTS0 IS NULL\n");
+		g_printerr("ERROR: PARTS0 IS NULL\n");
 		return "";
 	}
+	
 	/* If second line does not exist, there is no content */
 	if (parts[1] == NULL) {
 		result = "";
@@ -76,8 +76,6 @@ remove_xml_tag_and_title(const gchar* content)
 	}
 
 	g_strfreev(parts);
-
-	g_printerr("ZZZZZZZ:\n>%s<\n", result);
 
 	return result;
 }
@@ -95,7 +93,6 @@ convert_content(const gchar *content)
 		g_free(tmp);
 		return result;
 	}
-
 }
 
 JsonNode*

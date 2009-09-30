@@ -324,8 +324,8 @@ static gint sort_by_prio(GtkTextTag *tag1, GtkTextTag *tag2)
 	return (tag2->priority - tag1->priority);
 }
 
-static
-void write_content(xmlTextWriter *writer, GtkTextBuffer *buffer, gdouble version)
+static void
+write_content(xmlTextWriter *writer, GtkTextBuffer *buffer, gdouble version)
 {
 	int rc = 0;
 	GtkTextIter start, end;
@@ -339,12 +339,12 @@ void write_content(xmlTextWriter *writer, GtkTextBuffer *buffer, gdouble version
 	  
 	/* Start note-content element */
 	rc = xmlTextWriterStartElement(writer, BAD_CAST "note-content");
+	
+	/* Add version attribute */
 	g_ascii_formatd(version_str, 10, "%.1f", version);
 	rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "version", BAD_CAST &version_str);
 	
-	/*****************************************************/
-	
-	
+	/**************************************************/
 	
 	gtk_text_buffer_get_bounds(buffer, &start, &end);
 	iter = start;
@@ -378,14 +378,6 @@ void write_content(xmlTextWriter *writer, GtkTextBuffer *buffer, gdouble version
 		write_text(text, writer);
 	}
 	
-	/* TODO: Free this stuff */
-	/*
-	g_slist_free(start_tags);
-	g_slist_free(end_tags);
-	g_free(text);
-	*/
-	
-	
 	/**************************************************/
 	  
 	/* Close note-content */
@@ -394,9 +386,6 @@ void write_content(xmlTextWriter *writer, GtkTextBuffer *buffer, gdouble version
 	/* Insert linebreak like in Tomboy format */
 	rc = xmlTextWriterWriteRaw(writer, BAD_CAST "\n");	
 }
-
-
-
 
 
 /*

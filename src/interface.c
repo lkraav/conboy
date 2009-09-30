@@ -450,7 +450,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	gtk_widget_set_sensitive(button, FALSE);
 	
 	GtkWidget *txt = gtk_label_new("");
-	gtk_label_set_markup(GTK_LABEL(txt), "<b> Synchronization ongoing </b>");
+	gtk_label_set_markup(GTK_LABEL(txt), "<b>Synchronization ongoing</b>");
 	gtk_label_set_line_wrap(GTK_LABEL(txt), TRUE);
 	gtk_widget_show(txt);
 	
@@ -472,7 +472,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	dialog_data->button = GTK_BUTTON(button);
 	
 	if (!g_thread_create(do_sync, dialog_data, FALSE, NULL)) {
-		g_printerr("ERROR: Cannot create a thread\n");
+		g_printerr("ERROR: Cannot create sync thread\n");
 		return;
 	}
 	
