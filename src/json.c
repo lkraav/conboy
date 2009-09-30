@@ -456,11 +456,25 @@ json_get_user(const gchar* json_string)
 JsonNoteList*
 json_get_note_list(const gchar* json_string)
 {
+	/* First sanity checks on the input */
+	if (json_string == NULL || strcmp(json_string, "") == 0) {
+		g_printerr("ERROR: Cannot parse empty string\n");
+		return NULL;
+	}
+	
+	if (strncmp(json_string, "{\"notes\":", 9) != 0) {
+		g_printerr("ERROR: Cannot parse string. Does not start with '{\"notes\":'\n");
+		return NULL;
+	}
+	
 	JsonParser *parser = json_parser_new();
-	JsonNoteList *result = g_new0(JsonNoteList, 1);
+	JsonNoteList *result = NULL;
 	GError *error = NULL;
 
 	if (json_parser_load_from_data(parser, json_string, -1, &error)) {
+		
+		result = g_new0(JsonNoteList, 1);
+		
 		JsonNode *node = json_parser_get_root(parser);
 		JsonObject *obj = json_node_get_object(node);
 
@@ -479,6 +493,8 @@ json_get_note_list(const gchar* json_string)
 		}
 	} else {
 		g_printerr("ERROR: Could not parse the following JSON string:\n%s\n", json_string);
+		g_printerr("ERRRO: Message is: %s\n", error->message);
+		g_error_free(error);
 	}
 
 	g_object_unref(G_OBJECT(parser));

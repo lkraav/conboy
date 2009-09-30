@@ -264,7 +264,7 @@ static void
 show_message (DialogData *data, gchar *msg)
 {
 	gdk_threads_enter();
-	
+
 	gtk_widget_hide(GTK_WIDGET(data->bar));
 	gtk_label_set_markup(data->label, msg);
 	gtk_widget_set_sensitive(GTK_WIDGET(data->button), TRUE);
@@ -359,7 +359,7 @@ do_sync (gpointer *user_data)
 	gchar get_all_notes_url[1024];
 	g_sprintf(get_all_notes_url, "%s?include_notes=true&since=%i", user->api_ref, last_sync_rev);
 
-	/* TODO: This can take some time */
+	pulse_bar(bar);
 	gchar *all_notes = conboy_http_get(get_all_notes_url);
 	pulse_bar(bar);
 	
@@ -368,7 +368,6 @@ do_sync (gpointer *user_data)
 	g_printerr("%s\n", all_notes);
 	g_printerr("****************\n");
 	*/
-
 	
 	JsonNoteList *note_list = json_get_note_list(all_notes);
 	last_sync_rev = note_list->latest_sync_revision;
@@ -411,21 +410,29 @@ do_sync (gpointer *user_data)
 	 * Send them to the server
 	 */
 	pulse_bar(bar);
-	last_sync_rev = web_send_notes(local_notes, last_sync_rev + 1, last_sync_time);
+	GError *error = NULL;
+	int sync_rev = web_send_notes(local_notes, last_sync_rev + 1, last_sync_time, &error);
 	pulse_bar(bar);
-	g_printerr("Saving last sync rev: %i\n", last_sync_rev);
-	settings_save_last_sync_revision(last_sync_rev);
-	settings_save_last_sync_time(time(NULL));
 	
 	gchar msg[1000];
-	g_sprintf(msg, "<b>%s</b>\n\n%s: %i\n%s: %i\n%s: %i",
-			"Synchonization completed",
-			"Added notes", added_notes,
-			"Changed notes", changed_notes,
-			"Deleted notes", 0);
-			
-	show_message(data, msg);
 	
+	if (!error) {
+		settings_save_last_sync_revision(sync_rev);
+		settings_save_last_sync_time(time(NULL));
+		
+		g_sprintf(msg, "<b>%s</b>\n\n%s: %i\n%s: %i\n%s: %i",
+				"Synchonization completed",
+				"Added notes", added_notes,
+				"Changed notes", changed_notes,
+				"Deleted notes", 0);
+		
+	} else {
+		g_printerr("ERROR: %s\n", error->message);
+		g_sprintf(msg, "<b>%s</b>\n\nError Message was:\n%s\n", "Synchonization failed", error->message);
+		g_error_free(error);
+	}
+
+	show_message(data, msg);
 }
 
 static void
@@ -444,7 +451,8 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	GtkWidget *dia = gtk_dialog_new();
 	gtk_window_set_modal(GTK_WINDOW(dia), TRUE);
 	gtk_window_set_transient_for(GTK_WINDOW(dia), parent);
-	gtk_window_set_default_size(GTK_WINDOW(dia), 400, -1);
+	gtk_window_set_default_size(GTK_WINDOW(dia), 400, 250);
+	gtk_window_set_title(GTK_WINDOW(dia), " ");
 	
 	GtkWidget *button = gtk_dialog_add_button(GTK_DIALOG(dia), GTK_STOCK_OK, GTK_RESPONSE_OK);
 	gtk_widget_set_sensitive(button, FALSE);
@@ -457,14 +465,14 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	GtkWidget *bar = gtk_progress_bar_new();
 	gtk_widget_show(bar);
 	
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dia)->vbox), bar, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dia)->vbox), bar, FALSE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dia)->vbox), txt, TRUE, TRUE, 0);
 	
 	g_signal_connect(dia, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 	
 	gtk_widget_show(dia);
 	
-	
+	/* TODO: This data must get freed once the dialog is closed */
 	DialogData *dialog_data = g_new0(DialogData, 1);
 	dialog_data->dialog = GTK_DIALOG(dia);
 	dialog_data->bar = GTK_PROGRESS_BAR(bar);

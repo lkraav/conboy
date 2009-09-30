@@ -352,12 +352,11 @@ get_all_notes(gboolean inc_notes)
 */
 
 gint
-web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time)
+web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time, GError **error)
 {
 	gchar *base_url = settings_load_sync_base_url();
 	gchar *t_key = settings_load_oauth_access_token();
 	gchar *t_secret = settings_load_oauth_access_secret();
-
 
 	/*
 	 * Create correct json structure to send the note
@@ -403,7 +402,7 @@ web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time)
 
 	gchar *oauth_args = "";
 
-	gchar *uri = g_strconcat(base_url, "/api/1.0/root/notes/", NULL);
+	gchar *uri = g_strconcat(base_url, "/api/1.0/root/notes/", NULL); /* TODO: /root/notes is hardcoded not good */
 
 
 	gchar *req_url = oauth_sign_url2(uri, &oauth_args, OA_HMAC, "PUT", c_key, c_secret, t_key, t_secret);
@@ -418,6 +417,20 @@ web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time)
 	 * TODO: Parse answer and see if expected_rev fits or not
 	 * If not return expected_rev - 1.
 	 */
+	
+	JsonNoteList *note_list = json_get_note_list(reply);
+	
+	if (note_list == NULL) {
+		g_set_error(error, 0, 0, "json_get_note_list() returned NULL");
+		return expected_rev - 1;
+	}
+	
+	if (note_list->latest_sync_revision != expected_rev) {
+		g_printerr("ERROR: Expected sync rev (%i) and actual sync rev (%i) are not the same\n", expected_rev, note_list->latest_sync_revision);
+		g_set_error(error, 0, 0, "Expected sync rev (%i) and actual sync rev (%i) are not the same\n", expected_rev, note_list->latest_sync_revision);
+		return note_list->latest_sync_revision;
+	}
+	
 	return expected_rev;
 }
 

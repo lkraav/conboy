@@ -84,6 +84,7 @@ main (int argc, char *argv[])
   
   /* Init threads */
   g_thread_init(NULL);
+  gdk_threads_init();
 
   /* Init GTK */
 #ifdef HILDON_HAS_APP_MENU
@@ -152,8 +153,10 @@ main (int argc, char *argv[])
   */
 
   /****/
-
+  
+  gdk_threads_enter();
   gtk_main();
+  gdk_threads_leave();
 
   cleanup();
 

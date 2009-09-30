@@ -15,7 +15,7 @@ gchar*
 get_all_notes(gboolean inc_notes);
 
 gint
-web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time);
+web_send_notes(GList *notes, gint expected_rev, time_t last_sync_time, GError **error);
 
 gchar*
 conboy_get_auth_link(const gchar *base_url);
