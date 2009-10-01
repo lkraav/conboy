@@ -272,6 +272,8 @@ _conboy_midgard_storage_plugin_dispose(GObject *object)
 	G_OBJECT_CLASS(conboy_midgard_storage_plugin_parent_class)->dispose(object);
 }
 
+#define __DB_EXISTS_FILE "/home/user/.midgard-2.0/.conboy_db_exists"
+
 static void
 conboy_midgard_storage_plugin_class_init (ConboyMidgardStoragePluginClass *klass)
 {
@@ -289,22 +291,43 @@ conboy_midgard_storage_plugin_class_init (ConboyMidgardStoragePluginClass *klass
 	storage_plugin_class->list_ids = _conboy_midgard_storage_plugin_note_list_ids;
 	
 	plugin_class->get_widget 		= _conboy_midgard_storage_plugin_get_widget;
-
-	/* Initialize config for SQLite */
-
-	/* Initialize connection for given config */
-
-	/* Set connection global */
-
-	/* Check if database already exists */
-
-	/* Create base storage and one required for note */
 }
 
 static void
 conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 {
 	g_printerr("Hello from Midgard plugin\n");
+
+	/* Initialize midgard */
+	midgard_init();
+
+	/* Initialize config for SQLite */
+	MidgardConfig *config = midgard_config_new();
+	g_object_set (config, 
+			"dbtype", "SQLite",
+			"database", "ConboyNotes",
+			"dbuser", "midgard",
+			"dbpass", "midgard", NULL);
+
+	midgard_config_save_file ("ConboyNotesStorage", TRUE);
+
+	/* Initialize connection for given config */
+	MidgardConnection *mgd_global = midgard_connection_new();
+	if (!midgard_connection_open_config (mgd_global, config))
+		g_abort ("Can not connect to Conboy notes database. %s", midgard_connection_get_error_string (mgd_global));
+
+	/* Check if database already exists */
+	if (g_file_test (__DB_EXISTS_FILE, G_FILE_TEST_EXISTS)) /* HACK */
+		return TRUE;
+
+	/* Create base storage and one required for note */
+	midgard_config_create_midgard_tables (config);
+	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME (CONBOY_MIDGARD_NOTE_NAME);
+	midgard_config_create_class_table (config, klass);
+
+	/* HACK */
+	g_file_set_contents (__DB_EXISTS_FILE, "", 1, NULL);
+
 	CONBOY_PLUGIN(self)->has_settings = TRUE;
 }
 
