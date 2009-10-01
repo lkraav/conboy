@@ -225,19 +225,12 @@ on_new_button_clicked					(GtkAction		*action,
 										 gpointer		 user_data)
 {
 	AppData *app_data = app_data_get();
-
-	ConboyNote *note = conboy_note_new();
-
 	int num = conboy_note_store_get_length(app_data->note_store) + 1;
 	gchar title[100];
-	gchar xml[200];
-	g_sprintf(title, "New Note %i", num);
-	g_sprintf(xml, "<note-content version=\"0.1\">%s\n\n%s</note-content>",
-			title,
-			_("Describe your new note here."));
-
-	g_object_set(note, "title", title, "content", xml, NULL);
-
+	
+	g_sprintf(title, _("New Note %i"), num);
+	
+	ConboyNote *note = conboy_note_new_with_title(title);
 	note_show(note);
 }
 

@@ -78,6 +78,7 @@ struct _ConboyNoteClass {
 GType		 conboy_note_get_type		(void);
 ConboyNote*  conboy_note_new            (void);
 ConboyNote*  conboy_note_new_with_guid	(const gchar* guid);
+ConboyNote*  conboy_note_new_with_title (const gchar* title);
 
 void         conboy_note_add_tag        (ConboyNote* note, const gchar*);
 void         conboy_note_remove_tag     (ConboyNote* note, const gchar*);

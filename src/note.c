@@ -35,6 +35,7 @@
 
 #define _(String)gettext(String)
 
+
 void note_show_by_title(const char* title)
 {
 	ConboyNote *note;
@@ -43,8 +44,7 @@ void note_show_by_title(const char* title)
 	note = conboy_note_store_find_by_title(app_data->note_store, title);
 
 	if (note == NULL) {
-		note = conboy_note_new();
-		g_object_set(note, "title", title, NULL);
+		note = conboy_note_new_with_title(title);
 		note_show(note);
 		return;
 	}

@@ -17,6 +17,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "localisation.h"
+#include <glib/gprintf.h>
 #include "conboy_note.h"
 
 static GObjectClass *parent_class = NULL;
@@ -324,6 +326,21 @@ ConboyNote*
 conboy_note_new_with_guid(const gchar* guid)
 {
 	return g_object_new(CONBOY_TYPE_NOTE, "guid", guid, NULL);
+}
+
+ConboyNote*
+conboy_note_new_with_title (const gchar* title)
+{
+	ConboyNote *note = conboy_note_new();
+
+	gchar xml[200];
+	g_sprintf(xml, "<note-content version=\"0.1\">%s\n\n%s</note-content>",
+			title,
+			_("Describe your new note here."));
+
+	g_object_set(note, "title", title, "content", xml, NULL);
+	
+	return note;
 }
 
 void

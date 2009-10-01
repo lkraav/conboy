@@ -405,7 +405,6 @@ do_sync (gpointer *user_data)
 			g_printerr("INFO: Updating note '%s' in note store\n", note->title);
 			ConboyNote *old_note = conboy_note_store_find_by_guid(app_data->note_store, note->guid);
 			conboy_note_store_remove(app_data->note_store, old_note);
-			ConboyNote *test = conboy_note_store_find_by_guid(app_data->note_store, note->guid);
 			conboy_note_store_add(app_data->note_store, note, NULL); /* maybe copy only content from new to old note */
 			/*conboy_note_store_note_changed(app_data->note_store, note);*/
 			changed_notes++;
