@@ -178,7 +178,7 @@ json_node_to_string(JsonNode *node, gboolean pretty)
 
 	gen = json_generator_new();
 	if (pretty) {
-		g_object_set(gen, "pretty", TRUE, NULL);
+		g_object_set(gen, "pretty", FALSE, NULL);
 	}
 	json_generator_set_root(gen, node);
 	string = json_generator_to_data(gen, NULL);
