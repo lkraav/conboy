@@ -157,7 +157,8 @@ conboy_plugin_store_activate_by_name (ConboyPluginStore *self, const gchar *name
 	GList *infos = self->plugins;
 	while (infos) {
 		ConboyPluginInfo *info = (ConboyPluginInfo*) infos->data;
-		if (strcmp(conboy_plugin_info_get_module_name(info), name) == 0) {
+		gchar *plugin_name = conboy_plugin_info_get_module_name (info);
+		if (name && plugin_name && g_str_equal (name, plugin_name)) {
 			conboy_plugin_info_activate_plugin(info);
 			return TRUE;
 		}
