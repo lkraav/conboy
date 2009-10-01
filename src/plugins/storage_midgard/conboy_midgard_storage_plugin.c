@@ -314,7 +314,7 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 	/* Initialize connection for given config */
 	MidgardConnection *mgd_global = midgard_connection_new();
 	if (!midgard_connection_open_config (mgd_global, config))
-		g_abort ("Can not connect to Conboy notes database. %s", midgard_connection_get_error_string (mgd_global));
+		g_error ("Can not connect to Conboy notes database. %s", midgard_connection_get_error_string (mgd_global));
 
 	/* Check if database already exists */
 	if (g_file_test (__DB_EXISTS_FILE, G_FILE_TEST_EXISTS)) /* HACK */
