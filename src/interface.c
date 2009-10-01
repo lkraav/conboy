@@ -545,7 +545,7 @@ on_storage_activated (ConboyStorage *storage, UserInterface *ui)
 		gtk_text_buffer_set_text(ui->buffer, "", -1);
 	}
 
-	gtk_widget_set_sensitive(GTK_WIDGET(ui->view), TRUE);
+	gtk_text_view_set_editable(GTK_TEXT_VIEW(ui->view), TRUE);
 	gtk_widget_set_sensitive(GTK_WIDGET(ui->toolbar), TRUE);
 }
 
@@ -565,14 +565,7 @@ on_storage_deactivated (ConboyStorage *storage, UserInterface *ui)
 
 	conboy_note_buffer_clear_active_tags(CONBOY_NOTE_BUFFER(ui->buffer));
 
-	/*note_close();*/
-
-	/*
-	AppData *app_data = app_data_get();
-	app_data->open_notes = NULL;
-	*/
-
-	gtk_widget_set_sensitive(GTK_WIDGET(ui->view), FALSE);
+	gtk_text_view_set_editable(GTK_TEXT_VIEW(ui->view), FALSE);
 	gtk_widget_set_sensitive(GTK_WIDGET(ui->toolbar), FALSE);
 }
 
