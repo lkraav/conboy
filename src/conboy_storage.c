@@ -261,7 +261,12 @@ conboy_storage_note_delete (ConboyStorage *self, ConboyNote *note)
 	g_return_val_if_fail(self->plugin != NULL, FALSE);
 	g_return_val_if_fail(CONBOY_IS_STORAGE_PLUGIN(self->plugin), FALSE);
 
-	return conboy_storage_plugin_note_delete(self->plugin, note);
+	if (conboy_storage_plugin_note_delete(self->plugin, note)) {
+		/* TODO: Add filename to a files which tracks deleted files */
+		return TRUE;
+	} else {
+		return FALSE;
+	}
 }
 
 GSList*

@@ -285,15 +285,28 @@ static void
 do_sync (gpointer *user_data)
 {
 	DialogData *data = (DialogData*)user_data;
+	AppData *app_data = app_data_get();
+	UserInterface *ui = app_data->note_window;
 	GtkProgressBar *bar = data->bar;
-	GtkDialog *dia = data->dialog;
-	GtkLabel *label = data->label;
+	
+	
+	
+	/* Save and make uneditable */
+	gdk_threads_enter();
+	gtk_text_view_set_editable(ui->view, FALSE);
+	note_save(ui);
+	gdk_threads_leave();
+	
+	/* Save guid of current note */
+	gchar *guid = NULL;
+	if (ui->note != NULL) {
+		g_object_get(ui->note, "guid", &guid, NULL);
+	}
+	
+	
 	
 	
 	pulse_bar(bar);
-	
-	
-	AppData *app_data = app_data_get();
 
 	gchar *url = settings_load_sync_base_url();
 	if (url == NULL || strcmp(url, "") == 0) {
@@ -392,6 +405,7 @@ do_sync (gpointer *user_data)
 			g_printerr("INFO: Updating note '%s' in note store\n", note->title);
 			ConboyNote *old_note = conboy_note_store_find_by_guid(app_data->note_store, note->guid);
 			conboy_note_store_remove(app_data->note_store, old_note);
+			ConboyNote *test = conboy_note_store_find_by_guid(app_data->note_store, note->guid);
 			conboy_note_store_add(app_data->note_store, note, NULL); /* maybe copy only content from new to old note */
 			/*conboy_note_store_note_changed(app_data->note_store, note);*/
 			changed_notes++;
@@ -432,22 +446,39 @@ do_sync (gpointer *user_data)
 		g_error_free(error);
 	}
 
-	show_message(data, msg);
-}
-
-static void
-on_sync_but_clicked(GtkButton *but, gpointer user_data)
-{
-	
 	/*
-	 * TODO:
-	 * - Before sync. Close open note and remember GUID
-	 * - After sync. Get note by GUID and show
+	 * Sync finished
 	 */
 	
-	AppData *app_data = app_data_get();
-	GtkWindow *parent = GTK_WINDOW(app_data->note_window->window);
+	/* Show message to user */
+	show_message(data, msg);
 	
+	/* Try to get previous note */
+	ConboyNote *note = NULL;
+	if (guid != NULL) {
+		note = conboy_note_store_find_by_guid(app_data->note_store, guid);
+	}
+	
+	/* If not possible, because it was deleted or there was no previous note, get latest */
+	if (note == NULL) {
+		note = conboy_note_store_get_latest(app_data->note_store);
+	}
+	
+	if (note == NULL) {
+		/* TODO: Show demo note */
+		g_printerr("ERROR: No notes to display\n");
+	}
+	
+	/* Load again and make editable */
+	gdk_threads_enter();
+	gtk_text_view_set_editable(ui->view, TRUE);
+	note_show(note);
+	gdk_threads_leave();
+}
+
+static DialogData*
+create_sync_dialog(GtkWindow *parent)
+{
 	GtkWidget *dia = gtk_dialog_new();
 	gtk_window_set_modal(GTK_WINDOW(dia), TRUE);
 	gtk_window_set_transient_for(GTK_WINDOW(dia), parent);
@@ -470,8 +501,6 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	
 	g_signal_connect(dia, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 	
-	gtk_widget_show(dia);
-	
 	/* TODO: This data must get freed once the dialog is closed */
 	DialogData *dialog_data = g_new0(DialogData, 1);
 	dialog_data->dialog = GTK_DIALOG(dia);
@@ -479,7 +508,23 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	dialog_data->label = GTK_LABEL(txt);
 	dialog_data->button = GTK_BUTTON(button);
 	
-	if (!g_thread_create(do_sync, dialog_data, FALSE, NULL)) {
+	return dialog_data;
+}
+
+
+static void
+on_sync_but_clicked(GtkButton *but, gpointer user_data)
+{
+	AppData *app_data = app_data_get();
+	
+	/* Show dialog */
+	GtkWindow *parent = GTK_WINDOW(app_data->note_window->window);
+	DialogData *dialog_data = create_sync_dialog(parent);
+	gtk_widget_show(GTK_WIDGET(dialog_data->dialog));
+
+	/* Create thread and start sync */
+	GThread *thread = g_thread_create(do_sync, dialog_data, TRUE, NULL);
+	if (!thread) {
 		g_printerr("ERROR: Cannot create sync thread\n");
 		return;
 	}
