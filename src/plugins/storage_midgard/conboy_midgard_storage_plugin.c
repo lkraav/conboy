@@ -36,7 +36,14 @@ _conboy_midgard_storage_plugin_note_load (ConboyStoragePlugin *self, const gchar
 	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);
 	
 	/* Get Midgard object and its properties */
-	MidgardObject *mgdobject = midgard_object_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME, uuid);
+	GValue gval = {0, };
+	g_value_init (&gval, G_TYPE_STRING);
+	
+	if (uuid) g_value_set_string (&gval, uuid);
+
+	MidgardObject *mgdobject = midgard_object_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME, uuid ? &gval : NULL);
+
+	g_value_unset (&gval);
 
 	gchar *guid = NULL;
 	gchar *content = NULL;
@@ -309,7 +316,7 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 			"dbuser", "midgard",
 			"dbpass", "midgard", NULL);
 
-	midgard_config_save_file ("ConboyNotesStorage", TRUE);
+	midgard_config_save_file (config, "ConboyNotesStorage", TRUE, NULL);
 
 	/* Initialize connection for given config */
 	MidgardConnection *mgd_global = midgard_connection_new();
@@ -318,12 +325,12 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 
 	/* Check if database already exists */
 	if (g_file_test (__DB_EXISTS_FILE, G_FILE_TEST_EXISTS)) /* HACK */
-		return TRUE;
+		return;
 
 	/* Create base storage and one required for note */
-	midgard_config_create_midgard_tables (config);
+	midgard_config_create_midgard_tables (config, mgd_global);
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME (CONBOY_MIDGARD_NOTE_NAME);
-	midgard_config_create_class_table (config, klass);
+	midgard_config_create_class_table (config, klass, mgd_global);
 
 	/* HACK */
 	g_file_set_contents (__DB_EXISTS_FILE, "", 1, NULL);
