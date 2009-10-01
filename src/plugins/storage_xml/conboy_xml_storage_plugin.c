@@ -21,6 +21,7 @@
 #include <libxml/xmlwriter.h>
 #include <string.h>
 #include <glib/gprintf.h>
+#include <glib/gstdio.h>
 
 #include "../../metadata.h"
 #include "../../conboy_note.h"
@@ -381,11 +382,22 @@ delete (ConboyStoragePlugin *self, ConboyNote *note)
 	g_return_val_if_fail(CONBOY_IS_XML_STORAGE_PLUGIN(self), FALSE);
 	g_return_val_if_fail(CONBOY_IS_NOTE(note), FALSE);
 
-	/* TODO */
-	/* Delete xml file */
-	g_printerr("Called 'delete' on ConboyXmlStoragePlugin\n");
+	gboolean result = FALSE;
+	
+	gchar *guid;
+	g_object_get(note, "guid", &guid, NULL);
+	gchar *filename = g_strconcat(guid, ".note", NULL);
+	gchar *full_name = g_build_filename(CONBOY_XML_STORAGE_PLUGIN(self)->path, filename, NULL);
+	
+	if (g_unlink(full_name) == 0) {
+		result = TRUE;
+	}
+	
+	g_free(full_name);
+	g_free(filename);
+	g_free(guid);
 
-	return FALSE;
+	return result;
 }
 
 static GSList*
