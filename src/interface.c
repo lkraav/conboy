@@ -368,35 +368,24 @@ do_sync (gpointer *user_data)
 	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(note_store), &iter));
 
 
-	/* Get all notes since last syncRef and save them. */
-	gchar get_all_notes_url[1024];
-	g_sprintf(get_all_notes_url, "%s?include_notes=true&since=%i", user->api_ref, last_sync_rev);
-
-	pulse_bar(bar);
-	gchar *all_notes = conboy_http_get(get_all_notes_url);
-	pulse_bar(bar);
-	
-	/*
-	g_printerr("****************\n");
-	g_printerr("%s\n", all_notes);
-	g_printerr("****************\n");
-	*/
-	
-	JsonNoteList *note_list = json_get_note_list(all_notes);
+	/* Get all notes since last syncRef*/
+	JsonNoteList *note_list = web_sync_get_notes(user, last_sync_rev);
 	last_sync_rev = note_list->latest_sync_revision;
 	pulse_bar(bar);
 	
 	int added_notes = 0;
 	int changed_notes = 0;
 
+	/* Save notes */ 
 	GSList *notes = note_list->notes;
 	while (notes != NULL) {
 		ConboyNote *note = CONBOY_NOTE(notes->data);
 		g_printerr("Saving: %s\n", note->title);
+		/* TODO: Check for title conflicts */
+		
 		conboy_storage_note_save(app_data->storage, note);
 
 		/* If not yet in the note store, add this note */
-		/* TODO: If note is newer, send signal, that the note store updates it */
 		if (!conboy_note_store_find_by_guid(app_data->note_store, note->guid)) {
 			g_printerr("INFO: Adding note '%s' to note store\n", note->title);
 			conboy_note_store_add(app_data->note_store, note, NULL);
@@ -419,12 +408,14 @@ do_sync (gpointer *user_data)
 	}
 
 	/*
-	 * Remaining local notes are new on the client.
+	 * Remaining local notes are newer on the client.
 	 * Send them to the server
 	 */
+	gint uploaded_notes = 0;
+	
 	pulse_bar(bar);
 	GError *error = NULL;
-	int sync_rev = web_send_notes(local_notes, user->api_ref, last_sync_rev + 1, last_sync_time, &error);
+	int sync_rev = web_sync_send_notes(local_notes, user->api_ref, last_sync_rev + 1, last_sync_time, &uploaded_notes, &error);
 	pulse_bar(bar);
 	
 	gchar msg[1000];
@@ -433,11 +424,12 @@ do_sync (gpointer *user_data)
 		settings_save_last_sync_revision(sync_rev);
 		settings_save_last_sync_time(time(NULL));
 		
-		g_sprintf(msg, "<b>%s</b>\n\n%s: %i\n%s: %i\n%s: %i",
+		g_sprintf(msg, "<b>%s</b>\n\n%s: %i\n%s: %i\n%s: %i\n%s: %i",
 				"Synchonization completed",
 				"Added notes", added_notes,
 				"Changed notes", changed_notes,
-				"Deleted notes", 0);
+				"Deleted notes", 0,
+				"Uploaded notes", uploaded_notes);
 		
 	} else {
 		g_printerr("ERROR: %s\n", error->message);
@@ -448,6 +440,9 @@ do_sync (gpointer *user_data)
 	/*
 	 * Sync finished
 	 */
+	g_free(api_ref);
+	g_list_free(local_notes);
+	/* TODO: Free json stuff */
 	
 	/* Show message to user */
 	show_message(data, msg);

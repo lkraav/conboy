@@ -325,7 +325,7 @@ conboy_http_get(const gchar *url) {
 
 
 gint
-web_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_sync_time, GError **error)
+web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_sync_time, gint *uploaded_notes, GError **error)
 {
 	gchar *t_key = settings_load_oauth_access_token();
 	gchar *t_secret = settings_load_oauth_access_secret();
@@ -347,7 +347,8 @@ web_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_sync_tim
 		notes = notes->next;
 	}
 
-	if (json_array_get_length(array) == 0) {
+	*uploaded_notes = json_array_get_length(array);
+	if (*uploaded_notes == 0) {
 		g_printerr("INFO: No new notes on client. Sending nothing.\n");
 		return expected_rev - 1;
 	}
@@ -400,5 +401,21 @@ web_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_sync_tim
 	}
 	
 	return expected_rev;
+}
+
+JsonNoteList*
+web_sync_get_notes(JsonUser *user, int since_rev)
+{
+	JsonNoteList *result;
+	gchar *json_string;
+	gchar get_all_notes_url[1024];
+	
+	g_sprintf(get_all_notes_url, "%s?include_notes=true&since=%i", user->api_ref, since_rev);
+
+	json_string = conboy_http_get(get_all_notes_url);
+	result = json_get_note_list(json_string);
+	
+	g_free(json_string);
+	return result;
 }
 
