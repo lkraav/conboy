@@ -26,6 +26,7 @@ typedef struct
 	ConboyPluginStore *plugin_store;
 } AppData;
 
+void app_data_init(void);
 AppData* app_data_get(void);
 void app_data_free(void);
 

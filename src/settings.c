@@ -19,6 +19,15 @@
 #include "settings.h"
 #include "app_data.h"
 
+/**
+ * Simple wrapper that it can be used from g_list_foreach()
+ */
+static void
+free_data(gpointer data, gpointer ignore)
+{
+	g_free(data);
+}
+
 void
 settings_save_last_sync_time(time_t time)
 {
@@ -48,23 +57,6 @@ settings_load_last_sync_revision(void)
 }
 
 void
-settings_save_storage_plugin_name(GConfClient *client, const gchar *name)
-{
-	gconf_client_set_string(client, SETTINGS_STORAGE_PLUGIN_NAME, name, NULL);
-}
-
-gchar*
-settings_load_storage_plugin_name(GConfClient *client) {
-	/*AppData *app_data = app_data_get();*/ /* Called from app_data_get(), so we cannot call it here again*/
-	gchar *result = gconf_client_get_string(client, SETTINGS_STORAGE_PLUGIN_NAME, NULL);
-	if (result == NULL) {
-		settings_save_storage_plugin_name(client, "storagexml");
-		return "storagexml"; 
-	}
-	return result;
-}
-
-void
 settings_save_sync_base_url(const gchar *url)
 {
 	AppData *app_data = app_data_get();
@@ -89,7 +81,55 @@ GSList*
 settings_load_active_plugins()
 {
 	AppData *app_data = app_data_get();
-	return gconf_client_get_list(app_data->client, SETTINGS_ACTIVE_PLUGINS, GCONF_VALUE_STRING, NULL);
+	GSList *list = gconf_client_get_list(app_data->client, SETTINGS_ACTIVE_PLUGINS, GCONF_VALUE_STRING, NULL);
+	if (list == NULL) {
+		list = g_slist_append(list, "storagexml");
+		settings_save_active_plugins(list);
+	}
+	return list;
+}
+
+void
+settings_add_active_plugin(const gchar *name)
+{
+	GSList *plugin_names = settings_load_active_plugins();
+	/* We need to duplicate name here, because later all elements get freed */
+	plugin_names = g_slist_prepend(plugin_names, g_strdup(name));
+	settings_save_active_plugins(plugin_names);
+	
+	g_slist_foreach(plugin_names, free_data, NULL);
+	g_slist_free(plugin_names);
+}
+
+void
+settings_remove_active_plugin(const gchar *name)
+{
+	GSList *plugin_names = settings_load_active_plugins();
+	gchar *found_element = NULL;
+	
+	/* Find the right element */
+	GSList *iter = plugin_names;
+	while (iter) {
+		gchar *plugin_name = (gchar*) iter->data;
+		if (g_str_equal(plugin_name, name)) {
+			found_element = plugin_name;
+			break;
+		}
+		iter = iter->next;
+	}
+	
+	/* Remove the element */
+	if (found_element != NULL) {
+		plugin_names = g_slist_remove(plugin_names, found_element);
+		settings_save_active_plugins(plugin_names);
+	} else {
+		g_printerr("WARN: settings_remove_active_plugin: Element not found \n");
+	}
+	
+	/* Free everything */
+	g_free(found_element);
+	g_slist_foreach(plugin_names, free_data, NULL);
+	g_slist_free(plugin_names);
 }
 
 void

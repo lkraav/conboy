@@ -33,62 +33,51 @@
 /* Global AppData only access with get_app_data() */
 AppData *_app_data = NULL;
 
-
-AppData* app_data_get() {
-
-	if (_app_data == NULL) {
-		gint font_size;
-		GConfClient *client;
-		const gchar *path;
-		ConboyNoteStore *note_store;
-
-		client = gconf_client_get_default();
-		gconf_client_add_dir(client, SETTINGS_ROOT, GCONF_CLIENT_PRELOAD_NONE, NULL);
-
-		font_size = gconf_client_get_int(client, SETTINGS_FONT_SIZE, NULL);
-		if (font_size == 0) {
-			font_size = 20000;
-		}
-
-		path = g_strconcat(g_get_home_dir(), "/.conboy/", NULL);
-
-		/* Create dir if needed */
-		if (!g_file_test(path, G_FILE_TEST_EXISTS)) {
-			g_mkdir(path, 0700);
-		}
-
-		/* Dicover plugins */
-		g_printerr("INFO: Now looking for plugins\n");
-		ConboyPluginStore *plugin_store = conboy_plugin_store_new();
-		g_printerr("INFO: Plugin search finished\n");
-
-		/* Create storage */
-		ConboyStorage *storage = conboy_storage_new();
-		conboy_storage_set_plugin_store(storage, plugin_store);
-		g_object_unref(plugin_store);
-
-		/* Create store */
-		note_store = conboy_note_store_new();
-		conboy_note_store_set_storage(note_store, storage);
-		g_object_unref(storage);
-
-		_app_data = g_new(AppData, 1);
-		_app_data->note_store = note_store;
-		/*_app_data->open_notes = NULL;*/
-		_app_data->client = client;
-		_app_data->program = hildon_program_get_instance();
-		_app_data->fullscreen = FALSE;
-		_app_data->portrait = is_portrait_mode();
-		_app_data->search_window = NULL;
-		_app_data->reader = NULL;
-		_app_data->storage = storage;
-		_app_data->note_window = NULL;
-		_app_data->plugin_store = plugin_store;
-
-		/*conboy_note_store_fill_from_storage(store, storage);*/
-	}
-
+AppData*
+app_data_get()
+{
 	return _app_data;
+}
+
+void
+app_data_init()
+{
+	g_return_if_fail(_app_data == NULL);
+	
+	_app_data = g_new(AppData, 1);
+	_app_data->fullscreen = FALSE;
+	_app_data->search_window = NULL;
+	_app_data->reader = NULL;
+	_app_data->note_window = NULL;
+	_app_data->portrait = is_portrait_mode();
+	_app_data->program = hildon_program_get_instance();
+	_app_data->client = gconf_client_get_default();
+	
+	gconf_client_add_dir(_app_data->client, SETTINGS_ROOT, GCONF_CLIENT_PRELOAD_NONE, NULL);
+	
+	/* Create dir if needed */
+	gchar *path = g_strconcat(g_get_home_dir(), "/.conboy/", NULL);
+	if (!g_file_test(path, G_FILE_TEST_EXISTS)) {
+		g_mkdir(path, 0700);
+	}
+	g_free(path);
+
+	/* Dicover plugins */
+	ConboyPluginStore *plugin_store = conboy_plugin_store_new();
+	_app_data->plugin_store = plugin_store;
+
+	/* Create storage */
+	ConboyStorage *storage = conboy_storage_new();
+	conboy_storage_set_plugin_store(storage, plugin_store);
+	g_object_unref(plugin_store);
+	_app_data->storage = storage;
+
+	/* Create store */
+	ConboyNoteStore *note_store = conboy_note_store_new();
+	conboy_note_store_set_storage(note_store, storage);
+	g_object_unref(storage);
+	_app_data->note_store = note_store;
+
 }
 
 void app_data_free()

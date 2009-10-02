@@ -673,6 +673,12 @@ model_name_sort_func (GtkTreeModel *model,
 	gtk_tree_model_get (model, iter1, INFO_COLUMN, &info1, -1);
 	gtk_tree_model_get (model, iter2, INFO_COLUMN, &info2, -1);
 
+	gchar *name1 = conboy_plugin_info_get_name (info1);
+	gchar *name2 = conboy_plugin_info_get_name (info2);
+	
+	g_printerr("++++++++ name1: %s\n", name1);
+	g_printerr("++++++++ name2: %s\n", name2);
+	
 	return g_utf8_collate (conboy_plugin_info_get_name (info1),
 			       conboy_plugin_info_get_name (info2));
 }
@@ -751,6 +757,7 @@ plugin_manager_construct_tree (ConboyPluginManager *pm)
 	/* Enable search for our non-string column */
 	gtk_tree_view_set_search_column (GTK_TREE_VIEW (pm->priv->tree),
 					 INFO_COLUMN);
+	
 	gtk_tree_view_set_search_equal_func (GTK_TREE_VIEW (pm->priv->tree),
 					     name_search_cb,
 					     NULL,

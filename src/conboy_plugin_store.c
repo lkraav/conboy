@@ -116,6 +116,9 @@ on_plugin_activate(ConboyPluginInfo *info, ConboyPluginStore *self)
 static void
 on_plugin_activated(ConboyPluginInfo *info, ConboyPluginStore *self)
 {
+	/* Add to list of active plugins */
+	settings_add_active_plugin(conboy_plugin_info_get_name(info));
+	
 	g_signal_emit_by_name(self, "plugin-activated", info);
 }
 
@@ -128,6 +131,9 @@ on_plugin_deactivate(ConboyPluginInfo *info, ConboyPluginStore *self)
 static void
 on_plugin_deactivated(ConboyPluginInfo *info, ConboyPluginStore *self)
 {
+	/* Remove from list of active plugins */
+	settings_remove_active_plugin(conboy_plugin_info_get_name(info));
+	
 	g_signal_emit_by_name(self, "plugin-deactivated", info);
 }
 
@@ -157,7 +163,7 @@ conboy_plugin_store_activate_by_name (ConboyPluginStore *self, const gchar *name
 	GList *infos = self->plugins;
 	while (infos) {
 		ConboyPluginInfo *info = (ConboyPluginInfo*) infos->data;
-		gchar *plugin_name = conboy_plugin_info_get_module_name (info);
+		const gchar *plugin_name = conboy_plugin_info_get_module_name (info);
 		if (name && plugin_name && g_str_equal (name, plugin_name)) {
 			conboy_plugin_info_activate_plugin(info);
 			return TRUE;
@@ -296,19 +302,23 @@ conboy_plugin_store_init (ConboyPluginStore *self)
 	
 	g_printerr("INFO: Initializing ConboyPluginStore\n");
 	
-	/* TODO: Don't hardcode */
-	conboy_plugin_store_activate_by_name(self, "storagexml");
+	/* Activate all plugins that should get activated */
+	GSList *active_plugins = settings_load_active_plugins();
+	while (active_plugins) {
+		gchar *plugin_name = (gchar*) active_plugins->data;
+		conboy_plugin_store_activate_by_name(self, plugin_name);
+		active_plugins = active_plugins->next;
+	}
 	
 	/* Connect signal handler */
-	GList *plugins = self->plugins;
-	while (plugins) {
-		ConboyPluginInfo *info = CONBOY_PLUGIN_INFO(plugins->data);
-		g_printerr(" add signal handler\n");
+	GList *plugin_infos = self->plugins;
+	while (plugin_infos) {
+		ConboyPluginInfo *info = CONBOY_PLUGIN_INFO(plugin_infos->data);
 		g_signal_connect(info, "plugin-activate",    G_CALLBACK(on_plugin_activate),    self);
 		g_signal_connect(info, "plugin-activated",   G_CALLBACK(on_plugin_activated),   self);
 		g_signal_connect(info, "plugin-deactivate",  G_CALLBACK(on_plugin_deactivate),  self);
 		g_signal_connect(info, "plugin-deactivated", G_CALLBACK(on_plugin_deactivated), self);
-		plugins = plugins->next;
+		plugin_infos = plugin_infos->next;
 	}
 }
 

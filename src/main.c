@@ -97,8 +97,8 @@ main (int argc, char *argv[])
   g_printerr("After init\n");
 
   /* Call this to initialize it */
+  app_data_init();
   app_data = app_data_get();
-  g_printerr("After app_data_get()\n");
 
   /* Initialize maemo application */
   g_printerr("Starting %s, Version %s \n", APP_NAME, VERSION);

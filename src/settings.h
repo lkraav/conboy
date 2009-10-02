@@ -66,14 +66,14 @@ time_t settings_load_last_sync_time(void);
 void settings_save_last_sync_revision(gint revision);
 gint settings_load_last_sync_revision(void);
 
-void settings_save_storage_plugin_name(GConfClient *client, const gchar *name);
-gchar* settings_load_storage_plugin_name(GConfClient *client);
-
 void settings_save_sync_base_url(const gchar *url);
 gchar* settings_load_sync_base_url(void);
 
 void settings_save_active_plugins(GSList *active_plugins);
 GSList* settings_load_active_plugins(void);
+
+void settings_add_active_plugin(const gchar *name);
+void settings_remove_active_plugin(const gchar *name);
 
 void settings_save_oauth_access_token(const gchar *token);
 gchar* settings_load_oauth_access_token(void);
