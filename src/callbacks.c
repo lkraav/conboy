@@ -986,17 +986,10 @@ apply_active_tags(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, 
 	GtkTextIter start_iter;
 	GSList *active_tags = conboy_note_buffer_get_active_tags(CONBOY_NOTE_BUFFER(buffer));
 
-	/* Only apply active tags on typed text, not on pasted text */
-	if (g_utf8_strlen(input, -1) > 1) {
-		return;
-	}
-
 	/* The first line is always the title. Don't apply tags there */
 	if (gtk_text_iter_get_line(iter) == 0) {
 		return;
 	}
-
-	g_printerr("apply_active_tags()\n");
 
 	/* First remove all tags, then apply all active tags */
 	start_iter = *iter;

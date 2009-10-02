@@ -30,6 +30,10 @@
 
 #include "conboy_note_store.h"
 
+#ifndef max
+	#define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
+#endif
+
 /*
  * Implementation of the interface
  */
@@ -77,6 +81,7 @@ conboy_note_store_init (ConboyNoteStore *self)
 	gtk_list_store_set_column_types(GTK_LIST_STORE(self), 1, types);
 
 	self->storage = NULL;
+	self->max_title_length = 0;
 }
 
 /**
@@ -104,6 +109,9 @@ conboy_note_store_add(ConboyNoteStore *self, ConboyNote *note, GtkTreeIter *iter
 	 * connect signals to recognize whenever the Note itself was
 	 * changed. If such a change would occure we could update the
 	 * coresponding row. */
+	
+	/* Find out if title of the newly added note is longer then the currently longest */
+	self->max_title_length = max (g_utf8_strlen(note->title, -1), self->max_title_length);
 
 	/* return the iter if the user cares */
 	if (iter) *iter = iter1;
@@ -252,6 +260,24 @@ conboy_note_store_new(void)
 	return g_object_new(CONBOY_TYPE_NOTE_STORE, NULL);
 }
 
+static gint
+find_longest_title(ConboyNoteStore *self)
+{
+	gint max_len = 0;
+	GtkTreeIter iter;
+	GtkTreeModel *model = GTK_TREE_MODEL(self);
+	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
+
+	while (valid) {
+		ConboyNote *note;
+		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
+		max_len = max(g_utf8_strlen(note->title, -1), max_len);
+		valid = gtk_tree_model_iter_next(model, &iter);
+	}
+
+	return max_len;
+}
+
 gboolean
 conboy_note_store_remove(ConboyNoteStore *self, ConboyNote *note)
 {
@@ -259,8 +285,15 @@ conboy_note_store_remove(ConboyNoteStore *self, ConboyNote *note)
 
 	if (conboy_note_store_get_iter(self, note, &iter)) {
 		gtk_list_store_remove(GTK_LIST_STORE(self), &iter);
+		
+		/* If the note with the longest title was removed, we need to find out what the longest title is now */
+		if (g_utf8_strlen(note->title, -1) == self->max_title_length) {
+			self->max_title_length = find_longest_title(self);
+		}
+		
 		return TRUE;
 	}
+	
 	return FALSE;
 }
 

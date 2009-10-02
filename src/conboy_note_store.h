@@ -48,6 +48,7 @@ typedef struct {
   GtkListStore parent;
   /* <privat> */
   ConboyStorage *storage;
+  gint max_title_length;
 } ConboyNoteStore;
 
 typedef struct {

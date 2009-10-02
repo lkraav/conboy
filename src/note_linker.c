@@ -38,25 +38,6 @@ typedef struct {
 	ConboyNote  *note;
 } SearchHit;
 
-/* TODO: Optimize this. We need a place where all titles are stored, info which is the longest, ... */
-static gint
-get_length_of_longest_title()
-{
-	gint max_length = 0;
-	AppData *app_data = app_data_get();
-	GtkTreeIter iter;
-	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
-	gboolean valid = gtk_tree_model_get_iter_first(model, &iter);
-
-	while (valid) {
-		ConboyNote *note;
-		gtk_tree_model_get(model, &iter, NOTE_COLUMN, &note, -1);
-		max_length = max(g_utf8_strlen(note->title, -1), max_length);
-		valid = gtk_tree_model_iter_next(model, &iter);
-	}
-
-	return max_length;
-}
 
 static
 GSList* find_titles(gchar *haystack) {
@@ -192,10 +173,10 @@ void auto_highlight_links(UserInterface *ui, GtkTextIter *start_iter, GtkTextIte
 {
 	GtkTextBuffer *buffer = ui->buffer;
 	GtkTextTag *link_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
-	int max_len = get_length_of_longest_title();
+	AppData *app_data = app_data_get();
 	
 	/* Grow the block which will be checked for links */
-	extend_block(start_iter, end_iter, max_len, link_tag);
+	extend_block(start_iter, end_iter, app_data->note_store->max_title_length, link_tag);
 	
 	/* Remove existing link tag */
 	gtk_text_buffer_remove_tag(buffer, link_tag, start_iter, end_iter);
