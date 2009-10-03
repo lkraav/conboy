@@ -279,7 +279,7 @@ _conboy_midgard_storage_plugin_dispose(GObject *object)
 	G_OBJECT_CLASS(conboy_midgard_storage_plugin_parent_class)->dispose(object);
 }
 
-#define __DB_EXISTS_FILE "/home/user/.midgard-2.0/.conboy_db_exists"
+#define __DB_EXISTS_FILE "~/.midgard-2.0/.conboy_db_exists"
 
 static void
 conboy_midgard_storage_plugin_class_init (ConboyMidgardStoragePluginClass *klass)
@@ -319,9 +319,11 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 	midgard_config_save_file (config, "ConboyNotesStorage", TRUE, NULL);
 
 	/* Initialize connection for given config */
-	MidgardConnection *mgd_global = midgard_connection_new();
+	mgd_global = midgard_connection_new();
 	if (!midgard_connection_open_config (mgd_global, config))
 		g_error ("Can not connect to Conboy notes database. %s", midgard_connection_get_error_string (mgd_global));
+
+	midgard_connection_set_loglevel (mgd_global, "debug", NULL);
 
 	/* Check if database already exists */
 	if (g_file_test (__DB_EXISTS_FILE, G_FILE_TEST_EXISTS)) /* HACK */
@@ -334,6 +336,9 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 
 	/* HACK */
 	g_file_set_contents (__DB_EXISTS_FILE, "", 1, NULL);
+
+	MidgardObject *mgdobject = midgard_object_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME, NULL);
+	CONBOY_MIDGARD_STORAGE_PLUGIN (self)->object = mgdobject;
 
 	CONBOY_PLUGIN(self)->has_settings = TRUE;
 }
