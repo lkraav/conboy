@@ -4,7 +4,7 @@ AC_INIT(src/main.c)
 AM_CONFIG_HEADER(config.h)
 
 PACKAGE=conboy
-VERSION=0.6.0-alpha6
+VERSION=0.6.0-alpha7
 
 AM_INIT_AUTOMAKE($PACKAGE,$VERSION)
 
