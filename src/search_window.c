@@ -379,7 +379,7 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	/* Add New Note item */
 	menu_new_note = gtk_button_new();
 	gtk_action_connect_proxy(new_note_action, menu_new_note);
-	hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
+	/*hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));*/
 
 	/* Add sort filters */
 	button_sort_by_title = gtk_radio_button_new_with_label(NULL, _("Sort By Title"));
@@ -390,6 +390,9 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(button_sort_by_date), FALSE);
 
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button_sort_by_date), TRUE);
+
+	gtk_widget_show(button_sort_by_title);
+	gtk_widget_show(button_sort_by_date);
 
 	hildon_app_menu_add_filter(HILDON_APP_MENU(menu), GTK_BUTTON(button_sort_by_title));
 	hildon_app_menu_add_filter(HILDON_APP_MENU(menu), GTK_BUTTON(button_sort_by_date));

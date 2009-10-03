@@ -106,22 +106,15 @@ set_item_label(GtkContainer *item, const gchar *open_tag, const gchar *text, con
 }
 
 static void
-on_orientation_changed(GdkScreen *screen, GHashTable *hash)
+on_orientation_changed(GdkScreen *screen, gpointer data)
 {
 	AppData *app_data = app_data_get();
-
-	/*
-	GtkWidget *toolbar = g_hash_table_lookup(hash, "toolbar");
-	GtkWidget *menu_open = g_hash_table_lookup(hash, "menu_open");
-	GtkTextView *text_view = app_data->note_window->view;
-	*/
 	UserInterface *ui = app_data->note_window;
 
 	app_data->portrait = is_portrait_mode();
 
-
-
 	if (app_data->portrait) {
+		/* Toolbar */
 		gtk_action_set_visible(ui->action_dec_indent, FALSE);
 		gtk_action_set_visible(ui->action_inc_indent, FALSE);
 		gtk_action_set_visible(ui->action_delete, FALSE);
@@ -129,11 +122,15 @@ on_orientation_changed(GdkScreen *screen, GHashTable *hash)
 		gtk_action_set_visible(ui->action_text_style, FALSE);
 		gtk_action_set_visible(ui->action_find, FALSE);
 
-		gtk_widget_show(ui->menu_open);
+		/* Menu */
+		g_object_ref(ui->app_menu); /* Ref the menu, otherwise it gets destroyed after the next call */
+		hildon_window_set_app_menu(ui->window, NULL);
+
+		/* Other */
 		gtk_text_view_set_editable(ui->view, FALSE);
 
 	} else {
-
+		/* Toolbar */
 		gtk_action_set_visible(ui->action_dec_indent, TRUE);
 		gtk_action_set_visible(ui->action_inc_indent, TRUE);
 		gtk_action_set_visible(ui->action_delete, TRUE);
@@ -141,7 +138,11 @@ on_orientation_changed(GdkScreen *screen, GHashTable *hash)
 		gtk_action_set_visible(ui->action_text_style, TRUE);
 		gtk_action_set_visible(ui->action_find, TRUE);
 
-		gtk_widget_hide(ui->menu_open);
+		/* Menu */
+		hildon_window_set_app_menu(ui->window, HILDON_APP_MENU(ui->app_menu));
+		g_object_unref(ui->app_menu); /* Drop the ref and let HildonWindow handle it again */
+
+		/* Other */
 		gtk_text_view_set_editable(ui->view, TRUE);
 	}
 }
@@ -720,6 +721,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	GtkWidget *menu_font_huge;
 	GtkWidget *menu_open;
 	GtkWidget *menu_sync;
+	GtkWidget *menu_delete;
 
 	GtkWidget *toolbar;
 	GtkWidget *find_bar;
@@ -974,18 +976,19 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	menu_settings = gtk_button_new();
 	menu_sync = gtk_button_new();
 	menu_quit = gtk_button_new();
+	menu_delete = gtk_button_new();
 
 	gtk_action_connect_proxy(action_new, menu_new);
 	gtk_action_connect_proxy(action_notes, menu_open);
 	gtk_action_connect_proxy(action_settings, menu_settings);
 	gtk_action_connect_proxy(action_sync, menu_sync);
 	gtk_action_connect_proxy(action_quit, menu_quit);
+	gtk_action_connect_proxy(action_delete, menu_delete);
 
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_new));
-	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_open));
-	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_settings));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_delete));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_sync));
-	/*hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_quit));*/
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_settings));
 
 	if (app_data->portrait) {
 		gtk_widget_hide(menu_settings);
@@ -1027,7 +1030,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	button_dec_indent = create_tool_button(action_dec_indent, ICON_DEC_INDENT);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_dec_indent), -1);
 #ifdef HILDON_HAS_APP_MENU
-	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 87, -1);
+	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 95, -1);
 #else
 	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 68, -1);
 #endif
@@ -1035,23 +1038,14 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	button_inc_indent = create_tool_button(action_inc_indent, ICON_INC_INDENT);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_inc_indent), -1);
 
-	/*gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);*/
-
 	button_link = create_tool_button(action_link, ICON_LINK);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_link), -1);
 
 	button_style = create_tool_button(action_text_style, ICON_TEXT_STYLE);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_style), -1);
 
-	/*gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);*/
-
 	button_find = create_tool_button(action_find, ICON_SEARCH);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_find), -1);
-
-	/*gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);*/
-
-	button_delete = create_tool_button(action_delete, ICON_DELETE);
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_delete), -1);
 
 	GtkToolItem *separator = gtk_separator_tool_item_new();
 	gtk_tool_item_set_expand(separator, TRUE);
@@ -1070,18 +1064,10 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	gtk_widget_show_all(toolbar);
 
 	if (app_data->portrait) {
-		gtk_widget_hide(toolbar);
+		on_orientation_changed(NULL, NULL);
 	}
 
 	hildon_window_add_toolbar(HILDON_WINDOW(mainwin), GTK_TOOLBAR(toolbar));
-	/* TODO: Maybe we can use one intance of the toolbar for all windows. */
-	/*
-	HildonProgram *prg = hildon_program_get_instance();
-	if (hildon_program_get_common_toolbar(prg) == NULL) {
-		g_printerr("ADD THE TOOLBAR \n");
-		hildon_program_set_common_toolbar(prg, toolbar);
-	}
-	*/
 
 	/* FIND TOOL BAR */
 	find_bar = hildon_find_toolbar_new(_("Search:"));
@@ -1158,6 +1144,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	ui->find_bar = HILDON_FIND_TOOLBAR(find_bar);
 	ui->find_bar_is_visible = FALSE;
 	ui->style_menu = text_style_menu;
+	ui->app_menu = main_menu;
 
 	ui->action_bold = GTK_TOGGLE_ACTION(action_bold);
 	ui->action_bullets = GTK_TOGGLE_ACTION(action_bullets);

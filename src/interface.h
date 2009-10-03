@@ -32,6 +32,7 @@ typedef struct
 	gboolean             find_bar_is_visible;
 	GtkWidget			*style_menu;
 	GtkToolbar			*toolbar;
+	GtkWidget			*app_menu;
 
 	GtkToggleToolButton *button_bold;
 	GtkToggleToolButton *button_italic;
