@@ -41,8 +41,6 @@
 static void cleanup()
 {
 	AppData *app_data = app_data_get();
-	GtkTreeIter iter;
-	GtkTreeModel *model = GTK_TREE_MODEL(app_data->note_store);
 	gtk_list_store_clear(GTK_LIST_STORE(app_data->note_store));
 
 	/* Free AppData */
@@ -137,7 +135,7 @@ main (int argc, char *argv[])
   if (note == NULL) {
 	  note = conboy_note_new();
   }
-  note_show(note);
+  note_show(note, TRUE);
 
   /* Register URL listener */
   if (osso_rpc_set_cb_f(app_data->osso_ctx, APP_SERVICE, APP_METHOD, APP_SERVICE, dbus_handler, app_data->note_window->window) != OSSO_OK) {

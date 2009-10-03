@@ -128,7 +128,7 @@ void on_row_activated(GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *c
 	/* Close this window and show the selected note */
 	gtk_widget_hide(GTK_WIDGET(app_data->search_window));
 
-	note_show(note);
+	note_show(note, TRUE);
 }
 
 static
@@ -284,7 +284,7 @@ on_new_note_action_activated(GtkAction *action, gpointer user_data)
 	GtkWidget *window = GTK_WIDGET(user_data);
 	gtk_widget_hide(window);
 	ConboyNote *note = conboy_note_new();
-	note_show(note);
+	note_show(note, TRUE);
 }
 
 static

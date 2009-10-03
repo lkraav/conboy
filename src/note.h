@@ -38,7 +38,7 @@ void note_delete(ConboyNote *note);
 
 gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer);
 
-void note_show(ConboyNote *note);
+void note_show(ConboyNote *note, gboolean add_to_history);
 
 void note_show_by_title(const char* title);
 

@@ -52,6 +52,8 @@ app_data_init()
 	_app_data->portrait = is_portrait_mode();
 	_app_data->program = hildon_program_get_instance();
 	_app_data->client = gconf_client_get_default();
+	_app_data->note_history = NULL;
+	_app_data->current_element = NULL;
 	
 	gconf_client_add_dir(_app_data->client, SETTINGS_ROOT, GCONF_CLIENT_PRELOAD_NONE, NULL);
 	

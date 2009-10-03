@@ -49,6 +49,8 @@ typedef struct
 	GtkRadioAction		*action_font_small;
 	GtkAction			*action_inc_indent;
 	GtkAction			*action_dec_indent;
+	GtkAction			*action_back;
+	GtkAction			*action_forward;
 	
 	GList               *listeners;
 	

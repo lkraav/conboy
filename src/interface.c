@@ -466,7 +466,7 @@ do_sync (gpointer *user_data)
 	/* Load again and make editable */
 	gdk_threads_enter();
 	gtk_text_view_set_editable(ui->view, TRUE);
-	note_show(note);
+	note_show(note, FALSE);
 	gdk_threads_leave();
 }
 
@@ -534,7 +534,7 @@ on_storage_activated (ConboyStorage *storage, UserInterface *ui)
 	AppData *app_data = app_data_get();
 	ConboyNote *note = conboy_note_store_get_latest(app_data->note_store);
 	if (note != NULL) {
-		note_show(note);
+		note_show(note, TRUE);
 	} else {
 		/* TODO: Create new note */
 		gtk_text_buffer_set_text(ui->buffer, "", -1);
@@ -552,6 +552,13 @@ on_storage_deactivated (ConboyStorage *storage, UserInterface *ui)
 	if (gtk_text_buffer_get_modified(ui->buffer)) {
 		note_save(ui);
 	}
+	
+	/* Clear history */
+	AppData *app_data = app_data_get();
+	g_list_free(app_data->note_history);
+	g_list_free(app_data->current_element);
+	app_data->note_history = NULL;
+	app_data->current_element = NULL;
 
 	/* Block automatic saving, set text, unblock saving */
 	g_signal_handlers_block_matched(ui->buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
@@ -571,7 +578,9 @@ enum Icon {
 	ICON_TEXT_STYLE,
 	ICON_DELETE,
 	ICON_SEARCH,
-	ICON_OPEN
+	ICON_OPEN,
+	ICON_BACK,
+	ICON_FORWARD
 };
 
 #ifdef HILDON_HAS_APP_MENU
@@ -700,6 +709,8 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	GtkWidget *button_dec_indent;
 	GtkWidget *button_style;
 	GtkWidget *button_find;
+	GtkWidget *button_back;
+	GtkWidget *button_forward;
 
 	GtkAction *action_new;
 	GtkAction *action_delete;
@@ -724,6 +735,8 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	GtkAction *action_font_huge;
 	GtkAction *action_find;
 	GtkAction *action_sync;
+	GtkAction *action_back;
+	GtkAction *action_forward;
 
 	GtkActionGroup *action_group;
 
@@ -777,6 +790,8 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	action_zoom_out = GTK_ACTION(gtk_action_new("zoom_out", _("Zoom Out"), NULL, GTK_STOCK_ZOOM_OUT));
 	action_find = GTK_ACTION(gtk_action_new("find", _("Find In Note"), NULL, GTK_STOCK_FIND));
 	action_sync = GTK_ACTION(gtk_action_new("sync", _("Synchronize"), NULL, NULL));
+	action_back = GTK_ACTION(gtk_action_new("back", _("Back"), NULL, GTK_STOCK_GO_BACK));
+	action_forward = GTK_ACTION(gtk_action_new("forward", _("Foreward"), NULL, GTK_STOCK_GO_FORWARD));
 	/* TODO: Use an enum instead of 0 to 3 */
 	action_font_small = GTK_ACTION(gtk_radio_action_new("size:small", _("Small"), NULL, NULL, 0));
 	action_font_normal = GTK_ACTION(gtk_radio_action_new("size:normal", _("Normal"), NULL, NULL, 1));
@@ -786,6 +801,8 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	gtk_action_set_sensitive(action_link, FALSE);
 	/*gtk_action_set_sensitive(action_inc_indent, FALSE);*/
 	gtk_action_set_sensitive(action_dec_indent, FALSE);
+	gtk_action_set_sensitive(action_back, FALSE);
+	gtk_action_set_sensitive(action_forward, FALSE);
 
 	/* Build the radio action group */
 	gtk_radio_action_set_group(GTK_RADIO_ACTION(action_font_small), radio_group);
@@ -982,13 +999,12 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	/* TOOLBAR */
 	toolbar = gtk_toolbar_new();
 	ui->toolbar = GTK_TOOLBAR(toolbar);
-
 	button_dec_indent = create_tool_button(action_dec_indent, ICON_DEC_INDENT);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_dec_indent), -1);
 #ifdef HILDON_HAS_APP_MENU
 	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 105, -1);
 #else
-	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 85, -1);
+	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 68, -1);
 #endif
 
 	button_inc_indent = create_tool_button(action_inc_indent, ICON_INC_INDENT);
@@ -1014,6 +1030,12 @@ UserInterface* create_mainwin(ConboyNote *note) {
 
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
 
+	button_back = create_tool_button(action_back, ICON_BACK);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_back), -1);
+	
+	button_forward = create_tool_button(action_forward, ICON_FORWARD);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_forward), -1);
+	
 	button_notes = create_tool_button(action_notes, ICON_OPEN);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_notes), -1);
 
@@ -1119,6 +1141,8 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	ui->action_font_small = GTK_RADIO_ACTION(action_font_small);
 	ui->action_inc_indent = GTK_ACTION(action_inc_indent);
 	ui->action_dec_indent = GTK_ACTION(action_dec_indent);
+	ui->action_back = GTK_ACTION(action_back);
+	ui->action_forward = GTK_ACTION(action_forward);
 
 	/* Window signals */
 	g_signal_connect(mainwin, "delete-event",
@@ -1206,6 +1230,14 @@ UserInterface* create_mainwin(ConboyNote *note) {
 
 	g_signal_connect(action_sync, "activate",
 			G_CALLBACK(on_sync_but_clicked),
+			ui);
+	
+	g_signal_connect(action_back, "activate",
+			G_CALLBACK(on_back_button_clicked),
+			ui);
+	
+	g_signal_connect(action_forward, "activate",
+			G_CALLBACK(on_forward_button_clicked),
 			ui);
 
 

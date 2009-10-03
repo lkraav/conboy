@@ -231,7 +231,7 @@ on_new_button_clicked					(GtkAction		*action,
 	g_sprintf(title, _("New Note %i"), num);
 	
 	ConboyNote *note = conboy_note_new_with_title(title);
-	note_show(note);
+	note_show(note, TRUE);
 }
 
 static void
@@ -382,7 +382,6 @@ on_bullets_button_clicked				(GtkAction		*action,
 {
 	UserInterface *ui = (UserInterface*)user_data;
 	GtkTextBuffer *buffer = ui->buffer;
-	GtkTextIter start_iter, end_iter;
 
 	if (gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action))) {
 		/* The button just became active, so we should enable the formatting */
@@ -539,8 +538,6 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 										gpointer		 user_data)
 {
 	UserInterface *ui = (UserInterface*)user_data;
-	GSList *tags;
-	GtkTextTag *tag;
 	const gchar *mark_name;
 
 	/* Only enable the link action, if something is selected */
@@ -743,7 +740,6 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 	UserInterface *ui = (UserInterface*)user_data;
 	GtkWidget *window = GTK_WIDGET(ui->window);
 	AppData *app_data = app_data_get();
-	GList *open_windows;
 
 	switch (event->keyval) {
 	case HILDON_HARDKEY_INCREASE:
@@ -1320,3 +1316,36 @@ void on_find_bar_close(GtkWidget *widget, UserInterface *ui)
 	gtk_widget_hide_all(widget);
 	ui->find_bar_is_visible = FALSE;
 }
+
+void
+on_back_button_clicked (GtkAction *action, gpointer user_data)
+{
+	g_printerr("Back\n");
+	
+	AppData *app_data = app_data_get();
+	
+	g_return_if_fail(app_data->current_element != NULL);
+	g_return_if_fail(app_data->current_element->prev != NULL);
+	
+	app_data->current_element = app_data->current_element->prev;
+	
+	ConboyNote *note = CONBOY_NOTE(app_data->current_element->data);
+	note_show(note, FALSE);
+}
+
+void
+on_forward_button_clicked (GtkAction *action, gpointer user_data)
+{
+	g_printerr("Forward\n");
+	
+	AppData *app_data = app_data_get();
+		
+	g_return_if_fail(app_data->current_element != NULL);
+	g_return_if_fail(app_data->current_element->next != NULL);
+	
+	app_data->current_element = app_data->current_element->next;
+	
+	ConboyNote *note = CONBOY_NOTE(app_data->current_element->data);
+	note_show(note, FALSE);
+}
+

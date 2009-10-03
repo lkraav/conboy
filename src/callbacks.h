@@ -77,6 +77,14 @@ on_style_button_clicked                (GtkAction       *action,
 		                                gpointer         user_data);
 
 void
+on_back_button_clicked                 (GtkAction       *action,
+		                                gpointer         user_data);
+
+void
+on_forward_button_clicked              (GtkAction       *action,
+		                                gpointer         user_data);
+
+void
 on_font_size_radio_group_changed       (GtkRadioAction  *action,
 										GtkRadioAction  *current,
 		                                gpointer         user_data);

@@ -24,6 +24,8 @@ typedef struct
 	osso_context_t *osso_ctx;
 	ConboyStorage  *storage;
 	ConboyPluginStore *plugin_store;
+	GList *note_history;
+	GList *current_element;
 } AppData;
 
 void app_data_init(void);

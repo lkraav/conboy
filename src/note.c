@@ -45,11 +45,9 @@ void note_show_by_title(const char* title)
 
 	if (note == NULL) {
 		note = conboy_note_new_with_title(title);
-		note_show(note);
-		return;
 	}
 
-	note_show(note);
+	note_show(note, TRUE);
 }
 
 void note_format_title(GtkTextBuffer *buffer)
@@ -202,34 +200,7 @@ void note_save(UserInterface *ui)
 
 void note_close_window(UserInterface *ui)
 {
-	HildonProgram *program = hildon_program_get_instance();
-	HildonWindow *window = ui->window;
-	AppData *app_data = app_data_get();
-
 	gtk_main_quit();
-
-	/*
-	guint count = g_list_length(app_data->open_notes);
-	GList  *listeners = ui->listeners;
-
-	if (count > 1) {
-		hildon_program_remove_window(program, window);
-
-		while (listeners != NULL) {
-			gconf_client_notify_remove(app_data->client, GPOINTER_TO_INT(listeners->data));
-			listeners = listeners->next;
-		}
-
-		gtk_widget_destroy(GTK_WIDGET(window));
-		g_list_free(ui->listeners);
-		g_free(ui);
-		ui = g_new0(UserInterface, 1);
-		app_data->open_windows = g_list_remove(app_data->open_windows, ui);
-	} else {
-		g_printerr("####################### QUIT ###################\n");
-		gtk_main_quit();
-	}
-	*/
 }
 
 
@@ -284,7 +255,59 @@ void note_set_focus(UserInterface *ui)
 	}
 }
 
-void note_show(ConboyNote *note)
+static void
+add_to_history(ConboyNote *note)
+{
+	AppData *app_data = app_data_get();
+	
+	/* Consistency check */
+	if (app_data->current_element == NULL) {
+		g_assert(app_data->note_history == NULL);
+	}
+	
+	/* Consistency check */
+	if (app_data->note_history == NULL) {
+		g_assert(app_data->current_element == NULL);
+	}
+
+	/* If we are currently not at the end of the history, we need to remove the 'future' before appending */
+	/* Remove everything from the current position to the end */
+	if (app_data->current_element != g_list_last(app_data->note_history)) {
+		
+		gint pos = g_list_position(app_data->note_history, app_data->current_element);
+		gint len = g_list_length(app_data->note_history);
+		
+		g_printerr("INFO: Pos: %i  Len: %i \n", pos, len);
+		
+		g_printerr("INFO: Removing %i elements\n", len-pos-1);
+		
+		GList *to_remove = NULL;
+		for (; pos < len; pos++) {
+			GList *element = g_list_nth(app_data->note_history, pos);
+			to_remove = g_list_prepend(to_remove, element);
+		}
+		
+		GList *iter = to_remove;
+		while (iter) {
+			GList *element = (GList*) iter->data;
+			app_data->note_history = g_list_remove_link(app_data->note_history, element);
+			g_list_free(element);
+			iter = iter->next;
+		}
+		g_list_free(to_remove);
+	}
+	
+	if (g_list_length(app_data->note_history) >= 5) {
+		g_printerr("INFO: History is too long. Removing oldes element. \n");
+		app_data->note_history = g_list_delete_link(app_data->note_history, app_data->note_history);
+	}
+	
+	g_printerr("INFO: Append one element\n");
+	app_data->note_history = g_list_append(app_data->note_history, note);
+	app_data->current_element = g_list_last(app_data->note_history);
+}
+
+void note_show(ConboyNote *note, gboolean modify_history)
 {
 	AppData *app_data = app_data_get();
 	GtkTextBuffer *buffer;
@@ -297,6 +320,8 @@ void note_show(ConboyNote *note)
 		/* Set window width/height, otherwise scroll to cursor doesn't work correctly */
 		gtk_window_set_default_size(GTK_WINDOW(app_data->note_window->window), 720, 420);
 
+		hildon_program_add_window(app_data->program, HILDON_WINDOW(app_data->note_window->window));
+		
 		/* Set to fullscreen or not */
 		if (app_data->fullscreen) {
 			gtk_window_fullscreen(GTK_WINDOW(app_data->note_window->window));
@@ -317,9 +342,15 @@ void note_show(ConboyNote *note)
 		g_printerr("NO WINDOW\n");
 	}
 
-
-	hildon_program_add_window(app_data->program, HILDON_WINDOW(window));
-
+	/* Add to history */
+	if (modify_history) {
+		add_to_history(note);
+	}
+	
+	/* Toggle forward/backward buttons */
+	gtk_action_set_sensitive(ui->action_back, (gboolean) app_data->current_element->prev);
+	gtk_action_set_sensitive(ui->action_forward, (gboolean) app_data->current_element->next);
+	
 	/* Block signals on TextBuffer until we are done with initializing the content. This is to prevent saves etc. */
 	g_signal_handlers_block_matched(buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
 
