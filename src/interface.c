@@ -123,8 +123,10 @@ on_orientation_changed(GdkScreen *screen, gpointer data)
 		gtk_action_set_visible(ui->action_find, FALSE);
 
 		/* Menu */
+		#ifdef HILDON_HAS_APP_MENU
 		g_object_ref(ui->app_menu); /* Ref the menu, otherwise it gets destroyed after the next call */
 		hildon_window_set_app_menu(ui->window, NULL);
+		#endif
 
 		/* Other */
 		gtk_text_view_set_editable(ui->view, FALSE);
@@ -139,8 +141,10 @@ on_orientation_changed(GdkScreen *screen, gpointer data)
 		gtk_action_set_visible(ui->action_find, TRUE);
 
 		/* Menu */
+		#ifdef HILDON_HAS_APP_MENU
 		hildon_window_set_app_menu(ui->window, HILDON_APP_MENU(ui->app_menu));
 		g_object_unref(ui->app_menu); /* Drop the ref and let HildonWindow handle it again */
+		#endif
 
 		/* Other */
 		gtk_text_view_set_editable(ui->view, TRUE);
