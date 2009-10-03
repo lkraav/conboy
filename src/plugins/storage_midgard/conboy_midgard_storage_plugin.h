@@ -21,6 +21,7 @@
 #define CONBOY_MIDGARD_STORAGE_PLUGIN_H
 
 #include <glib-object.h>
+#include <midgard/midgard.h>
 
 /* convention macros */
 #define CONBOY_TYPE_MIDGARD_STORAGE_PLUGIN				(conboy_midgard_storage_plugin_get_type())
@@ -30,8 +31,6 @@
 #define CONBOY_IS_MIDGARD_STORAGE_PLUGIN_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), CONBOY_TYPE_MIDGARD_STORAGE_PLUGIN))
 #define CONBOY_MIDGARD_STORAGE_PLUGIN_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), CONBOY_TYPE_MIDGARD_STORAGE_PLUGIN, ConboyMidgardStoragePluginClass))
 
-
-
 typedef struct _ConboyMidgardStoragePlugin 		ConboyMidgardStoragePlugin;
 typedef struct _ConboyMidgardStoragePluginClass ConboyMidgardStoragePluginClass;
 
@@ -40,6 +39,7 @@ struct _ConboyMidgardStoragePlugin {
 	
 	gchar *user;
 	gchar *pass;
+	MidgardObject *object;
 };
 
 struct _ConboyMidgardStoragePluginClass {
