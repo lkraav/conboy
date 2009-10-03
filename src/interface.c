@@ -110,20 +110,39 @@ on_orientation_changed(GdkScreen *screen, GHashTable *hash)
 {
 	AppData *app_data = app_data_get();
 
+	/*
 	GtkWidget *toolbar = g_hash_table_lookup(hash, "toolbar");
 	GtkWidget *menu_open = g_hash_table_lookup(hash, "menu_open");
 	GtkTextView *text_view = app_data->note_window->view;
+	*/
+	UserInterface *ui = app_data->note_window;
 
 	app_data->portrait = is_portrait_mode();
 
+
+
 	if (app_data->portrait) {
-		gtk_widget_hide(toolbar);
-		gtk_widget_show(menu_open);
-		gtk_text_view_set_editable(text_view, FALSE);
+		gtk_action_set_visible(ui->action_dec_indent, FALSE);
+		gtk_action_set_visible(ui->action_inc_indent, FALSE);
+		gtk_action_set_visible(ui->action_delete, FALSE);
+		gtk_action_set_visible(ui->action_link, FALSE);
+		gtk_action_set_visible(ui->action_text_style, FALSE);
+		gtk_action_set_visible(ui->action_find, FALSE);
+
+		gtk_widget_show(ui->menu_open);
+		gtk_text_view_set_editable(ui->view, FALSE);
+
 	} else {
-		gtk_widget_show(toolbar);
-		gtk_widget_hide(menu_open);
-		gtk_text_view_set_editable(text_view, TRUE);
+
+		gtk_action_set_visible(ui->action_dec_indent, TRUE);
+		gtk_action_set_visible(ui->action_inc_indent, TRUE);
+		gtk_action_set_visible(ui->action_delete, TRUE);
+		gtk_action_set_visible(ui->action_link, TRUE);
+		gtk_action_set_visible(ui->action_text_style, TRUE);
+		gtk_action_set_visible(ui->action_find, TRUE);
+
+		gtk_widget_hide(ui->menu_open);
+		gtk_text_view_set_editable(ui->view, TRUE);
 	}
 }
 
@@ -268,7 +287,7 @@ show_message (DialogData *data, gchar *msg)
 	gtk_widget_hide(GTK_WIDGET(data->bar));
 	gtk_label_set_markup(data->label, msg);
 	gtk_widget_set_sensitive(GTK_WIDGET(data->button), TRUE);
-	
+
 	gdk_threads_leave();
 }
 
@@ -288,24 +307,24 @@ do_sync (gpointer *user_data)
 	AppData *app_data = app_data_get();
 	UserInterface *ui = app_data->note_window;
 	GtkProgressBar *bar = data->bar;
-	
-	
-	
+
+
+
 	/* Save and make uneditable */
 	gdk_threads_enter();
 	gtk_text_view_set_editable(ui->view, FALSE);
 	note_save(ui);
 	gdk_threads_leave();
-	
+
 	/* Save guid of current note */
 	gchar *guid = NULL;
 	if (ui->note != NULL) {
 		g_object_get(ui->note, "guid", &guid, NULL);
 	}
-	
-	
-	
-	
+
+
+
+
 	pulse_bar(bar);
 
 	gchar *url = settings_load_sync_base_url();
@@ -372,17 +391,17 @@ do_sync (gpointer *user_data)
 	JsonNoteList *note_list = web_sync_get_notes(user, last_sync_rev);
 	last_sync_rev = note_list->latest_sync_revision;
 	pulse_bar(bar);
-	
+
 	int added_notes = 0;
 	int changed_notes = 0;
 
-	/* Save notes */ 
+	/* Save notes */
 	GSList *notes = note_list->notes;
 	while (notes != NULL) {
 		ConboyNote *note = CONBOY_NOTE(notes->data);
 		g_printerr("Saving: %s\n", note->title);
 		/* TODO: Check for title conflicts */
-		
+
 		conboy_storage_note_save(app_data->storage, note);
 
 		/* If not yet in the note store, add this note */
@@ -412,25 +431,25 @@ do_sync (gpointer *user_data)
 	 * Send them to the server
 	 */
 	gint uploaded_notes = 0;
-	
+
 	pulse_bar(bar);
 	GError *error = NULL;
 	int sync_rev = web_sync_send_notes(local_notes, user->api_ref, last_sync_rev + 1, last_sync_time, &uploaded_notes, &error);
 	pulse_bar(bar);
-	
+
 	gchar msg[1000];
-	
+
 	if (!error) {
 		settings_save_last_sync_revision(sync_rev);
 		settings_save_last_sync_time(time(NULL));
-		
+
 		g_sprintf(msg, "<b>%s</b>\n\n%s: %i\n%s: %i\n%s: %i\n%s: %i",
 				"Synchonization completed",
 				"Added notes", added_notes,
 				"Changed notes", changed_notes,
 				"Deleted notes", 0,
 				"Uploaded notes", uploaded_notes);
-		
+
 	} else {
 		g_printerr("ERROR: %s\n", error->message);
 		g_sprintf(msg, "<b>%s</b>\n\nError Message was:\n%s\n", "Synchonization failed", error->message);
@@ -443,26 +462,26 @@ do_sync (gpointer *user_data)
 	g_free(api_ref);
 	g_list_free(local_notes);
 	/* TODO: Free json stuff */
-	
+
 	/* Show message to user */
 	show_message(data, msg);
-	
+
 	/* Try to get previous note */
 	ConboyNote *note = NULL;
 	if (guid != NULL) {
 		note = conboy_note_store_find_by_guid(app_data->note_store, guid);
 	}
-	
+
 	/* If not possible, because it was deleted or there was no previous note, get latest */
 	if (note == NULL) {
 		note = conboy_note_store_get_latest(app_data->note_store);
 	}
-	
+
 	if (note == NULL) {
 		/* TODO: Show demo note */
 		g_printerr("ERROR: No notes to display\n");
 	}
-	
+
 	/* Load again and make editable */
 	gdk_threads_enter();
 	gtk_text_view_set_editable(ui->view, TRUE);
@@ -478,30 +497,30 @@ create_sync_dialog(GtkWindow *parent)
 	gtk_window_set_transient_for(GTK_WINDOW(dia), parent);
 	gtk_window_set_default_size(GTK_WINDOW(dia), 400, 250);
 	gtk_window_set_title(GTK_WINDOW(dia), " ");
-	
+
 	GtkWidget *button = gtk_dialog_add_button(GTK_DIALOG(dia), GTK_STOCK_OK, GTK_RESPONSE_OK);
 	gtk_widget_set_sensitive(button, FALSE);
-	
+
 	GtkWidget *txt = gtk_label_new("");
 	gtk_label_set_markup(GTK_LABEL(txt), "<b>Synchronization ongoing</b>");
 	gtk_label_set_line_wrap(GTK_LABEL(txt), TRUE);
 	gtk_widget_show(txt);
-	
+
 	GtkWidget *bar = gtk_progress_bar_new();
 	gtk_widget_show(bar);
-	
+
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dia)->vbox), bar, FALSE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dia)->vbox), txt, TRUE, TRUE, 0);
-	
+
 	g_signal_connect(dia, "response", G_CALLBACK(gtk_widget_destroy), NULL);
-	
+
 	/* TODO: This data must get freed once the dialog is closed */
 	DialogData *dialog_data = g_new0(DialogData, 1);
 	dialog_data->dialog = GTK_DIALOG(dia);
 	dialog_data->bar = GTK_PROGRESS_BAR(bar);
 	dialog_data->label = GTK_LABEL(txt);
 	dialog_data->button = GTK_BUTTON(button);
-	
+
 	return dialog_data;
 }
 
@@ -510,7 +529,7 @@ static void
 on_sync_but_clicked(GtkButton *but, gpointer user_data)
 {
 	AppData *app_data = app_data_get();
-	
+
 	/* Show dialog */
 	GtkWindow *parent = GTK_WINDOW(app_data->note_window->window);
 	DialogData *dialog_data = create_sync_dialog(parent);
@@ -522,7 +541,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 		g_printerr("ERROR: Cannot create sync thread\n");
 		return;
 	}
-	
+
 }
 
 
@@ -552,7 +571,7 @@ on_storage_deactivated (ConboyStorage *storage, UserInterface *ui)
 	if (gtk_text_buffer_get_modified(ui->buffer)) {
 		note_save(ui);
 	}
-	
+
 	/* Clear history */
 	AppData *app_data = app_data_get();
 	g_list_free(app_data->note_history);
@@ -636,6 +655,12 @@ create_tool_button(GtkAction *action, enum Icon icon)
 
 		case ICON_DELETE:
 			return add_icon("general_delete.png", button);
+
+		case ICON_BACK:
+			return add_icon("general_back.png", button);
+
+		case ICON_FORWARD:
+			return add_icon("general_forward.png", button);
 
 		default:
 			return GTK_WIDGET(button);
@@ -1002,7 +1027,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	button_dec_indent = create_tool_button(action_dec_indent, ICON_DEC_INDENT);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_dec_indent), -1);
 #ifdef HILDON_HAS_APP_MENU
-	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 105, -1);
+	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 87, -1);
 #else
 	gtk_widget_set_size_request(GTK_WIDGET(button_dec_indent), 68, -1);
 #endif
@@ -1010,7 +1035,7 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	button_inc_indent = create_tool_button(action_inc_indent, ICON_INC_INDENT);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_inc_indent), -1);
 
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
+	/*gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);*/
 
 	button_link = create_tool_button(action_link, ICON_LINK);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_link), -1);
@@ -1018,24 +1043,27 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	button_style = create_tool_button(action_text_style, ICON_TEXT_STYLE);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_style), -1);
 
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
+	/*gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);*/
 
 	button_find = create_tool_button(action_find, ICON_SEARCH);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_find), -1);
 
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
+	/*gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);*/
 
 	button_delete = create_tool_button(action_delete, ICON_DELETE);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_delete), -1);
 
-	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), gtk_separator_tool_item_new(), -1);
+	GtkToolItem *separator = gtk_separator_tool_item_new();
+	gtk_tool_item_set_expand(separator, TRUE);
+	gtk_separator_tool_item_set_draw(GTK_SEPARATOR_TOOL_ITEM(separator), FALSE);
+	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), separator, -1);
 
 	button_back = create_tool_button(action_back, ICON_BACK);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_back), -1);
-	
+
 	button_forward = create_tool_button(action_forward, ICON_FORWARD);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_forward), -1);
-	
+
 	button_notes = create_tool_button(action_notes, ICON_OPEN);
 	gtk_toolbar_insert(GTK_TOOLBAR(toolbar), GTK_TOOL_ITEM(button_notes), -1);
 
@@ -1143,6 +1171,11 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	ui->action_dec_indent = GTK_ACTION(action_dec_indent);
 	ui->action_back = GTK_ACTION(action_back);
 	ui->action_forward = GTK_ACTION(action_forward);
+	ui->action_delete = GTK_ACTION(action_delete);
+	ui->action_text_style = GTK_ACTION(action_text_style);
+	ui->action_find = GTK_ACTION(action_find);
+
+	ui->menu_open = menu_open;
 
 	/* Window signals */
 	g_signal_connect(mainwin, "delete-event",
@@ -1231,11 +1264,11 @@ UserInterface* create_mainwin(ConboyNote *note) {
 	g_signal_connect(action_sync, "activate",
 			G_CALLBACK(on_sync_but_clicked),
 			ui);
-	
+
 	g_signal_connect(action_back, "activate",
 			G_CALLBACK(on_back_button_clicked),
 			ui);
-	
+
 	g_signal_connect(action_forward, "activate",
 			G_CALLBACK(on_forward_button_clicked),
 			ui);

@@ -51,10 +51,14 @@ typedef struct
 	GtkAction			*action_dec_indent;
 	GtkAction			*action_back;
 	GtkAction			*action_forward;
-	
+	GtkAction			*action_delete;
+	GtkAction			*action_text_style;
+	GtkAction			*action_find;
+
+	GtkWidget			*menu_open;
 	GList               *listeners;
-	
-	
+
+
 
 } UserInterface;
 
