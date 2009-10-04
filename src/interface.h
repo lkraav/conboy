@@ -63,7 +63,7 @@ typedef struct
 
 } UserInterface;
 
-UserInterface* create_mainwin(ConboyNote *note);
+UserInterface* create_mainwin(void);
 
 void conboy_note_window_show_note(UserInterface *ui, ConboyNote *note);
 

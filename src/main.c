@@ -74,7 +74,6 @@ int
 main (int argc, char *argv[])
 {
   HildonProgram *program;
-  ConboyNote *note;
   AppData *app_data;
 
   /* Startup message */
@@ -115,7 +114,7 @@ main (int argc, char *argv[])
   orientation_init(app_data);
 #endif
 
-  app_data->note_window = create_mainwin(note);
+  app_data->note_window = create_mainwin();
   hildon_program_add_window(app_data->program, HILDON_WINDOW(app_data->note_window->window));
 
   /* Register URL listener */

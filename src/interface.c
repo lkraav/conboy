@@ -608,11 +608,13 @@ on_storage_deactivated (ConboyStorage *storage, UserInterface *ui)
 	}
 
 	/* Clear history */
+	/*
 	AppData *app_data = app_data_get();
 	g_list_free(app_data->note_history);
 	g_list_free(app_data->current_element);
 	app_data->note_history = NULL;
 	app_data->current_element = NULL;
+	*/
 
 	/* Block automatic saving, set text, unblock saving */
 	g_signal_handlers_block_matched(ui->buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
@@ -726,10 +728,9 @@ ungrab_volume_keys(GtkWidget *window)
  * 1) Declaring all as GtkWidget, so that Fremantle and Diablo code can share these.
  * 2) Declare all as the actual types, so inside the code it's easy to know which type a widget has.
  */
-UserInterface* create_mainwin(ConboyNote *note) {
+UserInterface* create_mainwin() {
 
 	UserInterface *ui = g_new0(UserInterface, 1);
-	ui->note = note;
 
 	GtkWidget *mainwin;
 	GtkWidget *vbox1;
