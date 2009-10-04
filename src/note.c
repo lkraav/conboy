@@ -151,7 +151,6 @@ void note_save(UserInterface *ui)
 	mark = gtk_text_buffer_get_insert(buffer);
 	gtk_text_buffer_get_iter_at_mark(buffer, &iter, mark);
 	cursor_position = gtk_text_iter_get_offset(&iter);
-	g_printerr("SAVING CURSOR TO: %i\n", cursor_position);
 
 	/* Get title */
 	title = note_extract_title_from_buffer(buffer);

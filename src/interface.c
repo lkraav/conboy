@@ -585,10 +585,11 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 static void
 on_storage_activated (ConboyStorage *storage, UserInterface *ui)
 {
-	g_printerr("Storage activated\n");
+	g_printerr("INFO: Storage activated\n");
 
 	AppData *app_data = app_data_get();
 	ConboyNote *note = conboy_note_store_get_latest(app_data->note_store);
+	gtk_text_buffer_set_modified(ui->buffer, FALSE); /* Prevent note_show() from saving */
 	if (note != NULL) {
 		note_show(note, TRUE);
 	} else {
@@ -603,18 +604,18 @@ on_storage_activated (ConboyStorage *storage, UserInterface *ui)
 static void
 on_storage_deactivated (ConboyStorage *storage, UserInterface *ui)
 {
+	g_printerr("INFO: Storage deactivated\n");
+	
 	if (gtk_text_buffer_get_modified(ui->buffer)) {
 		note_save(ui);
 	}
 
 	/* Clear history */
-	/*
 	AppData *app_data = app_data_get();
+	/* Only free note_history because current_element is part of it */
 	g_list_free(app_data->note_history);
-	g_list_free(app_data->current_element);
 	app_data->note_history = NULL;
 	app_data->current_element = NULL;
-	*/
 
 	/* Block automatic saving, set text, unblock saving */
 	g_signal_handlers_block_matched(ui->buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
