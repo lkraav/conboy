@@ -280,7 +280,6 @@ write_footer(xmlTextWriter *writer, ConboyNote *note)
 ConboyXmlStoragePlugin*
 conboy_plugin_new ()
 {
-	g_printerr("Hello from xml plugin \n");
 	return g_object_new(CONBOY_TYPE_XML_STORAGE_PLUGIN, NULL);
 }
 
@@ -328,8 +327,6 @@ load (ConboyStoragePlugin *self, const gchar *guid)
 static gboolean
 save (ConboyStoragePlugin *self, ConboyNote *note)
 {
-	g_printerr("save() called on XmlStoragePlugin\n");
-	
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(note != NULL, FALSE);
 
@@ -428,7 +425,6 @@ list (ConboyStoragePlugin *self)
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(CONBOY_IS_XML_STORAGE_PLUGIN(self), FALSE);
 
-	g_printerr("Called 'list' on ConboyXmlStoragePlugin\n");
 	GSList *result = NULL;
 	GSList *ids = list_ids(self);
 	GSList *iter = ids;
@@ -451,7 +447,6 @@ list (ConboyStoragePlugin *self)
 static void
 dispose(GObject *object)
 {
-	g_printerr("INFO: Dispose() called on xml storage plugin\n");
 	ConboyXmlStoragePlugin *self = CONBOY_XML_STORAGE_PLUGIN(object);
 	
 	g_free(self->path);
@@ -466,10 +461,6 @@ conboy_xml_storage_plugin_class_init (ConboyXmlStoragePluginClass *klass)
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	ConboyStoragePluginClass *storage_class = CONBOY_STORAGE_PLUGIN_CLASS(klass);
 	
-	/*parent_class = g_type_class_peek_parent (klass);*/
-	
-	g_printerr("XML: class init called\n");
-	
 	object_class->dispose =	dispose;
 
 	storage_class->load = load;
@@ -483,7 +474,6 @@ conboy_xml_storage_plugin_class_init (ConboyXmlStoragePluginClass *klass)
 static void
 conboy_xml_storage_plugin_init (ConboyXmlStoragePlugin *self)
 {
-	g_printerr("XML: init called\n");
 	CONBOY_PLUGIN(self)->has_settings = FALSE;
 	self->path = g_strconcat(g_get_home_dir(), "/.conboy/", NULL);
 }
