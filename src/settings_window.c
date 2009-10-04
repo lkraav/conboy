@@ -555,6 +555,7 @@ void settings_window_open(GtkWindow *parent)
 			GTK_STOCK_OK,
 			GTK_RESPONSE_OK,
 			NULL);
+	gtk_widget_set_size_request(dialog, 800, 480);
 #endif
 
 	GtkWidget *content_area = GTK_DIALOG(dialog)->vbox;
