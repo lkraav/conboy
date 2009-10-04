@@ -13,10 +13,21 @@
 
 G_DEFINE_TYPE(ConboyPluginManagerRow, conboy_plugin_manager_row, GTK_TYPE_HBOX);
 
+static void
+on_main_button_toggled (ConboyCheckButton *button, ConboyPluginManagerRow *self)
+{
+	if (conboy_check_button_get_active(button)) {
+		conboy_plugin_info_activate_plugin(self->plugin_info);
+	} else {
+		conboy_plugin_info_deactivate_plugin(self->plugin_info);
+	}
+}
 
 static void
 update_row (ConboyPluginInfo *info, ConboyPluginManagerRow *self)
 {
+	g_signal_handlers_block_by_func(self->main_but, on_main_button_toggled, self);
+
 	if (conboy_plugin_info_is_active(info)) {
 		conboy_check_button_set_active(self->main_but, TRUE);
 		gtk_widget_set_sensitive(self->conf_but, conboy_plugin_info_is_configurable(info));
@@ -24,6 +35,8 @@ update_row (ConboyPluginInfo *info, ConboyPluginManagerRow *self)
 		conboy_check_button_set_active(self->main_but, FALSE);
 		gtk_widget_set_sensitive(self->conf_but, FALSE);
 	}
+
+	g_signal_handlers_unblock_by_func(self->main_but, on_main_button_toggled, self);
 }
 
 static void
@@ -78,26 +91,6 @@ conboy_plugin_manager_row_set_active (ConboyPluginManagerRow *self, gboolean act
 	} else {
 		conboy_check_button_set_active(self->main_but, FALSE);
 		gtk_widget_set_sensitive(self->conf_but, FALSE);
-	}
-}
-
-/*
-enum {
-	MAIN_BUTTON_TOGGLED,
-	CONF_BUTTON_CLICKED,
-	INFO_BUTTON_CLICKED,
-	LAST_SIGNAL
-};
-*/
-
-
-static void
-on_main_button_toggled (ConboyCheckButton *button, ConboyPluginManagerRow *self)
-{
-	if (conboy_check_button_get_active(button)) {
-		conboy_plugin_info_activate_plugin(self->plugin_info);
-	} else {
-		conboy_plugin_info_deactivate_plugin(self->plugin_info);
 	}
 }
 
@@ -175,10 +168,6 @@ on_info_button_clicked (GtkButton *button, ConboyPluginManagerRow *self)
 	gtk_widget_destroy(GTK_WIDGET(dia));
 }
 
-
-/*static guint signals[LAST_SIGNAL] = {0};*/
-
-
 static void
 conboy_plugin_manager_row_dispose (GObject *obj)
 {
@@ -207,46 +196,6 @@ conboy_plugin_manager_row_class_init (ConboyPluginManagerRowClass *klass)
 
 	klass->info_pix = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_information.png", NULL);
 	klass->conf_pix = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_settings.png", NULL);
-
-	/* We dont need those signals
-	klass->main_button_toggled = NULL;
-	klass->conf_button_clicked = NULL;
-	klass->info_button_clicked = NULL;
-
-	signals[MAIN_BUTTON_TOGGLED] =
-			g_signal_new(
-					"main-button-toggled",
-					CONBOY_TYPE_PLUGIN_MANAGER_ROW,
-					G_SIGNAL_RUN_LAST,
-					G_STRUCT_OFFSET(ConboyPluginManagerRowClass, main_button_toggled),
-					NULL, NULL,
-					g_cclosure_marshal_VOID__VOID,
-					G_TYPE_NONE,
-					0);
-
-	signals[CONF_BUTTON_CLICKED] =
-			g_signal_new(
-					"conf-button-clicked",
-					CONBOY_TYPE_PLUGIN_MANAGER_ROW,
-					G_SIGNAL_RUN_LAST,
-					G_STRUCT_OFFSET(ConboyPluginManagerRowClass, conf_button_clicked),
-					NULL, NULL,
-					g_cclosure_marshal_VOID__VOID,
-					G_TYPE_NONE,
-					0);
-
-	signals[INFO_BUTTON_CLICKED] =
-			g_signal_new(
-					"info-button-clicked",
-					CONBOY_TYPE_PLUGIN_MANAGER_ROW,
-					G_SIGNAL_RUN_LAST,
-					G_STRUCT_OFFSET(ConboyPluginManagerRowClass, info_button_clicked),
-					NULL, NULL,
-					g_cclosure_marshal_VOID__VOID,
-					G_TYPE_NONE,
-					0);
-	*/
-
 }
 
 static void
@@ -284,7 +233,6 @@ conboy_plugin_manager_row_init (ConboyPluginManagerRow *self)
 	g_signal_connect(main_but, "toggled", G_CALLBACK(on_main_button_toggled), self);
 	g_signal_connect(conf_but, "clicked", G_CALLBACK(on_conf_button_clicked), self);
 	g_signal_connect(info_but, "clicked", G_CALLBACK(on_info_button_clicked), self);
-
 }
 
-#endif /* #ifdef HILDON_HAS_APP_MENU */
+#endif /* HILDON_HAS_APP_MENU */

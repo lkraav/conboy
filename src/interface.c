@@ -554,11 +554,11 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
  * The reason is, that in note_show() we scroll to the last
  * saved cursor position. This scrolling only works releable
  * after some size calculation on the widget have been done.
- * 
+ *
  * When running directly from main (outside of the mainloop) those
  * calculations are not done yet, so the scrolling to the cursor
  * possition does not work correctly.
- * 
+ *
  * To make it run only once, and to every time the application
  * is minimized/maximized, we you a boolean flag on app_data.
  */
@@ -566,7 +566,7 @@ static gboolean
 on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 {
 	AppData *app_data = app_data_get();
-	
+
 	if (!app_data->started) {
 		/* Open latest note or new one */
 		app_data->started = TRUE;
@@ -578,7 +578,7 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 		}
 		note_show(note, TRUE);
 	}
-	
+
 	return FALSE;
 }
 
@@ -605,7 +605,7 @@ static void
 on_storage_deactivated (ConboyStorage *storage, UserInterface *ui)
 {
 	g_printerr("INFO: Storage deactivated\n");
-	
+
 	if (gtk_text_buffer_get_modified(ui->buffer)) {
 		note_save(ui);
 	}
@@ -1111,7 +1111,6 @@ UserInterface* create_mainwin() {
 
 	/* SCROLLED WINDOW */
 #ifdef HILDON_HAS_APP_MENU
-	g_printerr("Using pannable area");
 	scrolledwindow1 = hildon_pannable_area_new();
 #else
 	scrolledwindow1 = gtk_scrolled_window_new(NULL, NULL);
@@ -1337,7 +1336,7 @@ UserInterface* create_mainwin() {
 	g_signal_connect((gpointer)find_bar, "close",
 			G_CALLBACK(on_find_bar_close),
 			ui);
-	
+
 	g_signal_connect((gpointer)mainwin, "map-event",
 			G_CALLBACK(on_window_visible),
 			NULL);
@@ -1377,7 +1376,7 @@ UserInterface* create_mainwin() {
 
 	/* Set approximate window size to make scrolling work correctly */
 	gtk_window_set_default_size(GTK_WINDOW(mainwin), 700, 450);
-	
+
 	/* Before ungrabbing the keys, we need to show it */
 	gtk_widget_show(mainwin);
 	ungrab_volume_keys(mainwin);
