@@ -55,13 +55,11 @@ create_all_plugin_infos (const gchar *plugin_base_dir)
 	GDir *dir = g_dir_open(plugin_base_dir, 0, NULL);
 	while ((filename = g_dir_read_name(dir)) != NULL) {
 		gchar *full_path = g_build_filename(plugin_base_dir, filename, NULL);
-		g_printerr("Check: %s\n", full_path);
 		/* If it's a dir, check if it contains .plugin files */
 		if (g_file_test(full_path, G_FILE_TEST_IS_DIR)) {
 			const gchar *inner_filename;
 			GDir *inner_dir = g_dir_open(full_path, 0, NULL);
 			while ((inner_filename = g_dir_read_name(inner_dir)) != NULL) {
-				g_printerr("Check: %s\n", inner_filename);
 				if (g_str_has_suffix(inner_filename, ".plugin")) {
 					gchar *plugin_file = g_build_filename(full_path, inner_filename, NULL);
 					ConboyPluginInfo *info = conboy_plugin_info_new(plugin_file);
@@ -75,7 +73,6 @@ create_all_plugin_infos (const gchar *plugin_base_dir)
 			
 		/* If it's a file, check if it's a .plugin file */
 		} else if (g_file_test(full_path, G_FILE_TEST_EXISTS)) {
-			g_printerr("Check: %s\n", full_path);
 			if (g_str_has_suffix(full_path, ".plugin")) {
 				ConboyPluginInfo *info = conboy_plugin_info_new(full_path);
 				result = g_list_prepend(result, info);
@@ -292,15 +289,12 @@ conboy_plugin_store_class_init (ConboyPluginStoreClass *klass)
 static void
 conboy_plugin_store_init (ConboyPluginStore *self)
 {
-	g_printerr("INFO: conboy_plugin_store_init()\n");
 	g_return_if_fail(CONBOY_PLUGIN_STORE(self));
 	
 	self->plugin_path = get_plugin_base_dir();
 	g_printerr("INFO: Looking for plugins in: %s\n", self->plugin_path);
 
 	self->plugins = create_all_plugin_infos(self->plugin_path);
-	
-	g_printerr("INFO: Initializing ConboyPluginStore\n");
 	
 	/* Activate all plugins that should get activated */
 	GSList *active_plugins = settings_load_active_plugins();

@@ -25,20 +25,9 @@ G_DEFINE_ABSTRACT_TYPE(ConboyStoragePlugin, conboy_storage_plugin, CONBOY_TYPE_P
 /* GOBJECT ROUTINES */
 
 static void
-conboy_storage_plugin_dispose(GObject *object)
-{
-	g_printerr("INFO: Dispose() called on storage plugin\n");
-	ConboyStoragePlugin *self = CONBOY_STORAGE_PLUGIN(object);
-	G_OBJECT_CLASS(conboy_storage_plugin_parent_class)->dispose(object);
-}
-
-
-static void
 conboy_storage_plugin_init (ConboyStoragePlugin *self)
 {
-	g_printerr("INFO: conboy_storage_plugin_init() called\n");
 }
-
 
 static void
 conboy_storage_plugin_class_init (ConboyStoragePluginClass *klass)

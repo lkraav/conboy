@@ -153,7 +153,7 @@ conboy_plugin_info_new (const gchar *file)
 
 	g_return_val_if_fail (file != NULL, NULL);
 
-	g_print("Loading plugin: %s\n", file);
+	g_printerr("INFO: Loading plugin description: %s\n", file);
 
 	info = g_object_new(CONBOY_TYPE_PLUGIN_INFO, NULL);
 
@@ -335,7 +335,6 @@ conboy_plugin_info_activate_plugin (ConboyPluginInfo *info)
 	gchar *dir = g_path_get_dirname(info->file);
 	gchar *filename = g_strconcat("lib", info->module_name, ".la", NULL);
 	gchar *path = g_build_filename(dir, filename, NULL);
-	g_printerr("INFO: Trying to create plugin from: %s\n", path);
 
 	g_signal_emit_by_name(info, "plugin-activate");
 
@@ -373,10 +372,7 @@ conboy_plugin_info_deactivate_plugin (ConboyPluginInfo *info)
 	 * listeners have a change to react, e.g. save notes. */
 	g_signal_emit_by_name(info, "plugin-deactivate");
 
-
-	g_printerr("## NOW KILLING THE PLUGIN\n");
 	g_object_unref(info->plugin);
-	g_printerr("## NOW AFTER KILLING THE PLUGIN\n");
 	info->plugin = NULL;
 
 	g_signal_emit_by_name(info, "plugin-deactivated");

@@ -603,8 +603,6 @@ on_storage_activated (ConboyStorage *storage, UserInterface *ui)
 static void
 on_storage_deactivated (ConboyStorage *storage, UserInterface *ui)
 {
-	g_printerr("Storage deactivated\n");
-
 	if (gtk_text_buffer_get_modified(ui->buffer)) {
 		note_save(ui);
 	}

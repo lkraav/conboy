@@ -47,7 +47,6 @@ conboy_plugin_finalize (GObject *object)
 	 * if we do it in dispose(), we get a nasty Segfault
 	 */
 	
-	g_printerr("*** Finalize Plugin ***\n");
 	ConboyPlugin *self = CONBOY_PLUGIN(object);
 	if (self->gmodule) {
 		g_printerr("INFO: Unloading library\n");
@@ -58,7 +57,6 @@ conboy_plugin_finalize (GObject *object)
 		}
 	}
 	self->gmodule = NULL;
-	g_printerr("*** End Finalize Plugin ***\n");
 	
 	G_OBJECT_CLASS(conboy_plugin_parent_class)->finalize(object);
 }
@@ -76,7 +74,6 @@ static void
 conboy_plugin_init (ConboyPlugin *self)
 {
 	g_return_if_fail(CONBOY_PLUGIN(self));
-	g_printerr("INFO: conboy_plugin_init() called\n");
 	self->has_settings = FALSE;
 	self->gmodule = NULL;
 }
@@ -96,7 +93,7 @@ conboy_plugin_new_from_path (gchar *filename)
 	typedef ConboyPlugin* (* TypeFunc) (void);
 	TypeFunc func = NULL;
 	
-	g_printerr("FILENAME: %s\n", filename);
+	g_printerr("INFO: Loading library: %s\n", filename);
 	
 	GModule *module = g_module_open(filename, G_MODULE_BIND_LAZY | G_MODULE_BIND_LOCAL);
 	if (module == NULL) {

@@ -104,8 +104,6 @@ conboy_storage_init (ConboyStorage *self)
 	/* Init all members */
 	self->plugin = NULL;
 	self->plugin_store = NULL;
-	
-	g_printerr("INFO: Initializing ConboyStorage\n");
 }
 	
 
@@ -127,7 +125,6 @@ conboy_storage_set_active_plugin(ConboyStorage *self, ConboyPluginStore *plugin_
 		ConboyPluginInfo *info = CONBOY_PLUGIN_INFO(infos->data);
 		if (conboy_plugin_info_is_active(info)) {
 			if (CONBOY_IS_STORAGE_PLUGIN(info->plugin)) {
-				g_printerr("# Set active plugin for Storage\n");
 				self->plugin = CONBOY_STORAGE_PLUGIN(info->plugin);
 				g_object_ref(self->plugin);
 				break;
@@ -159,8 +156,6 @@ on_plugin_activated(ConboyPluginStore *store, ConboyPluginInfo *info, ConboyStor
 static void
 on_plugin_deactivate(ConboyPluginStore *store, ConboyPluginInfo *info, ConboyStorage *self)
 {
-	g_printerr("on_plugin_deactivated called\n");
-	
 	g_return_if_fail(info != NULL);
 	g_return_if_fail(self != NULL);
 	
@@ -179,7 +174,6 @@ on_plugin_deactivate(ConboyPluginStore *store, ConboyPluginInfo *info, ConboySto
 		return;
 	}
 	
-	g_printerr("## INFO: Storage: Fire deactivate signale\n");
 	g_signal_emit_by_name(self, "deactivated");
 	g_object_unref(self->plugin);
 	self->plugin = NULL;
@@ -193,8 +187,6 @@ conboy_storage_set_plugin_store(ConboyStorage *self, ConboyPluginStore *plugin_s
 	
 	g_return_if_fail(CONBOY_IS_STORAGE(self));
 	g_return_if_fail(CONBOY_IS_PLUGIN_STORE(plugin_store));
-	
-	g_printerr("INFO: Setting the plugin store\n");
 	
 	if (self->plugin_store == NULL) {
 		self->plugin_store = plugin_store;

@@ -77,6 +77,9 @@ main (int argc, char *argv[])
   ConboyNote *note;
   AppData *app_data;
 
+  /* Startup message */
+  g_printerr("Starting %s, Version %s \n", APP_NAME, VERSION);
+  
   /* Init i18n */
   locale_init();
   
@@ -92,14 +95,11 @@ main (int argc, char *argv[])
   gtk_init(&argc, &argv);
 #endif
 
-  g_printerr("After init\n");
-
   /* Call this to initialize it */
   app_data_init();
   app_data = app_data_get();
 
   /* Initialize maemo application */
-  g_printerr("Starting %s, Version %s \n", APP_NAME, VERSION);
   app_data->osso_ctx = osso_initialize(APP_SERVICE, VERSION, TRUE, NULL);
 
   /* Check that initialization was ok */

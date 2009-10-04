@@ -138,8 +138,6 @@ gboolean is_portrait_mode()
 	int width = gdk_screen_get_width(screen);
 	int height = gdk_screen_get_height(screen);
 
-	g_printerr("Screen size: %i x %i \n", width, height);
-
 	/* Hopefully we don't have a square screen ;) */
 	if (width > height) {
 		return FALSE;

@@ -424,8 +424,6 @@ conboy_note_store_set_storage(ConboyNoteStore *self, ConboyStorage *storage) {
 	g_return_if_fail(CONBOY_IS_NOTE_STORE(self));
 	g_return_if_fail(CONBOY_IS_STORAGE(storage));
 
-	g_printerr("filling note store\n");
-
 	self->storage = storage;
 	g_object_ref(storage);
 

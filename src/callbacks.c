@@ -418,24 +418,10 @@ void
 on_notes_button_clicked				   (GtkAction		*action,
 										gpointer		 user_data) {
 
-	AppData *app_data;
-	GTimer *timer;
-	gulong micro;
-
-	app_data = app_data_get();
-	if (app_data->note_store == NULL) {
-		return;
-	}
-
-	timer = g_timer_new();
+	AppData *app_data = app_data_get();
+	g_return_if_fail(app_data->note_store != NULL);
 
 	search_window_open();
-
-	g_timer_stop(timer);
-	g_timer_elapsed(timer, &micro);
-	g_timer_destroy(timer);
-	g_printerr("Opening search window: %lu micro seconds \n", micro);
-
 }
 
 static void

@@ -15,7 +15,6 @@ G_DEFINE_TYPE(ConboyNoteBuffer, conboy_note_buffer, GTK_TYPE_TEXT_BUFFER)
 static void
 conboy_note_buffer_init (ConboyNoteBuffer *self)
 {
-	g_printerr("INFO: conboy_note_buffer_init() called\n");
 	self->active_tags = NULL;
 }
 
