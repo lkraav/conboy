@@ -1,8 +1,8 @@
-conboy (0.6.0-alpha7) stable; urgency=low
+conboy (0.6.0-alpha8) stable; urgency=low
 
   * Development version
   
- -- Cornelius Hald <hald@icandy.de>  Sat, 03 Oct 2009 18:15:11 +0200
+ -- Cornelius Hald <hald@icandy.de>  Sat, 04 Oct 2009 19:30:52 +0200
 
 conboy (0.5.0) stable; urgency=low
 
