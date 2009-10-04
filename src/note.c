@@ -151,6 +151,7 @@ void note_save(UserInterface *ui)
 	mark = gtk_text_buffer_get_insert(buffer);
 	gtk_text_buffer_get_iter_at_mark(buffer, &iter, mark);
 	cursor_position = gtk_text_iter_get_offset(&iter);
+	g_printerr("SAVING CURSOR TO: %i\n", cursor_position);
 
 	/* Get title */
 	title = note_extract_title_from_buffer(buffer);
@@ -198,12 +199,6 @@ void note_save(UserInterface *ui)
 }
 
 
-void note_close_window(UserInterface *ui)
-{
-	gtk_main_quit();
-}
-
-
 void note_delete(ConboyNote *note)
 {
 	AppData *app_data = app_data_get();
@@ -215,7 +210,14 @@ void note_delete(ConboyNote *note)
 
 	/* Remove from list store */
 	conboy_note_store_remove(app_data->note_store, note);
-
+	
+	/* Remove from history */
+	if (app_data->current_element->prev) {
+		app_data->current_element = app_data->current_element->prev;
+	} else {
+		app_data->current_element = app_data->current_element->next;
+	}
+	app_data->note_history = g_list_remove_all(app_data->note_history, note);
 }
 
 /*
@@ -277,10 +279,6 @@ add_to_history(ConboyNote *note)
 		gint pos = g_list_position(app_data->note_history, app_data->current_element);
 		gint len = g_list_length(app_data->note_history);
 		
-		g_printerr("INFO: Pos: %i  Len: %i \n", pos, len);
-		
-		g_printerr("INFO: Removing %i elements\n", len-pos-1);
-		
 		GList *to_remove = NULL;
 		for (; pos < len; pos++) {
 			GList *element = g_list_nth(app_data->note_history, pos);
@@ -297,12 +295,11 @@ add_to_history(ConboyNote *note)
 		g_list_free(to_remove);
 	}
 	
-	if (g_list_length(app_data->note_history) >= 5) {
+	if (g_list_length(app_data->note_history) >= 20) {
 		g_printerr("INFO: History is too long. Removing oldes element. \n");
 		app_data->note_history = g_list_delete_link(app_data->note_history, app_data->note_history);
 	}
 	
-	g_printerr("INFO: Append one element\n");
 	app_data->note_history = g_list_append(app_data->note_history, note);
 	app_data->current_element = g_list_last(app_data->note_history);
 }
@@ -310,36 +307,14 @@ add_to_history(ConboyNote *note)
 void note_show(ConboyNote *note, gboolean modify_history)
 {
 	AppData *app_data = app_data_get();
-	GtkTextBuffer *buffer;
-	GtkWindow *window;
-
-	if (app_data->note_window == NULL) {
-		g_printerr("##### Creating Mainwin\n");
-		app_data->note_window = create_mainwin(note);
-
-		/* Set window width/height, otherwise scroll to cursor doesn't work correctly */
-		gtk_window_set_default_size(GTK_WINDOW(app_data->note_window->window), 720, 420);
-
-		hildon_program_add_window(app_data->program, HILDON_WINDOW(app_data->note_window->window));
-		
-		/* Set to fullscreen or not */
-		if (app_data->fullscreen) {
-			gtk_window_fullscreen(GTK_WINDOW(app_data->note_window->window));
-		} else {
-			gtk_window_unfullscreen(GTK_WINDOW(app_data->note_window->window));
-		}
-	}
-
+	
 	UserInterface *ui = app_data->note_window;
-	buffer = ui->buffer;
-	window = GTK_WINDOW(ui->window);
+	GtkTextBuffer *buffer = ui->buffer;
+	GtkWindow *window = GTK_WINDOW(ui->window);
 
-	if (!GTK_IS_TEXT_BUFFER(buffer)) {
-		g_printerr("NO BUFFER\n");
-	}
-
-	if (!GTK_IS_WINDOW(window)) {
-		g_printerr("NO WINDOW\n");
+	/* Before we switch to a new note, we save the last one if it was modified. */
+	if (gtk_text_buffer_get_modified(buffer)) {
+		note_save(ui);
 	}
 
 	/* Add to history */
@@ -360,8 +335,18 @@ void note_show(ConboyNote *note, gboolean modify_history)
 	note_format_title(buffer);
 	note_set_window_title_from_buffer(window, buffer); /* Replace this. And use note->title instead */
 
+	/* Show widget and set focus to the text view */
 	gtk_widget_show(GTK_WIDGET(window));
+	gtk_widget_grab_focus(GTK_WIDGET(ui->view));
+	
+	/* Scroll to cursor position */
+	GtkTextIter iter;
+	gtk_text_buffer_get_iter_at_offset(buffer, &iter, note->cursor_position);
+	gtk_text_buffer_place_cursor(buffer, &iter);
+	GtkTextMark *mark = gtk_text_buffer_get_insert(buffer);
+	gtk_text_view_scroll_to_mark(ui->view, mark, 0.1, TRUE, 0, 0.5);
 
+	/* Set the buffer to unmodified */
 	gtk_text_buffer_set_modified(buffer, FALSE);
 
 	/* unblock signals */

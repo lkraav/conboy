@@ -42,6 +42,7 @@
 #include "settings.h"
 #include "settings_window.h"
 #include "conboy_note_buffer.h"
+#include "ui_helper.h"
 
 #include "callbacks.h"
 
@@ -623,41 +624,39 @@ on_delete_button_clicked			   (GtkAction		*action,
 										gpointer		 user_data)
 {
 	UserInterface *ui = (UserInterface*)user_data;
-
+	AppData *app_data = app_data_get();
+	
 	gchar *message = g_strconcat("<b>",
 			_("Really delete this note?"),
 			"</b>\n\n",
 			_("If you delete a note it is permanently lost."),
 			NULL);
-
-	GtkWidget *dialog = gtk_dialog_new_with_buttons(
-			"",
-			GTK_WINDOW(ui->window),
-			GTK_DIALOG_MODAL,
-			GTK_STOCK_YES, GTK_RESPONSE_YES,
-			GTK_STOCK_NO, GTK_RESPONSE_NO,
-			NULL);
-
-	GtkWidget *label = gtk_label_new("");
-	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-	gtk_label_set_markup(GTK_LABEL(label), message);
-	gtk_widget_show(label);
-
-	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), label);
-
+	
+	GtkWidget *dialog = ui_helper_create_yes_no_dialog(GTK_WINDOW(ui->window), message);
 	gint response = gtk_dialog_run(GTK_DIALOG(dialog));
-
 	gtk_widget_destroy(dialog);
-
+	g_free(message);
+	
 	if (response == GTK_RESPONSE_YES) {
-		/* Delete note and close window */
+
+		/* Delete note */
 		note_delete(ui->note);
-		note_close_window(ui);
 		g_object_unref(ui->note);
 		ui->note = NULL;
+		
+		/* Show previous note */
+		ConboyNote *note;
+		if (app_data->current_element == NULL) {
+			note = conboy_note_store_get_latest(app_data->note_store);
+			app_data->note_history = g_list_append(app_data->note_history, note);
+			app_data->current_element = app_data->note_history;
+			note_show(note, FALSE);
+		} else {
+			note = CONBOY_NOTE(app_data->current_element->data);
+			note_show(note, FALSE);
+		}
+		
 	}
-
-	g_free(message);
 }
 
 static
@@ -678,16 +677,13 @@ on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 {
 	UserInterface *ui = (UserInterface*)user_data;
 
-	g_printerr("Buffer changed\n");
-
 	if (!gtk_text_buffer_get_modified(ui->buffer)) {
-		/*g_printerr("Buffer changed from dirty to saved \n");*/
 		return;
 	}
 
-	/*g_printerr("Buffer is dirty. Saving in 10 seconds\n");*/
+	g_printerr("Buffer is dirty\n");
 
-	/* Save 10 seconds after the buffer got dirty */
+	/* Save 4 seconds after the buffer got dirty */
 	g_timeout_add(4000, (GSourceFunc)note_save_callback, ui);
 }
 
@@ -1320,8 +1316,6 @@ void on_find_bar_close(GtkWidget *widget, UserInterface *ui)
 void
 on_back_button_clicked (GtkAction *action, gpointer user_data)
 {
-	g_printerr("Back\n");
-	
 	AppData *app_data = app_data_get();
 	
 	g_return_if_fail(app_data->current_element != NULL);
@@ -1336,8 +1330,6 @@ on_back_button_clicked (GtkAction *action, gpointer user_data)
 void
 on_forward_button_clicked (GtkAction *action, gpointer user_data)
 {
-	g_printerr("Forward\n");
-	
 	AppData *app_data = app_data_get();
 		
 	g_return_if_fail(app_data->current_element != NULL);

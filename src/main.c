@@ -111,31 +111,12 @@ main (int argc, char *argv[])
   program = HILDON_PROGRAM(hildon_program_get_instance());
   g_set_application_name("Conboy");
 
-
-  /* Ignore settings for now. Probably remove in future. With StackableWindows
-   * it doesn't make much sens to first show the search window.
-  if (settings_load_startup_window() == SETTINGS_STARTUP_WINDOW_NOTE) {
-
-	  note = conboy_note_store_get_latest(app_data->note_store);
-	  if (note == NULL) {
-		  note = conboy_note_new();
-	  }
-	  note_show(note);
-  } else {
-	  search_window_open();
-  }
-  */
-
 #ifdef HILDON_HAS_APP_MENU
   orientation_init(app_data);
 #endif
 
-  /* Open latest note or new one */
-  note = conboy_note_store_get_latest(app_data->note_store);
-  if (note == NULL) {
-	  note = conboy_note_new();
-  }
-  note_show(note, TRUE);
+  app_data->note_window = create_mainwin(note);
+  hildon_program_add_window(app_data->program, HILDON_WINDOW(app_data->note_window->window));
 
   /* Register URL listener */
   if (osso_rpc_set_cb_f(app_data->osso_ctx, APP_SERVICE, APP_METHOD, APP_SERVICE, dbus_handler, app_data->note_window->window) != OSSO_OK) {

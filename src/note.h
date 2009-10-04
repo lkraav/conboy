@@ -32,8 +32,6 @@ void note_set_window_title_from_buffer(GtkWindow *win, GtkTextBuffer *buffer);
 
 void note_save(UserInterface *ui);
 
-void note_close_window(UserInterface *ui);
-
 void note_delete(ConboyNote *note);
 
 gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer);

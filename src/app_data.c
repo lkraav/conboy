@@ -54,6 +54,7 @@ app_data_init()
 	_app_data->client = gconf_client_get_default();
 	_app_data->note_history = NULL;
 	_app_data->current_element = NULL;
+	_app_data->started = FALSE;
 	
 	gconf_client_add_dir(_app_data->client, SETTINGS_ROOT, GCONF_CLIENT_PRELOAD_NONE, NULL);
 	

@@ -51,6 +51,8 @@ _conboy_note_class_dispose(GObject *object)
 {
 	ConboyNote *self = CONBOY_NOTE(object);
 	
+	g_printerr("Dispose Note: %s\n", self->title);
+	
 	g_free((gchar*)self->guid);
 	self->guid = NULL;
 

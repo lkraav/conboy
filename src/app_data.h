@@ -26,6 +26,7 @@ typedef struct
 	ConboyPluginStore *plugin_store;
 	GList *note_history;
 	GList *current_element;
+	gboolean started;
 } AppData;
 
 void app_data_init(void);
