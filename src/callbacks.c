@@ -1009,6 +1009,8 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 	gtk_text_iter_backward_chars(&start_iter, g_utf8_strlen(text, -1));
 
 	auto_highlight_links(ui, &start_iter, &end_iter);
+	
+	auto_highlight_urls(ui, &start_iter, &end_iter);
 
 	g_timer_stop(timer);
 	g_timer_elapsed(timer, &micro);
@@ -1028,9 +1030,10 @@ on_text_buffer_delete_range					(GtkTextBuffer *buffer,
 	if (gtk_text_iter_get_line(start_iter) == 0 || gtk_text_iter_get_line(end_iter) == 0) {
 		return;
 	}
-
+	
 	auto_highlight_links(ui, start_iter, end_iter);
 
+	auto_highlight_urls(ui, start_iter, end_iter);
 }
 
 /*

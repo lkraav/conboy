@@ -26,6 +26,8 @@
 #include "app_data.h"
 #include "metadata.h"
 #include "conboy_note_store.h"
+#include "gregex.h"
+
 #include "note_linker.h"
 
 #ifndef max
@@ -169,20 +171,79 @@ highlight_titles(ConboyNote *note, GtkTextBuffer *buffer, GtkTextIter *start_ite
 	g_slist_free(hits);
 }
 
-void auto_highlight_links(UserInterface *ui, GtkTextIter *start_iter, GtkTextIter *end_iter)
+void
+auto_highlight_links(UserInterface *ui, GtkTextIter *start_iter, GtkTextIter *end_iter)
 {
+	/* Copy text iters because extend_block will change them */
+	GtkTextIter start = *start_iter;
+	GtkTextIter end = *end_iter;
+	
 	GtkTextBuffer *buffer = ui->buffer;
 	GtkTextTag *link_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	AppData *app_data = app_data_get();
 	
 	/* Grow the block which will be checked for links */
-	extend_block(start_iter, end_iter, app_data->note_store->max_title_length, link_tag);
+	extend_block(&start, &end, app_data->note_store->max_title_length, link_tag);
 	
 	/* Remove existing link tag */
-	gtk_text_buffer_remove_tag(buffer, link_tag, start_iter, end_iter);
+	gtk_text_buffer_remove_tag(buffer, link_tag, &start, &end);
 
 	/* Add links */
-	highlight_titles(ui->note, buffer, start_iter, end_iter);
+	highlight_titles(ui->note, buffer, &start, &end);
+}
+
+
+#define REGEX "((\\b((news|http|https|ftp|file|irc)://|mailto:|(www|ftp)\\.|\\S*@\\S*\\.)|(?<=^|\\s)/\\S+/|(?<=^|\\s)~/\\S+)\\S*\\b/?)"
+GRegex *_regex = NULL;
+
+void
+auto_highlight_urls(UserInterface *ui, GtkTextIter *start_iter, GtkTextIter *end_iter)
+{
+	/* Copy text iters because extend_block will change them */
+	GtkTextIter start = *start_iter;
+	GtkTextIter end = *end_iter;
+	
+	GtkTextBuffer *buffer = ui->buffer;
+	GtkTextTag *link_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:url");
+
+	/* Grow the block by 256 chars (max url length) which will be checked for links */
+	extend_block(&start, &end, 256, link_tag);
+	
+	/* Remove existing link tag */
+	gtk_text_buffer_remove_tag(buffer, link_tag, &start, &end);
+
+	/* The piece of text we are interested in */
+	gchar *str = gtk_text_iter_get_slice(&start, &end);
+	
+	/* Only compile the regex once */
+	if (_regex == NULL) {
+		_regex = g_regex_new(REGEX, G_REGEX_CASELESS & G_REGEX_OPTIMIZE, 0, NULL);
+	}
+	
+	/* Match the regex */
+	GMatchInfo *match_info;
+	g_regex_match(_regex, str, 0, &match_info);
+	
+	/* Iterate through the matches and apply the link tag */
+	while (g_match_info_matches(match_info))
+	{
+		gint start_pos, end_pos;
+		
+		/* Get start and end position of the match */
+		g_match_info_fetch_pos(match_info, 0, &start_pos, &end_pos);
+		
+		GtkTextIter xstart = start;
+		gtk_text_iter_forward_chars(&xstart, start_pos);
+		
+		GtkTextIter xend = xstart;
+		gtk_text_iter_forward_chars(&xend, end_pos - start_pos);
+		
+		gtk_text_buffer_apply_tag(buffer, link_tag, &xstart, &xend);
+		
+		g_match_info_next(match_info, NULL);
+	}
+	
+	g_match_info_free(match_info);
 }
 
 

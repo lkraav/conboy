@@ -26,6 +26,15 @@ AC_SUBST(HILDON_CFLAGS)
 
 PKG_CHECK_EXISTS([hildon-1 >= 2.1.62], [AC_DEFINE([HILDON_HAS_APP_MENU], [1], [Does hildon app menu exist])])
 
+# If glib >= 2.14 it has pcre support build in. If not we need the libpcre3 package
+PKG_CHECK_EXISTS([glib-2.0 >= 2.14.0], [AC_DEFINE([GLIB_HAS_PCRE], [1], [Does glib have support for pearl regular expressions])])
+PKG_CHECK_EXISTS([glib-2.0 < 2.14.0], [ 
+	PKG_CHECK_MODULES([PCRE], [libpcre >= 6.7])  
+])
+
+AC_SUBST(PCRE_LIBS)
+AC_SUBST(PCRE_CFLAGS)
+
 PKG_CHECK_MODULES(OSSO, libosso >= 0.8.4)
 AC_SUBST(OSSO_LIBS)
 AC_SUBST(OSSO_CFLAGS)
@@ -46,7 +55,9 @@ PKG_CHECK_MODULES(JSON, json-glib-1.0 >= 0.6.2)
 AC_SUBST(JSON_CFLAGS)
 AC_SUBST(JSON_LIBS)
 
-PKG_CHECK_EXISTS([tracker >= 0.6.90], [PKG_CHECK_MODULES([TRACKER], [tracker >= 0.6.90])])
+PKG_CHECK_EXISTS([tracker >= 0.6.90], [
+	PKG_CHECK_MODULES([TRACKER], [tracker >= 0.6.90])
+])
 AC_SUBST(TRACKER_CFLAGS)
 AC_SUBST(TRACKER_LIBS)
 
