@@ -32,7 +32,8 @@
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <math.h>
-
+#include <tablet-browser-interface.h>
+#include <libmodest-dbus-client/libmodest-dbus-client.h>
 
 #include "metadata.h"
 #include "interface.h"
@@ -615,7 +616,43 @@ open_url(gchar *url)
 	g_printerr("INFO: Open URL: >%s<\n", url);
 	
 	DBusConnection *con = osso_get_dbus_connection(app_data->osso_ctx);
-	hildon_mime_open_file(con, url);
+	
+	if (hildon_mime_open_file(con, url)) {
+		/* Everything ok. File was opened */
+		g_printerr("INFO: URL successfull opened\n");
+		return;
+	}
+	
+	g_printerr("INFO: Cannot open URL with hildon_mime. Falling back to hardcoded values\n");
+	
+	if (strncmp(url, "http", 4) == 0 || strncmp(url, "ftp", 3) == 0)
+	{
+		g_printerr("Trying to open in browser\n");
+		/* Open in browser */
+		osso_rpc_run_with_defaults(app_data->osso_ctx, "osso_browser",
+				OSSO_BROWSER_OPEN_NEW_WINDOW_REQ, NULL,
+				DBUS_TYPE_STRING, url, DBUS_TYPE_INVALID);
+		return;
+	}
+	
+	if (strncmp(url, "mailto", 6) == 0)
+	{
+		/* Open in Modest */
+		g_printerr("Trying to open with modest\n");
+		libmodest_dbus_client_mail_to(app_data->osso_ctx, url);
+		return;
+	}
+	
+	if (strncmp(url, "file", 4) == 0)
+	{	
+		/* Open in Filemanager */
+		g_printerr("Trying to open in file manager \n");
+		/* TODO: Implement call to file manager */
+		return;
+	}
+	
+	HildonBanner *banner = hildon_banner_show_informationf(app_data->note_window->window, NULL,
+			"Cannot open '%s'", url);
 }
 
 /**
