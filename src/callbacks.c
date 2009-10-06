@@ -647,8 +647,17 @@ open_url(gchar *url)
 	{	
 		/* Open in Filemanager */
 		g_printerr("Trying to open in file manager \n");
-		/* TODO: Implement call to file manager */
-		return;
+		
+		/* Test if is a path and the path exits */
+		gchar *path = url + 7;
+		g_printerr("Path: %s\n", path);
+		
+		if (g_file_test(path, G_FILE_TEST_IS_DIR)) {
+			osso_rpc_run_with_defaults(app_data->osso_ctx, "osso_filemanager",
+					"open_folder", NULL,
+					DBUS_TYPE_STRING, path, DBUS_TYPE_INVALID);
+			return;
+		}
 	}
 	
 	HildonBanner *banner = hildon_banner_show_informationf(app_data->note_window->window, NULL,
