@@ -124,6 +124,13 @@ on_link_internal_tag_event				(GtkTextTag  *tag,
 										 GtkTextIter *iter,
 										 gpointer     user_data);
 
+gboolean
+on_link_url_tag_event				    (GtkTextTag  *tag,
+										 GObject     *object,
+										 GdkEvent    *event,
+										 GtkTextIter *iter,
+										 gpointer     user_data);
+
 void
 on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 										 gpointer		user_data);

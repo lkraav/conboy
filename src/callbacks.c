@@ -25,6 +25,7 @@
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-banner.h>
 #include <hildon/hildon-defines.h>
+#include <hildon-mime.h>
 #include <gconf/gconf.h>
 #include <gconf/gconf-client.h>
 #include <gdk/gdkkeysyms.h>
@@ -43,6 +44,7 @@
 #include "settings_window.h"
 #include "conboy_note_buffer.h"
 #include "ui_helper.h"
+#include "gregex.h"
 
 #include "callbacks.h"
 
@@ -599,6 +601,87 @@ on_link_internal_tag_event				(GtkTextTag  *tag,
 
 			g_printerr("Link: >%s< \n", link_text);
 			note_show_by_title(link_text);
+		}
+	}
+
+	return FALSE;
+}
+
+static void
+open_url(gchar *url)
+{
+	AppData *app_data = app_data_get();
+	
+	g_printerr("INFO: Open URL: >%s<\n", url);
+	
+	DBusConnection *con = osso_get_dbus_connection(app_data->osso_ctx);
+	hildon_mime_open_file(con, url);
+}
+
+/**
+ * Create a proper URL out of the given link.
+ * 
+ * Returns: Newly allocated string
+ */
+static gchar*
+create_url(gchar *link)
+{
+	gchar *result;
+	
+	if (strncmp(link, "www.", 4) == 0) {
+		result = g_strconcat("http://", link, NULL);
+	}
+	else if (strncmp(link, "/", 1) == 0 && strncmp(link, "//", 2) != 0) {
+		result = g_strconcat("file://", link, NULL);
+	}
+	else if (strncmp(link, "~/", 2) == 0) {
+		gchar *path = link + 1; /* Cut of the tilde char */
+		gchar *file = g_build_filename(g_get_home_dir(), path, NULL);
+		result = g_strconcat("file://", file, NULL);
+		g_free(file);
+	}
+	else if (g_regex_match_simple("^(?!(news|mailto|http|https|ftp|file|irc):).+@.{2,}$", link, G_REGEX_CASELESS, 0)) {
+		result = g_strconcat("mailto:", link, NULL);
+	}
+	else {
+		result = g_strdup(link);
+	}
+	
+	return result;
+}
+
+gboolean
+on_link_url_tag_event				(GtkTextTag  *tag,
+										 GObject     *object,
+										 GdkEvent    *event,
+										 GtkTextIter *iter,
+										 gpointer     user_data)
+{
+	GdkEventType type = event->type;
+	GtkTextIter start;
+	gchar *link_text;
+
+	if (type == GDK_BUTTON_RELEASE) {
+		if (((GdkEventButton*)event)->button == 1) {
+
+			if (!gtk_text_iter_begins_tag(iter, tag)) {
+				gtk_text_iter_backward_to_tag_toggle(iter, tag);
+			}
+
+			start = *iter;
+
+			if (!gtk_text_iter_ends_tag(iter, tag)) {
+				gtk_text_iter_forward_to_tag_toggle(iter, tag);
+			}
+
+			link_text = gtk_text_iter_get_text(&start, iter);
+
+			g_printerr("Link: >%s< \n", link_text);
+			
+			gchar *url = create_url(link_text);
+			g_free(link_text);
+			
+			open_url(url);
 		}
 	}
 

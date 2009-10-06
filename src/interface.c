@@ -804,6 +804,7 @@ UserInterface* create_mainwin() {
 	GtkActionGroup *action_group;
 
 	GtkTextTag *link_internal_tag;
+	GtkTextTag *link_url_tag;
 
 	GSList *radio_group = NULL;
 
@@ -1372,6 +1373,11 @@ UserInterface* create_mainwin() {
 	link_internal_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	g_signal_connect ((gpointer) link_internal_tag, "event",
 			G_CALLBACK (on_link_internal_tag_event),
+			ui);
+	
+	link_url_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:url");
+	g_signal_connect ((gpointer) link_url_tag, "event",
+			G_CALLBACK (on_link_url_tag_event),
 			ui);
 
 	/* Set approximate window size to make scrolling work correctly */

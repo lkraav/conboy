@@ -26,7 +26,10 @@
 #include "app_data.h"
 #include "metadata.h"
 #include "conboy_note_store.h"
+
+#ifndef GLIB_HAS_PCRE
 #include "gregex.h"
+#endif
 
 #include "note_linker.h"
 

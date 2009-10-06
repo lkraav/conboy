@@ -24,6 +24,10 @@ PKG_CHECK_MODULES(HILDON, hildon-1 >= 0.8.4)
 AC_SUBST(HILDON_LIBS)
 AC_SUBST(HILDON_CFLAGS)
 
+PKG_CHECK_MODULES(HILDON_MIME, libhildonmime >= 2.0.0)
+AC_SUBST(HILDON_MIME_LIBS)
+AC_SUBST(HILDON_MIME_CFLAGS)
+
 PKG_CHECK_EXISTS([hildon-1 >= 2.1.62], [AC_DEFINE([HILDON_HAS_APP_MENU], [1], [Does hildon app menu exist])])
 
 # If glib >= 2.14 it has pcre support build in. If not we need the libpcre3 package

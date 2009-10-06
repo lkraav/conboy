@@ -21,6 +21,10 @@
 #ifndef __G_REGEX_H__
 #define __G_REGEX_H__
 
+#include "config.h"
+
+#ifndef GLIB_HAS_PCRE
+
 #include <glib/gerror.h>
 #include <glib/gstring.h>
 
@@ -198,3 +202,4 @@ G_END_DECLS
 
 #endif  /*  __G_REGEX_H__ */
 
+#endif /* GLIB_HAS_PCRE */
