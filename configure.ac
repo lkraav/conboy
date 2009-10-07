@@ -87,7 +87,7 @@ PKG_CHECK_EXISTS(maemo-version, [
   MAJOR=`echo $VERSION | cut -b1 -`
   CFLAGS="$CFLAGS -DMAEMO_VERSION_MAJOR=$MAJOR"
 ], [
-  AC_MSG_ERROR([maemo-version not found])
+  AC_MSG_WARN([maemo-version not found])
 ])
 
 # Fremantle uses different categories for backup then Diablo
