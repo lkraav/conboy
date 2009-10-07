@@ -220,7 +220,7 @@ auto_highlight_urls(UserInterface *ui, GtkTextIter *start_iter, GtkTextIter *end
 	
 	/* Only compile the regex once */
 	if (_regex == NULL) {
-		_regex = g_regex_new(REGEX, G_REGEX_CASELESS & G_REGEX_OPTIMIZE, 0, NULL);
+		_regex = g_regex_new(REGEX, G_REGEX_CASELESS, 0, NULL);
 	}
 	
 	/* Match the regex */
@@ -232,9 +232,23 @@ auto_highlight_urls(UserInterface *ui, GtkTextIter *start_iter, GtkTextIter *end
 	{
 		gint start_pos, end_pos;
 		
-		/* Get start and end position of the match */
+		/* Get start and end position of the match.
+		 * 
+		 * The Problem is g_match_info_fetch_pos() get the position
+		 * in bytes. Which breaks things when we use characters that
+		 * are bigger than 1 byte (e.g. umlauts, bullets, etc).
+		 * 
+		 * So we need to recalculate the position.
+		 */
 		g_match_info_fetch_pos(match_info, 0, &start_pos, &end_pos);
 		
+		gchar *start_ptr = str + start_pos;
+		gchar *end_ptr   = str + end_pos;
+		
+		start_pos = g_utf8_pointer_to_offset(str, start_ptr);
+		end_pos   = g_utf8_pointer_to_offset(str, end_ptr);
+		
+		/* Move the iters and apply tag */
 		GtkTextIter xstart = start;
 		gtk_text_iter_forward_chars(&xstart, start_pos);
 		
