@@ -43,7 +43,7 @@ void
 app_data_init()
 {
 	g_return_if_fail(_app_data == NULL);
-	
+
 	_app_data = g_new(AppData, 1);
 	_app_data->fullscreen = FALSE;
 	_app_data->search_window = NULL;
@@ -55,9 +55,10 @@ app_data_init()
 	_app_data->note_history = NULL;
 	_app_data->current_element = NULL;
 	_app_data->started = FALSE;
-	
+	_app_data->accelerators = FALSE;
+
 	gconf_client_add_dir(_app_data->client, SETTINGS_ROOT, GCONF_CLIENT_PRELOAD_NONE, NULL);
-	
+
 	/* Create dir if needed */
 	gchar *path = g_strconcat(g_get_home_dir(), "/.conboy/", NULL);
 	if (!g_file_test(path, G_FILE_TEST_EXISTS)) {

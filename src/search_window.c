@@ -556,6 +556,7 @@ void search_window_open()
 	if (app_data->search_window == NULL) {
 		window_data = g_new0(SearchWindowData, 1);
 		app_data->search_window = search_window_create(window_data);
+		hildon_program_add_window(app_data->program, HILDON_WINDOW(app_data->search_window));
 	}
 
 	if (app_data->fullscreen) {

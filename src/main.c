@@ -70,6 +70,18 @@ dbus_handler(const gchar *interface, const gchar *method, GArray *arguments, gpo
 	return OSSO_OK;
 }
 
+#ifdef HILDON_HAS_APP_MENU
+static void
+on_window_is_topmost_changed (HildonProgram *prog, GParamSpec *prop, gpointer data)
+{
+	if (hildon_program_get_is_topmost(prog)) {
+		orientation_enable_accelerators();
+	} else {
+		orientation_disable_accelerators();
+	}
+}
+#endif
+
 int
 main (int argc, char *argv[])
 {
@@ -78,10 +90,10 @@ main (int argc, char *argv[])
 
   /* Startup message */
   g_printerr("Starting %s, Version %s \n", APP_NAME, VERSION);
-  
+
   /* Init i18n */
   locale_init();
-  
+
   /* Init threads */
   g_thread_init(NULL);
   gdk_threads_init();
@@ -110,9 +122,12 @@ main (int argc, char *argv[])
   program = HILDON_PROGRAM(hildon_program_get_instance());
   g_set_application_name("Conboy");
 
+
 #ifdef HILDON_HAS_APP_MENU
+  g_signal_connect(program, "notify::is-topmost", G_CALLBACK(on_window_is_topmost_changed), NULL);
   orientation_init(app_data);
 #endif
+
 
   app_data->note_window = create_mainwin();
   hildon_program_add_window(app_data->program, HILDON_WINDOW(app_data->note_window->window));
@@ -131,7 +146,7 @@ main (int argc, char *argv[])
   */
 
   /****/
-  
+
   gdk_threads_enter();
   gtk_main();
   gdk_threads_leave();

@@ -82,11 +82,52 @@ dbus_is_portrait_mode(osso_context_t* ctx)
 }
 
 void
+orientation_enable_accelerators()
+{
+	AppData *app_data = app_data_get();
+
+	if (app_data->accelerators == TRUE) {
+		return;
+	}
+
+	/* TODO: Replace string "req_accelerometer_enable" with constant once we switched to final SDK */
+	if (osso_rpc_run_system(app_data->osso_ctx, MCE_SERVICE, MCE_REQUEST_PATH,
+			MCE_REQUEST_IF,	"req_accelerometer_enable", NULL, DBUS_TYPE_INVALID) == OSSO_OK) {
+		g_printerr("INFO: Accelerometers enabled\n");
+		app_data->accelerators = TRUE;
+	} else {
+		g_printerr("WARN: Cannot enable accelerometers\n");
+	}
+}
+
+void
+orientation_disable_accelerators()
+{
+	AppData *app_data = app_data_get();
+
+	if (app_data->accelerators == FALSE) {
+		return;
+	}
+
+	/* TODO: Replace string "req_accelerometer_disable" with constant once we switched to final SDK */
+	if (osso_rpc_run_system(app_data->osso_ctx, MCE_SERVICE, MCE_REQUEST_PATH,
+			MCE_REQUEST_IF,	"req_accelerometer_disable", NULL, DBUS_TYPE_INVALID) == OSSO_OK) {
+		g_printerr("INFO: Accelerometers disabled\n");
+		app_data->accelerators = FALSE;
+	} else {
+		g_printerr("WARN: Cannot disable accelerometers\n");
+	}
+}
+
+void
 orientation_init(AppData *app_data)
 {
 	/* Get the DBus connection */
 	osso_context_t *ctx = app_data->osso_ctx;
 	DBusConnection *con = osso_get_sys_dbus_connection(ctx);
+
+	/* Enable accelerators */
+	orientation_enable_accelerators();
 
 	/* Get current orientation from DBus and save into app_data */
 	app_data->portrait = dbus_is_portrait_mode(ctx);

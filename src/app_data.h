@@ -27,6 +27,7 @@ typedef struct
 	GList *note_history;
 	GList *current_element;
 	gboolean started;
+	gboolean accelerators;
 } AppData;
 
 void app_data_init(void);
