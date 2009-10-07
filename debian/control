@@ -3,7 +3,7 @@ Section: user/utilities
 Priority: optional
 Maintainer: Cornelius Hald <hald@icandy.de>
 Depends: libjson-glib (>= 0.6.2-7), liboauth (>= 0.5.2-3), libcurl3 (>= 7.15.0), libpcre3 (>= 6.7)
-Build-Depends: debhelper (>= 4.0.0), intltool, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings, maemo-version-dev, libcurl3-dev, liboauth-dev, libssl-dev, tablet-browser-interface-dev, mce-dev, libpcre3-dev, libhildonmime-dev, libmodest-dbus-client-dev
+Build-Depends: debhelper (>= 4.0.0), intltool, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings, maemo-version-dev, libcurl3-dev, liboauth-dev, libssl-dev, tablet-browser-interface-dev, mce-dev, libpcre3-dev, libhildonmime-dev, libmodest-dbus-client-devi, libmidgard2-2009-dev
 Standards-Version: 3.6.0
 
 Package: conboy
@@ -72,4 +72,8 @@ XB-Maemo-Icon-26:
  JIAuIGXtgFDow3ax3wdEevfAehASueDzd7v5JHKBp4JrHzD2AoH9Xz5wBCQL
  yoUCu+B7Dbcv9Rcr/wNmArLWkmPEkQAAAABJRU5ErkJggg==
 
+Package: conboy-midgard
+Architecture: any
+Depends: conboy, libmidgard2-2009, midgard2-common
+Description: Conboy plugin to store notes in Midgard content repository.
 
