@@ -547,7 +547,7 @@ void settings_window_open(GtkWindow *parent)
 			parent,
 			GTK_DIALOG_MODAL,
 			NULL);
-	hildon_gtk_window_set_portrait_flags(GTK_WINDOW(dialog), !HILDON_PORTRAIT_MODE_SUPPORT);
+	hildon_gtk_window_set_portrait_flags(GTK_WINDOW(dialog), ~HILDON_PORTRAIT_MODE_SUPPORT);
 #else
 	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Settings"),
 			parent,
