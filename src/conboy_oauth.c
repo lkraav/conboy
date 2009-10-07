@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <glib/gmessages.h>
+#include <glib/gprintf.h>
 #include <curl/curl.h>
 #include <oauth.h>
 
@@ -13,10 +14,9 @@
 #include "json.h"
 
 
-#define c_key    "root"  /*< consumer key */
-#define c_secret "klaus" /*/< consumer secret */
+#define c_key    "anyone"  /*< consumer key */
+#define c_secret "anyone" /*/< consumer secret */
 
-#define OAUTH_USER_AGENT "liboauth-agent"
 
 struct MemoryStruct {
   char *data;
@@ -169,8 +169,8 @@ static int parse_reply(const char *reply, char **token, char **secret) {
       && !strncmp(rv[0],"oauth_token=",11)
       && !strncmp(rv[1],"oauth_token_secret=",18) ) {
     ok=0;
-    if (token)  *token =strdup(&(rv[0][12]));
-    if (secret) *secret=strdup(&(rv[1][19]));
+    if (token)  *token = g_strdup(&(rv[0][12]));
+    if (secret) *secret = g_strdup(&(rv[1][19]));
     printf("key:    '%s'\nsecret: '%s'\n",*token, *secret);
   }
   if(rv) free(rv);
