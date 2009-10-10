@@ -314,7 +314,8 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 			"dbtype", "SQLite",
 			"database", "ConboyNotes",
 			"dbuser", "midgard",
-			"dbpass", "midgard", NULL);
+			"dbpass", "midgard", 
+			"sharedir", "/usr/share/midgard-2.0", NULL);
 
 	midgard_config_save_file (config, "ConboyNotesStorage", TRUE, NULL);
 
@@ -325,9 +326,20 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 
 	midgard_connection_set_loglevel (mgd_global, "debug", NULL);
 
+	gchar *db_file_exists = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), ".midgard-2.0/.conboy_db_exists", NULL);
+
 	/* Check if database already exists */
-	if (g_file_test (__DB_EXISTS_FILE, G_FILE_TEST_EXISTS)) /* HACK */
+	if (g_file_test (db_file_exists, G_FILE_TEST_EXISTS)) { /* HACK */
+
+		MidgardObject *mgdobject = midgard_object_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME, NULL);
+		CONBOY_MIDGARD_STORAGE_PLUGIN (self)->object = mgdobject;
+
+		CONBOY_PLUGIN(self)->has_settings = TRUE;
+
+		g_free (db_file_exists);
+
 		return;
+	}
 
 	/* Create base storage and one required for note */
 	midgard_config_create_midgard_tables (config, mgd_global);
@@ -335,7 +347,8 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 	midgard_config_create_class_table (config, klass, mgd_global);
 
 	/* HACK */
-	g_file_set_contents (__DB_EXISTS_FILE, "", 1, NULL);
+	g_file_set_contents (db_file_exists, "", 1, NULL);
+	g_free (db_file_exists);
 
 	MidgardObject *mgdobject = midgard_object_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME, NULL);
 	CONBOY_MIDGARD_STORAGE_PLUGIN (self)->object = mgdobject;
