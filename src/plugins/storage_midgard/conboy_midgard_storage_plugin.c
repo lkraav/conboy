@@ -27,6 +27,36 @@ static MidgardConnection *mgd_global = NULL;
 
 G_DEFINE_TYPE(ConboyMidgardStoragePlugin, conboy_midgard_storage_plugin, CONBOY_TYPE_STORAGE_PLUGIN);
 
+static ConboyNote *
+__conboy_note_from_midgard_object (MidgardObject *mgdobject)
+{
+	g_return_val_if_fail (mgdobject != NULL, NULL);
+
+	gchar *guid = NULL;
+	gchar *content = NULL;
+	gchar *title = NULL;
+
+	g_object_get (mgdobject, 
+			"guid", &guid,
+			"title", &title,
+			"text", &content, NULL);
+	
+	/* Create new conboy instance */
+	ConboyNote *note = conboy_note_new();
+
+	/* and copy properties */
+	g_object_set (note, 
+			"guid", guid,
+			"title", title,
+			"content", content, NULL);
+
+	g_free (guid);
+	g_free (content);
+	g_free (title);
+
+	return note;
+}
+
 static ConboyNote*
 _conboy_midgard_storage_plugin_note_load (ConboyStoragePlugin *self, const gchar *uuid)
 {
@@ -44,28 +74,9 @@ _conboy_midgard_storage_plugin_note_load (ConboyStoragePlugin *self, const gchar
 	MidgardObject *mgdobject = midgard_object_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME, uuid ? &gval : NULL);
 
 	g_value_unset (&gval);
-
-	gchar *guid = NULL;
-	gchar *content = NULL;
-	gchar *title = NULL;
-
-	g_object_get (mgdobject, 
-			"guid", &guid,
-			"title", &title,
-			"text", &content, NULL);
 	
 	/* Create new conboy instance */
-	ConboyNote *note = conboy_note_new();
-
-	/* and copy properties */
-	g_object_get (note, 
-			"guid", guid,
-			"title", title,
-			"content", content, NULL);
-
-	g_free (guid);
-	g_free (content);
-	g_free (title);
+	ConboyNote *note = __conboy_note_from_midgard_object (mgdobject);
 
 	CONBOY_MIDGARD_STORAGE_PLUGIN (self)->object = mgdobject;
 
@@ -163,7 +174,9 @@ _conboy_midgard_storage_plugin_note_list (ConboyStoragePlugin *self)
 
 	for (i = 0; i < n_objects; i++) {
 
-		slist = g_slist_prepend (slist, (gpointer) objects[i]);
+		ConboyNote *note = __conboy_note_from_midgard_object (objects[i]);
+		slist = g_slist_prepend (slist, (gpointer) note);
+		g_object_unref (objects[i]);
 	}
 
 	g_free (objects);
@@ -173,7 +186,7 @@ _conboy_midgard_storage_plugin_note_list (ConboyStoragePlugin *self)
 
 static GSList*
 _conboy_midgard_storage_plugin_note_list_ids (ConboyStoragePlugin *self)
-{
+{	
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);	
 
