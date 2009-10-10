@@ -1,0 +1,10 @@
+usr/lib/conboy/libstoragexml.*
+usr/lib/conboy/conboy_storage_xml.plugin
+usr/share/icons/hicolor/40x40/hildon/*
+usr/share/icons/hicolor/26x26/hildon/*
+usr/share/icons/hicolor/scalable/hildon/*
+usr/share/icons/hicolor/48x48/hildon/*
+usr/share/dbus-1/services/de.zwong.conboy.service
+usr/share/locale/*
+usr/share/applications/hildon/conboy.inactive
+etc/osso-backup/applications/conboy.conf
