@@ -3,7 +3,7 @@ Section: user/utilities
 Priority: optional
 Maintainer: Cornelius Hald <hald@icandy.de>
 Depends: libjson-glib (>= 0.6.2-7), liboauth (>= 0.5.2-3), libcurl3 (>= 7.15.0), libpcre3 (>= 6.7)
-Build-Depends: debhelper (>= 4.0.0), intltool, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings, maemo-version-dev, libcurl3-dev, liboauth-dev, libssl-dev, tablet-browser-interface-dev, mce-dev, libpcre3-dev, libhildonmime-dev, libmodest-dbus-client-devi, libmidgard2-2009-dev
+Build-Depends: debhelper (>= 4.0.0), intltool, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings, maemo-version-dev, libcurl3-dev, liboauth-dev, libssl-dev, tablet-browser-interface-dev, mce-dev, libpcre3-dev, libhildonmime-dev, libmodest-dbus-client-devi, libmidgard2-dev
 Standards-Version: 3.6.0
 
 Package: conboy
