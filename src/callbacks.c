@@ -182,21 +182,22 @@ on_font_size_radio_group_changed       (GtkRadioAction  *action,
 	}
 }
 
-
 gboolean
 on_window_delete		               (GtkObject		*window,
 										GdkEvent		*event,
 										gpointer		 user_data)
 {
 	UserInterface *ui = (UserInterface*)user_data;
-	/*
-	g_printerr("Window delete \n");
-	*/
+	
 	note_save(ui);
+	
+	/* Take screenshot */
+	#ifdef HILDON_HAS_APP_MENU
+	hildon_gtk_window_take_screenshot(ui->window, TRUE);
+	#endif
+	
 	gtk_main_quit();
-	/*
-	note_close_window(ui);
-	*/
+	
 	return TRUE; /* True to stop other handler from being invoked */
 }
 
