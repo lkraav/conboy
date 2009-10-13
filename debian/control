@@ -1,16 +1,20 @@
-Source: conboy
+Source: conboy-unstable
 Section: user/utilities
 Priority: optional
 Maintainer: Cornelius Hald <hald@icandy.de>
-Depends: libjson-glib (>= 0.6.2-7), liboauth (>= 0.5.2-3), libcurl3 (>= 7.15.0), libpcre3 (>= 6.7)
-Build-Depends: debhelper (>= 4.0.0), intltool, libhildon-1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings, maemo-version-dev, libcurl3-dev, liboauth-dev, libssl-dev, tablet-browser-interface-dev, mce-dev, libpcre3-dev, libhildonmime-dev, libmodest-dbus-client-dev, libmidgard2-dev
+Build-Depends: debhelper (>= 4.0.0), intltool, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings, maemo-version-dev, libcurl3-dev, liboauth-dev, libssl-dev, tablet-browser-interface-dev, mce-dev, libpcre3-dev, libhildonmime-dev, libmodest-dbus-client-dev, libmidgard2-dev
 Standards-Version: 3.6.0
 
-Package: conboy
+Package: conboy-unstable
 Architecture: any
-Depends: ${shlibs:Depends}
-Description: Conboy is a note taking application. It is designed to be easy to use - yet powerful. It can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows.
-XB-Maemo-Display-Name: Conboy
+Depends: libjson-glib-1.0-0 (>= 0.6.2-7), liboauth0 (>= 0.5.2-3), libcurl3 (>= 7.15.0), libpcre3 (>= 6.7)
+Conflicts: conboy
+Replaces: conboy
+Description: Conboy is a note taking application.
+ It is designed to be easy to use - yet powerful. Conboy can
+ read and write the Tomboy file format to be compatible with
+ Tomboy on Linux, Mac and Windows.
+XB-Maemo-Display-Name: Conboy (unstable)
 XB-Maemo-Icon-26:
  iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABHNCSVQICAgI
  fAhkiAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAnm
@@ -74,6 +78,7 @@ XB-Maemo-Icon-26:
 
 Package: conboy-midgard
 Architecture: any
-Depends: conboy, libmidgard2-2009, midgard2-common
+Depends: conboy-unstable, libmidgard2-2009, midgard2-common
+XB-Maemo-Display-Name: Conboy Midgard Plugin
 Description: Conboy plugin to store notes in Midgard content repository.
 

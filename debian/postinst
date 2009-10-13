@@ -3,7 +3,9 @@
 gtk-update-icon-cache -f /usr/share/icons/hicolor
 
 # copy the desktop file for use
-( cd /usr/share/applications/hildon/ && mv conboy.inactive conboy.desktop )
+if [ -f /usr/share/applications/hildon/conboy.inactive ]
+	then ( cd /usr/share/applications/hildon/ && mv conboy.inactive conboy.desktop )
+fi
 
 # select the installation folder
 if [ -f /usr/bin/X11/maemo-select-menu-location ]
