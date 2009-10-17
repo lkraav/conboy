@@ -42,6 +42,8 @@
 #define SETTINGS_STORAGE_PLUGIN_NAME SETTINGS_ROOT"/storage_plugin_name"
 #define SETTINGS_STORAGE_LAST_SYNC_REV SETTINGS_ROOT"/last_sync_rev"
 #define SETTINGS_STORAGE_LAST_SYNC_TIME SETTINGS_ROOT"/last_sync_time"
+#define SETTINGS_LAST_SCROLL_POSITION SETTINGS_ROOT"/last_scroll_position"
+#define SETTINGS_LAST_OPEN_NOTE      SETTINGS_ROOT"/last_open_note"
 
 typedef enum {
 	SETTINGS_SCROLLBAR_SIZE_SMALL,
@@ -59,6 +61,12 @@ typedef enum {
 	SETTINGS_COLOR_TYPE_LINKS
 } SettingsColorType;
 
+
+void settings_save_last_open_note(const gchar *guid);
+gchar* settings_load_last_open_note(void);
+
+void settings_save_last_scroll_position(gdouble pos);
+gdouble settings_load_last_scroll_position(void);
 
 void settings_save_last_sync_time(time_t time);
 time_t settings_load_last_sync_time(void);

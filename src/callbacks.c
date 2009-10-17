@@ -188,14 +188,24 @@ on_window_delete		               (GtkObject		*window,
 										gpointer		 user_data)
 {
 	UserInterface *ui = (UserInterface*)user_data;
+	GtkAdjustment *adj;
 	
+	/* Save the current note */
 	note_save(ui);
 	
-	/* Take screenshot */
-	#ifdef HILDON_HAS_APP_MENU
+#ifdef HILDON_HAS_APP_MENU
+	adj = hildon_pannable_area_get_vadjustment(HILDON_PANNABLE_AREA(ui->scrolled_window));
+	/* Take screenshot for faster startup trick */
 	hildon_gtk_window_take_screenshot(ui->window, TRUE);
-	#endif
+#else
+	adj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(ui->scrolled_window));
+#endif
 	
+	/* Save last viewd note and the scroll position */
+	settings_save_last_scroll_position(gtk_adjustment_get_value(adj));
+	settings_save_last_open_note(ui->note->guid);
+	
+	/* Quit */
 	gtk_main_quit();
 	
 	return TRUE; /* True to stop other handler from being invoked */

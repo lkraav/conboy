@@ -29,6 +29,34 @@ free_data(gpointer data, gpointer ignore)
 }
 
 void
+settings_save_last_open_note(const gchar *guid)
+{
+	AppData *app_data = app_data_get();
+	gconf_client_set_string(app_data->client, SETTINGS_LAST_OPEN_NOTE, guid, NULL);
+}
+
+gchar*
+settings_load_last_open_note()
+{
+	AppData *app_data = app_data_get();
+	return gconf_client_get_string(app_data->client, SETTINGS_LAST_OPEN_NOTE, NULL);
+}
+
+void
+settings_save_last_scroll_position(gdouble pos)
+{
+	AppData *app_data = app_data_get();
+	gconf_client_set_float(app_data->client, SETTINGS_LAST_SCROLL_POSITION, pos, NULL);
+}
+
+gdouble
+settings_load_last_scroll_position()
+{
+	AppData *app_data = app_data_get();
+	return gconf_client_get_float(app_data->client, SETTINGS_LAST_SCROLL_POSITION, NULL);
+}
+
+void
 settings_save_last_sync_time(time_t time)
 {
 	AppData *app_data = app_data_get();

@@ -33,6 +33,7 @@ typedef struct
 	GtkWidget			*style_menu;
 	GtkToolbar			*toolbar;
 	GtkWidget			*app_menu;
+	GtkWidget			*scrolled_window;
 
 	GtkToggleToolButton *button_bold;
 	GtkToggleToolButton *button_italic;

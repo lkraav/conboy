@@ -560,24 +560,65 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
  * possition does not work correctly.
  *
  * To make it run only once, and to every time the application
- * is minimized/maximized, we you a boolean flag on app_data.
+ * is minimized/maximized, we use a boolean flag on app_data.
  */
 static gboolean
 on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 {
 	AppData *app_data = app_data_get();
 
-	if (!app_data->started) {
-		/* Open latest note or new one */
-		app_data->started = TRUE;
-		ConboyNote *note = conboy_note_store_get_latest(app_data->note_store);
-		if (note == NULL) {
-			gchar title[50];
-			g_sprintf(title, _("New Note %i"), 1);
-			note = conboy_note_new_with_title(title);
-		}
-		note_show(note, TRUE);
+	if (app_data->started) {
+		return FALSE;
 	}
+	
+	/* Open latest note or new one */
+	gchar *guid = settings_load_last_open_note();
+	ConboyNote *note = NULL;
+	
+	app_data->started = TRUE;
+
+	/* Try to open last viewed note */
+	if (guid != NULL) {
+		note = conboy_note_store_find_by_guid(app_data->note_store, guid);
+		
+		if (note) {
+			
+			note_show(note, TRUE);
+			
+			/* Now process all pending events like calculating window size,
+			 * text amount, scrollbar positions etc. If we don't do this,
+			 * we cannot set the scrollbars to the right position as the size
+			 * of the widget is still unknown */
+			while (gtk_events_pending()) {
+				gtk_main_iteration_do(FALSE);
+			}
+			
+			/* Scroll to saved position */
+			GtkAdjustment *adj;
+			#ifdef HILDON_HAS_APP_MENU
+			adj = hildon_pannable_area_get_vadjustment(HILDON_PANNABLE_AREA(app_data->note_window->scrolled_window));
+			#else
+			adj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(app_data->note_window->scrolled_window));
+			#endif
+			gtk_adjustment_set_value(adj, settings_load_last_scroll_position());
+			
+			return FALSE;
+		}
+	}
+	
+	/* If that does not work, use last edited note */
+	if (note == NULL) {
+		note = conboy_note_store_get_latest(app_data->note_store);
+	}
+	
+	/* If that does not work, create new note */
+	if (note == NULL) {
+		gchar title[50];
+		g_sprintf(title, _("New Note %i"), 1);
+		note = conboy_note_new_with_title(title);
+	}
+	
+	note_show(note, TRUE);
 
 	return FALSE;
 }
@@ -1181,6 +1222,7 @@ UserInterface* create_mainwin() {
 	ui->find_bar_is_visible = FALSE;
 	ui->style_menu = text_style_menu;
 	ui->app_menu = main_menu;
+	ui->scrolled_window = scrolledwindow1;
 
 	ui->action_bold = GTK_TOGGLE_ACTION(action_bold);
 	ui->action_bullets = GTK_TOGGLE_ACTION(action_bullets);
