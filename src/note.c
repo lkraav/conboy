@@ -47,7 +47,7 @@ void note_show_by_title(const char* title)
 		note = conboy_note_new_with_title(title);
 	}
 
-	note_show(note, TRUE);
+	note_show(note, TRUE, TRUE);
 }
 
 void note_format_title(GtkTextBuffer *buffer)
@@ -303,7 +303,7 @@ add_to_history(ConboyNote *note)
 	app_data->current_element = g_list_last(app_data->note_history);
 }
 
-void note_show(ConboyNote *note, gboolean modify_history)
+void note_show(ConboyNote *note, gboolean modify_history, gboolean scroll)
 {
 	AppData *app_data = app_data_get();
 	
@@ -339,11 +339,13 @@ void note_show(ConboyNote *note, gboolean modify_history)
 	gtk_widget_grab_focus(GTK_WIDGET(ui->view));
 	
 	/* Scroll to cursor position */
+	if (scroll) {
 	GtkTextIter iter;
 	gtk_text_buffer_get_iter_at_offset(buffer, &iter, note->cursor_position);
 	gtk_text_buffer_place_cursor(buffer, &iter);
 	GtkTextMark *mark = gtk_text_buffer_get_insert(buffer);
 	gtk_text_view_scroll_to_mark(ui->view, mark, 0.1, TRUE, 0, 0.5);
+	}
 
 	/* Set the buffer to unmodified */
 	gtk_text_buffer_set_modified(buffer, FALSE);

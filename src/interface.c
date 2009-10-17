@@ -490,7 +490,7 @@ do_sync (gpointer *user_data)
 	/* Load again and make editable */
 	gdk_threads_enter();
 	gtk_text_view_set_editable(ui->view, TRUE);
-	note_show(note, FALSE);
+	note_show(note, FALSE, TRUE);
 	gdk_threads_leave();
 }
 
@@ -571,6 +571,8 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 		return FALSE;
 	}
 	
+	UserInterface *ui = app_data->note_window;
+	
 	/* Open latest note or new one */
 	gchar *guid = settings_load_last_open_note();
 	ConboyNote *note = NULL;
@@ -583,7 +585,7 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 		
 		if (note) {
 			
-			note_show(note, TRUE);
+			note_show(note, TRUE, FALSE);
 			
 			/* Now process all pending events like calculating window size,
 			 * text amount, scrollbar positions etc. If we don't do this,
@@ -596,9 +598,9 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 			/* Scroll to saved position */
 			GtkAdjustment *adj;
 			#ifdef HILDON_HAS_APP_MENU
-			adj = hildon_pannable_area_get_vadjustment(HILDON_PANNABLE_AREA(app_data->note_window->scrolled_window));
+			adj = hildon_pannable_area_get_vadjustment(HILDON_PANNABLE_AREA(ui->scrolled_window));
 			#else
-			adj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(app_data->note_window->scrolled_window));
+			adj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(ui->scrolled_window));
 			#endif
 			gtk_adjustment_set_value(adj, settings_load_last_scroll_position());
 			
@@ -618,7 +620,7 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 		note = conboy_note_new_with_title(title);
 	}
 	
-	note_show(note, TRUE);
+	note_show(note, TRUE, TRUE);
 
 	return FALSE;
 }
@@ -632,7 +634,7 @@ on_storage_activated (ConboyStorage *storage, UserInterface *ui)
 	ConboyNote *note = conboy_note_store_get_latest(app_data->note_store);
 	gtk_text_buffer_set_modified(ui->buffer, FALSE); /* Prevent note_show() from saving */
 	if (note != NULL) {
-		note_show(note, TRUE);
+		note_show(note, TRUE, TRUE);
 	} else {
 		/* TODO: Create new note */
 		gtk_text_buffer_set_text(ui->buffer, "", -1);
