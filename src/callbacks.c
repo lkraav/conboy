@@ -23,6 +23,9 @@
 #include <string.h>
 #include <libintl.h>
 #include <hildon/hildon-program.h>
+#ifdef HILDON_HAS_APP_MENU
+#include <hildon/hildon-pannable-area.h>
+#endif
 #include <hildon/hildon-banner.h>
 #include <hildon/hildon-defines.h>
 #include <hildon-mime.h>
@@ -189,10 +192,10 @@ on_window_delete		               (GtkObject		*window,
 {
 	UserInterface *ui = (UserInterface*)user_data;
 	GtkAdjustment *adj;
-	
+
 	/* Save the current note */
 	note_save(ui);
-	
+
 #ifdef HILDON_HAS_APP_MENU
 	adj = hildon_pannable_area_get_vadjustment(HILDON_PANNABLE_AREA(ui->scrolled_window));
 	/* Take screenshot for faster startup trick */
@@ -200,14 +203,14 @@ on_window_delete		               (GtkObject		*window,
 #else
 	adj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(ui->scrolled_window));
 #endif
-	
+
 	/* Save last viewd note and the scroll position */
 	settings_save_last_scroll_position(gtk_adjustment_get_value(adj));
 	settings_save_last_open_note(ui->note->guid);
-	
+
 	/* Quit */
 	gtk_main_quit();
-	
+
 	return TRUE; /* True to stop other handler from being invoked */
 }
 
@@ -242,9 +245,9 @@ on_new_button_clicked					(GtkAction		*action,
 	AppData *app_data = app_data_get();
 	int num = conboy_note_store_get_length(app_data->note_store) + 1;
 	gchar title[100];
-	
+
 	g_sprintf(title, _("New Note %i"), num);
-	
+
 	ConboyNote *note = conboy_note_new_with_title(title);
 	note_show(note, TRUE);
 }
@@ -424,7 +427,7 @@ on_link_button_clicked				   (GtkAction		*action,
 	gtk_text_buffer_get_selection_bounds(buffer, &start, &end);
 	text = gtk_text_iter_get_text(&start, &end);
 	gtk_text_buffer_apply_tag_by_name(buffer, "link:internal", &start, &end);
-	
+
 	/* Make it save */
 	gtk_text_buffer_set_modified(buffer, TRUE);
 
@@ -626,19 +629,19 @@ static void
 open_url(gchar *url)
 {
 	AppData *app_data = app_data_get();
-	
+
 	g_printerr("INFO: Open URL: >%s<\n", url);
-	
+
 	DBusConnection *con = osso_get_dbus_connection(app_data->osso_ctx);
-	
+
 	if (hildon_mime_open_file(con, url)) {
 		/* Everything ok. File was opened */
 		g_printerr("INFO: URL successfull opened\n");
 		return;
 	}
-	
+
 	g_printerr("INFO: Cannot open URL with hildon_mime. Falling back to hardcoded values\n");
-	
+
 	if (strncmp(url, "http", 4) == 0 || strncmp(url, "ftp", 3) == 0)
 	{
 		g_printerr("Trying to open in browser\n");
@@ -648,7 +651,7 @@ open_url(gchar *url)
 				DBUS_TYPE_STRING, url, DBUS_TYPE_INVALID);
 		return;
 	}
-	
+
 	if (strncmp(url, "mailto", 6) == 0)
 	{
 		/* Open in Modest */
@@ -656,16 +659,16 @@ open_url(gchar *url)
 		libmodest_dbus_client_mail_to(app_data->osso_ctx, url);
 		return;
 	}
-	
+
 	if (strncmp(url, "file", 4) == 0)
-	{	
+	{
 		/* Open in Filemanager */
 		g_printerr("Trying to open in file manager \n");
-		
+
 		/* Test if is a path and the path exits */
 		gchar *path = url + 7;
 		g_printerr("Path: %s\n", path);
-		
+
 		if (g_file_test(path, G_FILE_TEST_IS_DIR)) {
 			osso_rpc_run_with_defaults(app_data->osso_ctx, "osso_filemanager",
 					"open_folder", NULL,
@@ -673,21 +676,21 @@ open_url(gchar *url)
 			return;
 		}
 	}
-	
+
 	HildonBanner *banner = hildon_banner_show_informationf(app_data->note_window->window, NULL,
 			"Cannot open '%s'", url);
 }
 
 /**
  * Create a proper URL out of the given link.
- * 
+ *
  * Returns: Newly allocated string
  */
 static gchar*
 create_url(gchar *link)
 {
 	gchar *result;
-	
+
 	if (strncmp(link, "www.", 4) == 0) {
 		result = g_strconcat("http://", link, NULL);
 	}
@@ -706,7 +709,7 @@ create_url(gchar *link)
 	else {
 		result = g_strdup(link);
 	}
-	
+
 	return result;
 }
 
@@ -737,10 +740,10 @@ on_link_url_tag_event				(GtkTextTag  *tag,
 			link_text = gtk_text_iter_get_text(&start, iter);
 
 			g_printerr("Link: >%s< \n", link_text);
-			
+
 			gchar *url = create_url(link_text);
 			g_free(link_text);
-			
+
 			open_url(url);
 		}
 	}
@@ -754,25 +757,25 @@ on_delete_button_clicked			   (GtkAction		*action,
 {
 	UserInterface *ui = (UserInterface*)user_data;
 	AppData *app_data = app_data_get();
-	
+
 	gchar *message = g_strconcat("<b>",
 			_("Really delete this note?"),
 			"</b>\n\n",
 			_("If you delete a note it is permanently lost."),
 			NULL);
-	
+
 	GtkWidget *dialog = ui_helper_create_yes_no_dialog(GTK_WINDOW(ui->window), message);
 	gint response = gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog);
 	g_free(message);
-	
+
 	if (response == GTK_RESPONSE_YES) {
 
 		/* Delete note */
 		note_delete(ui->note);
 		g_object_unref(ui->note);
 		ui->note = NULL;
-		
+
 		/* Show previous note */
 		ConboyNote *note;
 		if (app_data->current_element == NULL) {
@@ -784,7 +787,7 @@ on_delete_button_clicked			   (GtkAction		*action,
 			note = CONBOY_NOTE(app_data->current_element->data);
 			note_show(note, FALSE);
 		}
-		
+
 	}
 }
 
@@ -1152,7 +1155,7 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 	gtk_text_iter_backward_chars(&start_iter, g_utf8_strlen(text, -1));
 
 	auto_highlight_links(ui, &start_iter, &end_iter);
-	
+
 	auto_highlight_urls(ui, &start_iter, &end_iter);
 
 	g_timer_stop(timer);
@@ -1173,7 +1176,7 @@ on_text_buffer_delete_range					(GtkTextBuffer *buffer,
 	if (gtk_text_iter_get_line(start_iter) == 0 || gtk_text_iter_get_line(end_iter) == 0) {
 		return;
 	}
-	
+
 	auto_highlight_links(ui, start_iter, end_iter);
 
 	auto_highlight_urls(ui, start_iter, end_iter);
@@ -1449,12 +1452,12 @@ void
 on_back_button_clicked (GtkAction *action, gpointer user_data)
 {
 	AppData *app_data = app_data_get();
-	
+
 	g_return_if_fail(app_data->current_element != NULL);
 	g_return_if_fail(app_data->current_element->prev != NULL);
-	
+
 	app_data->current_element = app_data->current_element->prev;
-	
+
 	ConboyNote *note = CONBOY_NOTE(app_data->current_element->data);
 	note_show(note, FALSE);
 }
@@ -1463,12 +1466,12 @@ void
 on_forward_button_clicked (GtkAction *action, gpointer user_data)
 {
 	AppData *app_data = app_data_get();
-		
+
 	g_return_if_fail(app_data->current_element != NULL);
 	g_return_if_fail(app_data->current_element->next != NULL);
-	
+
 	app_data->current_element = app_data->current_element->next;
-	
+
 	ConboyNote *note = CONBOY_NOTE(app_data->current_element->data);
 	note_show(note, FALSE);
 }
