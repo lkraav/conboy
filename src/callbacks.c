@@ -414,6 +414,9 @@ on_link_button_clicked				   (GtkAction		*action,
 	gtk_text_buffer_get_selection_bounds(buffer, &start, &end);
 	text = gtk_text_iter_get_text(&start, &end);
 	gtk_text_buffer_apply_tag_by_name(buffer, "link:internal", &start, &end);
+	
+	/* Make it save */
+	gtk_text_buffer_set_modified(buffer, TRUE);
 
 	note_show_by_title(text);
 }
