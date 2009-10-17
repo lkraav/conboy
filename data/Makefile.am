@@ -20,12 +20,13 @@ dbus_DATA=de.zwong.conboy.service
 desktopdir=$(datadir)/applications/hildon
 desktop_DATA = conboy.desktop
 
-icon_26x26_DATA = icons/26x26/conboy.png icons/26x26/highlighter.png
+icon_26x26_DATA = icons/26x26/conboy.png
 icon_40x40_DATA = icons/40x40/conboy.png
 icon_48x48_DATA = icons/48x48/conboy.png icons/48x48/conboy-decrease_indent.png icons/48x48/conboy-hyperlink.png icons/48x48/conboy-increase_indent.png icons/48x48/conboy-text_transform.png
+icon_64x64_DATA = icons/64x64/conboy.png
 icon_scalable_DATA = icons/scalable/conboy.png
 
 backupdir=/etc/osso-backup/applications
 backup_DATA = conboy.conf
 
-EXTRA_DIST = $(dbus_DATA) $(desktop_DATA) $(icon_26x26_DATA) $(icon_40x40_DATA) $(icon_scalable_DATA) $(backup_DATA)
+EXTRA_DIST = $(dbus_DATA) $(desktop_DATA) $(icon_26x26_DATA) $(icon_40x40_DATA) $(icon_48x48_DATA) $(icon_64x64_DATA) $(icon_scalable_DATA) $(backup_DATA)
