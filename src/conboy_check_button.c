@@ -1,5 +1,5 @@
 /*
- * This file is a part of hildon
+ * This file is a part of Conboy. Based on hildon. Original copyright below:
  *
  * Copyright (C) 2008, 2009 Nokia Corporation, all rights reserved.
  *
