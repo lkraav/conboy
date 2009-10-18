@@ -1,5 +1,4 @@
 # Sub directories
-#SUBDIRS = tracker plugins
 SUBDIRS = plugins
 
 # Includes
@@ -8,10 +7,6 @@ INCLUDES = $(GMODULE_CFLAGS) $(HILDON_CFLAGS) $(OSSO_CFLAGS) $(HILDONDESKTOP_CFL
 # Binary
 bin_PROGRAMS = \
         conboy
-		
-#pluginlib_LTLIBRARIES = \
-#		libconboy_applet.la
-# /Binary
 
 # Sources
 conboy_SOURCES = \
@@ -62,8 +57,6 @@ conboy_SOURCES = \
         conboy_plugin_store.c \
         conboy_check_button.h \
         conboy_check_button.c \
-        conboy_check_mark.h \
-        conboy_check_mark.c \
         orientation.h \
         orientation.c \
         fullscreenmanager.h \
@@ -77,26 +70,6 @@ conboy_SOURCES = \
         conboy_xml.h \
         conboy_xml.c
         
-
-#libconboy_applet_la_SOURCES = \
-#		conboy_applet.c \
-#		conboy_applet.h \
-#		metadata.h \
-#       metadata.cs
-		
-# /Sources
-
-# XXX
-#libconboy_applet_la_LDFLAGS = -module -avoid-version 
-# /XXX
-
 # LDADD
 conboy_LDADD = \
         $(GMODULE_LIBS) $(HILDON_LIBS) $(OSSO_LIBS) $(GCONF_LIBS) $(HILDONDESKTOP_LIBS) $(XML2_LIBS) $(JSON_LIBS) $(OAUTH_LIBS) $(CURL_LIBS) $(PCRE_LIBS) $(HILDON_MIME_LIBS) $(MODEST_LIBS)
-
-#libconboy_applet_la_LIBADD = \
-#		$(HILDONDESKTOP_LIBS)
-# /LDADD
-
-
-

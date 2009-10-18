@@ -4,15 +4,20 @@ AC_INIT(src/main.c)
 AM_CONFIG_HEADER(config.h)
 
 PACKAGE=conboy
-VERSION=0.6.0-alpha10
+VERSION=0.6.0-alpha11
 
 AM_INIT_AUTOMAKE($PACKAGE,$VERSION)
 
 AC_PROG_CC
 AC_STDC_HEADERS
 AC_PROG_INSTALL
-dnl AC_PREFIX_DEFAULT(/var/lib/install/usr)
+AC_PROG_LIBTOOL
 AC_PREFIX_DEFAULT(/usr)
+
+# AC_PREFIX_DEFAULT does not get expanded until too late so we need to do this to use prefix in this script
+if test "x$prefix" = "xNONE" ; then
+    prefix='/usr'
+fi
 
 CFLAGS="$CFLAGS -Wall -ansi -Wmissing-prototypes -Wmissing-declarations"
 
@@ -47,10 +52,6 @@ PKG_CHECK_MODULES(OSSO, libosso >= 0.8.4)
 AC_SUBST(OSSO_LIBS)
 AC_SUBST(OSSO_CFLAGS)
 
-dnl PKG_CHECK_MODULES(HILDONDESKTOP, libhildondesktop >= 2.0.0)
-dnl AC_SUBST(HILDONDESKTOP_LIBS)
-dnl AC_SUBST(HILDONDESKTOP_CFLAGS)
-
 PKG_CHECK_MODULES(GCONF, gconf-2.0 >= 0.22)
 AC_SUBST(GCONF_LIBS)
 AC_SUBST(GCONF_CFLAGS)
@@ -62,12 +63,6 @@ AC_SUBST(XML2_LIBS)
 PKG_CHECK_MODULES(JSON, json-glib-1.0 >= 0.6.2)
 AC_SUBST(JSON_CFLAGS)
 AC_SUBST(JSON_LIBS)
-
-PKG_CHECK_EXISTS([tracker >= 0.6.90], [
-	PKG_CHECK_MODULES([TRACKER], [tracker >= 0.6.90])
-])
-AC_SUBST(TRACKER_CFLAGS)
-AC_SUBST(TRACKER_LIBS)
 
 PKG_CHECK_MODULES(CURL, libcurl >= 7.15.0)
 AC_SUBST(CURL_CFLAGS)
@@ -98,9 +93,7 @@ else
 fi
 
 AC_MSG_NOTICE([Using backup category "$BACKUP_CATEGORY"])
-
 AC_SUBST(BACKUP_CATEGORY)
-
 
 AC_MSG_CHECKING([whether to build Midgard storage plugin])
 AC_ARG_WITH([midgard],[AS_HELP_STRING([--without-midgard], [disable Midgard storage])],
@@ -123,38 +116,11 @@ icon_64x64dir=$datadir/icons/hicolor/64x64/hildon
 icon_scalabledir=$datadir/icons/hicolor/scalable/hildon
 
 localedir=`$PKG_CONFIG osso-af-settings --variable=localedir`
-hildondesktopentrydir=/usr/share/dbus-1/services
-hildoncpdesktopentrydir=/usr/
-hildonstatusbarplugindir=`$PKG_CONFIG hildon-status-bar-lib --variable=pluginlibdir`
-hildoncplibdir=`$PKG_CONFIG hildon-control-panel --variable=pluginlibdir`
-hildoniconthemedir=$HOME/.icons/hicolor
-
-dnl For the navigation bar plug-in
-
-AC_PROG_LIBTOOL
-
-#pluginlibdir=`pkg-config osso-af-settings --variable=hildondesktoplibdir`
-#AC_SUBST(pluginlibdir)
-
-dnl
-dnl Tracker dirs
-dnl
-
-trackerlibdir=/usr/lib/tracker/indexer-modules
-AC_SUBST(trackerlibdir)
-
-trackermoduledir=/usr/share/tracker/modules
-AC_SUBST(trackermoduledir)
-
-trackerservicedir=/usr/share/tracker/services
-AC_SUBST(trackerservicedir)
 
 # Plugin dirs (TODO: should not be hardcoded to /usr/)
-pluginslibdir=/usr/lib/conboy
+pluginslibdir=$prefix/lib/conboy
+AC_MSG_NOTICE([Using "$pluginslibdir" for plugins])
 AC_SUBST(pluginslibdir)
-
-pluginsdatadir=/usr/share/conboy
-AC_SUBST(plugindatadir)
 
 # Localization-related
 AC_PROG_INTLTOOL([0.23])
@@ -168,11 +134,6 @@ AC_SUBST(localedir)
 AC_DEFINE_UNQUOTED(LOCALEDIR,"$localedir",[localedir])
 
 AC_SUBST(desktopentrydir)
-AC_SUBST(hildondesktopentrydir)
-AC_SUBST(hildoncpdesktopentrydir)
-AC_SUBST(hildonstatusbarplugindir)
-AC_SUBST(hildoncplibdir)
-AC_SUBST(hildoniconthemedir)
 AC_SUBST(icon_26x26dir)
 AC_SUBST(icon_40x40dir)
 AC_SUBST(icon_48x48dir)
@@ -184,7 +145,6 @@ AC_CONFIG_FILES([src/conboy_config.h])
 AC_OUTPUT([
     Makefile 
     src/Makefile
-    src/tracker/Makefile
     data/Makefile
     po/Makefile.in 
     po/Makefile
