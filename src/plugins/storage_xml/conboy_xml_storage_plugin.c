@@ -26,6 +26,7 @@
 #include "../../metadata.h"
 #include "../../conboy_note.h"
 #include "../../conboy_storage_plugin.h"
+#include "../../conboy_xml.h"
 #include "conboy_xml_storage_plugin.h"
 
 #define NOTE_TAG "note"
@@ -297,9 +298,7 @@ load (ConboyStoragePlugin *self, const gchar *guid)
 	xmlTextReader *reader;
 	
 	filename = g_strconcat(CONBOY_XML_STORAGE_PLUGIN(self)->path, guid, ".note", NULL);
-	
-	reader = xmlReaderForFile(filename, NULL, 0);
-	
+	reader = conboy_xml_get_reader_for_file(filename);
 	note = conboy_note_new_with_guid(guid);
 	
 	ret = xmlTextReaderRead(reader);
@@ -312,7 +311,6 @@ load (ConboyStoragePlugin *self, const gchar *guid)
 		g_printerr("ERROR: Failed to parse file: %s\n", filename);
 	}
 	
-	xmlFreeTextReader(reader);
 	g_free(filename);
 	
 	if (ret != 0) {

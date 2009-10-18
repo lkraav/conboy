@@ -6,6 +6,7 @@
 #include <libxml/xmlwriter.h>
 
 #include "app_data.h"
+#include "conboy_xml.h"
 #include "conboy_note_buffer.h"
 
 #define ELEMENT_IS(name) (strcmp (element_name, (name)) == 0)
@@ -714,42 +715,28 @@ void destroy_parse_context(ParseContext *ctx) {
 
 
 void
-conboy_note_buffer_set_xml (ConboyNoteBuffer *self, const gchar *xmlString)
+conboy_note_buffer_set_xml (ConboyNoteBuffer *self, const gchar *xml_string)
 {
 	g_return_if_fail(self != NULL);
-	g_return_if_fail(xmlString != NULL);
+	g_return_if_fail(xml_string != NULL);
 	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
 	
-	ParseContext *ctx;
 	int ret;
+	ParseContext *ctx;
 	GtkTextIter iter;
-	AppData *app_data = app_data_get();
 	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(self);
+	xmlTextReader *reader = conboy_xml_get_reader_for_memory(xml_string);
 	
-	/* We try to reuse the existing xml parser. If none exists yet, we create a new one. */
-	if (app_data->reader == NULL) {
-		app_data->reader = xmlReaderForMemory(xmlString, strlen(xmlString), "", "UTF-8", 0);
-	}
-	
-	if (xmlReaderNewMemory(app_data->reader, xmlString, strlen(xmlString), "", "UTF-8", 0) != 0) {
-		g_printerr("ERROR: Cannot reuse xml parser. \n");
-		g_assert_not_reached();
-	}
-	
-	if (app_data->reader == NULL) {
-		g_printerr("ERROR: Couldn't init xml parser.\n");
-		g_assert_not_reached();
-	}
 	
 	/* Clear text buffer */
 	gtk_text_buffer_set_text(buffer, "", -1);
 	
 	ctx = init_parse_context(buffer, &iter);
 	
-	ret = xmlTextReaderRead(app_data->reader);
+	ret = xmlTextReaderRead(reader);
 	while (ret == 1) {
-		process_note(ctx, app_data->reader, buffer);
-		ret = xmlTextReaderRead(app_data->reader);
+		process_note(ctx, reader, buffer);
+		ret = xmlTextReaderRead(reader);
 	}
 	
 	if (ret != 0) {

@@ -45,6 +45,8 @@ static void cleanup()
 
 	/* Free AppData */
 	app_data_free();
+	
+	conboy_xml_reader_free();
 }
 
 static gint

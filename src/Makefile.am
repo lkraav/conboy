@@ -73,7 +73,9 @@ conboy_SOURCES = \
         conboy_plugin_manager_row.h \
         conboy_plugin_manager_row.c \
         gregex.h \
-        gregex.c
+        gregex.c \
+        conboy_xml.h \
+        conboy_xml.c
         
 
 #libconboy_applet_la_SOURCES = \

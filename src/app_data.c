@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#  include <config.h>
+#include <config.h>
 #endif
 
 #include <glib.h>
@@ -47,7 +47,6 @@ app_data_init()
 	_app_data = g_new(AppData, 1);
 	_app_data->fullscreen = FALSE;
 	_app_data->search_window = NULL;
-	_app_data->reader = NULL;
 	_app_data->note_window = NULL;
 	_app_data->portrait = is_portrait_mode();
 	_app_data->program = hildon_program_get_instance();
@@ -89,13 +88,9 @@ void app_data_free()
 	AppData *app_data = app_data_get();
 
 	g_object_unref(app_data->client);
-	/*g_list_free(app_data->open_notes);*/
 	if (app_data->search_window != NULL) {
 		gtk_widget_destroy(GTK_WIDGET(app_data->search_window));
 	}
-	if (app_data->reader != NULL) {
-		xmlFreeTextReader(app_data->reader);
-		xmlCleanupParser();
-	}
+	
 	g_free(app_data);
 }
