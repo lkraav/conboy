@@ -11,3 +11,8 @@ fi
 if [ -f /usr/bin/X11/maemo-select-menu-location ]
 	then /usr/bin/X11/maemo-select-menu-location conboy.desktop
 fi
+
+# remove startup screenshot if there
+if [ -f /home/user/.cache/launch/de.zwong.conboy.pvr ]
+	then rm /home/user/.cache/launch/de.zwong.conboy.pvr
+fi

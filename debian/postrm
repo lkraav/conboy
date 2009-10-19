@@ -4,3 +4,7 @@ if [ -f /usr/share/applications/hildon/conboy.desktop ]
 	then rm /usr/share/applications/hildon/conboy.desktop
 fi
 
+# remove startup screenshot if there
+if [ -f /home/user/.cache/launch/de.zwong.conboy.pvr ]
+	then rm /home/user/.cache/launch/de.zwong.conboy.pvr
+fi
