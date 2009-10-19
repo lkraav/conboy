@@ -167,6 +167,14 @@ msgstr "Configurações"
 msgid "Scrollbar Size"
 msgstr "Tamanho da barra de rolagem"
 
+#: ../src/settings_window.c:238
+msgid "Thin"
+msgstr "Fino"
+
+#: ../src/settings_window.c:242
+msgid "Thick"
+msgstr "Grosso"
+
 #: ../src/settings_window.c:126
 msgid "On Startup"
 msgstr "Ao iniciar"
