@@ -47,7 +47,7 @@ void note_show_by_title(const char* title)
 		note = conboy_note_new_with_title(title);
 	}
 
-	note_show(note, TRUE, TRUE);
+	note_show(note, TRUE, TRUE, FALSE);
 }
 
 /* TODO: Move to ConboyNoteBuffer */
@@ -319,7 +319,7 @@ add_to_history(ConboyNote *note)
 	app_data->current_element = g_list_last(app_data->note_history);
 }
 
-void note_show(ConboyNote *note, gboolean modify_history, gboolean scroll)
+void note_show(ConboyNote *note, gboolean modify_history, gboolean scroll, gboolean select_row)
 {
 	AppData *app_data = app_data_get();
 	
@@ -354,13 +354,28 @@ void note_show(ConboyNote *note, gboolean modify_history, gboolean scroll)
 	gtk_widget_show(GTK_WIDGET(window));
 	gtk_widget_grab_focus(GTK_WIDGET(ui->view));
 	
+	
+	while (gtk_events_pending()) {
+		gtk_main_iteration_do(FALSE);
+	}
+	
+	
+	/* Select first row if wanted */
+	if (select_row) {
+		GtkTextIter start, end;
+		gtk_text_buffer_get_iter_at_line(buffer, &start, 2);
+		end = start;
+		gtk_text_iter_forward_to_line_end(&end);
+		gtk_text_buffer_select_range(buffer, &start, &end);
+	}
+	
 	/* Scroll to cursor position */
-	if (scroll) {
-	GtkTextIter iter;
-	gtk_text_buffer_get_iter_at_offset(buffer, &iter, note->cursor_position);
-	gtk_text_buffer_place_cursor(buffer, &iter);
-	GtkTextMark *mark = gtk_text_buffer_get_insert(buffer);
-	gtk_text_view_scroll_to_mark(ui->view, mark, 0.1, TRUE, 0, 0.5);
+	if (scroll && !select_row) {
+		GtkTextIter iter;
+		gtk_text_buffer_get_iter_at_offset(buffer, &iter, note->cursor_position);
+		gtk_text_buffer_place_cursor(buffer, &iter);
+		GtkTextMark *mark = gtk_text_buffer_get_insert(buffer);
+		gtk_text_view_scroll_to_mark(ui->view, mark, 0.1, TRUE, 0, 0.5);
 	}
 
 	/* Set the buffer to unmodified */

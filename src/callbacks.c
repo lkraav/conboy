@@ -228,7 +228,7 @@ on_window_delete		               (GtkObject		*window,
 #ifdef HILDON_HAS_APP_MENU
 	adj = hildon_pannable_area_get_vadjustment(HILDON_PANNABLE_AREA(ui->scrolled_window));
 	/* Take screenshot for faster startup trick */
-	/* TODO: Maybe enable later again, now it causes confusion with scrolling / flickering
+	/* TODO: Maybe enable later again, now it causes confusion with scrolling / flickering */
 	/*hildon_gtk_window_take_screenshot(ui->window, TRUE);*/
 #else
 	adj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(ui->scrolled_window));
@@ -273,13 +273,19 @@ on_new_button_clicked					(GtkAction		*action,
 										 gpointer		 user_data)
 {
 	AppData *app_data = app_data_get();
+	UserInterface *ui = (UserInterface*)user_data;
+	
+	/* Save current note */
+	note_save(ui);
+	
+	/* Create new note */
 	int num = conboy_note_store_get_length(app_data->note_store) + 1;
 	gchar title[100];
 	
 	g_sprintf(title, _("New Note %i"), num);
 	
 	ConboyNote *note = conboy_note_new_with_title(title);
-	note_show(note, TRUE, TRUE);
+	note_show(note, TRUE, TRUE, TRUE);
 }
 
 static void
@@ -709,8 +715,8 @@ open_url(gchar *url)
 		}
 	}
 	
-	HildonBanner *banner = hildon_banner_show_informationf(app_data->note_window->window, NULL,
-			"Cannot open '%s'", url);
+	hildon_banner_show_informationf(GTK_WIDGET(app_data->note_window->window),
+			NULL, "Cannot open '%s'", url);
 }
 
 /**
@@ -814,10 +820,10 @@ on_delete_button_clicked			   (GtkAction		*action,
 			note = conboy_note_store_get_latest(app_data->note_store);
 			app_data->note_history = g_list_append(app_data->note_history, note);
 			app_data->current_element = app_data->note_history;
-			note_show(note, FALSE, TRUE);
+			note_show(note, FALSE, TRUE, FALSE);
 		} else {
 			note = CONBOY_NOTE(app_data->current_element->data);
-			note_show(note, FALSE, TRUE);
+			note_show(note, FALSE, TRUE, FALSE);
 		}
 		
 	}
@@ -1497,7 +1503,7 @@ on_back_button_clicked (GtkAction *action, gpointer user_data)
 	app_data->current_element = app_data->current_element->prev;
 	
 	ConboyNote *note = CONBOY_NOTE(app_data->current_element->data);
-	note_show(note, FALSE, TRUE);
+	note_show(note, FALSE, TRUE, FALSE);
 }
 
 void
@@ -1511,6 +1517,6 @@ on_forward_button_clicked (GtkAction *action, gpointer user_data)
 	app_data->current_element = app_data->current_element->next;
 	
 	ConboyNote *note = CONBOY_NOTE(app_data->current_element->data);
-	note_show(note, FALSE, TRUE);
+	note_show(note, FALSE, TRUE, FALSE);
 }
 

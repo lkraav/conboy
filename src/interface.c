@@ -491,7 +491,7 @@ do_sync (gpointer *user_data)
 	/* Load again and make editable */
 	gdk_threads_enter();
 	gtk_text_view_set_editable(ui->view, TRUE);
-	note_show(note, FALSE, TRUE);
+	note_show(note, FALSE, TRUE, FALSE);
 	gdk_threads_leave();
 }
 
@@ -586,7 +586,7 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 		
 		if (note) {
 			
-			note_show(note, TRUE, FALSE);
+			note_show(note, TRUE, FALSE, FALSE);
 			
 			/* Now process all pending events like calculating window size,
 			 * text amount, scrollbar positions etc. If we don't do this,
@@ -619,9 +619,12 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 		gchar title[50];
 		g_sprintf(title, _("New Note %i"), 1);
 		note = conboy_note_new_with_title(title);
+		note_show(note, TRUE, TRUE, TRUE);
+	} else {
+		note_show(note, TRUE, TRUE, FALSE);
 	}
 	
-	note_show(note, TRUE, TRUE);
+	
 
 	return FALSE;
 }
@@ -635,7 +638,7 @@ on_storage_activated (ConboyStorage *storage, UserInterface *ui)
 	ConboyNote *note = conboy_note_store_get_latest(app_data->note_store);
 	gtk_text_buffer_set_modified(ui->buffer, FALSE); /* Prevent note_show() from saving */
 	if (note != NULL) {
-		note_show(note, TRUE, TRUE);
+		note_show(note, TRUE, TRUE, FALSE);
 	} else {
 		/* TODO: Create new note */
 		gtk_text_buffer_set_text(ui->buffer, "", -1);

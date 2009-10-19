@@ -128,7 +128,7 @@ void on_row_activated(GtkTreeView *view, GtkTreePath *path, GtkTreeViewColumn *c
 	/* Close this window and show the selected note */
 	gtk_widget_hide(GTK_WIDGET(app_data->search_window));
 
-	note_show(note, TRUE, TRUE);
+	note_show(note, TRUE, TRUE, FALSE);
 }
 
 static
@@ -278,14 +278,16 @@ on_scrollbar_settings_changed(GConfClient *client, guint cnxn_id, GConfEntry *en
 	}
 }
 
+/*
 static void
 on_new_note_action_activated(GtkAction *action, gpointer user_data)
 {
 	GtkWidget *window = GTK_WIDGET(user_data);
 	gtk_widget_hide(window);
 	ConboyNote *note = conboy_note_new();
-	note_show(note, TRUE, TRUE);
+	note_show(note, TRUE, TRUE, FALSE);
 }
+*/
 
 static
 gint compare_titles(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
@@ -370,16 +372,18 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	screen = gdk_screen_get_default();
 	search_result = g_hash_table_new(NULL, NULL);
 
-	new_note_action = GTK_ACTION(gtk_action_new("new", _("New Note"), NULL, NULL));
+	/*new_note_action = GTK_ACTION(gtk_action_new("new", _("New Note"), NULL, NULL));*/
 
 	/* Window menu */
 #ifdef HILDON_HAS_APP_MENU
 	menu = hildon_app_menu_new();
 
 	/* Add New Note item */
+	/*
 	menu_new_note = gtk_button_new();
 	gtk_action_connect_proxy(new_note_action, menu_new_note);
-	/*hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));*/
+	hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
+	*/
 
 	/* Add sort filters */
 	button_sort_by_title = gtk_radio_button_new_with_label(NULL, _("Sort By Title"));
@@ -399,10 +403,12 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 
 	hildon_window_set_app_menu(HILDON_WINDOW(win), HILDON_APP_MENU(menu));
 #else
+	/*
 	menu = gtk_menu_new();
 	menu_new_note = gtk_action_create_menu_item(new_note_action);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_new_note);
 	hildon_window_set_menu(HILDON_WINDOW(win), GTK_MENU(menu));
+	*/
 #endif
 
 	vbox = gtk_vbox_new(FALSE, 0);
@@ -533,7 +539,7 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	g_signal_connect(win, "key_press_event", G_CALLBACK(on_hardware_key_pressed), win);
 	g_signal_connect(tree, "key_press_event", G_CALLBACK(on_key_pressed), search_field);
 	g_signal_connect(screen, "size-changed", G_CALLBACK(on_orientation_changed), window_data);
-	g_signal_connect(new_note_action, "activate", G_CALLBACK(on_new_note_action_activated), win);
+	/*g_signal_connect(new_note_action, "activate", G_CALLBACK(on_new_note_action_activated), win);*/
 
 	gconf_client_notify_add(app_data->client, SETTINGS_SCROLLBAR_SIZE, on_scrollbar_settings_changed, scrolledwindow, NULL, NULL);
 
