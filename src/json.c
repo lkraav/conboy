@@ -80,6 +80,70 @@ remove_xml_tag_and_title(const gchar* content)
 	return result;
 }
 
+/**
+ * Escapes only \ \n \r \t \b \f \ and " and leaves unicode characters
+ * as they are. g_strescape is doing "Höllo" -> "H\303\266llo" which
+ * is not JSON conform.
+ */
+static gchar*
+escape_string (gchar *orig)
+{
+	const guchar *p;
+	gchar *result;
+	gchar *q;
+
+ 	if (orig == NULL) {
+ 		return g_strdup ("\"\"");
+ 	}
+
+	p = (guchar *) orig;
+	/* Each source byte needs maximally two destination chars (\n) */
+	q = result = g_malloc (strlen (orig) * 2 + 1);
+
+	while (*p)
+	{
+		switch (*p)
+		{
+		case '\n':
+			*q++ = '\\';
+			*q++ = 'n';
+			break;
+		case '\r':
+			*q++ = '\\';
+			*q++ = 'r';
+			break;
+		case '\t':
+			*q++ = '\\';
+			*q++ = 't';
+			break;
+		case '\b':
+			*q++ = '\\';
+			*q++ = 'b';
+			break;
+		case '\f':
+			*q++ = '\\';
+			*q++ = 'f';
+			break;	
+		case '\\':
+			*q++ = '\\';
+			*q++ = '\\';
+			break;
+		case '\"':
+			*q++ = '\\';
+			*q++ = '"';
+			break;
+		default:
+			*q++ = *p;
+		}
+		p++;
+	}
+
+	*q = 0;
+
+	return result;
+}
+
+
 static gchar*
 convert_content(const gchar *content)
 {
@@ -89,7 +153,7 @@ convert_content(const gchar *content)
 	if (tmp == NULL || strcmp(tmp, "") == 0) {
 		return "";
 	} else {
-		result = g_strescape(tmp, NULL);
+		result = escape_string(tmp);
 		g_free(tmp);
 		return result;
 	}
@@ -177,9 +241,7 @@ json_node_to_string(JsonNode *node, gboolean pretty)
 	gchar *string;
 
 	gen = json_generator_new();
-	if (pretty) {
-		g_object_set(gen, "pretty", FALSE, NULL);
-	}
+	g_object_set(gen, "pretty", pretty, NULL);
 	json_generator_set_root(gen, node);
 	string = json_generator_to_data(gen, NULL);
 

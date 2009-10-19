@@ -347,11 +347,12 @@ do_sync (gpointer *user_data)
 	gchar *reply = conboy_http_get(request);
 
 	if (reply == NULL) {
-		gchar *msg = g_strconcat("Got no reply from: \n", request, NULL);
+		gchar *msg = g_strconcat("Got no reply from: %s\n", request, NULL);
 		show_message(data, msg);
 		g_free(msg);
 		return;
 	}
+	g_free(request);
 	pulse_bar(bar);
 
 	/*g_printerr("Reply from /api/1.0/:: %s\n", reply);*/
