@@ -458,7 +458,7 @@ do_sync (gpointer *user_data)
 
 	} else {
 		g_printerr("ERROR: %s\n", error->message);
-		g_sprintf(msg, "<b>%s</b>\n\nError Message was:\n%s\n", "Synchonization failed", error->message);
+		g_sprintf(msg, "<b>Synchonization failed</b>\n\nError Message was:\n%s\n", error->message);
 		g_error_free(error);
 	}
 
