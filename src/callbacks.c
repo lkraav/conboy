@@ -228,7 +228,8 @@ on_window_delete		               (GtkObject		*window,
 #ifdef HILDON_HAS_APP_MENU
 	adj = hildon_pannable_area_get_vadjustment(HILDON_PANNABLE_AREA(ui->scrolled_window));
 	/* Take screenshot for faster startup trick */
-	hildon_gtk_window_take_screenshot(ui->window, TRUE);
+	/* TODO: Maybe enable later again, now it causes confusion with scrolling / flickering
+	/*hildon_gtk_window_take_screenshot(ui->window, TRUE);*/
 #else
 	adj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(ui->scrolled_window));
 #endif
