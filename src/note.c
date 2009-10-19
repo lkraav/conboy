@@ -50,6 +50,7 @@ void note_show_by_title(const char* title)
 	note_show(note, TRUE, TRUE);
 }
 
+/* TODO: Move to ConboyNoteBuffer */
 void note_format_title(GtkTextBuffer *buffer)
 {
 	GtkTextIter start, end;
@@ -67,7 +68,9 @@ void note_format_title(GtkTextBuffer *buffer)
 	gtk_text_buffer_apply_tag_by_name(buffer, "_title", &start, &end);
 }
 
-
+/* TODO: Move to ConboyNoteBuffer
+ * The return value needs to be freed by the caller. 
+ */
 gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer)
 {
 	GtkTextIter start, end;
@@ -120,7 +123,7 @@ gboolean is_empty_str(const gchar* str)
 void note_save(UserInterface *ui)
 {
 	time_t time_in_s;
-	const gchar* title;
+	gchar* title;
 	gchar* content;
 	GtkTextIter iter, start, end;
 	GtkTextMark *mark;
@@ -154,6 +157,17 @@ void note_save(UserInterface *ui)
 
 	/* Get title */
 	title = note_extract_title_from_buffer(buffer);
+	
+	/* Check for duplicated title */
+	ConboyNote *existing_note = conboy_note_store_find_by_title(app_data->note_store, title);
+	if (existing_note && (existing_note != note)) {
+		/* Save alternative title if title is already taken */
+		int num = conboy_note_store_get_length(app_data->note_store) + 1;
+		gchar new_title[100];
+		g_sprintf(new_title, _("New Note %i"), num);
+		g_free(title);
+		title = g_strdup(new_title);
+	}
 
 	/* Set meta data */
 	/* We don't change height, width, x and y because we don't use them */
@@ -165,6 +179,8 @@ void note_save(UserInterface *ui)
 			"open-on-startup", FALSE,
 			NULL);
 
+	g_free(title);
+	
 	if (note->create_date == 0) {
 		g_object_set(note, "create-date", time_in_s, NULL);
 	}

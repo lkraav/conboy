@@ -324,6 +324,9 @@ conboy_note_store_find(ConboyNoteStore *self, ConboyNote *note_a)
 	return NULL;
 }
 
+/**
+ * Searched for a note with the given title. The comparison is case insensitive.
+ */
 ConboyNote*
 conboy_note_store_find_by_title(ConboyNoteStore *self, const gchar *title)
 {

@@ -116,7 +116,7 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 	gchar *old_url = settings_load_sync_base_url();
 
 	if (old_url != NULL && strcmp(old_url, "") != 0 && strcmp(url, old_url) != 0) {
-		GtkWidget *dialog = hildon_note_new_confirmation(parent, "Really reset the sync settings?"); /*create_yes_no_dialog(parent, "Really reset the sync settings?");*/
+		GtkWidget *dialog = ui_helper_create_yes_no_dialog(parent, "Really reset the sync settings?");
 		int ret = gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy(dialog);
 		if (ret == GTK_RESPONSE_OK) {
@@ -134,9 +134,7 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 	gchar *link = conboy_get_auth_link(url);
 
 	if (link == NULL) {
-		GtkWidget *dialog = ui_helper_create_confirmation_dialog(parent, "Could not connect to host.");
-		gtk_dialog_run(GTK_DIALOG(dialog));
-		gtk_widget_destroy(dialog);
+		ui_helper_show_confirmation_dialog(parent, "Could not connect to host.");
 		return;
 	}
 
@@ -151,24 +149,16 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 
 	g_printerr("Opening browser with URL: >%s<\n", link);
 
-	GtkWidget *dialog = ui_helper_create_confirmation_dialog(parent, "Click OK after authenticating on the website.");
-	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
-	gtk_dialog_run(GTK_DIALOG(dialog));
+	ui_helper_show_confirmation_dialog(parent, "Click OK after authenticating on the website.");
 
 	if (conboy_get_access_token()) {
 		/* Disable Authenticate button */
 		gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
 		/* Popup dialog */
-		GtkWidget *ok_dialog = ui_helper_create_confirmation_dialog(parent, "You're authenticated. Everything is good :)");
-		g_signal_connect(ok_dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
-		gtk_dialog_run(GTK_DIALOG(ok_dialog));
-		gtk_widget_destroy(ok_dialog);
+		ui_helper_show_confirmation_dialog(parent, "You're authenticated. Everything is good :)");
 
 	} else {
-		GtkWidget *fail_dialog = ui_helper_create_confirmation_dialog(parent, "Something went wrong. Not good :(");
-		g_signal_connect(fail_dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
-		gtk_dialog_run(GTK_DIALOG(fail_dialog));
-		gtk_widget_destroy(fail_dialog);
+		ui_helper_show_confirmation_dialog(parent, "Something went wrong. Not good :(");
 		settings_save_sync_base_url("");
 	}
 

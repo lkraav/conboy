@@ -63,3 +63,11 @@ ui_helper_create_confirmation_dialog(GtkWindow *parent, const gchar *message)
 
 	return dialog;
 }
+
+void
+ui_helper_show_confirmation_dialog(GtkWindow *parent, const gchar *message)
+{
+	GtkWidget *dialog = ui_helper_create_confirmation_dialog(parent, message);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+}

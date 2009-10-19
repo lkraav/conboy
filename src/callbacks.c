@@ -56,6 +56,39 @@
 GtkTextTag* iter_get_depth_tag(GtkTextIter* iter);
 GtkTextTag* buffer_get_depth_tag(GtkTextBuffer *buffer, gint depth);
 
+gboolean __editing_title = FALSE;
+
+static void
+check_title(UserInterface *ui)
+{
+	if (__editing_title) {
+		__editing_title = FALSE;
+	} else {
+		return;
+	}
+	
+	AppData *app_data = app_data_get();
+	ConboyNote *note = ui->note;
+	gchar *title = note_extract_title_from_buffer(ui->buffer);
+	
+	ConboyNote *existing_note = conboy_note_store_find_by_title(app_data->note_store, title);
+	if (existing_note && (existing_note != note)) {
+		/* Display message */
+		gchar msg[1024];
+		g_sprintf(msg, "<b>Note title taken</b>\n\nA note with the title <b>%s</b> already exists. Please choose another name for this note before continuing.", title);
+		ui_helper_show_confirmation_dialog(GTK_WINDOW(ui->window), msg);
+
+		/* Select title */
+		GtkTextIter start, end;
+		gtk_text_buffer_get_start_iter(ui->buffer, &start);
+		end = start;
+		gtk_text_iter_forward_to_line_end(&end);
+		gtk_text_buffer_select_range(ui->buffer, &start, &end);
+	}
+	
+	g_free(title);
+}
+
 static
 GtkTextTag* get_depth_tag_at_line(GtkTextBuffer *buffer, gint line_number)
 {
@@ -70,10 +103,6 @@ static void change_format(UserInterface *ui, GtkToggleAction *action)
 	GtkTextIter selection_start_iter, selection_end_iter;
 	GtkTextIter start_iter, end_iter;
 	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(ui->buffer);
-
-	if (CONBOY_IS_NOTE_BUFFER(buffer)) {
-		g_printerr("''' ITs A NOTE BUFFER '''\n");
-	}
 
 	const gchar *tag_name = gtk_action_get_name(GTK_ACTION(action));
 
@@ -555,6 +584,8 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 	if ((mark_name == NULL) || (strcmp(mark_name, "insert") != 0)) {
 		return;
 	}
+	
+	check_title(ui);
 
 	update_active_tags(ui->buffer, location);
 	update_button_states(ui);
@@ -1141,8 +1172,11 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 
 	/* Don't do anything when in the title line */
 	if (gtk_text_iter_get_line(iter) == 0) {
+		__editing_title = TRUE;
 		return;
 	}
+	
+	check_title(ui);
 
 	apply_active_tags(buffer, iter, text, ui);
 
@@ -1174,8 +1208,11 @@ on_text_buffer_delete_range					(GtkTextBuffer *buffer,
 
 	/* Don't do anything when in the title line */
 	if (gtk_text_iter_get_line(start_iter) == 0 || gtk_text_iter_get_line(end_iter) == 0) {
+		__editing_title = TRUE;
 		return;
 	}
+	
+	check_title(ui);
 	
 	auto_highlight_links(ui, start_iter, end_iter);
 
