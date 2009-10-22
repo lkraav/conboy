@@ -37,29 +37,22 @@ typedef struct _FullscreenManagerClass FullscreenManagerClass;
 struct _FullscreenManager {
         GObject      parent;
 
-        GtkWindow   *view;
-        GtkWidget   *ui_window;
+        GtkWindow   *parent_window;
+        GtkWidget   *overlay;
 
         gboolean     release_event;
         guint32      last_event_time;
 
-        /*guint        key_press_signal_id;
-        guint        key_release_signal_id;*/
         guint        button_press_signal_id;
         guint        button_release_signal_id;
-        /*gulong       key_press_hook_id;
-        gulong       key_release_hook_id;*/
         gulong       button_press_hook_id;
         gulong       button_release_hook_id;
-
-        /*GtkWidget   *cur_win;*/
-        /*GtkWidget   *ui_parent;*/
-        /*GtkWidget   *ui_store;*/
 
         gint		 overlay_x;
         gint		 overlay_y;
 
         gboolean	 overlay_visible;
+        gboolean	 fullscreen;
 };
 
 struct _FullscreenManagerClass {

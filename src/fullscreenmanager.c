@@ -90,35 +90,7 @@ static gchar G_dmsgbuf[2048];
 
 G_DEFINE_TYPE(FullscreenManager, fullscreen_manager, G_TYPE_OBJECT)
 
-/**
- * Set compositing hint property.
- * @param aWidget a GtkWidget instance.
- * @param aEnable TRUE to enable compositing, FALSE to disable.
- */
-static void
-set_window_compositing_state (GtkWidget * aWidget, gboolean aEnable)
-{
-#ifndef __arm__
-    return;
-#endif
-    DMSG_FUNC_BEGIN();
-    g_return_if_fail (aWidget);
 
-    Display * xdisplay = GDK_DISPLAY_XDISPLAY (gdk_display_get_default ());
-    g_return_if_fail (xdisplay);
-
-    Window xwindow = GDK_WINDOW_XWINDOW (aWidget->window);
-
-    Atom atom = XInternAtom (xdisplay,
-                             "_HILDON_NON_COMPOSITED_WINDOW",
-                             aEnable?True:False);
-    int one = 1;
-    XChangeProperty (xdisplay, xwindow, atom,
-                     XA_INTEGER, 32, PropModeReplace,
-                     (unsigned char *) &one, 1);
-    DMSG("%s compositing for xwindow %x", aEnable?"Enabled":"Disabled", (int)xwindow);
-    DMSG_FUNC_END();
-}
 
 
 /**
@@ -135,54 +107,12 @@ set_fullscreen (GtkWindow * aWindow, gboolean aEnable)
 
     if (aEnable) {
         gtk_window_fullscreen (aWindow);
-        set_window_compositing_state (GTK_WIDGET (aWindow), FALSE);
     } else {
         gtk_window_unfullscreen (aWindow);
-        set_window_compositing_state (GTK_WIDGET (aWindow), TRUE);
     }
     DMSG_FUNC_END();
 }
 
-/**
-* Callback handler for VIEW_CHANGED_S signals from browser view.
-*
-* @param source Ignored.
-* @param child The view window to which browser UI has changed.
-* @param data A FullscreenManager instance.
-*/
-/*
-static void
-view_changed_cb(GObject * source, GtkWidget * child, gpointer data)
-{
-    DMSG_FUNC_BEGIN ();
-    (void) source;
-
-    FullscreenManager *manager = FULLSCREEN_MANAGER (data);
-    g_return_if_fail (manager != NULL);
-
-    GtkWidget *win = child;
-    while (win && !GTK_IS_WINDOW (win))
-           win = gtk_widget_get_parent (win);
-    if (win == NULL) {
-        return;
-    }
-
-#if FULLSCREEN_ENABLE_UI_WIDGET
-    if (fullscreen_is_active (manager))
-        fullscreen_ui_disable (manager);
-#endif
-
-    manager->cur_win = win;
-    gboolean win_needs_fsm =
-           (gboolean)g_object_get_data (G_OBJECT(win), FSM_WIN_STATE_KEY);
-    if (win_needs_fsm)
-        fullscreen_enable (manager);
-    else
-        if (fullscreen_is_active (manager))
-            fullscreen_disable (manager);
-    DMSG_FUNC_END();
-}
-*/
 
 /**
 * FullscreenManager object instance initialization.
@@ -195,8 +125,8 @@ fullscreen_manager_init(FullscreenManager * self)
     DMSG_FUNC_BEGIN();
     g_assert(self != NULL);
 
-    self->view = NULL;
-    self->ui_window = NULL;
+    self->parent_window = NULL;
+    self->overlay = NULL;
     self->release_event = TRUE;
     self->last_event_time = 0;
 
@@ -231,8 +161,8 @@ fullscreen_create_manager(GtkWindow * view)
     FullscreenManager *instance = g_object_new(FULLSCREEN_MANAGER_TYPE, NULL);
     g_return_val_if_fail(instance != NULL, NULL);
 
-    instance->view = view;
-    instance->ui_window = fullscreen_ui_create(instance);
+    instance->parent_window = view;
+    instance->overlay = fullscreen_ui_create(instance);
 
     instance->button_press_signal_id = 0;
     instance->button_release_signal_id = 0;
@@ -244,10 +174,6 @@ fullscreen_create_manager(GtkWindow * view)
                              "destroy",
                              G_CALLBACK(fullscreen_destroy_manager),
                              instance);
-
-    /*g_signal_connect(G_OBJECT(view),
-                     VIEW_CHANGED_S,
-                     G_CALLBACK(view_changed_cb), instance);*/
 
     DMSG_FUNC_END();
     return instance;
@@ -261,9 +187,8 @@ fullscreen_destroy_manager(FullscreenManager * self)
     DMSG_FUNC_BEGIN();
     g_assert(self != NULL);
 
-    if (self->view != NULL) {
-        g_signal_handlers_disconnect_by_func (self->view, fullscreen_destroy_manager, self);
-        /*g_signal_handlers_disconnect_by_func (self->view, view_changed_cb, self);*/
+    if (self->parent_window != NULL) {
+        g_signal_handlers_disconnect_by_func (self->parent_window, fullscreen_destroy_manager, self);
     }
 
     if (fullscreen_is_active (self)) {
@@ -271,37 +196,39 @@ fullscreen_destroy_manager(FullscreenManager * self)
     }
 
     fullscreen_ui_destroy (self);
-    self->ui_window = NULL;
+    self->overlay = NULL;
 
     DMSG_FUNC_END();
 }
 
 
 void
-fullscreen_enable(FullscreenManager * self)
+fullscreen_enable (FullscreenManager *self)
 {
     DMSG_FUNC_BEGIN();
     g_assert(self != NULL);
 
-    set_fullscreen (GTK_WINDOW (self->view), TRUE);
-    g_object_set_data (G_OBJECT(self->view), FSM_WIN_STATE_KEY, (gpointer)TRUE);
+    set_fullscreen (GTK_WINDOW (self->parent_window), TRUE);
+    g_object_set_data (G_OBJECT(self->parent_window), FSM_WIN_STATE_KEY, (gpointer)TRUE);
 
     fullscreen_ui_enable(self);
+    self->fullscreen = TRUE;
 
     DMSG_FUNC_END();
 }
 
 
 void
-fullscreen_disable(FullscreenManager * self)
+fullscreen_disable (FullscreenManager *self)
 {
     DMSG_FUNC_BEGIN();
     g_assert(self != NULL);
 
     fullscreen_ui_disable(self);
 
-    set_fullscreen (GTK_WINDOW (self->view), FALSE);
-    g_object_set_data (G_OBJECT(self->view), FSM_WIN_STATE_KEY, (gpointer)FALSE);
+    set_fullscreen (GTK_WINDOW (self->parent_window), FALSE);
+    g_object_set_data (G_OBJECT(self->parent_window), FSM_WIN_STATE_KEY, (gpointer)FALSE);
+    self->fullscreen = FALSE;
 
     DMSG_FUNC_END();
 }
@@ -316,9 +243,7 @@ fullscreen_is_active(FullscreenManager * self)
 
     DMSG_FUNC_END();
 
-    AppData *app_data = app_data_get();
-    return app_data->fullscreen;
-
+    return self->fullscreen;
 }
 
 
@@ -338,7 +263,7 @@ ui_parent_size_allocate_cb (GtkWidget     *widget,
     FullscreenManager *self = FULLSCREEN_MANAGER(user_data);
     g_return_if_fail (self != NULL);
 
-    GtkWidget *ui_win = GTK_WIDGET(self->ui_window);
+    GtkWidget *ui_win = GTK_WIDGET(self->overlay);
     g_return_if_fail (ui_win != NULL);
 
     gint x = allocation->width - ui_win->allocation.width;
@@ -363,7 +288,7 @@ ui_parent_destroy_cb(FullscreenManager * self)
 {
 	g_printerr("parent_destroy_cb\n");
     g_return_if_fail (self);
-    g_return_if_fail (self->ui_window);
+    g_return_if_fail (self->overlay);
 
     fullscreen_ui_hide (self);
 }
@@ -387,7 +312,7 @@ fullscreen_ui_hide(FullscreenManager * self)
     if (self->ui_window != NULL)
         gtk_widget_hide(GTK_WIDGET(self->ui_window));
     */
-    hildon_animation_actor_set_parent(HILDON_ANIMATION_ACTOR(self->ui_window), NULL);
+    hildon_animation_actor_set_parent(HILDON_ANIMATION_ACTOR(self->overlay), NULL);
     self->overlay_visible = FALSE;
 
     /*fullscreen_ui_detach (self);*/
@@ -430,7 +355,7 @@ fullscreen_ui_show(FullscreenManager * self)
 	g_printerr("ui_show()\n");
     DMSG_FUNC_BEGIN();
     g_return_if_fail (self != NULL);
-    g_return_if_fail (GTK_IS_WIDGET (self->ui_window));
+    g_return_if_fail (GTK_IS_WIDGET (self->overlay));
 
     /* Stop return button hide timeout */
     g_source_remove_by_user_data((gpointer) self);
@@ -439,9 +364,9 @@ fullscreen_ui_show(FullscreenManager * self)
     /* Only show overlay if we come here through a button release event, not a button press event */
     if (self->release_event) {
 
-        fullscreen_ui_attach(self, GTK_WIDGET(self->view));
+        fullscreen_ui_attach(self, GTK_WIDGET(self->parent_window));
 
-        hildon_animation_actor_set_parent(HILDON_ANIMATION_ACTOR(self->ui_window), GTK_WINDOW(self->view));
+        hildon_animation_actor_set_parent(HILDON_ANIMATION_ACTOR(self->overlay), GTK_WINDOW(self->parent_window));
         self->overlay_visible = TRUE;
 
         /* Set the return button hide timeout */
@@ -449,6 +374,27 @@ fullscreen_ui_show(FullscreenManager * self)
                     fullscreen_ui_hide_timer_cb, (gpointer) self);
     }
 
+    DMSG_FUNC_END();
+}
+
+
+/**
+* Full screen mode exit button callback.
+*
+* This function is called as a result of exit button activation and
+* causes the emission of full screen mode disabled signal.
+*/
+static void
+fullscreen_ui_exit_button_activated_cb (FullscreenManager *self)
+{
+    DMSG_FUNC_BEGIN();
+    g_return_if_fail(FULLSCREEN_IS_MANAGER(self));
+    fullscreen_disable(self);
+    /* toggle fullscreen on<->off */
+    /*
+    AppData *app_data = app_data_get();
+    app_data->fullscreen = !app_data->fullscreen;
+    */
     DMSG_FUNC_END();
 }
 
@@ -514,13 +460,11 @@ fullscreen_ui_input_activity_hook(GSignalInvocationHint * ihint,
         /* Find out whether or not it was a click on our overlay */
         gdouble click_x, click_y;
         gdk_event_get_coords((GdkEvent*)event, &click_x, &click_y);
-        /*g_printerr("**** Click on: %f / %f \n", click_x, click_y);*/
 
 
         gint overlay_x = self->overlay_x;
         gint overlay_y = self->overlay_y;
 
-        /*g_printerr("*** Overlay pos: %i / %i \n", overlay_x, overlay_y);*/
 
         if (self->overlay_visible) {
 
@@ -528,6 +472,7 @@ fullscreen_ui_input_activity_hook(GSignalInvocationHint * ihint,
 					click_y > overlay_y && click_y < overlay_y + FULLSCREEN_UI_BUTTON_HEIGHT)
 			{
 				g_printerr("############# BUTTON CLICKED ####################\n");
+				fullscreen_ui_exit_button_activated_cb(self);
 			}
 
         }
@@ -596,20 +541,6 @@ fullscreen_ui_disable(FullscreenManager * self)
     g_return_if_fail(FULLSCREEN_IS_MANAGER(self));
     fullscreen_ui_hide(self);
 
-    /*
-    if (self->key_release_hook_id > 0) {
-        g_signal_remove_emission_hook(self->key_release_signal_id,
-                                      self->key_release_hook_id);
-        self->key_release_hook_id = 0;
-    }
-
-    if (self->key_press_hook_id > 0) {
-        g_signal_remove_emission_hook(self->key_press_signal_id,
-                                      self->key_press_hook_id);
-        self->key_press_hook_id = 0;
-    }
-    */
-
     if (self->button_release_hook_id > 0) {
         g_signal_remove_emission_hook(self->button_release_signal_id,
                                       self->button_release_hook_id);
@@ -626,24 +557,7 @@ fullscreen_ui_disable(FullscreenManager * self)
 }
 
 
-/**
-* Full screen mode exit button callback.
-*
-* This function is called as a result of exit button activation and
-* causes the emission of full screen mode disabled signal.
-*/
-static void
-fullscreen_ui_exit_button_activated_cb(FullscreenManager * self)
-{
-    DMSG_FUNC_BEGIN();
-    g_return_if_fail(FULLSCREEN_IS_MANAGER(self));
-    fullscreen_disable(self);
-    /* toggle fullscreen on<->off */
-    /*self->view->fullscreen = !self->view->fullscreen;*/
-    AppData *app_data = app_data_get();
-    app_data->fullscreen = !app_data->fullscreen;
-    DMSG_FUNC_END();
-}
+
 
 
 /**
@@ -665,6 +579,7 @@ fullscreen_ui_create(FullscreenManager * manager)
 
     HildonAnimationActor *actor = HILDON_ANIMATION_ACTOR(hildon_animation_actor_new());
     gtk_widget_set_size_request(GTK_WIDGET(actor), FULLSCREEN_UI_BUTTON_WIDTH, FULLSCREEN_UI_BUTTON_HEIGHT);
+
     GdkColor color;
     gdk_color_parse("#f00", &color);
     gtk_widget_modify_bg(GTK_WIDGET(actor), GTK_STATE_NORMAL, &color);
@@ -674,14 +589,6 @@ fullscreen_ui_create(FullscreenManager * manager)
 
 
     hildon_animation_actor_set_opacity(actor, 127);
-
-    /*
-      g_signal_connect_swapped(G_OBJECT(btn),
-                             "clicked",
-                             G_CALLBACK
-                             (fullscreen_ui_exit_button_activated_cb),
-                             (gpointer) manager);
-    */
 
     DMSG_FUNC_END();
 
@@ -695,23 +602,16 @@ fullscreen_ui_create(FullscreenManager * manager)
  * @param self A FullscreenManager instance.
  */
 static void
-fullscreen_ui_destroy(FullscreenManager * self)
+fullscreen_ui_destroy (FullscreenManager * self)
 {
-	g_printerr("Destroy button\n");
     DMSG_FUNC_BEGIN();
     g_return_if_fail (self != NULL);
 
-    if (self->ui_window != NULL) {
-        gtk_widget_destroy(GTK_WIDGET(self->ui_window));
-        self->ui_window = NULL;
+    if (self->overlay != NULL) {
+        gtk_widget_destroy (GTK_WIDGET(self->overlay));
+        self->overlay = NULL;
     }
 
-    /*
-    if (self->ui_store != NULL) {
-        gtk_widget_destroy (GTK_WIDGET(self->ui_store));
-        self->ui_store = NULL;
-    }
-    */
     DMSG_FUNC_END();
 }
 
@@ -737,12 +637,12 @@ fullscreen_ui_attach (FullscreenManager * self, GtkWidget * parent)
         g_return_val_if_fail (GTK_WIDGET_REALIZED (parent), FALSE);
     }
 
-    if (self->ui_window == NULL) {
-        self->ui_window = fullscreen_ui_create (self);
-        g_return_val_if_fail (self->ui_window != NULL, FALSE);
+    if (self->overlay == NULL) {
+        self->overlay = fullscreen_ui_create (self);
+        g_return_val_if_fail (self->overlay != NULL, FALSE);
     }
 
-    GtkWidget * wid = GTK_WIDGET(self->ui_window);
+    GtkWidget * wid = GTK_WIDGET(self->overlay);
     g_return_val_if_fail (wid != NULL, FALSE);
 
 
@@ -757,23 +657,19 @@ fullscreen_ui_attach (FullscreenManager * self, GtkWidget * parent)
     self->overlay_x = x;
     self->overlay_y = y;
 
-    /*gtk_widget_show(wid);*/
 
     /* Make sure that FSM ui is detached from the parent window before it is
        destroyed */
-    /*
+
     g_signal_connect_swapped(G_OBJECT(parent),
                              "destroy",
                              G_CALLBACK(ui_parent_destroy_cb),
                              self);
-    */
 
     g_signal_connect (G_OBJECT(parent),
                       "size-allocate",
                       G_CALLBACK(ui_parent_size_allocate_cb),
                       (gpointer)self);
-
-    /*self->ui_parent = parent;*/
 
     DMSG_FUNC_END();
     return TRUE;
@@ -788,47 +684,25 @@ fullscreen_ui_attach (FullscreenManager * self, GtkWidget * parent)
 static void
 fullscreen_ui_detach (FullscreenManager * self)
 {
-	g_printerr("ui_detach()\n");
-	return;
-
     DMSG_FUNC_BEGIN();
     g_return_if_fail (FULLSCREEN_IS_MANAGER (self));
-    g_return_if_fail (self->ui_window != NULL);
+    g_return_if_fail (self->overlay != NULL);
 
-    GtkWidget * ui_wid = GTK_WIDGET (self->ui_window);
+    GtkWidget * ui_wid = GTK_WIDGET (self->overlay);
     g_return_if_fail (ui_wid != NULL);
 
-    hildon_animation_actor_set_parent(HILDON_ANIMATION_ACTOR(self->ui_window), NULL);
+    hildon_animation_actor_set_parent(HILDON_ANIMATION_ACTOR(self->overlay), NULL);
     self->overlay_visible = FALSE;
 
-    /*GtkWidget * cur_parent = GTK_WIDGET (self->ui_parent);*/
+	/* Disconnect "size-allocate" and "destroy" signals */
+	g_signal_handlers_disconnect_by_func (G_OBJECT(self->parent_window),
+										  G_CALLBACK(ui_parent_size_allocate_cb),
+										  (gpointer)ui_wid);
 
-    /*gtk_widget_hide(ui_wid);*/
-
-    /*if (cur_parent != NULL) {*/
-        /* Disconnect "size-allocate" and "destroy" signals */
-        /*g_signal_handlers_disconnect_by_func (G_OBJECT(cur_parent),
-                                              G_CALLBACK(ui_parent_size_allocate_cb),
-                                              (gpointer)ui_wid);*/
-        /*
-        g_signal_handlers_disconnect_by_func (G_OBJECT(cur_parent),
-                                              G_CALLBACK(ui_parent_destroy_cb),
-                                              (gpointer)self);
-                                              */
-    /*}*/
+	g_signal_handlers_disconnect_by_func (G_OBJECT(self->parent_window),
+										  G_CALLBACK(ui_parent_destroy_cb),
+										  (gpointer)self);
 
 
-
-    /* Detach FSM UI from current parent */
-    /*
-    if (self->ui_store == NULL) {
-        self->ui_store = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-        gtk_widget_realize (self->ui_store);
-        g_return_if_fail (self->ui_store != NULL);
-    }
-    gdk_window_reparent (ui_wid->window, self->ui_store->window, 0, 0);
-
-    self->ui_parent = NULL;
-    */
     DMSG_FUNC_END();
 }
