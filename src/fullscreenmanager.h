@@ -52,7 +52,6 @@ struct _FullscreenManager {
         gint		 overlay_y;
 
         gboolean	 overlay_visible;
-        gboolean	 fullscreen;
 };
 
 struct _FullscreenManagerClass {
@@ -95,22 +94,6 @@ fullscreen_create_manager(GtkWindow * view);
  */
 void
 fullscreen_destroy_manager(FullscreenManager * self);
-
-/**
- * Enable full screen mode.
- *
- * @param self A FullscreenManager instance.
- */
-void
-fullscreen_enable(FullscreenManager * self);
-
-/**
- * Disable full screen mode.
- *
- * @param self A FullscreenManager instance.
- */
-void
-fullscreen_disable(FullscreenManager * self);
 
 /**
  * This function returns true if the application is currently on full screen
