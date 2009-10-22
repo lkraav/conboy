@@ -32,37 +32,34 @@ typedef struct _FullscreenManagerClass FullscreenManagerClass;
 #include <glib-object.h>
 #include <gtk/gtk.h>
 
-/* Set this to 0 to enable Cairo UI for "return to normal mode" button or
-   1 to use a floating widget based button. */
-#define FULLSCREEN_ENABLE_UI_WIDGET 1
-
 #define FSM_WIN_STATE_KEY "is_fullscreen"
 
 struct _FullscreenManager {
         GObject      parent;
 
         GtkWindow   *view;
-#if FULLSCREEN_ENABLE_UI_WIDGET
-        GtkWindow   *ui_window;
+        GtkWidget   *ui_window;
 
-        gboolean     ui_hiding_enabled;
+        gboolean     release_event;
         guint32      last_event_time;
 
-        guint        key_press_signal_id;
-        guint        key_release_signal_id;
+        /*guint        key_press_signal_id;
+        guint        key_release_signal_id;*/
         guint        button_press_signal_id;
         guint        button_release_signal_id;
-        gulong       key_press_hook_id;
-        gulong       key_release_hook_id;
+        /*gulong       key_press_hook_id;
+        gulong       key_release_hook_id;*/
         gulong       button_press_hook_id;
         gulong       button_release_hook_id;
-#endif
 
-        GtkWidget   *cur_win;
-#if FULLSCREEN_ENABLE_UI_WIDGET
-        GtkWidget   *ui_parent;
-        GtkWidget   *ui_store;
-#endif
+        /*GtkWidget   *cur_win;*/
+        /*GtkWidget   *ui_parent;*/
+        /*GtkWidget   *ui_store;*/
+
+        gint		 overlay_x;
+        gint		 overlay_y;
+
+        gboolean	 overlay_visible;
 };
 
 struct _FullscreenManagerClass {
