@@ -83,27 +83,8 @@ GType fullscreen_manager_get_type(void);
  * @return New FullscreenManager instance.
  */
 FullscreenManager *
-fullscreen_create_manager(GtkWindow * view);
+fullscreen_manager_new(GtkWindow * view);
 
-/**
- * Explicitly destroy the full screen manager.
- * NOTE: Normally the full screen manager is destroyed automatically so there's
- * no need to call this function.
- *
- * @param self A FullscreenManager instance.
- */
-void
-fullscreen_destroy_manager(FullscreenManager * self);
-
-/**
- * This function returns true if the application is currently on full screen
- * mode (according to full screen manager).
- *
- * @param self A FullscreenManager instance.
- * @return TRUE if application is on full screen mode, else FALSE.
- */
-gboolean
-fullscreen_is_active(FullscreenManager * self);
 
 
 #endif /* _FULLSCREENMANAGER_H_ */
