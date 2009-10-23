@@ -2,8 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -22,7 +21,8 @@ msgid "New Note %i"
 msgstr "Titolo della nota %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
 #: ../src/interface.c:901 ../src/interface.c:1006 ../src/interface.c:1044
 msgid "Bold"
 msgstr "Grassetto"
@@ -74,10 +74,6 @@ msgstr "Apri nota"
 msgid "Settings"
 msgstr "Opzioni"
 
-#: ../src/interface.c:912
-msgid "Quit"
-msgstr ""
-
 #: ../src/interface.c:913 ../src/interface.c:1007 ../src/interface.c:1045
 msgid "Italic"
 msgstr "Corsivo"
@@ -107,14 +103,6 @@ msgstr "Cerca nella nota"
 
 #: ../src/interface.c:919
 msgid "Synchronize"
-msgstr ""
-
-#: ../src/interface.c:920
-msgid "Back"
-msgstr ""
-
-#: ../src/interface.c:921
-msgid "Foreward"
 msgstr ""
 
 #: ../src/interface.c:922
@@ -149,11 +137,11 @@ msgid "Search all notes"
 msgstr "Cerca in tutte le note"
 
 #. Add New Note item
-#.
+#. 
 #. menu_new_note = gtk_button_new();
 #. gtk_action_connect_proxy(new_note_action, menu_new_note);
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#.
+#. 
 #. Add sort filters
 #: ../src/search_window.c:389
 #, fuzzy
@@ -255,6 +243,18 @@ msgstr ""
 #: ../src/conboy_plugin_manager.c:635
 msgid "Configure plugin"
 msgstr ""
+
+#: ../src/interface.c:912
+msgid "Quit"
+msgstr "Esci"
+
+#: ../src/interface.c:920
+msgid "Back"
+msgstr "Indietro"
+
+#: ../src/interface.c:921
+msgid "Foreward"
+msgstr "Avanti"
 
 #~ msgid "Open"
 #~ msgstr "Apri"
