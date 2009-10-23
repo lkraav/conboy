@@ -42,13 +42,9 @@ struct _FullscreenManager {
 
         guint        button_press_signal_id;
         guint        button_release_signal_id;
+
         gulong       button_press_hook_id;
         gulong       button_release_hook_id;
-
-        gint		 overlay_x;
-        gint		 overlay_y;
-
-        gboolean	 overlay_visible;
 };
 
 struct _FullscreenManagerClass {

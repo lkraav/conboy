@@ -27,42 +27,18 @@
 
 #ifdef HILDON_HAS_APP_MENU
 
-#include <hildon/hildon.h>
-#include <hildon/hildon-animation-actor.h>
-#include <hildon/hildon-defines.h>
-
+#include <gtk/gtk.h>
 #include "fullscreenmanager.h"
 
 /* Full screen mode UI related stuff: */
 #define FULLSCREEN_UI_BUTTON_WIDTH          80
 #define FULLSCREEN_UI_BUTTON_HEIGHT         70
-#define FULLSCREEN_UI_BUTTON_OPACITY		255
 #define FULLSCREEN_UI_BUTTON_HIDE_DELAY		5000
 #define OFFSET 0
 
 
 G_DEFINE_TYPE(FullscreenManager, fullscreen_manager, G_TYPE_OBJECT)
 
-
-/**
- * Enable / disable fullscreen for given GtkWindow.
- * NOTE: Always use this function to set browser fullscreen mode!
- * @param aWindow a GtkWindow instance.
- * @param aEnable TRUE of aWindow should be set to fullscreen, FALSE if normal screen.
- */
-static void
-set_fullscreen (GtkWindow * aWindow, gboolean aEnable)
-{
-
-    g_return_if_fail (GTK_IS_WINDOW (aWindow));
-
-    if (aEnable) {
-        gtk_window_fullscreen (aWindow);
-    } else {
-        gtk_window_unfullscreen (aWindow);
-    }
-
-}
 
 /**
 * Helper function to hide full screen mode UI.
@@ -77,9 +53,7 @@ fullscreen_ui_hide(FullscreenManager * self)
     /* Reset timer */
     g_source_remove_by_user_data((gpointer) self);
 
-    /*hildon_animation_actor_set_parent(HILDON_ANIMATION_ACTOR(self->overlay), NULL);*/
-    hildon_animation_actor_set_show(HILDON_ANIMATION_ACTOR(self->overlay), FALSE);
-    self->overlay_visible = FALSE;
+    gtk_widget_hide(self->overlay);
 }
 
 
@@ -92,11 +66,7 @@ fullscreen_set_overlay_position (FullscreenManager *self)
 	gint x = parent->allocation.width - overlay->allocation.width;
 	gint y = parent->allocation.height - overlay->allocation.height - OFFSET;
 
-	g_printerr("Set overlay position %i / %i \n", x, y);
-	hildon_animation_actor_set_position(HILDON_ANIMATION_ACTOR(overlay), x, y);
-
-	self->overlay_x = x;
-	self->overlay_y = y;
+	gtk_window_move(GTK_WINDOW(overlay), x, y);
 }
 
 
@@ -110,12 +80,10 @@ fullscreen_set_overlay_position (FullscreenManager *self)
 static gboolean
 fullscreen_ui_hide_timer_cb(gpointer data)
 {
-
     g_return_val_if_fail(data != NULL, FALSE);
-    FullscreenManager *manager = (FullscreenManager *) data;
+    FullscreenManager *manager = FULLSCREEN_MANAGER(data);
 
-    fullscreen_ui_hide(manager);
-
+    fullscreen_ui_hide (manager);
 
     return FALSE;
 }
@@ -140,15 +108,12 @@ fullscreen_ui_show(FullscreenManager * self)
     if (self->release_event) {
 
     	fullscreen_set_overlay_position(self);
-        /*hildon_animation_actor_set_parent(HILDON_ANIMATION_ACTOR(self->overlay), GTK_WINDOW(self->parent_window));*/
-        hildon_animation_actor_set_show(HILDON_ANIMATION_ACTOR(self->overlay), TRUE);
-        self->overlay_visible = TRUE;
+    	gtk_widget_show (self->overlay);
 
         /* Set the return button hide timeout */
         g_timeout_add(FULLSCREEN_UI_BUTTON_HIDE_DELAY,
                     fullscreen_ui_hide_timer_cb, (gpointer) self);
     }
-
 }
 
 
@@ -164,21 +129,17 @@ fullscreen_ui_show(FullscreenManager * self)
 * @param data A FullscreenManager instance.
 */
 static gboolean
-fullscreen_ui_input_activity_hook(GSignalInvocationHint * ihint,
+fullscreen_ui_input_activity_hook(GSignalInvocationHint *ihint,
                                   guint n_param_values,
-                                  const GValue * param_values,
+                                  const GValue *param_values,
                                   gpointer data)
 {
-    (void) ihint;
-
     FullscreenManager *self = FULLSCREEN_MANAGER (data);
     g_return_val_if_fail (self, FALSE);
 
-    GtkWidget *widget;
     GdkEventAny *event = NULL;
 
     if (n_param_values >= 2)
-    	widget = GTK_WIDGET(g_value_peek_pointer(&(param_values[0])));
         event = (GdkEventAny*)g_value_peek_pointer(&(param_values[1]));
 
     g_return_val_if_fail (event, TRUE);
@@ -209,40 +170,9 @@ fullscreen_ui_input_activity_hook(GSignalInvocationHint * ihint,
         self->release_event = FALSE;
     } else {
         self->release_event = TRUE;
-        /* button was released */
-        /* Find out whether or not it was a click on the overlay
-         * We have to check for the coordinates on the parent window
-         * because the HildonAnimationActor does not fire events at all
-         */
-        gdouble click_x, click_y;
-        gdk_event_get_coords((GdkEvent*)event, &click_x, &click_y);
-
-        gint trans_x, trans_y;
-        gtk_widget_translate_coordinates(widget, GTK_WIDGET(self->parent_window), click_x, click_y, &trans_x, &trans_y);
-
-        gint overlay_x = self->overlay_x;
-        gint overlay_y = self->overlay_y;
-
-        g_printerr("Clicked: %f / %f\n", click_x, click_y);
-        g_printerr("Trans  : %i / %i\n", trans_x, trans_y);
-        g_printerr("Overlay: %i / %i\n", overlay_x, overlay_y);
-
-        if (self->overlay_visible) {
-        	/* If the click was in the region of the overlay */
-			if (click_x > overlay_x && click_x < overlay_x + FULLSCREEN_UI_BUTTON_WIDTH &&
-					click_y > overlay_y && click_y < overlay_y + FULLSCREEN_UI_BUTTON_HEIGHT)
-			{
-				g_printerr("INFO: Overlay clicked\n");
-				gtk_window_unfullscreen(self->parent_window);
-			}
-
-        }
     }
 
     fullscreen_ui_show(self);
-
-    /* Does not work :( TODO: Find replacement*/
-    /*g_signal_stop_emission(widget, ihint->signal_id, ihint->detail);*/
 
     return TRUE;
 }
@@ -260,7 +190,6 @@ fullscreen_ui_input_activity_hook(GSignalInvocationHint * ihint,
 static void
 fullscreen_ui_enable(FullscreenManager *self)
 {
-
     g_return_if_fail(FULLSCREEN_IS_MANAGER(self));
 
     if (self->button_press_hook_id == 0) {
@@ -268,17 +197,17 @@ fullscreen_ui_enable(FullscreenManager *self)
         	g_signal_lookup("button-press-event", GTK_TYPE_WIDGET);
         self->button_press_hook_id =
             g_signal_add_emission_hook(self->button_press_signal_id, 0,
-                                       fullscreen_ui_input_activity_hook,
-                                       (gpointer) self, NULL);
+            		fullscreen_ui_input_activity_hook,
+            		(gpointer) self, NULL);
     }
 
     if (self->button_release_hook_id == 0) {
         self->button_release_signal_id =
-            g_signal_lookup("button-release-event", GTK_TYPE_WIDGET);
+        	g_signal_lookup("button-release-event", GTK_TYPE_WIDGET);
         self->button_release_hook_id =
             g_signal_add_emission_hook(self->button_release_signal_id, 0,
-                                       fullscreen_ui_input_activity_hook,
-                                       (gpointer) self, NULL);
+            		fullscreen_ui_input_activity_hook,
+            		(gpointer) self, NULL);
     }
 
     fullscreen_ui_show(self);
@@ -314,28 +243,35 @@ fullscreen_ui_disable(FullscreenManager * self)
 }
 
 static void
-realize (GtkWidget *widget)
+change_color_map (GtkWidget *widget)
 {
     GdkScreen *screen = gtk_widget_get_screen (widget);
     gtk_widget_set_colormap (widget, gdk_screen_get_rgba_colormap (screen));
 }
 
 
-gboolean
+static gboolean
 on_expose_event (GtkWidget *widget, GdkEventExpose *event, gpointer data)
 {
-    cairo_t *cr;
+    cairo_t *ctx;
     GdkPixbuf *pixbuf = (GdkPixbuf *) data;
 
-    cr = gdk_cairo_create (widget->window);
-    gdk_cairo_region (cr, event->region);
-    cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
-    gdk_cairo_set_source_pixbuf (cr, pixbuf, 0.0, 0.0);
-    cairo_paint(cr);
-    cairo_destroy(cr);
+    ctx = gdk_cairo_create (widget->window);
+    gdk_cairo_region (ctx, event->region);
+    cairo_set_operator (ctx, CAIRO_OPERATOR_SOURCE);
+    gdk_cairo_set_source_pixbuf (ctx, pixbuf, 0.0, 0.0);
+    cairo_paint (ctx);
+    cairo_destroy (ctx);
     return TRUE;
 }
 
+
+gboolean
+on_overlay_clicked (GtkWidget *widget, GdkEventButton *event, gpointer data)
+{
+	FullscreenManager *self = FULLSCREEN_MANAGER(data);
+	gtk_window_unfullscreen(self->parent_window);
+}
 
 
 /**
@@ -344,27 +280,34 @@ on_expose_event (GtkWidget *widget, GdkEventExpose *event, gpointer data)
 * @param manager A FullscreenManager instance.
 * @return New full screen mode UI as GtkWidget pointer.
 */
-static GtkWidget *
+static GtkWidget*
 fullscreen_ui_create(FullscreenManager *self)
 {
     g_return_val_if_fail(FULLSCREEN_IS_MANAGER(self), NULL);
 
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/scalable/hildon/fullscreen_overlay.png", NULL);
     GtkWidget *img = gtk_image_new_from_pixbuf(pixbuf);
+    gtk_widget_show(img);
     g_object_unref(pixbuf);
+    g_signal_connect(img, "expose_event", G_CALLBACK(on_expose_event), pixbuf);
 
-    g_signal_connect(G_OBJECT(img), "expose_event", G_CALLBACK(on_expose_event), pixbuf);
+    GtkWidget *box = gtk_event_box_new();
+    gtk_event_box_set_visible_window(GTK_EVENT_BOX(box), FALSE);
+    gtk_widget_show(box);
+    gtk_container_add(GTK_CONTAINER(box), img);
+    g_signal_connect (box, "button-release-event", G_CALLBACK(on_overlay_clicked), self);
 
-    HildonAnimationActor *actor = HILDON_ANIMATION_ACTOR(hildon_animation_actor_new());
-    gtk_widget_set_size_request(GTK_WIDGET(actor), FULLSCREEN_UI_BUTTON_WIDTH, FULLSCREEN_UI_BUTTON_HEIGHT);
-    gtk_container_add(GTK_CONTAINER(actor), img);
-    realize (GTK_WIDGET(actor));
-    gtk_widget_show_all (GTK_WIDGET(actor));
+    GtkWidget *overlay = gtk_window_new(GTK_WINDOW_POPUP);
+    gtk_window_set_decorated(GTK_WINDOW(overlay), FALSE);
+    gtk_widget_set_size_request(overlay, FULLSCREEN_UI_BUTTON_WIDTH, FULLSCREEN_UI_BUTTON_HEIGHT);
+    gtk_window_set_resizable(GTK_WINDOW(overlay), FALSE);
+    gtk_window_set_transient_for(GTK_WINDOW(overlay), self->parent_window);
+    gtk_window_set_destroy_with_parent(GTK_WINDOW(overlay), TRUE);
+    gtk_container_add(GTK_CONTAINER(overlay), box);
+    change_color_map (overlay);
+    gtk_widget_realize(overlay);
 
-    /*hildon_animation_actor_set_opacity(actor, FULLSCREEN_UI_BUTTON_OPACITY);*/
-    hildon_animation_actor_set_parent(actor, self->parent_window);
-
-    return GTK_WIDGET(actor);
+    return overlay;
 }
 
 
@@ -376,10 +319,8 @@ fullscreen_on_toggled (GtkWidget *widget, GdkEventWindowState *event, gpointer d
 	if (event->changed_mask & GDK_WINDOW_STATE_FULLSCREEN) {
 
 		if (event->new_window_state == GDK_WINDOW_STATE_FULLSCREEN) {
-			g_printerr("INFO: FullscreenManager: fullscreen enabled \n");
 			fullscreen_ui_enable(self);
 		} else {
-			g_printerr("INFO: FullscreenManager: fullscreen disabled \n");
 			fullscreen_ui_disable(self);
 		}
 
@@ -490,10 +431,6 @@ fullscreen_manager_init (FullscreenManager *self)
     self->overlay = NULL;
     self->release_event = TRUE;
     self->last_event_time = 0;
-
-    self->overlay_x = 0;
-    self->overlay_y = 0;
-    self->overlay_visible = FALSE;
 
     self->button_press_signal_id = 0;
     self->button_release_signal_id = 0;
