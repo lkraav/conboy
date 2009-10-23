@@ -1,5 +1,9 @@
-../src/interface.c
-../src/search_window.c
-../src/callbacks.c
-../src/note.c
-../src/settings_window.c
+src/interface.c
+src/search_window.c
+src/callbacks.c
+src/note.c
+src/settings_window.c
+src/conboy_note.c
+src/conboy_plugin_manager.c
+src/conboy_plugin_manager_row.c
+
