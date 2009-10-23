@@ -1,25 +1,30 @@
-/* ***** BEGIN LICENSE BLOCK *****
-* Version: MPL 1.1
-*
-* The contents of this file are subject to the Mozilla Public License Version
-* 1.1 (the "License"); you may not use this file except in compliance with
-* the License. You may obtain a copy of the License at
-* http://www.mozilla.org/MPL/
-*
-* Software distributed under the License is distributed on an "AS IS" basis,
-* WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
-* for the specific language governing rights and limitations under the
-* License.
-*
-* The Original Code is the Server EAL package.
-*
-* The Initial Developer of the Original Code is Nokia Corporation.
-* Portions created by the Initial Developer are Copyright (C) 2008
-* the Initial Developer. All Rights Reserved.
-*
-* Contact: Sudarsana Nagineni <sudarsana.nagineni@nokia.com>
-*
-* ***** END LICENSE BLOCK ***** */
+/* This file is part of Conboy.
+ *
+ * Copyright (C) 2009 Cornelius Hald
+ *
+ * The code is based on example code taken from the maemoexamples project.
+ * Original copyright is below.
+ *
+ * Version: MPL 1.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is the Server EAL package.
+ *
+ * The Initial Developer of the Original Code is Nokia Corporation.
+ * Portions created by the Initial Developer are Copyright (C) 2008
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contact: Sudarsana Nagineni <sudarsana.nagineni@nokia.com>
+ */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>

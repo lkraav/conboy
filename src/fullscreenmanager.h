@@ -1,4 +1,10 @@
-/* ***** BEGIN LICENSE BLOCK *****
+/* This file is part of Conboy.
+ *
+ * Copyright (C) 2009 Cornelius Hald
+ *
+ * The code is based on example code taken from the maemoexamples project.
+ * Original copyright is below.
+ *
  * Version: MPL 1.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -18,8 +24,7 @@
  * the Initial Developer. All Rights Reserved.
  *
  * Contact: Sudarsana Nagineni <sudarsana.nagineni@nokia.com>
- *
- * ***** END LICENSE BLOCK ***** */
+ */
 
 #ifndef _FULLSCREENMANAGER_H_
 #define _FULLSCREENMANAGER_H_
