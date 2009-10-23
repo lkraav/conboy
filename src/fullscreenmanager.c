@@ -25,6 +25,8 @@
 #include <config.h>
 #endif
 
+#ifdef HILDON_HAS_APP_MENU
+
 #include <hildon/hildon.h>
 #include <hildon/hildon-animation-actor.h>
 #include <hildon/hildon-defines.h>
@@ -34,7 +36,7 @@
 /* Full screen mode UI related stuff: */
 #define FULLSCREEN_UI_BUTTON_WIDTH          80
 #define FULLSCREEN_UI_BUTTON_HEIGHT         70
-#define FULLSCREEN_UI_BUTTON_OPACITY		127
+#define FULLSCREEN_UI_BUTTON_OPACITY		255
 #define FULLSCREEN_UI_BUTTON_HIDE_DELAY		5000
 #define OFFSET 0
 
@@ -172,9 +174,13 @@ fullscreen_ui_input_activity_hook(GSignalInvocationHint * ihint,
     FullscreenManager *self = FULLSCREEN_MANAGER (data);
     g_return_val_if_fail (self, FALSE);
 
-    GdkEventAny * event = NULL;
+    GtkWidget *widget;
+    GdkEventAny *event = NULL;
+
     if (n_param_values >= 2)
+    	widget = GTK_WIDGET(g_value_peek_pointer(&(param_values[0])));
         event = (GdkEventAny*)g_value_peek_pointer(&(param_values[1]));
+
     g_return_val_if_fail (event, TRUE);
 
     guint32 time = 0;
@@ -203,7 +209,6 @@ fullscreen_ui_input_activity_hook(GSignalInvocationHint * ihint,
         self->release_event = FALSE;
     } else {
         self->release_event = TRUE;
-
         /* button was released */
         /* Find out whether or not it was a click on the overlay
          * We have to check for the coordinates on the parent window
@@ -212,8 +217,15 @@ fullscreen_ui_input_activity_hook(GSignalInvocationHint * ihint,
         gdouble click_x, click_y;
         gdk_event_get_coords((GdkEvent*)event, &click_x, &click_y);
 
+        gint trans_x, trans_y;
+        gtk_widget_translate_coordinates(widget, GTK_WIDGET(self->parent_window), click_x, click_y, &trans_x, &trans_y);
+
         gint overlay_x = self->overlay_x;
         gint overlay_y = self->overlay_y;
+
+        g_printerr("Clicked: %f / %f\n", click_x, click_y);
+        g_printerr("Trans  : %i / %i\n", trans_x, trans_y);
+        g_printerr("Overlay: %i / %i\n", overlay_x, overlay_y);
 
         if (self->overlay_visible) {
         	/* If the click was in the region of the overlay */
@@ -229,6 +241,9 @@ fullscreen_ui_input_activity_hook(GSignalInvocationHint * ihint,
 
     fullscreen_ui_show(self);
 
+    /* Does not work :( TODO: Find replacement*/
+    /*g_signal_stop_emission(widget, ihint->signal_id, ihint->detail);*/
+
     return TRUE;
 }
 
@@ -243,7 +258,7 @@ fullscreen_ui_input_activity_hook(GSignalInvocationHint * ihint,
 * @param self A FullscreenManager instance.
 */
 static void
-fullscreen_ui_enable(FullscreenManager * self)
+fullscreen_ui_enable(FullscreenManager *self)
 {
 
     g_return_if_fail(FULLSCREEN_IS_MANAGER(self));
@@ -298,6 +313,30 @@ fullscreen_ui_disable(FullscreenManager * self)
     }
 }
 
+static void
+realize (GtkWidget *widget)
+{
+    GdkScreen *screen = gtk_widget_get_screen (widget);
+    gtk_widget_set_colormap (widget, gdk_screen_get_rgba_colormap (screen));
+}
+
+
+gboolean
+on_expose_event (GtkWidget *widget, GdkEventExpose *event, gpointer data)
+{
+    cairo_t *cr;
+    GdkPixbuf *pixbuf = (GdkPixbuf *) data;
+
+    cr = gdk_cairo_create (widget->window);
+    gdk_cairo_region (cr, event->region);
+    cairo_set_operator (cr, CAIRO_OPERATOR_SOURCE);
+    gdk_cairo_set_source_pixbuf (cr, pixbuf, 0.0, 0.0);
+    cairo_paint(cr);
+    cairo_destroy(cr);
+    return TRUE;
+}
+
+
 
 /**
 * Creates the full screen mode UI.
@@ -310,22 +349,19 @@ fullscreen_ui_create(FullscreenManager *self)
 {
     g_return_val_if_fail(FULLSCREEN_IS_MANAGER(self), NULL);
 
-    GtkWidget *img = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_fullsize.png");
-    gtk_widget_show(img);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/scalable/hildon/fullscreen_overlay.png", NULL);
+    GtkWidget *img = gtk_image_new_from_pixbuf(pixbuf);
+    g_object_unref(pixbuf);
+
+    g_signal_connect(G_OBJECT(img), "expose_event", G_CALLBACK(on_expose_event), pixbuf);
 
     HildonAnimationActor *actor = HILDON_ANIMATION_ACTOR(hildon_animation_actor_new());
     gtk_widget_set_size_request(GTK_WIDGET(actor), FULLSCREEN_UI_BUTTON_WIDTH, FULLSCREEN_UI_BUTTON_HEIGHT);
-    gtk_widget_show(GTK_WIDGET(actor));
-
-    /*
-    GdkColor color;
-    gdk_color_parse("#f00", &color);
-    gtk_widget_modify_bg(GTK_WIDGET(actor), GTK_STATE_NORMAL, &color);
-    */
-
     gtk_container_add(GTK_CONTAINER(actor), img);
+    realize (GTK_WIDGET(actor));
+    gtk_widget_show_all (GTK_WIDGET(actor));
 
-    hildon_animation_actor_set_opacity(actor, FULLSCREEN_UI_BUTTON_OPACITY);
+    /*hildon_animation_actor_set_opacity(actor, FULLSCREEN_UI_BUTTON_OPACITY);*/
     hildon_animation_actor_set_parent(actor, self->parent_window);
 
     return GTK_WIDGET(actor);
@@ -353,7 +389,6 @@ fullscreen_on_toggled (GtkWidget *widget, GdkEventWindowState *event, gpointer d
 }
 
 
-
 static void
 fullscreen_manager_destroy (GtkWidget *parent_window, FullscreenManager *self)
 {
@@ -375,10 +410,6 @@ fullscreen_manager_destroy (GtkWidget *parent_window, FullscreenManager *self)
 	}
 
 }
-
-
-
-
 
 
 /**
@@ -470,3 +501,5 @@ fullscreen_manager_init (FullscreenManager *self)
     self->button_press_hook_id = 0;
 	self->button_release_hook_id = 0;
 }
+
+#endif /* HILDON_HAS_APP_MENU */

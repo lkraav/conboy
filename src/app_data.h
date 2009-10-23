@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@
 
 #include "conboy_note_store.h"
 #include "conboy_plugin_store.h"
+#include "fullscreenmanager.h"
 
 typedef struct
 {

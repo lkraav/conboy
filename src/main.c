@@ -45,7 +45,7 @@ static void cleanup()
 
 	/* Free AppData */
 	app_data_free();
-	
+
 	conboy_xml_reader_free();
 }
 
@@ -140,6 +140,9 @@ main (int argc, char *argv[])
   }
 
   /* EXPERIEMNT */
+
+
+
   /*
   gtk_widget_hide(GTK_WIDGET(app_data->note_window->toolbar));
 

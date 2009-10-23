@@ -369,7 +369,7 @@ plugin_manager_get_selected_plugin (ConboyPluginManager *pm)
 	GtkTreeIter iter;
 	GtkTreeSelection *selection;
 	GtkTreeModel *model = gtk_tree_view_get_model (GTK_TREE_VIEW (pm->priv->tree));
-	
+
 	g_return_val_if_fail (model != NULL, NULL);
 
 	selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (pm->priv->tree));
@@ -535,7 +535,7 @@ plugin_manager_construct_tree (ConboyPluginManager *pm)
 	/* Enable search for our non-string column */
 	gtk_tree_view_set_search_column (GTK_TREE_VIEW (pm->priv->tree),
 					 INFO_COLUMN);
-	
+
 	gtk_tree_view_set_search_equal_func (GTK_TREE_VIEW (pm->priv->tree),
 					     name_search_cb,
 					     NULL,
@@ -628,11 +628,11 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 	gtk_box_set_spacing (GTK_BOX (hbuttonbox), 8);
 
 	pm->priv->about_button = gtk_button_new_from_stock (GTK_STOCK_ABOUT);
-	gtk_button_set_label (GTK_BUTTON(pm->priv->about_button), "About Plugin");
+	gtk_button_set_label (GTK_BUTTON(pm->priv->about_button), _("About plugin"));
 	gtk_container_add (GTK_CONTAINER (hbuttonbox), pm->priv->about_button);
 
 	pm->priv->configure_button = gtk_button_new_from_stock (GTK_STOCK_PREFERENCES);
-	gtk_button_set_label (GTK_BUTTON(pm->priv->configure_button), "Configure Plugin");
+	gtk_button_set_label (GTK_BUTTON(pm->priv->configure_button), _("Configure plugin"));
 	gtk_container_add (GTK_CONTAINER (hbuttonbox), pm->priv->configure_button);
 
 	/* setup a window of a sane size. */

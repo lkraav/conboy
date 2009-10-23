@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ on_quit_button_clicked                 (GtkAction       *action,
                                         gpointer         user_data);
 
 void
-on_settings_button_clicked             (GtkAction       *action, 
+on_settings_button_clicked             (GtkAction       *action,
 		                                gpointer         user_data);
 
 void
@@ -66,6 +66,10 @@ on_delete_button_clicked			   (GtkAction		*action,
 
 void
 on_notes_button_clicked				   (GtkAction		*action,
+										gpointer		 user_data);
+
+void
+on_fullscreen_button_clicked		   (GtkAction		*action,
 										gpointer		 user_data);
 
 void
@@ -111,7 +115,7 @@ on_textview_insert_at_cursor		   (GtkTextView *text_view,
 void
 on_textbuffer_changed				   (GtkTextBuffer *buffer,
 									 	gpointer 		user_data);
-        								
+
 
 void
 update_title						   (GtkTextBuffer *buffer,

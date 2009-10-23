@@ -220,7 +220,7 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_box_pack_start(GTK_BOX(hbox), scroll_vbox, TRUE, TRUE, 0);
 
 	scroll_label = gtk_label_new("");
-	gtk_label_set_markup(GTK_LABEL(scroll_label), _("Scrollbar Size"));
+	gtk_label_set_markup(GTK_LABEL(scroll_label), _("Scrollbar size"));
 	gtk_misc_set_alignment(GTK_MISC(scroll_label), 0, 0.5);
 	gtk_widget_show(scroll_label);
 	gtk_container_add(GTK_CONTAINER(scroll_vbox), scroll_label);
@@ -240,7 +240,7 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_container_add(GTK_CONTAINER(hbox), view_box);
 
 	view_label = gtk_label_new("");
-	gtk_label_set_markup(GTK_LABEL(view_label), _("On Startup"));
+	gtk_label_set_markup(GTK_LABEL(view_label), _("On startup"));
 	gtk_misc_set_alignment(GTK_MISC(view_label), 0, 0.5);
 	gtk_widget_show(view_label);
 	gtk_container_add(GTK_CONTAINER(view_box), view_label);
@@ -259,13 +259,13 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	/* TODO: Write a bug report. This should be only 2 lines instaed of 6 */
 	view_but1 = hildon_gtk_radio_button_new(HILDON_SIZE_FINGER_HEIGHT, NULL);
 	view_but2 = hildon_gtk_radio_button_new_from_widget(HILDON_SIZE_FINGER_HEIGHT, GTK_RADIO_BUTTON(view_but1));
-	gtk_button_set_label(GTK_BUTTON(view_but1), _("Show Note"));
-	gtk_button_set_label(GTK_BUTTON(view_but2), _("Show Search"));
+	gtk_button_set_label(GTK_BUTTON(view_but1), _("Show note"));
+	gtk_button_set_label(GTK_BUTTON(view_but2), _("Show search"));
 	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(view_but1), FALSE);
 	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(view_but2), FALSE);
 #else
-	view_but1 = gtk_radio_button_new_with_label(NULL, _("Show Note"));
-	view_but2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(view_but1), _("Show Search"));
+	view_but1 = gtk_radio_button_new_with_label(NULL, _("Show note"));
+	view_but2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(view_but1), _("Show search"));
 #endif
 
 	gtk_widget_show(view_but1);
@@ -283,9 +283,9 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 
 #ifdef HILDON_HAS_APP_MENU
 	color_but = hildon_check_button_new(HILDON_SIZE_FINGER_HEIGHT);
-	gtk_button_set_label(GTK_BUTTON(color_but), _("Use Custom Colors"));
+	gtk_button_set_label(GTK_BUTTON(color_but), _("Use custom colors"));
 #else
-	color_but = gtk_check_button_new_with_label(_("Use Custom Colors"));
+	color_but = gtk_check_button_new_with_label(_("Use custom colors"));
 #endif
 	gtk_widget_show(color_but);
 	gtk_box_pack_start(GTK_BOX(color_vbox), color_but, TRUE, TRUE, 0);

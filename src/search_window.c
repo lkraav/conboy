@@ -368,7 +368,7 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 #else
 	win = hildon_window_new();
 #endif
-	gtk_window_set_title(GTK_WINDOW(win), _("Search All Notes"));
+	gtk_window_set_title(GTK_WINDOW(win), _("Search all notes"));
 	screen = gdk_screen_get_default();
 	search_result = g_hash_table_new(NULL, NULL);
 
@@ -386,8 +386,8 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	*/
 
 	/* Add sort filters */
-	button_sort_by_title = gtk_radio_button_new_with_label(NULL, _("Sort By Title"));
-	button_sort_by_date = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(button_sort_by_title), _("Sort By Date"));
+	button_sort_by_title = gtk_radio_button_new_with_label(NULL, _("Sort by title"));
+	button_sort_by_date = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(button_sort_by_title), _("Sort by date"));
 
 	/* Draw them as toggle buttons, not as radio buttons */
 	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(button_sort_by_title), FALSE);
@@ -511,7 +511,7 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 
 	/* CHANGE_DATE COLUMN */
 	renderer = gtk_cell_renderer_text_new();
-	change_date_column = gtk_tree_view_column_new_with_attributes(_("Last Changed"), renderer, "text", CHANGE_DATE_COLUMN, NULL);
+	change_date_column = gtk_tree_view_column_new_with_attributes(_("Last changed"), renderer, "text", CHANGE_DATE_COLUMN, NULL);
 	gtk_tree_view_column_set_sort_column_id(change_date_column, CHANGE_DATE_COLUMN);
 	gtk_tree_view_column_set_sort_indicator(change_date_column, TRUE);
 	gtk_tree_view_column_set_reorderable(change_date_column, FALSE);
@@ -548,8 +548,13 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	g_signal_connect(button_sort_by_date, "toggled", G_CALLBACK(on_sort_by_date_changed), sorted_store);
 #endif
 
+	/*
 	app_data = app_data_get();
 	app_data->note_store = store;
+	*/
+
+	/* Add transparent fullscreen button */
+	fullscreen_manager_new(GTK_WINDOW(win));
 
 	return HILDON_WINDOW(win);
 }

@@ -105,6 +105,23 @@ set_item_label(GtkContainer *item, const gchar *open_tag, const gchar *text, con
 	g_free(string);
 }
 
+static gboolean
+on_fullscreen_toggled (GtkWidget *widget, GdkEventWindowState *event, gpointer data)
+{
+	UserInterface *ui = (UserInterface*)data;
+
+	if (event->changed_mask & GDK_WINDOW_STATE_FULLSCREEN) {
+		/* Show / Hide toolbar */
+		if (event->new_window_state == GDK_WINDOW_STATE_FULLSCREEN) {
+			gtk_widget_hide(GTK_WIDGET(ui->toolbar));
+		} else {
+			gtk_widget_show(GTK_WIDGET(ui->toolbar));
+		}
+	}
+
+	return FALSE;
+}
+
 static void
 on_orientation_changed(GdkScreen *screen, gpointer data)
 {
@@ -571,23 +588,23 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 	if (app_data->started) {
 		return FALSE;
 	}
-	
+
 	UserInterface *ui = app_data->note_window;
-	
+
 	/* Open latest note or new one */
 	gchar *guid = settings_load_last_open_note();
 	ConboyNote *note = NULL;
-	
+
 	app_data->started = TRUE;
 
 	/* Try to open last viewed note */
 	if (guid != NULL) {
 		note = conboy_note_store_find_by_guid(app_data->note_store, guid);
-		
+
 		if (note) {
-			
+
 			note_show(note, TRUE, FALSE, FALSE);
-			
+
 			/* Now process all pending events like calculating window size,
 			 * text amount, scrollbar positions etc. If we don't do this,
 			 * we cannot set the scrollbars to the right position as the size
@@ -595,7 +612,7 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 			while (gtk_events_pending()) {
 				gtk_main_iteration_do(FALSE);
 			}
-			
+
 			/* Scroll to saved position */
 			GtkAdjustment *adj;
 			#ifdef HILDON_HAS_APP_MENU
@@ -604,16 +621,16 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 			adj = gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(ui->scrolled_window));
 			#endif
 			gtk_adjustment_set_value(adj, settings_load_last_scroll_position());
-			
+
 			return FALSE;
 		}
 	}
-	
+
 	/* If that does not work, use last edited note */
 	if (note == NULL) {
 		note = conboy_note_store_get_latest(app_data->note_store);
 	}
-	
+
 	/* If that does not work, create new note */
 	if (note == NULL) {
 		gchar title[50];
@@ -623,8 +640,8 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 	} else {
 		note_show(note, TRUE, TRUE, FALSE);
 	}
-	
-	
+
+
 
 	return FALSE;
 }
@@ -805,6 +822,7 @@ UserInterface* create_mainwin() {
 	GtkWidget *menu_open;
 	GtkWidget *menu_sync;
 	GtkWidget *menu_delete;
+	GtkWidget *menu_fullscreen;
 
 	GtkWidget *toolbar;
 	GtkWidget *find_bar;
@@ -847,6 +865,7 @@ UserInterface* create_mainwin() {
 	GtkAction *action_sync;
 	GtkAction *action_back;
 	GtkAction *action_forward;
+	GtkAction *action_fullscreen;
 
 	GtkActionGroup *action_group;
 
@@ -881,25 +900,26 @@ UserInterface* create_mainwin() {
 	/* ACTIONS */
 	action_bold = GTK_ACTION(gtk_toggle_action_new("bold", _("Bold"), NULL, NULL));
 	action_bullets = GTK_ACTION(gtk_toggle_action_new("bullets", _("Bullets"), NULL, NULL));
-	action_dec_indent = GTK_ACTION(gtk_action_new("dec_indent", _("Decrease Indent"), NULL, GTK_STOCK_UNINDENT));
-	action_delete = GTK_ACTION(gtk_action_new("delete", _("Delete Note"), NULL, GTK_STOCK_DELETE));
-	action_fixed = GTK_ACTION(gtk_toggle_action_new("monospace", _("Fixed Width"), NULL, NULL));
+	action_dec_indent = GTK_ACTION(gtk_action_new("dec_indent", _("Decrease indent"), NULL, GTK_STOCK_UNINDENT));
+	action_delete = GTK_ACTION(gtk_action_new("delete", _("Delete note"), NULL, GTK_STOCK_DELETE));
+	action_fixed = GTK_ACTION(gtk_toggle_action_new("monospace", _("Fixed width"), NULL, NULL));
 	action_highlight = GTK_ACTION(gtk_toggle_action_new("highlight", _("Highlight"), NULL, NULL));
-	action_inc_indent = GTK_ACTION(gtk_action_new("inc_indent", _("Increase Indent"), NULL, GTK_STOCK_INDENT));
+	action_inc_indent = GTK_ACTION(gtk_action_new("inc_indent", _("Increase indent"), NULL, GTK_STOCK_INDENT));
 	action_link = GTK_ACTION(gtk_action_new("link", _("Link"), NULL, GTK_STOCK_REDO));
-	action_new = GTK_ACTION(gtk_action_new("new", _("New Note"), NULL, NULL));
-	action_notes = GTK_ACTION(gtk_action_new("open", _("Open Note"), NULL, GTK_STOCK_OPEN));
+	action_new = GTK_ACTION(gtk_action_new("new", _("New note"), NULL, NULL));
+	action_notes = GTK_ACTION(gtk_action_new("open", _("Open note"), NULL, GTK_STOCK_OPEN));
 	action_settings = GTK_ACTION(gtk_action_new("settings", _("Settings"), NULL, NULL));
 	action_quit = GTK_ACTION(gtk_action_new("quit", _("Quit"), NULL, NULL));
 	action_italic = GTK_ACTION(gtk_toggle_action_new("italic", _("Italic"), NULL, GTK_STOCK_ITALIC));
 	action_strike = GTK_ACTION(gtk_toggle_action_new("strikethrough", _("Strikeout"), NULL, NULL));
 	action_text_style = GTK_ACTION(gtk_action_new("style", _("Style"), NULL, GTK_STOCK_SELECT_FONT));
-	action_zoom_in = GTK_ACTION(gtk_action_new("zoom_in", _("Zoom In"), NULL, GTK_STOCK_ZOOM_IN));
-	action_zoom_out = GTK_ACTION(gtk_action_new("zoom_out", _("Zoom Out"), NULL, GTK_STOCK_ZOOM_OUT));
-	action_find = GTK_ACTION(gtk_action_new("find", _("Find In Note"), NULL, GTK_STOCK_FIND));
+	action_zoom_in = GTK_ACTION(gtk_action_new("zoom_in", _("Zoom in"), NULL, GTK_STOCK_ZOOM_IN));
+	action_zoom_out = GTK_ACTION(gtk_action_new("zoom_out", _("Zoom out"), NULL, GTK_STOCK_ZOOM_OUT));
+	action_find = GTK_ACTION(gtk_action_new("find", _("Find in note"), NULL, GTK_STOCK_FIND));
 	action_sync = GTK_ACTION(gtk_action_new("sync", _("Synchronize"), NULL, NULL));
 	action_back = GTK_ACTION(gtk_action_new("back", _("Back"), NULL, GTK_STOCK_GO_BACK));
 	action_forward = GTK_ACTION(gtk_action_new("forward", _("Foreward"), NULL, GTK_STOCK_GO_FORWARD));
+	action_fullscreen = GTK_ACTION(gtk_action_new("fullscreen", _("Fullscreen"), NULL, NULL));
 	/* TODO: Use an enum instead of 0 to 3 */
 	action_font_small = GTK_ACTION(gtk_radio_action_new("size:small", _("Small"), NULL, NULL, 0));
 	action_font_normal = GTK_ACTION(gtk_radio_action_new("size:normal", _("Normal"), NULL, NULL, 1));
@@ -987,7 +1007,7 @@ UserInterface* create_mainwin() {
 	set_item_label(GTK_CONTAINER(menu_italic),     "<i>", _("Italic"), "</i>");
 	set_item_label(GTK_CONTAINER(menu_strike),     "<s>", _("Strikeout"), "</s>");
 	set_item_label(GTK_CONTAINER(menu_highlight),  "<span background=\"yellow\" foreground=\"black\">", _("Highlight"), "</span>");
-	set_item_label(GTK_CONTAINER(menu_fixed),      "<tt>", _("Fixed Width"), "</tt>");
+	set_item_label(GTK_CONTAINER(menu_fixed),      "<tt>", _("Fixed width"), "</tt>");
 	set_item_label(GTK_CONTAINER(menu_font_small), "<span size=\"small\">", _("Small"), "</span>");
 	set_item_label(GTK_CONTAINER(menu_font_large), "<span size=\"large\">", _("Large"), "</span>");
 	set_item_label(GTK_CONTAINER(menu_font_huge),  "<span size=\"x-large\">", _("Huge"), "</span>");
@@ -1025,7 +1045,7 @@ UserInterface* create_mainwin() {
 	set_item_label(GTK_CONTAINER(menu_italic),     "<i>", _("Italic"), "</i>");
 	set_item_label(GTK_CONTAINER(menu_strike),     "<s>", _("Strikeout"), "</s>");
 	set_item_label(GTK_CONTAINER(menu_highlight),  "<span background=\"yellow\">", _("Highlight"), "</span>");
-	set_item_label(GTK_CONTAINER(menu_fixed),      "<tt>", _("Fixed Width"), "</tt>");
+	set_item_label(GTK_CONTAINER(menu_fixed),      "<tt>", _("Fixed width"), "</tt>");
 	set_item_label(GTK_CONTAINER(menu_font_small), "<span size=\"small\">", _("Small"), "</span>");
 	set_item_label(GTK_CONTAINER(menu_font_large), "<span size=\"large\">", _("Large"), "</span>");
 	set_item_label(GTK_CONTAINER(menu_font_huge),  "<span size=\"x-large\">", _("Huge"), "</span>");
@@ -1058,6 +1078,7 @@ UserInterface* create_mainwin() {
 	menu_sync = gtk_button_new();
 	menu_quit = gtk_button_new();
 	menu_delete = gtk_button_new();
+	menu_fullscreen = gtk_button_new();
 
 	gtk_action_connect_proxy(action_new, menu_new);
 	gtk_action_connect_proxy(action_notes, menu_open);
@@ -1065,11 +1086,13 @@ UserInterface* create_mainwin() {
 	gtk_action_connect_proxy(action_sync, menu_sync);
 	gtk_action_connect_proxy(action_quit, menu_quit);
 	gtk_action_connect_proxy(action_delete, menu_delete);
+	gtk_action_connect_proxy(action_fullscreen, menu_fullscreen);
 
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_new));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_delete));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_sync));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_settings));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_fullscreen));
 
 	if (app_data->portrait) {
 		gtk_widget_hide(menu_settings);
@@ -1344,6 +1367,10 @@ UserInterface* create_mainwin() {
 			G_CALLBACK(on_forward_button_clicked),
 			ui);
 
+	g_signal_connect(action_fullscreen, "activate",
+			G_CALLBACK(on_fullscreen_button_clicked),
+			ui);
+
 
 	/* OTHER SIGNALS */
 	g_signal_connect ((gpointer) buffer, "mark-set",
@@ -1390,6 +1417,10 @@ UserInterface* create_mainwin() {
 			G_CALLBACK(on_window_visible),
 			NULL);
 
+	g_signal_connect((gpointer)mainwin, "window-state-event",
+			G_CALLBACK(on_fullscreen_toggled),
+			ui);
+
 	/* Listening to activation / deactivation of storage */
 	ConboyStorage *storage = app_data->storage;
 	g_signal_connect(storage, "activated",
@@ -1422,7 +1453,7 @@ UserInterface* create_mainwin() {
 	g_signal_connect ((gpointer) link_internal_tag, "event",
 			G_CALLBACK (on_link_internal_tag_event),
 			ui);
-	
+
 	link_url_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:url");
 	g_signal_connect ((gpointer) link_url_tag, "event",
 			G_CALLBACK (on_link_url_tag_event),
@@ -1434,6 +1465,9 @@ UserInterface* create_mainwin() {
 	/* Before ungrabbing the keys, we need to show it */
 	gtk_widget_show(mainwin);
 	ungrab_volume_keys(mainwin);
+
+	/* Adding the transparent fullscreen button */
+	fullscreen_manager_new(GTK_WINDOW(mainwin));
 
 	return ui;
 }

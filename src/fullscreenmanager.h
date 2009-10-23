@@ -27,12 +27,9 @@
 typedef struct _FullscreenManager FullscreenManager;
 typedef struct _FullscreenManagerClass FullscreenManagerClass;
 
-
 #include <glib.h>
 #include <glib-object.h>
 #include <gtk/gtk.h>
-
-#define FSM_WIN_STATE_KEY "is_fullscreen"
 
 struct _FullscreenManager {
         GObject      parent;
