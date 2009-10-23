@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: conboy 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-06-26 23:03+0200\n"
+"POT-Creation-Date: 2009-10-23 12:46+0200\n"
 "PO-Revision-Date: 2009-06-27\n"
 "Last-Translator: Leonardo Ferreira Fontenelle <leonardof@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <ldp-br@bazar.conectiva.com.br>\n"
@@ -15,191 +15,251 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/interface.c:201 ../src/interface.c:303 ../src/interface.c:341
-#: ../src/interface.c:402 ../src/interface.c:440
-msgid "Bold"
-msgstr "Negrito"
-
-#: ../src/interface.c:202 ../src/interface.c:304
-msgid "Bullets"
-msgstr "Marcadores"
-
-#: ../src/interface.c:203 ../src/interface.c:305
-msgid "Decrease Indent"
-msgstr "Diminuir recuo"
-
-#: ../src/interface.c:204 ../src/interface.c:306
-msgid "Delete Note"
-msgstr "Excluir nota"
-
-#: ../src/interface.c:205 ../src/interface.c:307 ../src/interface.c:345
-#: ../src/interface.c:406 ../src/interface.c:444
-msgid "Fixed Width"
-msgstr "Largura fixa"
-
-#: ../src/interface.c:206 ../src/interface.c:306 ../src/interface.c:344
-#: ../src/interface.c:308 ../src/interface.c:405 ../src/interface.c:443
-msgid "Highlight"
-msgstr "Destacar"
-
-#: ../src/interface.c:207 ../src/interface.c:309
-msgid "Increase Indent"
-msgstr "Aumentar recuo"
-
-#: ../src/interface.c:208 ../src/interface.c:310
-msgid "Link"
-msgstr "Link"
-
-#: ../src/interface.c:209 ../src/interface.c:311
-msgid "New Note"
-msgstr "Nova nota"
-
-#: ../src/interface.c:210
-msgid "Open"
-msgstr "Abrir"
-
-#: ../src/interface.c:211 ../src/interface.c:314
-msgid "Close All Notes"
-msgstr "Fechar todas as notas"
-
-#: ../src/interface.c:212 ../src/interface.c:304 ../src/interface.c:342
-#: ../src/interface.c:315 ../src/interface.c:403 ../src/interface.c:441
-msgid "Italic"
-msgstr "Itálico"
-
-#: ../src/interface.c:213 ../src/interface.c:305 ../src/interface.c:343
-#: ../src/interface.c:316 ../src/interface.c:404 ../src/interface.c:442
-msgid "Strikeout"
-msgstr "Tachado"
-
-#: ../src/interface.c:214 ../src/interface.c:317
-msgid "Style"
-msgstr "Estilo"
-
-#: ../src/interface.c:215 ../src/interface.c:318
-msgid "Zoom In"
-msgstr "Ampliar"
-
-#: ../src/interface.c:216 ../src/interface.c:319
-msgid "Zoom Out"
-msgstr "Reduzir"
-
-#: ../src/interface.c:217 ../src/interface.c:320
-msgid "Find In Note"
-msgstr "Localizar na nota"
-
-#: ../src/interface.c:219 ../src/interface.c:308 ../src/interface.c:346
-#: ../src/interface.c:322 ../src/interface.c:407 ../src/interface.c:445
-#: ../src/settings_window.c:111
-msgid "Small"
-msgstr "Pequeno"
-
-#: ../src/interface.c:220 ../src/interface.c:323
-msgid "Normal"
-msgstr "Normal"
-
-#: ../src/interface.c:221 ../src/interface.c:309 ../src/interface.c:347
-#: ../src/interface.c:324 ../src/interface.c:408 ../src/interface.c:446
-#: ../src/settings_window.c:115
-msgid "Large"
-msgstr "Grande"
-
-#: ../src/interface.c:222 ../src/interface.c:310 ../src/interface.c:348
-#: ../src/interface.c:325 ../src/interface.c:409 ../src/interface.c:447
-msgid "Huge"
-msgstr "Enorme"
-
-#: ../src/interface.c:397 ../src/interface.c:498
-msgid "Text Style"
-msgstr "Estio do texto"
-
-#: ../src/interface.c:466 ../src/search_window.c:267 ../src/interface.c:571
-#: ../src/search_window.c:374
-msgid "Search:"
-msgstr "Pesquisar:"
-
-#: ../src/search_window.c:257 ../src/search_window.c:341
-msgid "Search All Notes"
-msgstr "Pesquisar todas as notas"
-
-#: ../src/search_window.c:327 ../src/search_window.c:447
-msgid "Note"
-msgstr "Nota"
-
-#: ../src/search_window.c:346 ../src/search_window.c:464
-msgid "Last Changed"
-msgstr "Última alteração"
-
-#: ../src/callbacks.c:590 ../src/callbacks.c:586
-msgid "Really delete this note?"
-msgstr "Excluir mesmo essa nota?"
-
-#: ../src/callbacks.c:592 ../src/callbacks.c:588
-msgid "If you delete a note it is permanently lost."
-msgstr "Se você excluir uma nota, ela será perdida para sempre."
-
-#: ../src/note.c:341 ../src/note.c:374
+#: ../src/interface.c:637 ../src/callbacks.c:285 ../src/note.c:167
 #, c-format
 msgid "New Note %i"
 msgstr "Nova nota %i"
 
-#: ../src/note.c:344 ../src/note.c:377
-msgid "Describe your new note here."
-msgstr "Descreva sua nova nota aqui."
+#. ACTIONS
+#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#: ../src/interface.c:901 ../src/interface.c:1006 ../src/interface.c:1044
+msgid "Bold"
+msgstr "Negrito"
 
-#: ../src/search_window.c:284 ../src/search_window.c:349
-msgid "Sort By Title"
-msgstr "Ordenar por título"
+#: ../src/interface.c:902
+msgid "Bullets"
+msgstr "Marcadores"
 
-#: ../src/search_window.c:285 ../src/search_window.c:350
-msgid "Sort By Date"
-msgstr "Ordenar por data"
+#: ../src/interface.c:903
+#, fuzzy
+msgid "Decrease indent"
+msgstr "Diminuir recuo"
 
-#: ../src/interface.c:312
-msgid "Open Note"
+#: ../src/interface.c:904
+#, fuzzy
+msgid "Delete note"
+msgstr "Excluir nota"
+
+#: ../src/interface.c:905 ../src/interface.c:1010 ../src/interface.c:1048
+#, fuzzy
+msgid "Fixed width"
+msgstr "Largura fixa"
+
+#: ../src/interface.c:906 ../src/interface.c:1009 ../src/interface.c:1047
+msgid "Highlight"
+msgstr "Destacar"
+
+#: ../src/interface.c:907
+#, fuzzy
+msgid "Increase indent"
+msgstr "Aumentar recuo"
+
+#: ../src/interface.c:908
+msgid "Link"
+msgstr "Link"
+
+#: ../src/interface.c:909
+#, fuzzy
+msgid "New note"
+msgstr "Nova nota"
+
+#: ../src/interface.c:910
+#, fuzzy
+msgid "Open note"
 msgstr "Abrir nota"
 
-#: ../src/interface.c:313
+#: ../src/interface.c:911 ../src/settings_window.c:536
+#: ../src/settings_window.c:542
 msgid "Settings"
 msgstr "Configurações"
 
-#: ../src/settings_window.c:106
-msgid "Scrollbar Size"
+#: ../src/interface.c:912
+msgid "Quit"
+msgstr ""
+
+#: ../src/interface.c:913 ../src/interface.c:1007 ../src/interface.c:1045
+msgid "Italic"
+msgstr "Itálico"
+
+#: ../src/interface.c:914 ../src/interface.c:1008 ../src/interface.c:1046
+msgid "Strikeout"
+msgstr "Tachado"
+
+#: ../src/interface.c:915
+msgid "Style"
+msgstr "Estilo"
+
+#: ../src/interface.c:916
+#, fuzzy
+msgid "Zoom in"
+msgstr "Ampliar"
+
+#: ../src/interface.c:917
+#, fuzzy
+msgid "Zoom out"
+msgstr "Reduzir"
+
+#: ../src/interface.c:918
+#, fuzzy
+msgid "Find in note"
+msgstr "Localizar na nota"
+
+#: ../src/interface.c:919
+msgid "Synchronize"
+msgstr ""
+
+#: ../src/interface.c:920
+msgid "Back"
+msgstr ""
+
+#: ../src/interface.c:921
+msgid "Foreward"
+msgstr ""
+
+#: ../src/interface.c:922
+msgid "Fullscreen"
+msgstr ""
+
+#. TODO: Use an enum instead of 0 to 3
+#: ../src/interface.c:924 ../src/interface.c:1011 ../src/interface.c:1049
+msgid "Small"
+msgstr "Pequeno"
+
+#: ../src/interface.c:925
+msgid "Normal"
+msgstr "Normal"
+
+#: ../src/interface.c:926 ../src/interface.c:1012 ../src/interface.c:1050
+msgid "Large"
+msgstr "Grande"
+
+#: ../src/interface.c:927 ../src/interface.c:1013 ../src/interface.c:1051
+msgid "Huge"
+msgstr "Enorme"
+
+#. FIND TOOL BAR
+#: ../src/interface.c:1180 ../src/search_window.c:424
+msgid "Search:"
+msgstr "Pesquisar:"
+
+#: ../src/search_window.c:371
+#, fuzzy
+msgid "Search all notes"
+msgstr "Pesquisar todas as notas"
+
+#. Add New Note item
+#.
+#. menu_new_note = gtk_button_new();
+#. gtk_action_connect_proxy(new_note_action, menu_new_note);
+#. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
+#.
+#. Add sort filters
+#: ../src/search_window.c:389
+#, fuzzy
+msgid "Sort by title"
+msgstr "Ordenar por título"
+
+#: ../src/search_window.c:390
+#, fuzzy
+msgid "Sort by date"
+msgstr "Ordenar por data"
+
+#: ../src/search_window.c:497
+msgid "Note"
+msgstr "Nota"
+
+#: ../src/search_window.c:514
+#, fuzzy
+msgid "Last changed"
+msgstr "Última alteração"
+
+#: ../src/callbacks.c:800
+msgid "Really delete this note?"
+msgstr "Excluir mesmo essa nota?"
+
+#: ../src/callbacks.c:802
+msgid "If you delete a note it is permanently lost."
+msgstr "Se você excluir uma nota, ela será perdida para sempre."
+
+#: ../src/settings_window.c:223
+#, fuzzy
+msgid "Scrollbar size"
 msgstr "Tamanho da barra de rolagem"
 
-#: ../src/settings_window.c:238
+#: ../src/settings_window.c:228
 msgid "Thin"
 msgstr "Fino"
 
-#: ../src/settings_window.c:242
+#: ../src/settings_window.c:232
 msgid "Thick"
 msgstr "Grosso"
 
-#: ../src/settings_window.c:126
-msgid "On Startup"
+#: ../src/settings_window.c:243
+#, fuzzy
+msgid "On startup"
 msgstr "Ao iniciar"
 
-#: ../src/settings_window.c:144 ../src/settings_window.c:149
-msgid "Show Note"
+#: ../src/settings_window.c:262 ../src/settings_window.c:267
+#, fuzzy
+msgid "Show note"
 msgstr "Mostrar nota"
 
-#: ../src/settings_window.c:145 ../src/settings_window.c:150
-msgid "Show Search"
+#: ../src/settings_window.c:263 ../src/settings_window.c:268
+#, fuzzy
+msgid "Show search"
 msgstr "Mostrar pesquisa"
 
-#: ../src/settings_window.c:168 ../src/settings_window.c:170
-msgid "Use Custom Colors"
+#: ../src/settings_window.c:286 ../src/settings_window.c:288
+#, fuzzy
+msgid "Use custom colors"
 msgstr "Usar cores personalizadas"
 
-#: ../src/settings_window.c:184
+#: ../src/settings_window.c:302
 msgid "Text"
 msgstr "Texto"
 
-#: ../src/settings_window.c:198
+#: ../src/settings_window.c:316
 msgid "Background"
 msgstr "Plano de fundo"
 
-#: ../src/settings_window.c:212
+#: ../src/settings_window.c:330
 msgid "Links"
 msgstr "Links"
 
+#: ../src/conboy_note.c:341
+msgid "Describe your new note here."
+msgstr "Descreva sua nova nota aqui."
+
+#: ../src/conboy_plugin_manager.c:46
+msgid "Plugin"
+msgstr ""
+
+#: ../src/conboy_plugin_manager.c:47
+msgid "Enabled"
+msgstr ""
+
+#: ../src/conboy_plugin_manager.c:129 ../src/conboy_plugin_manager_row.c:132
+#, fuzzy
+msgid "Plugin settings"
+msgstr "Configurações"
+
+#: ../src/conboy_plugin_manager.c:602
+msgid "Active plugins"
+msgstr ""
+
+#: ../src/conboy_plugin_manager.c:631
+msgid "About plugin"
+msgstr ""
+
+#: ../src/conboy_plugin_manager.c:635
+msgid "Configure plugin"
+msgstr ""
+
+#~ msgid "Open"
+#~ msgstr "Abrir"
+
+#~ msgid "Close All Notes"
+#~ msgstr "Fechar todas as notas"
+
+#~ msgid "Text Style"
+#~ msgstr "Estio do texto"
