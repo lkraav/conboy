@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -21,7 +21,8 @@ msgid "New Note %i"
 msgstr "Neue Notiz %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
 #: ../src/interface.c:901 ../src/interface.c:1006 ../src/interface.c:1044
 msgid "Bold"
 msgstr "Fett"
@@ -103,11 +104,6 @@ msgstr "Synchronisieren"
 msgid "Back"
 msgstr "Zurück"
 
-#: ../src/interface.c:921
-#, fuzzy
-msgid "Forward"
-msgstr "Vorwärts"
-
 #: ../src/interface.c:922
 msgid "Fullscreen"
 msgstr "Vollbild"
@@ -139,11 +135,11 @@ msgid "Search all notes"
 msgstr "Alle Notizen durchsuchen"
 
 #. Add New Note item
-#.
+#. 
 #. menu_new_note = gtk_button_new();
 #. gtk_action_connect_proxy(new_note_action, menu_new_note);
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#.
+#. 
 #. Add sort filters
 #: ../src/search_window.c:389
 msgid "Sort by title"
@@ -236,6 +232,10 @@ msgstr "Über Plugin"
 #: ../src/conboy_plugin_manager.c:635
 msgid "Configure plugin"
 msgstr "Plugin konfigurieren"
+
+#: ../src/interface.c:921
+msgid "Forward"
+msgstr "Vorwärts"
 
 #~ msgid "Open"
 #~ msgstr "Öffnen"
