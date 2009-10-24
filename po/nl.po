@@ -101,7 +101,6 @@ msgid "Back"
 msgstr "Terug"
 
 #: ../src/interface.c:921
-#, fuzzy
 msgid "Forward"
 msgstr "Verder"
 
