@@ -918,7 +918,7 @@ UserInterface* create_mainwin() {
 	action_find = GTK_ACTION(gtk_action_new("find", _("Find in note"), NULL, GTK_STOCK_FIND));
 	action_sync = GTK_ACTION(gtk_action_new("sync", _("Synchronize"), NULL, NULL));
 	action_back = GTK_ACTION(gtk_action_new("back", _("Back"), NULL, GTK_STOCK_GO_BACK));
-	action_forward = GTK_ACTION(gtk_action_new("forward", _("Foreward"), NULL, GTK_STOCK_GO_FORWARD));
+	action_forward = GTK_ACTION(gtk_action_new("forward", _("Forward"), NULL, GTK_STOCK_GO_FORWARD));
 	action_fullscreen = GTK_ACTION(gtk_action_new("fullscreen", _("Fullscreen"), NULL, NULL));
 	/* TODO: Use an enum instead of 0 to 3 */
 	action_font_small = GTK_ACTION(gtk_radio_action_new("size:small", _("Small"), NULL, NULL, 0));

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Conboy\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-23 12:46+0200\n"
+"POT-Creation-Date: 2009-10-24 10:50+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Josef Assad <joe@donassad.com>\n"
 "Language-Team: \n"
@@ -101,7 +101,8 @@ msgid "Back"
 msgstr "Terug"
 
 #: ../src/interface.c:921
-msgid "Foreward"
+#, fuzzy
+msgid "Forward"
 msgstr "Verder"
 
 #: ../src/interface.c:922

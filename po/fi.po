@@ -5,12 +5,12 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the Conboy package.
 # FIRST AUTHOR <marko.vertainen@iki.fi>, 2009.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: fi_FI\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-23 12:46+0200\n"
+"POT-Creation-Date: 2009-10-24 10:50+0200\n"
 "PO-Revision-Date: 2009-10-18 19:07+0200\n"
 "Last-Translator: Marko Vertainen <marko.vertainen@iki.fi>\n"
 "Language-Team: fi_FI\n"
@@ -24,8 +24,7 @@ msgid "New Note %i"
 msgstr "Uusi muistilappu %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and
-#. that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
 #: ../src/interface.c:901 ../src/interface.c:1006 ../src/interface.c:1044
 msgid "Bold"
 msgstr "Lihavointi"
@@ -34,13 +33,37 @@ msgstr "Lihavointi"
 msgid "Bullets"
 msgstr "Luettelomerkit"
 
+#: ../src/interface.c:903
+msgid "Decrease indent"
+msgstr "Pienennä sisennystä"
+
+#: ../src/interface.c:904
+msgid "Delete note"
+msgstr "Poista muistilappu"
+
+#: ../src/interface.c:905 ../src/interface.c:1010 ../src/interface.c:1048
+msgid "Fixed width"
+msgstr "Tasalevyinen"
+
 #: ../src/interface.c:906 ../src/interface.c:1009 ../src/interface.c:1047
 msgid "Highlight"
 msgstr "Korostus"
 
+#: ../src/interface.c:907
+msgid "Increase indent"
+msgstr "Kasvata sisennystä"
+
 #: ../src/interface.c:908
 msgid "Link"
 msgstr "Linkki"
+
+#: ../src/interface.c:909
+msgid "New note"
+msgstr "Uusi muistilappu"
+
+#: ../src/interface.c:910
+msgid "Open note"
+msgstr "Avaa muistilappu"
 
 #: ../src/interface.c:911 ../src/settings_window.c:536
 #: ../src/settings_window.c:542
@@ -63,6 +86,18 @@ msgstr "Yliviivaus"
 msgid "Style"
 msgstr "Tyyli"
 
+#: ../src/interface.c:916
+msgid "Zoom in"
+msgstr "Lähennä"
+
+#: ../src/interface.c:917
+msgid "Zoom out"
+msgstr "Loitonna"
+
+#: ../src/interface.c:918
+msgid "Find in note"
+msgstr "Etsi muistilapusta"
+
 #: ../src/interface.c:919
 msgid "Synchronize"
 msgstr "Synkronoi"
@@ -72,7 +107,8 @@ msgid "Back"
 msgstr "Takaisin"
 
 #: ../src/interface.c:921
-msgid "Foreward"
+#, fuzzy
+msgid "Forward"
 msgstr "Eteenpäin"
 
 #: ../src/interface.c:922
@@ -101,9 +137,32 @@ msgstr "Valtava"
 msgid "Search:"
 msgstr "Etsi:"
 
+#: ../src/search_window.c:371
+msgid "Search all notes"
+msgstr "Etsi kaikista muistilapuista"
+
+#. Add New Note item
+#.
+#. menu_new_note = gtk_button_new();
+#. gtk_action_connect_proxy(new_note_action, menu_new_note);
+#. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
+#.
+#. Add sort filters
+#: ../src/search_window.c:389
+msgid "Sort by title"
+msgstr "Lajittele nimen mukaan"
+
+#: ../src/search_window.c:390
+msgid "Sort by date"
+msgstr "Lajittele päivämäärän mukaan"
+
 #: ../src/search_window.c:497
 msgid "Note"
 msgstr "Nuistilappu"
+
+#: ../src/search_window.c:514
+msgid "Last changed"
+msgstr "Viimeksi muutettu"
 
 #: ../src/callbacks.c:800
 msgid "Really delete this note?"
@@ -113,6 +172,10 @@ msgstr "Poistetaanko tämä muistilappu?"
 msgid "If you delete a note it is permanently lost."
 msgstr "Poistaminen hävittää muistilapun pysyvästi."
 
+#: ../src/settings_window.c:223
+msgid "Scrollbar size"
+msgstr "Vierityspalkin koko"
+
 #: ../src/settings_window.c:228
 msgid "Thin"
 msgstr "Ohut"
@@ -120,6 +183,22 @@ msgstr "Ohut"
 #: ../src/settings_window.c:232
 msgid "Thick"
 msgstr "Paksu"
+
+#: ../src/settings_window.c:243
+msgid "On startup"
+msgstr "Aloituksessa"
+
+#: ../src/settings_window.c:262 ../src/settings_window.c:267
+msgid "Show note"
+msgstr "Näytä muistilappu"
+
+#: ../src/settings_window.c:263 ../src/settings_window.c:268
+msgid "Show search"
+msgstr "Näytä haku"
+
+#: ../src/settings_window.c:286 ../src/settings_window.c:288
+msgid "Use custom colors"
+msgstr "Käytä vapaavalintaisia värejä"
 
 #: ../src/settings_window.c:302
 msgid "Text"
@@ -137,6 +216,14 @@ msgstr "Linkit"
 msgid "Describe your new note here."
 msgstr "Kirjoita tähän uuden muistilapun kuvaus."
 
+#: ../src/conboy_plugin_manager.c:46
+msgid "Plugin"
+msgstr "Liitännäinen"
+
+#: ../src/conboy_plugin_manager.c:47
+msgid "Enabled"
+msgstr "Käytössä"
+
 #: ../src/conboy_plugin_manager.c:129 ../src/conboy_plugin_manager_row.c:132
 msgid "Plugin settings"
 msgstr "Liitännäisen asetukset"
@@ -152,93 +239,6 @@ msgstr "Tietoja liitännäisestä"
 #: ../src/conboy_plugin_manager.c:635
 msgid "Configure plugin"
 msgstr "Liitännäisen asetukset"
-
-#: ../src/conboy_plugin_manager.c:46
-msgid "Plugin"
-msgstr "Liitännäinen"
-
-#: ../src/conboy_plugin_manager.c:47
-msgid "Enabled"
-msgstr "Käytössä"
-
-#: ../src/interface.c:904
-msgid "Delete note"
-msgstr "Poista muistilappu"
-
-#: ../src/interface.c:903
-msgid "Decrease indent"
-msgstr "Pienennä sisennystä"
-
-#: ../src/interface.c:905 ../src/interface.c:1010 ../src/interface.c:1048
-msgid "Fixed width"
-msgstr "Tasalevyinen"
-
-#: ../src/interface.c:907
-msgid "Increase indent"
-msgstr "Kasvata sisennystä"
-
-#: ../src/interface.c:918
-msgid "Find in note"
-msgstr "Etsi muistilapusta"
-
-#: ../src/interface.c:910
-msgid "Open note"
-msgstr "Avaa muistilappu"
-
-#: ../src/interface.c:909
-msgid "New note"
-msgstr "Uusi muistilappu"
-
-#: ../src/interface.c:917
-msgid "Zoom out"
-msgstr "Loitonna"
-
-#: ../src/interface.c:916
-msgid "Zoom in"
-msgstr "Lähennä"
-
-#: ../src/search_window.c:371
-msgid "Search all notes"
-msgstr "Etsi kaikista muistilapuista"
-
-#. Add New Note item
-#. 
-#. menu_new_note = gtk_button_new();
-#. gtk_action_connect_proxy(new_note_action, menu_new_note);
-#. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#. 
-#. Add sort filters
-#: ../src/search_window.c:389
-msgid "Sort by title"
-msgstr "Lajittele nimen mukaan"
-
-#: ../src/search_window.c:390
-msgid "Sort by date"
-msgstr "Lajittele päivämäärän mukaan"
-
-#: ../src/search_window.c:514
-msgid "Last changed"
-msgstr "Viimeksi muutettu"
-
-#: ../src/settings_window.c:223
-msgid "Scrollbar size"
-msgstr "Vierityspalkin koko"
-
-#: ../src/settings_window.c:286 ../src/settings_window.c:288
-msgid "Use custom colors"
-msgstr "Käytä vapaavalintaisia värejä"
-
-#: ../src/settings_window.c:263 ../src/settings_window.c:268
-msgid "Show search"
-msgstr "Näytä haku"
-
-#: ../src/settings_window.c:262 ../src/settings_window.c:267
-msgid "Show note"
-msgstr "Näytä muistilappu"
-
-#: ../src/settings_window.c:243
-msgid "On startup"
-msgstr "Aloituksessa"
 
 #~ msgid "Open"
 #~ msgstr "Avaa"

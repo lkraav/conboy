@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: conboy 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-23 12:46+0200\n"
+"POT-Creation-Date: 2009-10-24 10:50+0200\n"
 "PO-Revision-Date: 2009-06-27\n"
 "Last-Translator: Leonardo Ferreira Fontenelle <leonardof@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <ldp-br@bazar.conectiva.com.br>\n"
@@ -113,7 +113,7 @@ msgid "Back"
 msgstr ""
 
 #: ../src/interface.c:921
-msgid "Foreward"
+msgid "Forward"
 msgstr ""
 
 #: ../src/interface.c:922
