@@ -15,9 +15,17 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/interface.c:902
-msgid "Bullets"
-msgstr "Puces"
+#: ../src/interface.c:637 ../src/callbacks.c:285 ../src/note.c:167
+#, c-format
+msgid "New Note %i"
+msgstr "test test %i"
+
+#. ACTIONS
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
+#: ../src/interface.c:901 ../src/interface.c:1006 ../src/interface.c:1044
+msgid "Bold"
+msgstr "test"
 
 #: ../src/interface.c:903
 msgid "Decrease indent"
@@ -225,17 +233,9 @@ msgstr "A propos de l'extension"
 msgid "Configure plugin"
 msgstr "Configurer l'extension"
 
-#: ../src/interface.c:637 ../src/callbacks.c:285 ../src/note.c:167
-#, c-format
-msgid "New Note %i"
-msgstr "test test %i"
-
-#. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and
-#. that creates the correct widgets
-#: ../src/interface.c:901 ../src/interface.c:1006 ../src/interface.c:1044
-msgid "Bold"
-msgstr "test"
+#: ../src/interface.c:902
+msgid "Bullets"
+msgstr "test two"
 
 #~ msgid "Open"
 #~ msgstr "Ouvrir"
