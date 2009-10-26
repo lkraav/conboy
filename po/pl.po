@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: pl\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-10-24 10:50+0200\n"
-"PO-Revision-Date: 2009-10-23 16:42+0200\n"
+"PO-Revision-Date: 2009-10-26 00:54+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -103,7 +103,6 @@ msgid "Back"
 msgstr "Wstecz"
 
 #: ../src/interface.c:921
-#, fuzzy
 msgid "Forward"
 msgstr "Dalej"
 
