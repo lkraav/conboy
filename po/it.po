@@ -7,18 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-24 10:50+0200\n"
+"POT-Creation-Date: 2009-10-26 12:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#: ../src/interface.c:637 ../src/callbacks.c:285 ../src/note.c:167
-#, c-format
-msgid "New Note %i"
-msgstr "Titolo della nota %i"
 
 #. ACTIONS
 #. TODO: Write a function, which takes GtkActions that contain markup code and
@@ -31,13 +26,33 @@ msgstr "Grassetto"
 msgid "Bullets"
 msgstr "Lista puntata"
 
+#: ../src/interface.c:903
+msgid "Decrease indent"
+msgstr "Riduci l'indentazione"
+
+#: ../src/interface.c:904
+msgid "Delete note"
+msgstr "Cancella la nota"
+
+#: ../src/interface.c:905 ../src/interface.c:1010 ../src/interface.c:1048
+msgid "Fixed width"
+msgstr "Larghezza fissa"
+
 #: ../src/interface.c:906 ../src/interface.c:1009 ../src/interface.c:1047
 msgid "Highlight"
 msgstr "Evidenziato"
 
-#: ../src/interface.c:908
-msgid "Link"
-msgstr "Link"
+#: ../src/interface.c:907
+msgid "Increase indent"
+msgstr "Aumenta l'indentazione"
+
+#: ../src/interface.c:909
+msgid "New note"
+msgstr "Nuova nota"
+
+#: ../src/interface.c:910
+msgid "Open note"
+msgstr "Apri nota"
 
 #: ../src/interface.c:911 ../src/settings_window.c:536
 #: ../src/settings_window.c:542
@@ -60,6 +75,18 @@ msgstr "Barrato"
 msgid "Style"
 msgstr "Stile"
 
+#: ../src/interface.c:916
+msgid "Zoom in"
+msgstr "Ingrandisci"
+
+#: ../src/interface.c:917
+msgid "Zoom out"
+msgstr "Riduci"
+
+#: ../src/interface.c:918
+msgid "Find in note"
+msgstr "Cerca nella nota"
+
 #: ../src/interface.c:919
 msgid "Synchronize"
 msgstr "Sincronizza"
@@ -67,6 +94,10 @@ msgstr "Sincronizza"
 #: ../src/interface.c:920
 msgid "Back"
 msgstr "Indietro"
+
+#: ../src/interface.c:921
+msgid "Forward"
+msgstr "Avanti"
 
 #: ../src/interface.c:922
 msgid "Fullscreen"
@@ -94,9 +125,32 @@ msgstr "Molto grande"
 msgid "Search:"
 msgstr "Cerca:"
 
+#: ../src/search_window.c:371
+msgid "Search all notes"
+msgstr "Cerca in tutte le note"
+
+#. Add New Note item
+#. 
+#. menu_new_note = gtk_button_new();
+#. gtk_action_connect_proxy(new_note_action, menu_new_note);
+#. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
+#. 
+#. Add sort filters
+#: ../src/search_window.c:389
+msgid "Sort by title"
+msgstr "Ordina per titolo"
+
+#: ../src/search_window.c:390
+msgid "Sort by date"
+msgstr "Ordina per data"
+
 #: ../src/search_window.c:497
 msgid "Note"
 msgstr "Nota"
+
+#: ../src/search_window.c:514
+msgid "Last changed"
+msgstr "Ulltima modifica"
 
 #: ../src/callbacks.c:800
 msgid "Really delete this note?"
@@ -106,6 +160,10 @@ msgstr "Cancellare davvero la nota?"
 msgid "If you delete a note it is permanently lost."
 msgstr "La cancellazione di una nota è definitiva."
 
+#: ../src/settings_window.c:223
+msgid "Scrollbar size"
+msgstr "Barra di scorrimento"
+
 #: ../src/settings_window.c:228
 msgid "Thin"
 msgstr "Stretta"
@@ -114,6 +172,22 @@ msgstr "Stretta"
 msgid "Thick"
 msgstr "Larga"
 
+#: ../src/settings_window.c:243
+msgid "On startup"
+msgstr "Alla partenza"
+
+#: ../src/settings_window.c:262 ../src/settings_window.c:267
+msgid "Show note"
+msgstr "Mostra la nota"
+
+#: ../src/settings_window.c:263 ../src/settings_window.c:268
+msgid "Show search"
+msgstr "Mostra la ricerca"
+
+#: ../src/settings_window.c:286 ../src/settings_window.c:288
+msgid "Use custom colors"
+msgstr "Usa colori predefiniti"
+
 #: ../src/settings_window.c:302
 msgid "Text"
 msgstr "Testo"
@@ -121,14 +195,6 @@ msgstr "Testo"
 #: ../src/settings_window.c:316
 msgid "Background"
 msgstr "Sfondo"
-
-#: ../src/settings_window.c:330
-msgid "Links"
-msgstr "Links"
-
-#: ../src/conboy_note.c:341
-msgid "Describe your new note here."
-msgstr "Testo della nota."
 
 #: ../src/conboy_plugin_manager.c:46
 msgid "Plugin"
@@ -150,92 +216,26 @@ msgstr "Info estensione"
 msgid "Configure plugin"
 msgstr "Configura estensione"
 
-#: ../src/settings_window.c:286 ../src/settings_window.c:288
-msgid "Use custom colors"
-msgstr "Usa colori predefiniti"
+#: ../src/conboy_note.c:341
+msgid "Describe your new note here."
+msgstr "Descrivi la nuova nota qui."
 
-#: ../src/settings_window.c:262 ../src/settings_window.c:267
-msgid "Show note"
-msgstr "Mostra la nota"
+#: ../src/settings_window.c:330
+msgid "Links"
+msgstr "Collegamenti"
 
-#: ../src/settings_window.c:263 ../src/settings_window.c:268
-msgid "Show search"
-msgstr "Mostra la ricerca"
+#: ../src/interface.c:637 ../src/callbacks.c:285 ../src/note.c:167
+#, c-format
+msgid "New Note %i"
+msgstr "Nuova nota %i"
 
-#: ../src/interface.c:904
-msgid "Delete note"
-msgstr "Cancella la nota"
-
-#: ../src/interface.c:903
-msgid "Decrease indent"
-msgstr "Riduci l'indentazione"
-
-#: ../src/interface.c:905 ../src/interface.c:1010 ../src/interface.c:1048
-msgid "Fixed width"
-msgstr "Larghezza fissa"
-
-#: ../src/interface.c:907
-msgid "Increase indent"
-msgstr "Aumenta l'indentazione"
-
-#: ../src/interface.c:918
-msgid "Find in note"
-msgstr "Cerca nella nota"
-
-#: ../src/interface.c:917
-msgid "Zoom out"
-msgstr "Riduci"
-
-#: ../src/interface.c:910
-msgid "Open note"
-msgstr "Apri nota"
-
-#: ../src/interface.c:909
-msgid "New note"
-msgstr "Nuova nota"
-
-#: ../src/interface.c:916
-msgid "Zoom in"
-msgstr "Ingrandisci"
+#: ../src/interface.c:908
+msgid "Link"
+msgstr "Collega"
 
 #: ../src/conboy_plugin_manager.c:129 ../src/conboy_plugin_manager_row.c:132
 msgid "Plugin settings"
-msgstr "Opzioni"
-
-#: ../src/interface.c:921
-msgid "Forward"
-msgstr "Avanti"
-
-#: ../src/search_window.c:371
-msgid "Search all notes"
-msgstr "Cerca in tutte le note"
-
-#: ../src/search_window.c:514
-msgid "Last changed"
-msgstr "Ulltima modifica"
-
-#: ../src/search_window.c:390
-msgid "Sort by date"
-msgstr "Ordina per data"
-
-#. Add New Note item
-#. 
-#. menu_new_note = gtk_button_new();
-#. gtk_action_connect_proxy(new_note_action, menu_new_note);
-#. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#. 
-#. Add sort filters
-#: ../src/search_window.c:389
-msgid "Sort by title"
-msgstr "Ordina per titolo"
-
-#: ../src/settings_window.c:223
-msgid "Scrollbar size"
-msgstr "Barra di scorrimento"
-
-#: ../src/settings_window.c:243
-msgid "On startup"
-msgstr "Alla partenza"
+msgstr "Opzioni estensioni"
 
 #~ msgid "Open"
 #~ msgstr "Apri"
