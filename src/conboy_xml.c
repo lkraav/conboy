@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -30,39 +30,48 @@ conboy_xml_get_reader_for_memory(const gchar *xml_string)
 		__xml_text_reader = xmlReaderForMemory(xml_string, strlen(xml_string), "", "UTF-8", 0);
 		return __xml_text_reader;
 	}
-	
+
 	if (xmlReaderNewMemory(__xml_text_reader, xml_string, strlen(xml_string), "", "UTF-8", 0) != 0) {
 		g_printerr("ERROR: Couldn't reuse xml parser. \n");
 		g_assert_not_reached();
 	}
-	
+
 	if (__xml_text_reader == NULL) {
 		g_printerr("ERROR: Couldn't init xml parser.\n");
 		g_assert_not_reached();
 	}
-	
+
 	return __xml_text_reader;
 }
 
 xmlTextReader*
 conboy_xml_get_reader_for_file(const gchar *file_name)
 {
+	/* Reusing the parser is not possible due to a bug in libxml2 */
+	if (__xml_text_reader != NULL) {
+		xmlFreeTextReader(__xml_text_reader);
+	}
+
+	__xml_text_reader = xmlReaderForFile(file_name, "UTF-8", 0);
+
 	/* We try to reuse the existing xml parser. If none exists yet, we create a new one. */
+	/*
 	if (__xml_text_reader == NULL) {
 		__xml_text_reader = xmlReaderForFile(file_name, "UTF-8", 0);
 		return __xml_text_reader;
 	}
-	
+
 	if (xmlReaderNewFile(__xml_text_reader, file_name, "UTF-8", 0) != 0) {
 		g_printerr("ERROR: Cannot reuse xml parser. \n");
 		g_assert_not_reached();
 	}
-	
+
 	if (__xml_text_reader == NULL) {
 		g_printerr("ERROR: Couldn't init xml parser.\n");
 		g_assert_not_reached();
 	}
-	
+	*/
+
 	return __xml_text_reader;
 }
 

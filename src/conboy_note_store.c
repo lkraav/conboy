@@ -109,7 +109,7 @@ conboy_note_store_add(ConboyNoteStore *self, ConboyNote *note, GtkTreeIter *iter
 	 * connect signals to recognize whenever the Note itself was
 	 * changed. If such a change would occure we could update the
 	 * coresponding row. */
-	
+
 	/* Find out if title of the newly added note is longer then the currently longest */
 	self->max_title_length = max (g_utf8_strlen(note->title, -1), self->max_title_length);
 
@@ -285,15 +285,15 @@ conboy_note_store_remove(ConboyNoteStore *self, ConboyNote *note)
 
 	if (conboy_note_store_get_iter(self, note, &iter)) {
 		gtk_list_store_remove(GTK_LIST_STORE(self), &iter);
-		
+
 		/* If the note with the longest title was removed, we need to find out what the longest title is now */
 		if (g_utf8_strlen(note->title, -1) == self->max_title_length) {
 			self->max_title_length = find_longest_title(self);
 		}
-		
+
 		return TRUE;
 	}
-	
+
 	return FALSE;
 }
 
@@ -430,11 +430,20 @@ conboy_note_store_set_storage(ConboyNoteStore *self, ConboyStorage *storage) {
 	self->storage = storage;
 	g_object_ref(storage);
 
+	GTimer *timer = g_timer_new();
+	gulong micro;
+
 	GSList *notes = conboy_storage_note_list(storage);
 	while (notes) {
 		conboy_note_store_add(self, notes->data, NULL);
 		notes = notes->next;
 	}
+
+	g_timer_stop(timer);
+	g_timer_elapsed(timer, &micro);
+	g_timer_destroy(timer);
+
+	g_printerr("INFO: Loading %i notes took %i micro seconds\n", conboy_note_store_get_length(self), micro);
 
 	g_signal_connect(storage, "activated",   G_CALLBACK(on_storage_activated),   self);
 	g_signal_connect(storage, "deactivated", G_CALLBACK(on_storage_deactivated), self);
@@ -446,7 +455,7 @@ conboy_note_store_find_by_guid(ConboyNoteStore *self, const gchar *guid)
 	g_return_val_if_fail(self != NULL, NULL);
 	g_return_val_if_fail(guid != NULL, NULL);
 	g_return_val_if_fail(CONBOY_IS_NOTE_STORE(self), NULL);
-	
+
 	GtkTreeIter iter;
 	ConboyNote *result = NULL;
 
