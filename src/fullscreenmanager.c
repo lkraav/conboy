@@ -64,16 +64,22 @@ fullscreen_ui_hide(FullscreenManager * self)
 }
 
 
+/**
+ * Changes the position of the overlay, but only if it is visible.
+ */
 static void
 fullscreen_set_overlay_position (FullscreenManager *self)
 {
 	GtkWidget *parent = GTK_WIDGET(self->parent_window);
 	GtkWidget *overlay = GTK_WIDGET(self->overlay);
 
+	/* For some reason I have to call hide/show to make it appear at the new position */
 	gint x = parent->allocation.width - overlay->allocation.width;
 	gint y = parent->allocation.height - overlay->allocation.height - OFFSET;
 
+	gtk_widget_hide(overlay);
 	gtk_window_move(GTK_WINDOW(overlay), x, y);
+	gtk_widget_show(overlay);
 }
 
 
@@ -291,7 +297,7 @@ on_expose_event (GtkWidget *widget, GdkEventExpose *event, gpointer data)
     cairo_fill (ctx);
 
     /* Add icon */
-    gdk_cairo_set_source_pixbuf (ctx, pixbuf, 10, 10);
+    gdk_cairo_set_source_pixbuf (ctx, pixbuf, 15, 10);
     cairo_paint (ctx);
 
     /* Destroy context */
@@ -396,7 +402,7 @@ fullscreen_manager_destroy (GtkWidget *parent_window, FullscreenManager *self)
 /**
  * Called when the size allocation of the parent window changes.
  *
- * TODO: Why is is called so often?
+ * TODO: Why is is called so often? Looks like that only happens inside the SDK
  */
 static void
 ui_parent_size_allocate_cb (GtkWidget     *widget,
@@ -406,15 +412,15 @@ ui_parent_size_allocate_cb (GtkWidget     *widget,
     g_return_if_fail (widget != NULL);
     g_return_if_fail (allocation != NULL);
 
-    g_printerr("Size allocated\n");
-
     FullscreenManager *self = FULLSCREEN_MANAGER(user_data);
     g_return_if_fail (self != NULL);
 
     GtkWidget *ui_win = GTK_WIDGET(self->overlay);
     g_return_if_fail (ui_win != NULL);
 
-    fullscreen_set_overlay_position(self);
+    if (gdk_window_is_visible(self->overlay->window)) {
+    	fullscreen_set_overlay_position(self);
+    }
 }
 
 
@@ -440,7 +446,7 @@ fullscreen_manager_new (GtkWindow *parent_window, Callback callback)
     g_signal_connect (parent_window, "window-state-event",
     		G_CALLBACK(fullscreen_on_toggled), self);
 
-    g_signal_connect (parent_window, "size-allocate",
+    g_signal_connect_after (parent_window, "size-allocate",
     		G_CALLBACK(ui_parent_size_allocate_cb), self);
 
     return self;
