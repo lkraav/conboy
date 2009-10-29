@@ -180,7 +180,6 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 #ifndef HILDON_HAS_APP_MENU
 	GtkWidget *scroll_vbox, *scroll_label, *scroll_but1, *scroll_but2;
 #endif
-	GtkWidget *view_box, *view_button_box, *view_label, *view_but1, *view_but2;
 	GtkWidget *color_vbox, *color_but;
 	GtkWidget *text_color_hbox, *text_color_but, *text_color_label;
 	GtkWidget *back_color_hbox, *back_color_but, *back_color_label;
@@ -233,47 +232,6 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_widget_show(scroll_but2);
 	gtk_container_add(GTK_CONTAINER(scroll_vbox), scroll_but2);
 #endif
-
-	/* On Startup vbox */
-	view_box = gtk_vbox_new(FALSE, 0);
-	gtk_widget_show(view_box);
-	gtk_container_add(GTK_CONTAINER(hbox), view_box);
-
-	view_label = gtk_label_new("");
-	gtk_label_set_markup(GTK_LABEL(view_label), _("On startup"));
-	gtk_misc_set_alignment(GTK_MISC(view_label), 0, 0.5);
-	gtk_widget_show(view_label);
-	gtk_container_add(GTK_CONTAINER(view_box), view_label);
-
-	/* Box for the view toggle buttons */
-#ifdef HILDON_HAS_APP_MENU
-	view_button_box = gtk_hbox_new(FALSE, 0);
-#else
-	view_button_box = gtk_vbox_new(FALSE, 0);
-#endif
-	gtk_widget_show(GTK_WIDGET(view_button_box));
-	gtk_container_add(GTK_CONTAINER(view_box), view_button_box);
-
-
-#ifdef HILDON_HAS_APP_MENU
-	/* TODO: Write a bug report. This should be only 2 lines instaed of 6 */
-	view_but1 = hildon_gtk_radio_button_new(HILDON_SIZE_FINGER_HEIGHT, NULL);
-	view_but2 = hildon_gtk_radio_button_new_from_widget(HILDON_SIZE_FINGER_HEIGHT, GTK_RADIO_BUTTON(view_but1));
-	gtk_button_set_label(GTK_BUTTON(view_but1), _("Show note"));
-	gtk_button_set_label(GTK_BUTTON(view_but2), _("Show search"));
-	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(view_but1), FALSE);
-	gtk_toggle_button_set_mode(GTK_TOGGLE_BUTTON(view_but2), FALSE);
-#else
-	view_but1 = gtk_radio_button_new_with_label(NULL, _("Show note"));
-	view_but2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(view_but1), _("Show search"));
-#endif
-
-	gtk_widget_show(view_but1);
-	gtk_widget_show(view_but2);
-
-	gtk_box_pack_start(GTK_BOX(view_button_box), view_but1, TRUE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(view_button_box), view_but2, TRUE, TRUE, 0);
-
 
 
 	/* Select Colors vbox */
@@ -370,88 +328,11 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_widget_show(sync_auth_but);
 	gtk_box_pack_start(GTK_BOX(sync_hbox), sync_auth_but, FALSE, FALSE, 0);
 
-	/* Adding plugin section */
-	/*
-	GtkWidget *plugin_hbox = gtk_hbox_new(FALSE, 0);
-	gtk_widget_show(plugin_hbox);
-	gtk_box_pack_start(GTK_BOX(config_vbox), plugin_hbox, TRUE, TRUE, 0);
-
-	GtkWidget *plugin_manager = conboy_plugin_manager_new();
-	gtk_widget_show(plugin_manager);
-	gtk_box_pack_start(GTK_BOX(plugin_hbox), plugin_manager, TRUE, TRUE, 0);
-	*/
-
-	/* TODO: Current plugin manager does not look nice on Fremantle. Below is a demo
-	 * on how it should look. Implement this for PluginManager.
-	 */
-
+	/* Add the plugin manager widget */
 	GtkWidget *plugin_manager = conboy_plugin_manager_new();
 	gtk_widget_show(plugin_manager);
 	gtk_box_pack_start(GTK_BOX(config_vbox), plugin_manager, FALSE, FALSE, 0);
 
-#ifdef XXX
-	/* Touch test */
-	GtkWidget *test_vbox = gtk_vbox_new(FALSE, 0);
-	gtk_widget_show(test_vbox);
-	gtk_box_pack_start(GTK_BOX(config_vbox), test_vbox, TRUE, TRUE, 0);
-
-	/* Heading */
-	GtkWidget *heading = gtk_label_new("Plugins");
-	gtk_widget_show(heading);
-	/*gtk_label_set_justify(GTK_LABEL(heading), GTK_JUSTIFY_LEFT);*/
-	gtk_misc_set_alignment(GTK_MISC(heading), 0, -1);
-	gtk_box_pack_start(GTK_BOX(test_vbox), heading, TRUE, TRUE, 0);
-
-	/* Test row 1 */
-	GtkWidget *test_hbox1 = gtk_hbox_new(FALSE, 0);
-	gtk_widget_show(test_hbox1);
-	gtk_box_pack_start(GTK_BOX(test_vbox), test_hbox1, TRUE, TRUE, 0);
-
-	GtkWidget *but1 = conboy_check_button_new(HILDON_SIZE_FINGER_HEIGHT, HILDON_BUTTON_ARRANGEMENT_VERTICAL);
-	gtk_widget_show(but1);
-	conboy_check_button_set_text(CONBOY_CHECK_BUTTON(but1), "Xml Backend", "Loads and saves data using xml");
-	conboy_check_button_set_active(CONBOY_CHECK_BUTTON(but1), TRUE);
-	gtk_widget_show(but1);
-	gtk_box_pack_start(GTK_BOX(test_hbox1), but1, TRUE, TRUE, 0);
-
-	GtkWidget *inf1 = hildon_gtk_button_new(HILDON_SIZE_FINGER_HEIGHT);
-	GtkWidget *inf1_img = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_information.png");
-	gtk_button_set_image(GTK_BUTTON(inf1), inf1_img);
-	gtk_widget_show(inf1);
-	gtk_box_pack_start(GTK_BOX(test_hbox1), inf1, FALSE, FALSE, 0);
-
-	GtkWidget *cnf1 = hildon_gtk_button_new(HILDON_SIZE_FINGER_HEIGHT);
-	GtkWidget *cnf1_img = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_settings.png");
-	gtk_button_set_image(GTK_BUTTON(cnf1), cnf1_img);
-	gtk_widget_show(cnf1);
-	gtk_box_pack_start(GTK_BOX(test_hbox1), cnf1, FALSE, FALSE, 0);
-	/* End row 1 */
-
-	/* Test row 2 */
-	GtkWidget *test_hbox2 = gtk_hbox_new(FALSE, 0);
-	gtk_widget_show(test_hbox2);
-	gtk_box_pack_start(GTK_BOX(test_vbox), test_hbox2, TRUE, TRUE, 0);
-
-	GtkWidget *but2 = conboy_check_button_new(HILDON_SIZE_FINGER_HEIGHT, HILDON_BUTTON_ARRANGEMENT_VERTICAL);
-	conboy_check_button_set_text(HILDON_BUTTON(but2), "Midgard Backend", "Loads and saves data using a Midgard database");
-	gtk_widget_show(but2);
-	gtk_box_pack_start(GTK_BOX(test_hbox2), but2, TRUE, TRUE, 0);
-
-	GtkWidget *inf2 = hildon_gtk_button_new(HILDON_SIZE_FINGER_HEIGHT);
-	GtkWidget *inf2_img = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_information.png");
-	gtk_button_set_image(GTK_BUTTON(inf2), inf2_img);
-	gtk_widget_show(inf2);
-	gtk_box_pack_start(GTK_BOX(test_hbox2), inf2, FALSE, FALSE, 0);
-
-	GtkWidget *cnf2 = hildon_gtk_button_new(HILDON_SIZE_FINGER_HEIGHT);
-	GtkWidget *cnf2_img = gtk_image_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_settings.png");
-	gtk_button_set_image(GTK_BUTTON(cnf2), cnf2_img);
-	gtk_widget_show(cnf2);
-	gtk_box_pack_start(GTK_BOX(test_hbox2), cnf2, FALSE, FALSE, 0);
-	/* End row 2 */
-
-
-#endif
 
 	/*
 	 * Set initial values from gconf
@@ -511,7 +392,6 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 #ifndef HILDON_HAS_APP_MENU
 	g_signal_connect(scroll_but1, "toggled", G_CALLBACK(on_scroll_but_toggled), NULL);
 #endif
-	g_signal_connect(view_but1, "toggled", G_CALLBACK(on_view_but_toggled), NULL);
 	g_signal_connect(color_but, "toggled", G_CALLBACK(on_use_colors_but_toggled), text_color_hbox);
 	g_signal_connect(text_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_TEXT));
 	g_signal_connect(link_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_LINKS));
@@ -519,10 +399,6 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 
 	g_signal_connect(sync_auth_but, "clicked", G_CALLBACK(on_sync_auth_but_clicked), widget);
 	g_signal_connect(sync_entry, "changed", G_CALLBACK(on_sync_entry_changed), sync_auth_but);
-	/*
-	g_signal_connect(sync_but, "clicked", G_CALLBACK(on_sync_but_clicked), NULL);
-	g_signal_connect(plugin_but, "clicked", G_CALLBACK(on_plugin_but_clicked), NULL);
-	*/
 
 	/* Set to something big to make sure the maximum dialog area is used */
 	gtk_widget_set_size_request(pannable, -1, 800);
@@ -537,7 +413,9 @@ void settings_window_open(GtkWindow *parent)
 			parent,
 			GTK_DIALOG_MODAL,
 			NULL);
-	hildon_gtk_window_set_portrait_flags(GTK_WINDOW(dialog), ~HILDON_PORTRAIT_MODE_SUPPORT);
+	hildon_gtk_window_set_portrait_flags(GTK_WINDOW(dialog), 0);
+	orientation_disable_accelerators();
+
 #else
 	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Settings"),
 			parent,
@@ -558,4 +436,8 @@ void settings_window_open(GtkWindow *parent)
 	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 
 	gtk_dialog_run(GTK_DIALOG(dialog));
+
+#ifdef HILDON_HAS_APP_MENU
+	orientation_enable_accelerators();
+#endif
 }

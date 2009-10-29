@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -33,10 +33,23 @@
 static void
 set_orientation(const gchar* orientation)
 {
+	AppData *app_data = app_data_get();
+
+	/* If we disabled the accelarators, then we don't want to react on it if
+	 * it was turned on by another application.
+	 *
+	 * E.g. when a dialog is open we want to disable auto rotation and if there
+	 * is another application that turned on the accelerators we still don't want
+	 * the input.
+	 */
+	if (app_data->accelerators == FALSE) {
+		return;
+	}
+
 	g_printerr("INFO: Setting to orientation: %s\n", orientation);
 
 	HildonPortraitFlags flags;
-	AppData *app_data = app_data_get();
+
 
 	if (strcmp(orientation, "landscape") == 0) {
 		flags = HILDON_PORTRAIT_MODE_SUPPORT;
