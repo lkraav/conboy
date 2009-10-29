@@ -119,7 +119,7 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 		GtkWidget *dialog = ui_helper_create_yes_no_dialog(parent, "Really reset the sync settings?");
 		int ret = gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy(dialog);
-		if (ret == GTK_RESPONSE_OK) {
+		if (ret == GTK_RESPONSE_YES) {
 			/* Reset settings */
 			settings_save_last_sync_revision(0);
 			settings_save_last_sync_time(0);
