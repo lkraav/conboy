@@ -892,42 +892,6 @@ on_smaller_button_clicked			   (GtkAction		*action,
 	change_font_size_by(-5000);
 }
 
-static void
-toggle_fullscreen(UserInterface *ui)
-{
-	AppData *app_data = app_data_get();
-	gboolean fullscreen = FALSE;
-
-	GdkWindowState state = gdk_window_get_state(GTK_WIDGET(ui->window)->window);
-	if (state & GDK_WINDOW_STATE_FULLSCREEN) {
-		fullscreen = TRUE;
-	}
-
-	fullscreen = !fullscreen;
-
-	/*app_data->fullscreen = !app_data->fullscreen;*/
-
-	/* Set all open windows to fullscreen or unfullscreen */
-
-	if (fullscreen) {
-		gtk_window_fullscreen(GTK_WINDOW(app_data->note_window->window));
-	} else {
-		gtk_window_unfullscreen(GTK_WINDOW(app_data->note_window->window));
-	}
-
-	/* Set search window to fullscreen or unfullscreen */
-	if (app_data->search_window != NULL) {
-		if (fullscreen) {
-			gtk_window_fullscreen(GTK_WINDOW(app_data->search_window));
-		} else {
-			gtk_window_unfullscreen(GTK_WINDOW(app_data->search_window));
-		}
-	}
-
-	/* Focus again on the active note */
-	note_set_focus(ui);
-}
-
 void
 on_bigger_button_clicked				(GtkAction		*action,
 										gpointer		 user_data)
@@ -960,7 +924,7 @@ gboolean on_hardware_key_pressed	(GtkWidget			*widget,
 
 	case HILDON_HARDKEY_FULLSCREEN:
 		/* Toggle fullscreen */
-		toggle_fullscreen(ui);
+		ui_helper_toggle_fullscreen(GTK_WINDOW(ui->window));
 		return TRUE;
 	}
 
@@ -1528,18 +1492,7 @@ void
 on_fullscreen_button_clicked		   (GtkAction		*action,
 										gpointer		 user_data)
 {
-
-	g_printerr("FULLSCREEN CLICKED\n");
-
 	UserInterface *ui = (UserInterface*) user_data;
-
-	toggle_fullscreen(ui);
-
-/*
-	AppData *app_data = app_data_get();
-
-	FullscreenManager *mng = app_data->fullscreen_manager;
-	fullscreen_enable(mng);
-*/
+	ui_helper_toggle_fullscreen(GTK_WINDOW(ui->window));
 }
 

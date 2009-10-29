@@ -58,7 +58,9 @@ fullscreen_ui_hide(FullscreenManager * self)
     /* Reset timer */
     g_source_remove_by_user_data((gpointer) self);
 
-    gtk_widget_hide(self->overlay);
+    if (self->overlay != NULL && GTK_IS_WIDGET(self->overlay)) {
+    	gtk_widget_hide(self->overlay);
+    }
 }
 
 
@@ -230,9 +232,9 @@ fullscreen_ui_enable(FullscreenManager *self)
 static void
 fullscreen_ui_disable(FullscreenManager * self)
 {
-    g_return_if_fail(FULLSCREEN_IS_MANAGER(self));
+    g_return_if_fail (FULLSCREEN_IS_MANAGER(self));
 
-    fullscreen_ui_hide(self);
+    fullscreen_ui_hide (self);
 
     if (self->button_release_hook_id > 0) {
         g_signal_remove_emission_hook(self->button_release_signal_id,
@@ -302,7 +304,12 @@ gboolean
 on_overlay_clicked (GtkWidget *widget, GdkEventButton *event, gpointer data)
 {
 	FullscreenManager *self = FULLSCREEN_MANAGER(data);
-	gtk_window_unfullscreen(self->parent_window);
+	/*gtk_window_unfullscreen(self->parent_window);*/
+	if (self->callback == NULL) {
+		gtk_window_unfullscreen(self->parent_window);
+	} else {
+		self->callback(self->parent_window);
+	}
 }
 
 
@@ -377,7 +384,7 @@ fullscreen_manager_destroy (GtkWidget *parent_window, FullscreenManager *self)
 
     fullscreen_ui_disable (self);
 
-    if (self->overlay != NULL) {
+    if (self->overlay != NULL && GTK_IS_WIDGET(self->overlay)) {
     	g_printerr("Destroying overlay\n");
 		gtk_widget_destroy (GTK_WIDGET(self->overlay));
 		self->overlay = NULL;
@@ -389,8 +396,7 @@ fullscreen_manager_destroy (GtkWidget *parent_window, FullscreenManager *self)
 /**
  * Called when the size allocation of the parent window changes.
  *
- * TODO: Connect to parent window again, if needed. Right now, I don't see a reason why the
- * size of the parent window should change.
+ * TODO: Why is is called so often?
  */
 static void
 ui_parent_size_allocate_cb (GtkWidget     *widget,
@@ -399,6 +405,8 @@ ui_parent_size_allocate_cb (GtkWidget     *widget,
 {
     g_return_if_fail (widget != NULL);
     g_return_if_fail (allocation != NULL);
+
+    g_printerr("Size allocated\n");
 
     FullscreenManager *self = FULLSCREEN_MANAGER(user_data);
     g_return_if_fail (self != NULL);
@@ -415,7 +423,7 @@ ui_parent_size_allocate_cb (GtkWidget     *widget,
  * to provide a parent window.
  */
 FullscreenManager*
-fullscreen_manager_new (GtkWindow *parent_window)
+fullscreen_manager_new (GtkWindow *parent_window, Callback callback)
 {
 	g_return_val_if_fail (parent_window != NULL, NULL);
 	g_return_val_if_fail (GTK_IS_WINDOW (parent_window), NULL);
@@ -423,6 +431,7 @@ fullscreen_manager_new (GtkWindow *parent_window)
     FullscreenManager *self = g_object_new (FULLSCREEN_MANAGER_TYPE, NULL);
 
     self->parent_window = parent_window;
+    self->callback = callback;
     self->overlay = fullscreen_ui_create (self);
 
     g_signal_connect (parent_window, "destroy",
@@ -430,6 +439,9 @@ fullscreen_manager_new (GtkWindow *parent_window)
 
     g_signal_connect (parent_window, "window-state-event",
     		G_CALLBACK(fullscreen_on_toggled), self);
+
+    g_signal_connect (parent_window, "size-allocate",
+    		G_CALLBACK(ui_parent_size_allocate_cb), self);
 
     return self;
 }

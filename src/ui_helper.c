@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -17,6 +17,8 @@
  */
 
 #include <gtk/gtk.h>
+
+#include "app_data.h"
 
 #include "ui_helper.h"
 
@@ -70,4 +72,37 @@ ui_helper_show_confirmation_dialog(GtkWindow *parent, const gchar *message)
 	GtkWidget *dialog = ui_helper_create_confirmation_dialog(parent, message);
 	gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog);
+}
+
+void
+ui_helper_toggle_fullscreen(GtkWindow *active_window)
+{
+	AppData *app_data = app_data_get();
+	gboolean fullscreen = FALSE;
+
+	GdkWindowState state = gdk_window_get_state(GTK_WIDGET(active_window)->window);
+	if (state & GDK_WINDOW_STATE_FULLSCREEN) {
+		fullscreen = TRUE;
+	}
+
+	fullscreen = !fullscreen;
+
+	/* Set main window to fullscreen or unfullscreen */
+	if (fullscreen) {
+		gtk_window_fullscreen(GTK_WINDOW(app_data->note_window->window));
+	} else {
+		gtk_window_unfullscreen(GTK_WINDOW(app_data->note_window->window));
+	}
+
+	/* Set search window to fullscreen or unfullscreen */
+	if (app_data->search_window != NULL) {
+		if (fullscreen) {
+			gtk_window_fullscreen(GTK_WINDOW(app_data->search_window));
+		} else {
+			gtk_window_unfullscreen(GTK_WINDOW(app_data->search_window));
+		}
+	}
+
+	/* Focus again on the active note */
+	gtk_window_present(active_window);
 }

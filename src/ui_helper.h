@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -28,6 +28,9 @@ ui_helper_create_confirmation_dialog(GtkWindow *parent, const gchar *message);
 
 void
 ui_helper_show_confirmation_dialog(GtkWindow *parent, const gchar *message);
+
+void
+ui_helper_toggle_fullscreen(GtkWindow *active_window);
 
 
 #endif /* _UI_HELPER_H_ */

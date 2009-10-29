@@ -36,6 +36,8 @@ typedef struct _FullscreenManagerClass FullscreenManagerClass;
 #include <glib-object.h>
 #include <gtk/gtk.h>
 
+typedef void (* Callback) (GtkWindow *window);
+
 struct _FullscreenManager {
         GObject      parent;
 
@@ -50,6 +52,8 @@ struct _FullscreenManager {
 
         gulong       button_press_hook_id;
         gulong       button_release_hook_id;
+
+        Callback     callback;
 };
 
 struct _FullscreenManagerClass {
@@ -77,11 +81,12 @@ GType fullscreen_manager_get_type(void);
  * i.e. under normal circumstances there's no need to do explicit call to
  * fullscreen_destroy_manager.
  *
- * @param view A MaemopadWindow instance.
+ * @param window A GtkWindow instance.
+ * @param callback A function that should be called whenever the overlay is clicked if null, gtk_window_unfullscreen() is called.
  * @return New FullscreenManager instance.
  */
 FullscreenManager *
-fullscreen_manager_new(GtkWindow * view);
+fullscreen_manager_new(GtkWindow *window, Callback callback);
 
 
 

@@ -30,12 +30,13 @@
 #include <string.h>
 
 #include "app_data.h"
-#include "search_window.h"
 #include "metadata.h"
 #include "note.h"
 #include "conboy_note_store.h"
 #include "settings.h"
 #include "search.h"
+#include "ui_helper.h"
+#include "search_window.h"
 
 typedef struct {
 	GtkWidget          *search_field;
@@ -167,40 +168,9 @@ gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer
 		gtk_widget_hide(window);
 		return TRUE;
 
-	/* TODO: Duplicated code The same code (only last line differs) is used in callbacks.c */
 	case HILDON_HARDKEY_FULLSCREEN:
 		/* Toggle fullscreen */
-		app_data->fullscreen = !app_data->fullscreen;
-
-		/* Set all open windows to fullscreen or unfullscreen */
-		if (app_data->fullscreen) {
-			gtk_window_fullscreen(GTK_WINDOW(app_data->note_window->window));
-		} else {
-			gtk_window_unfullscreen(GTK_WINDOW(app_data->note_window->window));
-		}
-		/*
-		open_windows = app_data->open_windows;
-		while (open_windows != NULL) {
-			UserInterface *open_window = (UserInterface*)open_windows->data;
-			if (app_data->fullscreen) {
-				gtk_window_fullscreen(GTK_WINDOW(open_window->window));
-			} else {
-				gtk_window_unfullscreen(GTK_WINDOW(open_window->window));
-			}
-			open_windows = open_windows->next;
-		}
-		*/
-		/* Set search window to fullscreen or unfullscreen */
-		if (app_data->search_window != NULL) {
-			if (app_data->fullscreen) {
-				gtk_window_fullscreen(GTK_WINDOW(app_data->search_window));
-			} else {
-				gtk_window_unfullscreen(GTK_WINDOW(app_data->search_window));
-			}
-		}
-
-		/* Focus again this window */
-		gtk_window_present(GTK_WINDOW(window));
+		ui_helper_toggle_fullscreen(window);
 		return TRUE;
 	}
 
@@ -289,6 +259,12 @@ on_new_note_action_activated(GtkAction *action, gpointer user_data)
 }
 */
 
+static void
+on_fullscreen_button_clicked (GtkAction *action, gpointer user_data)
+{
+	ui_helper_toggle_fullscreen(GTK_WINDOW(user_data));
+}
+
 static
 gint compare_titles(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
 {
@@ -362,6 +338,7 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	GdkScreen *screen;
 	GHashTable *search_result;
 	GtkAction *new_note_action;
+	GtkAction *fullscreen_action;
 	GtkWidget *menu_new_note;
 #ifdef HILDON_HAS_APP_MENU
 	win = hildon_stackable_window_new();
@@ -372,7 +349,17 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	screen = gdk_screen_get_default();
 	search_result = g_hash_table_new(NULL, NULL);
 
-	/*new_note_action = GTK_ACTION(gtk_action_new("new", _("New Note"), NULL, NULL));*/
+	GtkAccelGroup *accel_group = gtk_accel_group_new();
+	gtk_window_add_accel_group(GTK_WINDOW(win), accel_group);
+	g_object_unref(accel_group);
+
+	GtkActionGroup *action_group = gtk_action_group_new("searchwin");
+	fullscreen_action = GTK_ACTION(gtk_action_new("fullscreen", _("Fullscreen"), NULL, NULL));
+
+	gtk_action_group_add_action_with_accel(action_group, fullscreen_action, "<Ctrl>u");
+	gtk_action_set_accel_group(fullscreen_action, accel_group);
+	gtk_action_connect_accelerator(fullscreen_action);
+
 
 	/* Window menu */
 #ifdef HILDON_HAS_APP_MENU
@@ -540,6 +527,7 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	g_signal_connect(tree, "key_press_event", G_CALLBACK(on_key_pressed), search_field);
 	g_signal_connect(screen, "size-changed", G_CALLBACK(on_orientation_changed), window_data);
 	/*g_signal_connect(new_note_action, "activate", G_CALLBACK(on_new_note_action_activated), win);*/
+	g_signal_connect(fullscreen_action, "activate", G_CALLBACK(on_fullscreen_button_clicked), win);
 
 	gconf_client_notify_add(app_data->client, SETTINGS_SCROLLBAR_SIZE, on_scrollbar_settings_changed, scrolledwindow, NULL, NULL);
 
@@ -554,7 +542,7 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	*/
 
 	/* Add transparent fullscreen button */
-	fullscreen_manager_new(GTK_WINDOW(win));
+	fullscreen_manager_new(GTK_WINDOW(win), ui_helper_toggle_fullscreen);
 
 	return HILDON_WINDOW(win);
 }

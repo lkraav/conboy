@@ -955,6 +955,7 @@ UserInterface* create_mainwin() {
 	gtk_action_group_add_action_with_accel(action_group, action_find,      "<Ctrl>f");
 	gtk_action_group_add_action_with_accel(action_group, action_new,       "<Ctrl>n");
 	gtk_action_group_add_action_with_accel(action_group, action_quit,      "<Ctrl>q");
+	gtk_action_group_add_action_with_accel(action_group, action_fullscreen,"<Ctrl>u");
 
 	gtk_action_set_accel_group(action_bold,      accel_group);
 	gtk_action_set_accel_group(action_italic,    accel_group);
@@ -966,6 +967,7 @@ UserInterface* create_mainwin() {
 	gtk_action_set_accel_group(action_find,      accel_group);
 	gtk_action_set_accel_group(action_new,       accel_group);
 	gtk_action_set_accel_group(action_quit,      accel_group);
+	gtk_action_set_accel_group(action_fullscreen,accel_group);
 
 	gtk_action_connect_accelerator(action_bold);
 	gtk_action_connect_accelerator(action_italic);
@@ -975,6 +977,7 @@ UserInterface* create_mainwin() {
 	gtk_action_connect_accelerator(action_find);
 	gtk_action_connect_accelerator(action_new);
 	gtk_action_connect_accelerator(action_quit);
+	gtk_action_connect_accelerator(action_fullscreen);
 
 
 	/* FORMAT MENU */
@@ -1467,7 +1470,7 @@ UserInterface* create_mainwin() {
 	ungrab_volume_keys(mainwin);
 
 	/* Adding the transparent fullscreen button */
-	fullscreen_manager_new(GTK_WINDOW(mainwin));
+	fullscreen_manager_new(GTK_WINDOW(mainwin), ui_helper_toggle_fullscreen);
 
 	return ui;
 }
