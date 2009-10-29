@@ -254,18 +254,45 @@ change_color_map (GtkWidget *widget)
     gtk_widget_set_colormap (widget, gdk_screen_get_rgba_colormap (screen));
 }
 
+#define RADIUS 20
+
+static void
+create_rectangle (cairo_t *ctx, double x, double y, double w, double h, double r)
+{
+	cairo_move_to(ctx, x+r, y);
+	cairo_line_to(ctx, x+w, y);
+	cairo_line_to(ctx, x+w, y+h);
+	cairo_line_to(ctx, x,   y+h);
+	cairo_line_to(ctx, x,   y+r);
+
+	/* Left upper corner is rounded */
+	cairo_curve_to(ctx, x, y, x, y, x+r, y);
+}
 
 static gboolean
 on_expose_event (GtkWidget *widget, GdkEventExpose *event, gpointer data)
 {
     cairo_t *ctx;
-    GdkPixbuf *pixbuf = (GdkPixbuf *) data;
+    GdkPixbuf *pixbuf = GDK_PIXBUF(data);
 
+    /* Create context */
     ctx = gdk_cairo_create (widget->window);
-    gdk_cairo_region (ctx, event->region);
-    cairo_set_operator (ctx, CAIRO_OPERATOR_SOURCE);
-    gdk_cairo_set_source_pixbuf (ctx, pixbuf, 0.0, 0.0);
+
+    /* Clear surface */
+    cairo_set_operator (ctx, CAIRO_OPERATOR_CLEAR);
     cairo_paint (ctx);
+
+    /* Add rectangle */
+    cairo_set_operator (ctx, CAIRO_OPERATOR_OVER);
+    cairo_set_source_rgba (ctx, 0, 0, 0, 0.60);
+    create_rectangle (ctx, 0, 0, FULLSCREEN_UI_BUTTON_WIDTH, FULLSCREEN_UI_BUTTON_HEIGHT, RADIUS);
+    cairo_fill (ctx);
+
+    /* Add icon */
+    gdk_cairo_set_source_pixbuf (ctx, pixbuf, 10, 10);
+    cairo_paint (ctx);
+
+    /* Destroy context */
     cairo_destroy (ctx);
     return TRUE;
 }
@@ -290,7 +317,8 @@ fullscreen_ui_create(FullscreenManager *self)
 {
     g_return_val_if_fail(FULLSCREEN_IS_MANAGER(self), NULL);
 
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/scalable/hildon/fullscreen_overlay.png", NULL);
+    /*GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/scalable/hildon/fullscreen_overlay.png", NULL);*/
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("/usr/share/icons/hicolor/48x48/hildon/general_fullsize.png", NULL);
     GtkWidget *img = gtk_image_new_from_pixbuf(pixbuf);
     gtk_widget_show(img);
     g_object_unref(pixbuf);
