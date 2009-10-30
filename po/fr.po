@@ -2,12 +2,12 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR fpp, 2009.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-24 10:50+0200\n"
+"POT-Creation-Date: 2009-10-30 15:21+0100\n"
 "PO-Revision-Date: 2009-06-13 17:50+0200\n"
 "Last-Translator: fpp <talk.maemo.org>\n"
 "Language-Team: FRENCH <LL@li.org>\n"
@@ -15,147 +15,159 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/interface.c:637 ../src/callbacks.c:285 ../src/note.c:167
+#: ../src/interface.c:638 ../src/callbacks.c:285 ../src/note.c:167
 #, c-format
 msgid "New Note %i"
 msgstr "Nouvelle note %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and
-#. that creates the correct widgets
-#: ../src/interface.c:901 ../src/interface.c:1006 ../src/interface.c:1044
+#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#: ../src/interface.c:902 ../src/interface.c:1010 ../src/interface.c:1048
 msgid "Bold"
 msgstr "Gras"
 
-#: ../src/interface.c:902
+#: ../src/interface.c:903
 msgid "Bullets"
 msgstr "Puces"
 
-#: ../src/interface.c:903
+#: ../src/interface.c:904
 msgid "Decrease indent"
 msgstr "Réduire le retrait"
 
-#: ../src/interface.c:904
+#: ../src/interface.c:905
 msgid "Delete note"
 msgstr "Supprimer la note"
 
-#: ../src/interface.c:905 ../src/interface.c:1010 ../src/interface.c:1048
+#: ../src/interface.c:906 ../src/interface.c:1014 ../src/interface.c:1052
 msgid "Fixed width"
 msgstr "Largeur fixe"
 
-#: ../src/interface.c:906 ../src/interface.c:1009 ../src/interface.c:1047
+#: ../src/interface.c:907 ../src/interface.c:1013 ../src/interface.c:1051
 msgid "Highlight"
 msgstr "Surligné"
 
-#: ../src/interface.c:907
+#: ../src/interface.c:908
 msgid "Increase indent"
 msgstr "Mettre en retrait"
 
-#: ../src/interface.c:908
+#: ../src/interface.c:909
 msgid "Link"
 msgstr "Lien"
 
-#: ../src/interface.c:909
+#: ../src/interface.c:910
 msgid "New note"
 msgstr "Nouvelle note"
 
-#: ../src/interface.c:910
+#: ../src/interface.c:911
 msgid "Open note"
 msgstr "Ouvrir la note"
 
-#: ../src/interface.c:911 ../src/settings_window.c:536
-#: ../src/settings_window.c:542
+#: ../src/interface.c:912 ../src/settings_window.c:412
+#: ../src/settings_window.c:420
 msgid "Settings"
 msgstr "Paramètres"
 
-#: ../src/interface.c:912
+#: ../src/interface.c:913
 msgid "Quit"
 msgstr "Quitter"
 
-#: ../src/interface.c:913 ../src/interface.c:1007 ../src/interface.c:1045
+#: ../src/interface.c:914 ../src/interface.c:1011 ../src/interface.c:1049
 msgid "Italic"
 msgstr "Italique"
 
-#: ../src/interface.c:914 ../src/interface.c:1008 ../src/interface.c:1046
+#: ../src/interface.c:915 ../src/interface.c:1012 ../src/interface.c:1050
 msgid "Strikeout"
 msgstr "Barré"
 
-#: ../src/interface.c:915
+#: ../src/interface.c:916
 msgid "Style"
 msgstr "Style"
 
-#: ../src/interface.c:916
+#: ../src/interface.c:917
 msgid "Zoom in"
 msgstr "Agrandir"
 
-#: ../src/interface.c:917
+#: ../src/interface.c:918
 msgid "Zoom out"
 msgstr "Réduire"
 
-#: ../src/interface.c:918
+#: ../src/interface.c:919
 msgid "Find in note"
 msgstr "Chercher dans la note"
 
-#: ../src/interface.c:919
+#: ../src/interface.c:920
 msgid "Synchronize"
 msgstr "Synchroniser"
 
-#: ../src/interface.c:920
+#: ../src/interface.c:921
 msgid "Back"
 msgstr "En arrière"
 
 #: ../src/interface.c:922
+msgid "Forward"
+msgstr "En avant"
+
+#: ../src/interface.c:923 ../src/search_window.c:357
 msgid "Fullscreen"
 msgstr "Plein écran"
 
 #. TODO: Use an enum instead of 0 to 3
-#: ../src/interface.c:924 ../src/interface.c:1011 ../src/interface.c:1049
+#: ../src/interface.c:925 ../src/interface.c:1015 ../src/interface.c:1053
 msgid "Small"
 msgstr "Petit"
 
-#: ../src/interface.c:925
+#: ../src/interface.c:926
 msgid "Normal"
 msgstr "Normal"
 
-#: ../src/interface.c:926 ../src/interface.c:1012 ../src/interface.c:1050
+#: ../src/interface.c:927 ../src/interface.c:1016 ../src/interface.c:1054
 msgid "Large"
 msgstr "Grand"
 
-#: ../src/interface.c:927 ../src/interface.c:1013 ../src/interface.c:1051
+#: ../src/interface.c:928 ../src/interface.c:1017 ../src/interface.c:1055
 msgid "Huge"
 msgstr "Très grand"
 
 #. FIND TOOL BAR
-#: ../src/interface.c:1180 ../src/search_window.c:424
+#: ../src/interface.c:1184 ../src/search_window.c:411
 msgid "Search:"
 msgstr "Recherche :"
 
-#: ../src/search_window.c:371
+#: ../src/search_window.c:348
 msgid "Search all notes"
 msgstr "Chercher dans toutes les notes"
 
 #. Add New Note item
-#. 
+#.
 #. menu_new_note = gtk_button_new();
 #. gtk_action_connect_proxy(new_note_action, menu_new_note);
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#. 
+#.
 #. Add sort filters
-#: ../src/search_window.c:389
+#: ../src/search_window.c:376
 msgid "Sort by title"
 msgstr "Trier par titre"
 
-#: ../src/search_window.c:390
+#: ../src/search_window.c:377
 msgid "Sort by date"
 msgstr "Trier par date"
 
-#: ../src/search_window.c:497
+#: ../src/search_window.c:484
 msgid "Note"
 msgstr "Note"
 
-#: ../src/search_window.c:514
+#: ../src/search_window.c:501
 msgid "Last changed"
 msgstr "Dernière modification"
+
+#: ../src/callbacks.c:78
+#, c-format
+msgid ""
+"<b>Note title taken</b>\n"
+"\n"
+"A note with the title <b>%s</b> already exists. Please choose another name "
+"for this note before continuing."
+msgstr ""
 
 #: ../src/callbacks.c:800
 msgid "Really delete this note?"
@@ -165,43 +177,31 @@ msgstr "Supprimer cette note ?"
 msgid "If you delete a note it is permanently lost."
 msgstr "La suppression d'une note est définitive."
 
-#: ../src/settings_window.c:223
+#: ../src/settings_window.c:222
 msgid "Scrollbar size"
 msgstr "Taille de l'ascenseur"
 
-#: ../src/settings_window.c:228
+#: ../src/settings_window.c:227
 msgid "Thin"
 msgstr "Petit"
 
-#: ../src/settings_window.c:232
+#: ../src/settings_window.c:231
 msgid "Thick"
 msgstr "Grand"
 
-#: ../src/settings_window.c:243
-msgid "On startup"
-msgstr "Au démarrage"
-
-#: ../src/settings_window.c:262 ../src/settings_window.c:267
-msgid "Show note"
-msgstr "Afficher la note"
-
-#: ../src/settings_window.c:263 ../src/settings_window.c:268
-msgid "Show search"
-msgstr "Afficher la recherche"
-
-#: ../src/settings_window.c:286 ../src/settings_window.c:288
+#: ../src/settings_window.c:244 ../src/settings_window.c:246
 msgid "Use custom colors"
 msgstr "Utiliser des couleurs personnalisées"
 
-#: ../src/settings_window.c:302
+#: ../src/settings_window.c:260
 msgid "Text"
 msgstr "Texte"
 
-#: ../src/settings_window.c:316
+#: ../src/settings_window.c:274
 msgid "Background"
 msgstr "Arrière-plan"
 
-#: ../src/settings_window.c:330
+#: ../src/settings_window.c:288
 msgid "Links"
 msgstr "Liens"
 
@@ -233,9 +233,14 @@ msgstr "A propos de l'extension"
 msgid "Configure plugin"
 msgstr "Configurer l'extension"
 
-#: ../src/interface.c:921
-msgid "Forward"
-msgstr "En avant"
+#~ msgid "On startup"
+#~ msgstr "Au démarrage"
+
+#~ msgid "Show note"
+#~ msgstr "Afficher la note"
+
+#~ msgid "Show search"
+#~ msgstr "Afficher la recherche"
 
 #~ msgid "Open"
 #~ msgstr "Ouvrir"
