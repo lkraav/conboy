@@ -160,7 +160,6 @@ static
 gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer user_data)
 {
 	GtkWidget *window = GTK_WIDGET(user_data);
-	AppData *app_data = app_data_get();
 
 	switch (event->keyval) {
 
@@ -170,7 +169,7 @@ gboolean on_hardware_key_pressed(GtkWidget *widget, GdkEventKey	*event, gpointer
 
 	case HILDON_HARDKEY_FULLSCREEN:
 		/* Toggle fullscreen */
-		ui_helper_toggle_fullscreen(window);
+		ui_helper_toggle_fullscreen(GTK_WINDOW(window));
 		return TRUE;
 	}
 
@@ -534,15 +533,9 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 #ifdef HILDON_HAS_APP_MENU
 	g_signal_connect(button_sort_by_title, "toggled", G_CALLBACK(on_sort_by_title_changed), sorted_store);
 	g_signal_connect(button_sort_by_date, "toggled", G_CALLBACK(on_sort_by_date_changed), sorted_store);
-#endif
-
-	/*
-	app_data = app_data_get();
-	app_data->note_store = store;
-	*/
-
 	/* Add transparent fullscreen button */
 	fullscreen_manager_new(GTK_WINDOW(win), ui_helper_toggle_fullscreen);
+#endif
 
 	return HILDON_WINDOW(win);
 }

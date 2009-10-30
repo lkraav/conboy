@@ -1471,7 +1471,9 @@ UserInterface* create_mainwin() {
 	ungrab_volume_keys(mainwin);
 
 	/* Adding the transparent fullscreen button */
+#ifdef HILDON_HAS_APP_MENU
 	fullscreen_manager_new(GTK_WINDOW(mainwin), ui_helper_toggle_fullscreen);
+#endif
 
 	return ui;
 }
