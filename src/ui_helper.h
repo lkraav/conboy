@@ -27,10 +27,14 @@ GtkWidget*
 ui_helper_create_confirmation_dialog(GtkWindow *parent, const gchar *message);
 
 void
-ui_helper_show_confirmation_dialog(GtkWindow *parent, const gchar *message);
+ui_helper_show_confirmation_dialog(GtkWindow *parent, const gchar *message, gboolean supports_portrait);
 
 void
 ui_helper_toggle_fullscreen(GtkWindow *active_window);
+
+void
+ui_helper_remove_portrait_support(GtkWindow *window);
+
 
 
 #endif /* _UI_HELPER_H_ */

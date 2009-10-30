@@ -556,6 +556,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	/* Show dialog */
 	GtkWindow *parent = GTK_WINDOW(app_data->note_window->window);
 	DialogData *dialog_data = create_sync_dialog(parent);
+	ui_helper_remove_portrait_support(GTK_WINDOW(dialog_data->dialog));
 	gtk_widget_show(GTK_WIDGET(dialog_data->dialog));
 
 	/* Create thread and start sync */

@@ -17,6 +17,8 @@
  */
 
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>
+#include <X11/Xatom.h>
 
 #include "app_data.h"
 
@@ -67,9 +69,12 @@ ui_helper_create_confirmation_dialog(GtkWindow *parent, const gchar *message)
 }
 
 void
-ui_helper_show_confirmation_dialog(GtkWindow *parent, const gchar *message)
+ui_helper_show_confirmation_dialog(GtkWindow *parent, const gchar *message, gboolean supports_portrait)
 {
 	GtkWidget *dialog = ui_helper_create_confirmation_dialog(parent, message);
+	if (!supports_portrait) {
+		ui_helper_remove_portrait_support(GTK_WINDOW(dialog));
+	}
 	gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog);
 }
@@ -105,4 +110,17 @@ ui_helper_toggle_fullscreen(GtkWindow *active_window)
 
 	/* Focus again on the active note */
 	gtk_window_present(active_window);
+}
+
+void
+ui_helper_remove_portrait_support(GtkWindow *window)
+{
+	gtk_widget_realize(GTK_WIDGET(window));
+
+	guint32 no = {0};
+
+	gdk_property_change(GTK_WIDGET(window)->window,
+			gdk_atom_intern_static_string("_HILDON_PORTRAIT_MODE_SUPPORT"),
+			gdk_x11_xatom_to_atom(XA_CARDINAL), 32,
+			GDK_PROP_MODE_REPLACE, (gpointer)&no, 1);
 }

@@ -134,7 +134,7 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 	gchar *link = conboy_get_auth_link(url);
 
 	if (link == NULL) {
-		ui_helper_show_confirmation_dialog(parent, "Could not connect to host.");
+		ui_helper_show_confirmation_dialog(parent, "Could not connect to host.", FALSE);
 		return;
 	}
 
@@ -149,16 +149,16 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 
 	g_printerr("Opening browser with URL: >%s<\n", link);
 
-	ui_helper_show_confirmation_dialog(parent, "Click OK after authenticating on the website.");
+	ui_helper_show_confirmation_dialog(parent, "Click OK after authenticating on the website.", FALSE);
 
 	if (conboy_get_access_token()) {
 		/* Disable Authenticate button */
 		gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
 		/* Popup dialog */
-		ui_helper_show_confirmation_dialog(parent, "You're authenticated. Everything is good :)");
+		ui_helper_show_confirmation_dialog(parent, "You're authenticated. Everything is good :)", FALSE);
 
 	} else {
-		ui_helper_show_confirmation_dialog(parent, "Something went wrong. Not good :(");
+		ui_helper_show_confirmation_dialog(parent, "Something went wrong. Not good :(", FALSE);
 		settings_save_sync_base_url("");
 	}
 
@@ -413,8 +413,8 @@ void settings_window_open(GtkWindow *parent)
 			parent,
 			GTK_DIALOG_MODAL,
 			NULL);
-	hildon_gtk_window_set_portrait_flags(GTK_WINDOW(dialog), 0);
-	orientation_disable_accelerators();
+
+	ui_helper_remove_portrait_support(GTK_WINDOW(dialog));
 
 #else
 	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Settings"),
@@ -436,8 +436,4 @@ void settings_window_open(GtkWindow *parent)
 	g_signal_connect(dialog, "response", G_CALLBACK(gtk_widget_destroy), NULL);
 
 	gtk_dialog_run(GTK_DIALOG(dialog));
-
-#ifdef HILDON_HAS_APP_MENU
-	orientation_enable_accelerators();
-#endif
 }

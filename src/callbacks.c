@@ -75,8 +75,8 @@ check_title(UserInterface *ui)
 	if (existing_note && (existing_note != note)) {
 		/* Display message */
 		gchar msg[1024];
-		g_sprintf(msg, "<b>Note title taken</b>\n\nA note with the title <b>%s</b> already exists. Please choose another name for this note before continuing.", title);
-		ui_helper_show_confirmation_dialog(GTK_WINDOW(ui->window), msg);
+		g_sprintf(msg, _("<b>Note title taken</b>\n\nA note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."), title);
+		ui_helper_show_confirmation_dialog(GTK_WINDOW(ui->window), msg, FALSE);
 
 		/* Select title */
 		GtkTextIter start, end;

@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -231,6 +231,8 @@ get_auth_link(gchar *request_url, gchar *link_url, gchar **t_key, gchar **t_secr
 
 	reply = oauth_http_post(req_url, postarg);
 
+	g_printerr("Reply: %s\n", reply);
+
 	if (reply == NULL) {
 		g_printerr("ERROR: Reply = NULL\n");
 		g_free(req_url);
@@ -405,18 +407,18 @@ web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_syn
 
 	/* Parse answer and see if expected_rev fits or not */
 	JsonNoteList *note_list = json_get_note_list(reply);
-	
+
 	if (note_list == NULL) {
 		g_set_error(error, 0, 0, "json_get_note_list() returned NULL");
 		return expected_rev - 1;
 	}
-	
+
 	if (note_list->latest_sync_revision != expected_rev) {
 		g_printerr("ERROR: Expected sync rev (%i) and actual sync rev (%i) are not the same\n", expected_rev, note_list->latest_sync_revision);
 		g_set_error(error, 0, 0, "Expected sync rev (%i) and actual sync rev (%i) are not the same\n", expected_rev, note_list->latest_sync_revision);
 		return note_list->latest_sync_revision;
 	}
-	
+
 	return expected_rev;
 }
 
@@ -426,12 +428,12 @@ web_sync_get_notes(JsonUser *user, int since_rev)
 	JsonNoteList *result;
 	gchar *json_string;
 	gchar get_all_notes_url[1024];
-	
+
 	g_sprintf(get_all_notes_url, "%s?include_notes=true&since=%i", user->api_ref, since_rev);
 
 	json_string = conboy_http_get(get_all_notes_url);
 	result = json_get_note_list(json_string);
-	
+
 	g_free(json_string);
 	return result;
 }
