@@ -159,14 +159,6 @@ msgstr "Not"
 msgid "Last changed"
 msgstr "Son değişim"
 
-#: ../src/callbacks.c:78
-#, c-format
-msgid ""
-"<b>Note title taken</b>\n"
-"\n"
-"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
-msgstr ""
-
 #: ../src/callbacks.c:800
 msgid "Really delete this note?"
 msgstr "Silmek istediğinizden emin misiniz?"
@@ -230,6 +222,17 @@ msgstr "Eklenti hakkında"
 #: ../src/conboy_plugin_manager.c:635
 msgid "Configure plugin"
 msgstr "Eklentiyi yapılandır"
+
+#: ../src/callbacks.c:78
+#, c-format
+msgid ""
+"<b>Note title taken</b>\n"
+"\n"
+"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
+msgstr ""
+"<b>Not başlığı kullanımda</b>\n"
+"\n"
+"<b>%s</b> başlıklı bir not zaten bulunmaktadır. Lütfen devam etmeden önce bu not için ayrı bir başlık seçin."
 
 #~ msgid "On startup"
 #~ msgstr "Başlangıçta"
