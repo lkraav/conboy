@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: pl\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-10-30 15:21+0100\n"
-"PO-Revision-Date: 2009-10-26 00:54+0100\n"
+"PO-Revision-Date: 2009-10-30 16:29+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -167,6 +167,10 @@ msgid ""
 "A note with the title <b>%s</b> already exists. Please choose another name "
 "for this note before continuing."
 msgstr ""
+"<b>Przyjęto tytuł notatki</b>\n"
+"\n"
+"Notatka o tytule <b>%s</b> już istnieje. Proszę wybrać inną nazwę dla tej "
+"notatki przed kontynuowaniem."
 
 #: ../src/callbacks.c:800
 msgid "Really delete this note?"
@@ -231,12 +235,3 @@ msgstr "O wtyczce"
 #: ../src/conboy_plugin_manager.c:635
 msgid "Configure plugin"
 msgstr "Skonfiguruj wtyczkę"
-
-#~ msgid "On startup"
-#~ msgstr "Podczas uruchamiania"
-
-#~ msgid "Show note"
-#~ msgstr "Wyświetlanie notatki"
-
-#~ msgid "Show search"
-#~ msgstr "Wyświetlanie wyszukiwania"
