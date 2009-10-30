@@ -143,11 +143,11 @@ msgstr "Zoeken in alle notes"
 #. Add sort filters
 #: ../src/search_window.c:376
 msgid "Sort by title"
-msgstr "Zoeken op titel"
+msgstr "Sorteren op titel"
 
 #: ../src/search_window.c:377
 msgid "Sort by date"
-msgstr "Zoeken op datum"
+msgstr "Sorteren op datum"
 
 #: ../src/search_window.c:484
 msgid "Note"
@@ -165,6 +165,10 @@ msgid ""
 "A note with the title <b>%s</b> already exists. Please choose another name "
 "for this note before continuing."
 msgstr ""
+"<b>Note titel klaar</b>\n"
+"\n"
+"Een note met titel <b>%s</b> bestaat al. Gebruik een andere naam "
+"voor deze note voordat je doorgaat."
 
 #: ../src/callbacks.c:800
 msgid "Really delete this note?"
@@ -204,7 +208,7 @@ msgstr "Koppelingen"
 
 #: ../src/conboy_note.c:341
 msgid "Describe your new note here."
-msgstr "Beschrijf je note hier"
+msgstr "Beschrijf je note hier."
 
 #: ../src/conboy_plugin_manager.c:46
 msgid "Plugin"
