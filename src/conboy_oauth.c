@@ -214,6 +214,39 @@ conboy_get_auth_link(const gchar *base_url)
 	return link;
 }
 
+static gchar*
+http_post (const gchar *url, const gchar *postdata)
+{
+	CURL *curl;
+	CURLcode res;
+
+	struct MemoryStruct chunk;
+	chunk.data=NULL;
+	chunk.size = 0;
+
+	curl = curl_easy_init();
+	if(!curl) return NULL;
+	curl_easy_setopt(curl, CURLOPT_URL, url);
+
+	/* Skip https security */
+
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+	/**/
+
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postdata);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+	res = curl_easy_perform(curl);
+	if (res) {
+		return NULL;
+	}
+
+	curl_easy_cleanup(curl);
+	return (chunk.data);
+}
+
 /* TODO: Improve error checking */
 gchar*
 get_auth_link(gchar *request_url, gchar *link_url, gchar **t_key, gchar **t_secret)
@@ -229,7 +262,8 @@ get_auth_link(gchar *request_url, gchar *link_url, gchar **t_key, gchar **t_secr
 		return NULL;
 	}
 
-	reply = oauth_http_post(req_url, postarg);
+	/*reply = oauth_http_post(req_url, postarg);*/
+	reply = http_post(req_url, postarg);
 
 	g_printerr("Reply: %s\n", reply);
 
