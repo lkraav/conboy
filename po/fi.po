@@ -5,7 +5,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the Conboy package.
 # FIRST AUTHOR <marko.vertainen@iki.fi>, 2009.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: fi_FI\n"
@@ -24,7 +24,8 @@ msgid "New Note %i"
 msgstr "Uusi muistilappu %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
 #: ../src/interface.c:902 ../src/interface.c:1010 ../src/interface.c:1048
 msgid "Bold"
 msgstr "Lihavointi"
@@ -141,11 +142,11 @@ msgid "Search all notes"
 msgstr "Etsi kaikista muistilapuista"
 
 #. Add New Note item
-#.
+#. 
 #. menu_new_note = gtk_button_new();
 #. gtk_action_connect_proxy(new_note_action, menu_new_note);
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#.
+#. 
 #. Add sort filters
 #: ../src/search_window.c:376
 msgid "Sort by title"
@@ -162,15 +163,6 @@ msgstr "Nuistilappu"
 #: ../src/search_window.c:501
 msgid "Last changed"
 msgstr "Viimeksi muutettu"
-
-#: ../src/callbacks.c:78
-#, c-format
-msgid ""
-"<b>Note title taken</b>\n"
-"\n"
-"A note with the title <b>%s</b> already exists. Please choose another name "
-"for this note before continuing."
-msgstr ""
 
 #: ../src/callbacks.c:800
 msgid "Really delete this note?"
@@ -235,6 +227,17 @@ msgstr "Tietoja liitännäisestä"
 #: ../src/conboy_plugin_manager.c:635
 msgid "Configure plugin"
 msgstr "Liitännäisen asetukset"
+
+#: ../src/callbacks.c:78
+#, c-format
+msgid ""
+"<b>Note title taken</b>\n"
+"\n"
+"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
+msgstr ""
+"<b>Nimi käytössä</b>\n"
+"\n"
+"Muistilappu nimellä <b>%s</b> on jo olemassa. Valitse toinen nimi tälle muistilapulle jatkaaksesi."
 
 #~ msgid "On startup"
 #~ msgstr "Aloituksessa"
