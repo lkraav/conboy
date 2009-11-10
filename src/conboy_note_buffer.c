@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ static void
 conboy_note_buffer_dispose(GObject *object)
 {
 	ConboyNoteBuffer *self = CONBOY_NOTE_BUFFER(object);
-	
+
 	GSList *list = self->active_tags;
 	while (list != NULL) {
 		g_free(list->data);
@@ -48,7 +48,7 @@ conboy_note_buffer_dispose(GObject *object)
 	}
 	g_slist_free(list);
 	self->active_tags = NULL;
-	
+
 	G_OBJECT_CLASS(conboy_note_buffer_parent_class)->dispose(object);
 }
 
@@ -76,7 +76,7 @@ conboy_note_buffer_add_active_tag (ConboyNoteBuffer *self, GtkTextTag *tag)
 	g_return_if_fail(tag != NULL);
 	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
 	g_return_if_fail(GTK_IS_TEXT_TAG(tag));
-	
+
 	GSList *tags = tags = self->active_tags;
 	while (tags != NULL) {
 		if (strcmp(GTK_TEXT_TAG(tags->data)->name, tag->name) == 0) {
@@ -94,7 +94,7 @@ conboy_note_buffer_remove_active_tag (ConboyNoteBuffer *self, GtkTextTag *tag)
 	g_return_if_fail(tag != NULL);
 	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
 	g_return_if_fail(GTK_IS_TEXT_TAG(tag));
-	
+
 	GSList *tags = self->active_tags;
 	while (tags != NULL) {
 		if (strcmp(GTK_TEXT_TAG(tags->data)->name, tag->name) == 0) {
@@ -111,7 +111,7 @@ conboy_note_buffer_add_active_tag_by_name (ConboyNoteBuffer *self, const gchar *
 	g_return_if_fail(self != NULL);
 	g_return_if_fail(tag_name != NULL);
 	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
-	
+
 	conboy_note_buffer_add_active_tag(self, gtk_text_tag_table_lookup(GTK_TEXT_BUFFER(self)->tag_table, tag_name));
 }
 
@@ -121,7 +121,7 @@ conboy_note_buffer_remove_active_tag_by_name (ConboyNoteBuffer *self, const gcha
 	g_return_if_fail(self != NULL);
 	g_return_if_fail(tag_name != NULL);
 	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
-		
+
 	conboy_note_buffer_remove_active_tag(self, gtk_text_tag_table_lookup(GTK_TEXT_BUFFER(self)->tag_table, tag_name));
 }
 
@@ -130,7 +130,7 @@ conboy_note_buffer_get_active_tags (ConboyNoteBuffer *self)
 {
 	g_return_val_if_fail(self != NULL, NULL);
 	g_return_val_if_fail(CONBOY_IS_NOTE_BUFFER(self), NULL);
-	
+
 	return self->active_tags;
 }
 
@@ -139,7 +139,7 @@ conboy_note_buffer_clear_active_tags (ConboyNoteBuffer *self)
 {
 	g_return_if_fail(self != NULL);
 	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
-	
+
 	g_slist_free(self->active_tags);
 	self->active_tags = NULL;
 }
@@ -150,11 +150,11 @@ conboy_note_buffer_set_active_tags (ConboyNoteBuffer *self, GSList *tags)
 	g_return_if_fail(self != NULL);
 	g_return_if_fail(tags != NULL);
 	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
-	
+
 	/* Free the list */
 	g_slist_free(self->active_tags);
 	self->active_tags = NULL;
-	
+
 	/* Copy elements of given list */
 	while (tags != NULL) {
 		self->active_tags = g_slist_prepend(self->active_tags, tags->data);
@@ -199,20 +199,20 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 {
 	gchar** strings;
 	gchar *tag_name;
-	
+
 	tag_name = tag->name;
-	
+
 	/* Ignore tags that start with "_". They are considered internal. */
 	if (strncmp(tag_name, "_", 1) == 0) {
 		return;
 	}
-	
+
 	/* Ignore <list> tags. */
 	if (strncmp(tag_name, "list", -1) == 0) {
 		_list_active = TRUE;
 		return;
 	}
-	
+
 	/* Use tag_get_depth() here. Currently in callbacks.c */
 	/* If a <depth> tag, ignore */
 	if (strncmp(tag_name, "depth", 5) == 0) {
@@ -224,20 +224,20 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 		/* /NEW */
 		return;
 	}
-	
+
 	/* If not a <list-item> tag, write it and return */
 	if (strncmp(tag_name, "list-item", 9) != 0) {
 		xmlTextWriterStartElement(writer, BAD_CAST tag_name);
 		return;
 	}
-	
+
 	/* It is a <list-item:*> tag */
 	if (_new_depth < _depth) {
 		gint diff = _depth - _new_depth;
-		
+
 		/* </list-item> */
 		xmlTextWriterEndElement(writer);
-		
+
 		while (diff > 0) { /* For each depth we need to close a <list-item> and a <list> tag. */
 			/* </list> */
 			xmlTextWriterEndElement(writer);
@@ -245,31 +245,31 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 			xmlTextWriterEndElement(writer);
 			diff--;
 		}
-		
+
 		/* <list-item dir=ltr> */
 		xmlTextWriterStartElement(writer, BAD_CAST "list-item");
 		xmlTextWriterWriteAttribute(writer, BAD_CAST "dir", BAD_CAST "ltr");
 	}
-	
-	
+
+
 	/* If there was an increase in depth, we need to add a <list> tag */
 	if (_new_depth > _depth) {
 		gint diff = _new_depth - _depth;
 		/*g_printerr("new_depth > depth. DIFF: %i \n", new_depth - depth);*/
-		
+
 		while (diff > 0) {
 			xmlTextWriterStartElement(writer, BAD_CAST "list");
 			xmlTextWriterStartElement(writer, BAD_CAST "list-item");
 			xmlTextWriterWriteAttribute(writer, BAD_CAST "dir", BAD_CAST "ltr");
 			diff--;
 		}
-		
+
 	} else if (_new_depth == _depth) {
 		xmlTextWriterEndElement(writer); /* </list-item> */
 		xmlTextWriterStartElement(writer, BAD_CAST "list-item");
 		xmlTextWriterWriteAttribute(writer, BAD_CAST "dir", BAD_CAST "ltr");
 	}
-	
+
 	_depth = _new_depth;
 }
 
@@ -279,21 +279,21 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 static void write_end_element(GtkTextTag *tag, xmlTextWriter *writer)
 {
 	gchar *tag_name = tag->name;
-	
+
 	/* Ignore tags that start with "_". They are considered internal. */
 	if (strncmp(tag_name, "_", 1) == 0) {
 		return;
 	}
-	
+
 	/* Ignore depth tags */
 	if (strncmp(tag_name, "depth", 5) == 0) {
 		_is_bullet = FALSE;
 		return;
 	}
-	
+
 	/* If the list completely ends, reset the depth */
 	if (strncmp(tag_name, "list", -1) == 0) {
-		
+
 		/* Close all open <list-item> and <list> tags */
 		while (_depth > 0) {
 			/* </list-item> */
@@ -302,11 +302,11 @@ static void write_end_element(GtkTextTag *tag, xmlTextWriter *writer)
 			xmlTextWriterEndElement(writer);
 			_depth--;
 		}
-		
+
 		_list_active = FALSE;
 		return;
 	}
-	
+
 	/* If it is not a <list-item> tag, just close it and return */
 	if (strncmp(tag_name, "list-item", 9) != 0) {
 		xmlTextWriterEndElement(writer);
@@ -323,7 +323,7 @@ static void write_text(const gchar *text, xmlTextWriter *writer)
 	if (_is_bullet) {
 		return;
 	}
-	
+
 	xmlTextWriterWriteString(writer, BAD_CAST text);
 }
 
@@ -332,12 +332,12 @@ static void write_text(const gchar *text, xmlTextWriter *writer)
  * will be sorted to the left of the list
  */
 static gint sort_by_prio(GtkTextTag *tag1, GtkTextTag *tag2)
-{	
+{
 	if (tag1->priority == tag2->priority) {
 		g_printerr("ERROR: Two tags cannot have the same priority.\n");
 		return 0;
 	}
-	
+
 	return (tag2->priority - tag1->priority);
 }
 
@@ -350,58 +350,66 @@ write_content(xmlTextWriter *writer, GtkTextBuffer *buffer, gdouble version)
 	gchar *text;
 	GSList *start_tags = NULL, *end_tags = NULL;
 	gchar version_str[10] = {0};
-	
+
 	/* Disable indentation */
 	rc = xmlTextWriterSetIndent(writer, FALSE);
-	  
+
 	/* Start note-content element */
 	rc = xmlTextWriterStartElement(writer, BAD_CAST "note-content");
-	
+
+	/* Add namespace information so that we are able to use the <content>
+	 * sub tree separately. When saving the merged document, the redundant
+	 * namespace information is removed again.
+	 */
+	rc = xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xmlns", BAD_CAST "link", NULL, BAD_CAST "http://beatniksoftware.com/tomboy/link");
+	rc = xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xmlns", BAD_CAST "size", NULL, BAD_CAST "http://beatniksoftware.com/tomboy/size");
+	rc = xmlTextWriterWriteAttributeNS(writer, NULL, BAD_CAST "xmlns", NULL, BAD_CAST "http://beatniksoftware.com/tomboy");
+
 	/* Add version attribute */
 	g_ascii_formatd(version_str, 10, "%.1f", version);
 	rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "version", BAD_CAST &version_str);
-	
+
 	/**************************************************/
-	
+
 	gtk_text_buffer_get_bounds(buffer, &start, &end);
 	iter = start;
 	old_iter = start;
-	
+
 	while (gtk_text_iter_compare(&iter, &end) <= 0) {
-		
+
 		start_tags = gtk_text_iter_get_toggled_tags(&iter, TRUE);
 		end_tags   = gtk_text_iter_get_toggled_tags(&iter, FALSE);
-		
+
 		/* Write end tags */
 		g_slist_foreach(end_tags, (GFunc)write_end_element, writer);
-		
+
 		/* Sort start tags by priority */
 		start_tags = g_slist_sort(start_tags, (GCompareFunc)sort_by_prio);
-		
+
 		/* Write start tags */
 		g_slist_foreach(start_tags, (GFunc)write_start_element, writer);
-		
+
 		/* Move iter */
 		/* Remember position and set iter to next toggle */
 		old_iter = iter;
-		
+
 		if (gtk_text_iter_compare(&iter, &end) >= 0) {
 			break;
 		}
 		gtk_text_iter_forward_to_tag_toggle(&iter, NULL);
-		
+
 		/* Write text */
 		text = gtk_text_iter_get_text(&old_iter, &iter);
 		write_text(text, writer);
 	}
-	
+
 	/**************************************************/
-	  
+
 	/* Close note-content */
 	rc = xmlTextWriterEndElement(writer);
-	  
+
 	/* Insert linebreak like in Tomboy format */
-	rc = xmlTextWriterWriteRaw(writer, BAD_CAST "\n");	
+	rc = xmlTextWriterWriteRaw(writer, BAD_CAST "\n");
 }
 
 
@@ -414,24 +422,24 @@ conboy_note_buffer_get_xml (ConboyNoteBuffer *self)
 {
 	g_return_val_if_fail(self != NULL, NULL);
 	g_return_val_if_fail(CONBOY_IS_NOTE_BUFFER(self), NULL);
-	
+
 	xmlBuffer *buf;
 	xmlTextWriter *writer;
 	gchar *result;
-	
+
 	buf = xmlBufferCreate();
 	writer = xmlNewTextWriterMemory(buf, 0);
-	
+
 	/* TODO: Implement version handling */
-	write_content(writer, GTK_TEXT_BUFFER(self), 0.1);	
+	write_content(writer, GTK_TEXT_BUFFER(self), 0.1);
 
 	/* Flushes and frees */
 	xmlFreeTextWriter(writer);
-	
+
 	result = g_strdup((gchar*)buf->content);
-	
+
 	xmlBufferFree(buf);
-	
+
 	return result;
 }
 
@@ -503,7 +511,7 @@ static
 void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 {
 	const gchar *element_name = xmlTextReaderConstName(reader);
-	
+
 	switch (peek_state(ctx)) {
 	case STATE_START:
 		if (ELEMENT_IS("note-content")) {
@@ -521,7 +529,7 @@ void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 		}
 		push_tag(ctx, element_name);
 		break;
-	
+
 	case STATE_LIST:
 		if (ELEMENT_IS("list-item")) {
 			push_state(ctx, STATE_LIST_ITEM);
@@ -529,7 +537,7 @@ void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 			g_printerr("ERROR: <list> may only contain <list-item>, not <%s>.", element_name);
 		}
 		break;
-	
+
 	default:
 		g_assert_not_reached();
 		break;
@@ -538,11 +546,11 @@ void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 
 static
 void handle_end_element(ParseContext *ctx, xmlTextReader *reader) {
-	
+
 	const gchar *element_name = xmlTextReaderConstName(reader);
-	
+
 	switch (peek_state(ctx)) {
-	  	
+
 	case STATE_CONTENT:
 		if (ELEMENT_IS("note-content")) {
 			pop_state(ctx);
@@ -550,7 +558,7 @@ void handle_end_element(ParseContext *ctx, xmlTextReader *reader) {
 			pop_tag(ctx);
 		}
 		break;
-		
+
 	case STATE_LIST:
 		if (ELEMENT_IS("list")) {
 			pop_state(ctx);
@@ -566,7 +574,7 @@ void handle_end_element(ParseContext *ctx, xmlTextReader *reader) {
 			pop_tag(ctx);
 		}
 		break;
-	
+
 	default:
 		g_assert_not_reached ();
 		break;
@@ -575,22 +583,22 @@ void handle_end_element(ParseContext *ctx, xmlTextReader *reader) {
 
 static
 GtkTextTag* get_depth_tag(ParseContext *ctx, GtkTextBuffer *buffer, gchar* name) {
-	
+
 	GtkTextTag *tag;
 	gchar depth[5] = {0};
 	gchar *tag_name;
-	
+
 	g_sprintf(depth, "%i", ctx->depth);
 	tag_name = g_strconcat(name, ":", depth, NULL);
-	
-	tag = gtk_text_tag_table_lookup(buffer->tag_table, tag_name); 
+
+	tag = gtk_text_tag_table_lookup(buffer->tag_table, tag_name);
 	if (tag == NULL) {
 		tag = gtk_text_buffer_create_tag(buffer, tag_name, "indent", -20, "left-margin", ctx->depth * 25, NULL);
 		gtk_text_tag_set_priority(gtk_text_tag_table_lookup(buffer->tag_table, "list"), gtk_text_tag_table_get_size(buffer->tag_table) - 1);
 	}
-	
+
 	g_free(tag_name);
-	
+
 	return tag;
 }
 
@@ -620,56 +628,56 @@ void handle_text_element(ParseContext *ctx, xmlTextReader *reader, GtkTextBuffer
 	GtkTextTag *depth_tag;
 	gint line_num;
 	gboolean bullet_was_inserted;
-	
+
 	switch (peek_state(ctx)) {
-	
+
 	case STATE_CONTENT:
 		mark = gtk_text_buffer_create_mark(buffer, "insert_point", iter, TRUE);
 		gtk_text_buffer_insert(buffer, iter, text, -1);
-		
+
 		gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, mark);
 		apply_tags(ctx->tag_stack, buffer, &start_iter, iter);
 		gtk_text_buffer_delete_mark(buffer, mark);
-	
+
 		break;
-	
+
 	case STATE_LIST:
 		/* Ignore text in <list> elements - do nothing */
 		break;
-	
+
 	case STATE_LIST_ITEM:
 		bullet_was_inserted = FALSE;
-		
+
 		/* Save the line number where we start inserting */
 		line_num = gtk_text_iter_get_line(iter);
-		
+
 		mark = gtk_text_buffer_create_mark(buffer, "insert_point", iter, TRUE);
-		
+
 		/* Insert bullet only if we are at the very beginning of a line */
 		depth_tag = get_depth_tag(ctx, buffer, "depth");
 		if (gtk_text_iter_get_line_offset(iter) == 0) {
 			gtk_text_buffer_insert_with_tags(buffer, iter, get_bullet_by_depth(ctx->depth), -1, depth_tag, NULL);
 			bullet_was_inserted = TRUE;
 		}
-		
+
 		/* Insert the text into the buffer with list-item tags */
 		gtk_text_buffer_insert_with_tags_by_name(buffer, iter, text, -1, "list-item", NULL);
-		
+
 		/* Apply <list> tag to the complete line, incuding the bullet */
 		gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, mark);
 		gtk_text_buffer_apply_tag_by_name(buffer, "list", &start_iter, iter);
-		
+
 		/* Now move start_iter behind BULLET character, because we don't want to format the bullet */
 		if (bullet_was_inserted) {
 			gtk_text_iter_forward_chars(&start_iter, 2);
 		}
-		
+
 		/* Apply the rest of the tags */
 		apply_tags(ctx->tag_stack, buffer, &start_iter, iter);
-		
+
 		gtk_text_buffer_delete_mark(buffer, mark);
 		break;
-	    
+
 	default:
 		g_printerr("ERROR: Wrong state: %i  Wrong tag: %s\n", peek_state(ctx), peek_tag(ctx));
 		g_assert_not_reached();
@@ -683,27 +691,27 @@ void process_note(ParseContext *ctx, xmlTextReader *reader, GtkTextBuffer *buffe
 {
 	int type;
 	const xmlChar *name, *value;
-	
+
 	value = xmlTextReaderConstValue(reader);
 	type  = xmlTextReaderNodeType(reader);
 	name  = xmlTextReaderConstName(reader);
 	if (name == NULL) {
 		name = BAD_CAST "(NULL)";
 	}
-	
+
 	switch(type) {
 	case XML_ELEMENT_NODE:
 		handle_start_element(ctx, reader);
 		break;
-	
+
 	case XML_ELEMENT_DECL:
 		handle_end_element(ctx, reader);
 		break;
-		
+
 	case XML_TEXT_NODE:
 		handle_text_element(ctx, reader, buffer);
 		break;
-	
+
 	case XML_DTD_NODE:
 		handle_text_element(ctx, reader, buffer);
 		break;
@@ -730,36 +738,35 @@ void destroy_parse_context(ParseContext *ctx) {
 	g_free(ctx);
 }
 
-
 void
 conboy_note_buffer_set_xml (ConboyNoteBuffer *self, const gchar *xml_string)
 {
 	g_return_if_fail(self != NULL);
 	g_return_if_fail(xml_string != NULL);
 	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
-	
+
 	int ret;
 	ParseContext *ctx;
 	GtkTextIter iter;
 	GtkTextBuffer *buffer = GTK_TEXT_BUFFER(self);
 	xmlTextReader *reader = conboy_xml_get_reader_for_memory(xml_string);
-	
-	
+
+
 	/* Clear text buffer */
 	gtk_text_buffer_set_text(buffer, "", -1);
-	
+
 	ctx = init_parse_context(buffer, &iter);
-	
+
 	ret = xmlTextReaderRead(reader);
 	while (ret == 1) {
 		process_note(ctx, reader, buffer);
 		ret = xmlTextReaderRead(reader);
 	}
-	
+
 	if (ret != 0) {
 		g_printerr("ERROR: Failed to parse content.\n");
 	}
-	
+
 	destroy_parse_context(ctx);
 }
 
