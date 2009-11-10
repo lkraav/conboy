@@ -1,5 +1,5 @@
-conboy-unstable (1:0.6.2) stable; urgency=low
+conboy-unstable (1:0.6.1.1) stable; urgency=low
 
   * Development version
   
- -- Cornelius Hald <hald@icandy.de>  Wed, 18 Oct 2009 17:37:49 +0200
+ -- Cornelius Hald <hald@icandy.de>  Tue, 10 Nov 2009 18:58:49 +0200
