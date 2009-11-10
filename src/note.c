@@ -43,11 +43,13 @@ void note_show_by_title(const char* title)
 
 	note = conboy_note_store_find_by_title(app_data->note_store, title);
 
-	if (note == NULL) {
+	if (note != NULL) {
+		note_show(note, TRUE, TRUE, FALSE);
+	} else {
 		note = conboy_note_new_with_title(title);
+		note_show(note, TRUE, TRUE, TRUE);
 	}
 
-	note_show(note, TRUE, TRUE, FALSE);
 }
 
 /* TODO: Move to ConboyNoteBuffer */
@@ -69,7 +71,7 @@ void note_format_title(GtkTextBuffer *buffer)
 }
 
 /* TODO: Move to ConboyNoteBuffer
- * The return value needs to be freed by the caller. 
+ * The return value needs to be freed by the caller.
  */
 gchar* note_extract_title_from_buffer(GtkTextBuffer *buffer)
 {
@@ -157,7 +159,7 @@ void note_save(UserInterface *ui)
 
 	/* Get title */
 	title = note_extract_title_from_buffer(buffer);
-	
+
 	/* Check for duplicated title */
 	ConboyNote *existing_note = conboy_note_store_find_by_title(app_data->note_store, title);
 	if (existing_note && (existing_note != note)) {
@@ -180,7 +182,7 @@ void note_save(UserInterface *ui)
 			NULL);
 
 	g_free(title);
-	
+
 	if (note->create_date == 0) {
 		g_object_set(note, "create-date", time_in_s, NULL);
 	}
@@ -198,7 +200,9 @@ void note_save(UserInterface *ui)
 	}
 
 	/* Clear note content, then set it with fresh data from the text buffer */
-	g_object_set(note, "content", conboy_note_buffer_get_xml(CONBOY_NOTE_BUFFER(buffer)), NULL);
+	content = conboy_note_buffer_get_xml(CONBOY_NOTE_BUFFER(buffer));
+	g_object_set(note, "content", content, NULL);
+	g_free(content);
 
 	/* Save the complete note */
 	conboy_storage_note_save(app_data->storage, note);
@@ -225,7 +229,7 @@ void note_delete(ConboyNote *note)
 
 	/* Remove from list store */
 	conboy_note_store_remove(app_data->note_store, note);
-	
+
 	/* Remove from history */
 	if (app_data->current_element->prev) {
 		app_data->current_element = app_data->current_element->prev;
@@ -276,12 +280,12 @@ static void
 add_to_history(ConboyNote *note)
 {
 	AppData *app_data = app_data_get();
-	
+
 	/* Consistency check */
 	if (app_data->current_element == NULL) {
 		g_assert(app_data->note_history == NULL);
 	}
-	
+
 	/* Consistency check */
 	if (app_data->note_history == NULL) {
 		g_assert(app_data->current_element == NULL);
@@ -290,16 +294,16 @@ add_to_history(ConboyNote *note)
 	/* If we are currently not at the end of the history, we need to remove the 'future' before appending */
 	/* Remove everything from the current position to the end */
 	if (app_data->current_element != g_list_last(app_data->note_history)) {
-		
+
 		gint pos = g_list_position(app_data->note_history, app_data->current_element);
 		gint len = g_list_length(app_data->note_history);
-		
+
 		GList *to_remove = NULL;
 		for (; pos < len; pos++) {
 			GList *element = g_list_nth(app_data->note_history, pos);
 			to_remove = g_list_prepend(to_remove, element);
 		}
-		
+
 		GList *iter = to_remove;
 		while (iter) {
 			GList *element = (GList*) iter->data;
@@ -309,12 +313,12 @@ add_to_history(ConboyNote *note)
 		}
 		g_list_free(to_remove);
 	}
-	
+
 	if (g_list_length(app_data->note_history) >= 20) {
 		g_printerr("INFO: History is too long. Removing oldes element. \n");
 		app_data->note_history = g_list_delete_link(app_data->note_history, app_data->note_history);
 	}
-	
+
 	app_data->note_history = g_list_append(app_data->note_history, note);
 	app_data->current_element = g_list_last(app_data->note_history);
 }
@@ -322,7 +326,7 @@ add_to_history(ConboyNote *note)
 void note_show(ConboyNote *note, gboolean modify_history, gboolean scroll, gboolean select_row)
 {
 	AppData *app_data = app_data_get();
-	
+
 	UserInterface *ui = app_data->note_window;
 	GtkTextBuffer *buffer = ui->buffer;
 	GtkWindow *window = GTK_WINDOW(ui->window);
@@ -336,11 +340,11 @@ void note_show(ConboyNote *note, gboolean modify_history, gboolean scroll, gbool
 	if (modify_history) {
 		add_to_history(note);
 	}
-	
+
 	/* Toggle forward/backward buttons */
 	gtk_action_set_sensitive(ui->action_back, (gboolean) app_data->current_element->prev);
 	gtk_action_set_sensitive(ui->action_forward, (gboolean) app_data->current_element->next);
-	
+
 	/* Block signals on TextBuffer until we are done with initializing the content. This is to prevent saves etc. */
 	g_signal_handlers_block_matched(buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
 
@@ -353,13 +357,13 @@ void note_show(ConboyNote *note, gboolean modify_history, gboolean scroll, gbool
 	/* Show widget and set focus to the text view */
 	gtk_widget_show(GTK_WIDGET(window));
 	gtk_widget_grab_focus(GTK_WIDGET(ui->view));
-	
-	
+
+
 	while (gtk_events_pending()) {
 		gtk_main_iteration_do(FALSE);
 	}
-	
-	
+
+
 	/* Select first row if wanted */
 	if (select_row) {
 		GtkTextIter start, end;
@@ -368,7 +372,7 @@ void note_show(ConboyNote *note, gboolean modify_history, gboolean scroll, gbool
 		gtk_text_iter_forward_to_line_end(&end);
 		gtk_text_buffer_select_range(buffer, &start, &end);
 	}
-	
+
 	/* Scroll to cursor position */
 	if (scroll && !select_row) {
 		GtkTextIter iter;
