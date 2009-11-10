@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2009 Piotr Pokora <piotrek.pokora@gmail.com>
  * Copyright (C) 2009 Cornelius Hald <hald@icandy.de>
  *
@@ -6,12 +6,12 @@
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -84,7 +84,7 @@ string_to_enum(const gchar *string)
 	if (strcmp(string, OPEN_ON_STARTUP_TAG) == 0) return OPEN_ON_STARTUP;
 	if (strcmp(string, TAGS_TAG) == 0) return TAGS;
 	if (strcmp(string, TAG_TAG) == 0) return TAG;
-	
+
 	return UNKNOWN;
 }
 
@@ -96,9 +96,9 @@ handle_start_element(xmlTextReader *reader, ConboyNote *note)
 	gchar *value = xmlTextReaderReadString(reader);
 	gchar *attr_value = NULL;
 	XmlTag tag = string_to_enum(name);
-	
+
 	switch (tag) {
-	
+
 	case NOTE:
 		attr_value = xmlTextReaderGetAttribute(reader, BAD_CAST "version");
 		if (attr_value != NULL) {
@@ -108,11 +108,11 @@ handle_start_element(xmlTextReader *reader, ConboyNote *note)
 		} else {
 			g_printerr("ERROR: Couldn't parse note version.\n");
 		}
-	
+
 	case TITLE:
 		g_object_set(note, "title", value, NULL);
 		break;
-	
+
 	case NOTE_CONTENT:
 		attr_value = xmlTextReaderGetAttribute(reader, BAD_CAST "version");
 		if (attr_value != NULL) {
@@ -122,54 +122,54 @@ handle_start_element(xmlTextReader *reader, ConboyNote *note)
 		} else {
 			g_printerr("ERROR: Couldn't parse content version.\n");
 		}
-		
+
 		g_object_set(note, "content", (gchar*)xmlTextReaderReadOuterXml(reader), NULL);
 		break;
-		
+
 	case LAST_CHANGE_DATE:
 		g_object_set(note, "change-date", get_iso8601_time_in_seconds(value), NULL);
 		break;
-		
+
 	case LAST_METADATA_CHANGE_DATE:
 		g_object_set(note, "metadata-change-date", get_iso8601_time_in_seconds(value), NULL);
 		break;
-		
+
 	case CREATE_DATE:
 		g_object_set(note, "create-date", get_iso8601_time_in_seconds(value), NULL);
 		break;
-		
+
 	case CURSOR_POSITION:
 		g_object_set(note, "cursor-position", atoi(value), NULL);
 		break;
-		
+
 	case WIDTH:
 		g_object_set(note, "width", atoi(value), NULL);
 		break;
-		
+
 	case HEIGHT:
 		g_object_set(note, "height", atoi(value), NULL);
 		break;
-		
+
 	case X:
 		g_object_set(note, "x", atoi(value), NULL);
 		break;
-		
+
 	case Y:
 		g_object_set(note, "y", atoi(value), NULL);
 		break;
-		
+
 	case OPEN_ON_STARTUP:
 		g_object_set(note, "open-on-startup", atoi(value), NULL);
 		break;
-		
+
 	case TAG:
 		conboy_note_add_tag(note, value);
 		break;
-		
+
 	default:
 		break;
 	}
-	
+
 	g_free(value);
 	g_free(attr_value);
 }
@@ -189,42 +189,42 @@ write_header(xmlTextWriter *writer, ConboyNote *note)
 	gchar version[20];
 	gdouble note_version;
 	gchar *title;
-	
+
 	g_object_get(note, "title", &title, "note-version", &note_version, NULL);
-	
+
 	/* Enable indentation */
 	rc = xmlTextWriterSetIndent(writer, TRUE);
-	
+
 	/* Start document */
 	rc = xmlTextWriterStartDocument(writer, "1.0", "utf-8", NULL);
-	  
+
 	/* Start note element */
 	rc = xmlTextWriterStartElement(writer, BAD_CAST "note");
-	
+
 	g_ascii_formatd(version, 20, "%.1f", note_version);
 	rc = xmlTextWriterWriteAttribute(writer, BAD_CAST "version", BAD_CAST &version);
 	rc = xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xmlns", BAD_CAST "link", NULL, BAD_CAST "http://beatniksoftware.com/tomboy/link");
 	rc = xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xmlns", BAD_CAST "size", NULL, BAD_CAST "http://beatniksoftware.com/tomboy/size");
 	rc = xmlTextWriterWriteAttributeNS(writer, NULL, BAD_CAST "xmlns", NULL, BAD_CAST "http://beatniksoftware.com/tomboy");
-	  
+
 	/* Title element */
 	rc = xmlTextWriterWriteElement(writer, BAD_CAST "title", BAD_CAST title);
 	g_free(title);
-	
+
 	/* Start text element */
 	rc = xmlTextWriterStartElement(writer, BAD_CAST "text");
 	rc = xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xml", BAD_CAST "space", NULL, BAD_CAST "preserve");
 }
 
 static void
-write_footer(xmlTextWriter *writer, ConboyNote *note) 
+write_footer(xmlTextWriter *writer, ConboyNote *note)
 {
 	int rc;
 	GList *tags;
 	guint change_date, metadata_change_date, create_date;
 	gint  cursor_position, width, height, x, y;
 	gboolean open_on_startup;
-	
+
 	g_object_get(note,
 			"change-date", &change_date,
 			"metadata-change-date", &metadata_change_date,
@@ -236,10 +236,10 @@ write_footer(xmlTextWriter *writer, ConboyNote *note)
 			"x", &x,
 			"y", &y,
 			NULL);
-	
+
 	/* Enable indentation */
 	rc = xmlTextWriterSetIndent(writer, TRUE);
-		  
+
 	/* Meta data tags */
 	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "last-change-date", "%s", get_time_in_seconds_as_iso8601(change_date));
 	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "last-metadata-change-date", "%s", get_time_in_seconds_as_iso8601(metadata_change_date));
@@ -249,7 +249,7 @@ write_footer(xmlTextWriter *writer, ConboyNote *note)
 	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "height", "%i", height);
 	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "x", "%i", x);
 	rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "y", "%i", y);
-	
+
 	/* Write tags */
 	tags = conboy_note_get_tags(note);
 	if (tags != NULL) {
@@ -261,7 +261,7 @@ write_footer(xmlTextWriter *writer, ConboyNote *note)
 		}
 		rc = xmlTextWriterEndElement(writer);
 	}
-	
+
 	if (open_on_startup == TRUE) {
 		rc = xmlTextWriterWriteFormatElement(writer, BAD_CAST "open-on-startup", "True");
 	} else {
@@ -291,34 +291,34 @@ load (ConboyStoragePlugin *self, const gchar *guid)
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(guid != NULL, FALSE);
 	g_return_val_if_fail(CONBOY_IS_XML_STORAGE_PLUGIN(self), FALSE);
-	
+
 	int ret;
 	ConboyNote *note;
 	gchar *filename;
 	xmlTextReader *reader;
-	
+
 	filename = g_strconcat(CONBOY_XML_STORAGE_PLUGIN(self)->path, guid, ".note", NULL);
 	reader = conboy_xml_get_reader_for_file(filename);
 	note = conboy_note_new_with_guid(guid);
-	
+
 	ret = xmlTextReaderRead(reader);
 	while (ret == 1) {
 		process_note(reader, note);
 		ret = xmlTextReaderRead(reader);
 	}
-		
+
 	if (ret != 0) {
 		g_printerr("ERROR: Failed to parse file: %s\n", filename);
 	}
-	
+
 	g_free(filename);
-	
+
 	if (ret != 0) {
 		return NULL;
 	} else {
 		return note;
 	}
-	
+
 }
 
 
@@ -332,14 +332,14 @@ save (ConboyStoragePlugin *self, ConboyNote *note)
 	g_return_val_if_fail(CONBOY_IS_NOTE(note), FALSE);
 
 	g_assert(note->guid != NULL);
-	
+
 	xmlTextWriter *writer;
 	gchar *filename;
 	gchar *content;
-	
+
 	/* Get content and version */
 	g_object_get(note, "content", &content, NULL);
-	
+
 	/* Create filename */
 	filename = g_strconcat(CONBOY_XML_STORAGE_PLUGIN(self)->path, note->guid, ".note", NULL);
 
@@ -349,26 +349,32 @@ save (ConboyStoragePlugin *self, ConboyNote *note)
 		g_printerr("ERROR: XmlWriter is NULL \n");
 		return FALSE;
 	}
-	
+
 	/* Write the complete header */
 	write_header(writer, note);
-	
-	/* Write the complete content */
-	xmlTextWriterWriteRaw(writer, content);
-	
-	xmlTextWriterEndElement(writer); /*</text> */
+
+	/* Write the complete content, but before writing it we need to
+	 * remove the redundant namespace declaration from it. Sady libxml2
+	 * wont do that for us :( */
+	GRegex *regex = g_regex_new(" xmlns(?:.*?)?=\".*?\"", 0, 0, NULL);
+	gchar *content_clean = g_regex_replace(regex, content, -1, 0, "", 0, NULL);
+
+	xmlTextWriterWriteRaw(writer, content_clean);
 	g_free(content);
-	
+	g_free(content_clean);
+
+	xmlTextWriterEndElement(writer); /*</text> */
+
 	/* Write the complete footer */
 	write_footer(writer, note);
-	
+
 	xmlFreeTextWriter(writer);
 	g_free(filename);
-	
+
 	return TRUE;
 }
 
-static gboolean 
+static gboolean
 delete (ConboyStoragePlugin *self, ConboyNote *note)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
@@ -378,16 +384,16 @@ delete (ConboyStoragePlugin *self, ConboyNote *note)
 	g_return_val_if_fail(CONBOY_IS_NOTE(note), FALSE);
 
 	gboolean result = FALSE;
-	
+
 	gchar *guid;
 	g_object_get(note, "guid", &guid, NULL);
 	gchar *filename = g_strconcat(guid, ".note", NULL);
 	gchar *full_name = g_build_filename(CONBOY_XML_STORAGE_PLUGIN(self)->path, filename, NULL);
-	
+
 	if (g_unlink(full_name) == 0) {
 		result = TRUE;
 	}
-	
+
 	g_free(full_name);
 	g_free(filename);
 	g_free(guid);
@@ -400,20 +406,20 @@ list_ids (ConboyStoragePlugin *self)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(CONBOY_IS_XML_STORAGE_PLUGIN(self), FALSE);
-	
+
 	const gchar *filename;
 	GDir *dir = g_dir_open(CONBOY_XML_STORAGE_PLUGIN(self)->path, 0, NULL);
 	GSList *result = NULL;
-	
+
 	while ((filename = g_dir_read_name(dir)) != NULL) {
 		if (g_str_has_suffix(filename, ".note")) {
 			gchar *guid = g_strndup(filename, g_utf8_strlen(filename, -1) - 5);
 			result = g_slist_prepend(result, guid);
 		}
 	}
-	
+
 	g_dir_close(dir);
-	
+
 	return result;
 }
 
@@ -446,7 +452,7 @@ static void
 dispose(GObject *object)
 {
 	ConboyXmlStoragePlugin *self = CONBOY_XML_STORAGE_PLUGIN(object);
-	
+
 	g_free(self->path);
 	self->path = NULL;
 
@@ -458,7 +464,7 @@ conboy_xml_storage_plugin_class_init (ConboyXmlStoragePluginClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	ConboyStoragePluginClass *storage_class = CONBOY_STORAGE_PLUGIN_CLASS(klass);
-	
+
 	object_class->dispose =	dispose;
 
 	storage_class->load = load;
@@ -466,7 +472,7 @@ conboy_xml_storage_plugin_class_init (ConboyXmlStoragePluginClass *klass)
 	storage_class->delete = delete;
 	storage_class->list = list;
 	storage_class->list_ids = list_ids;
-	
+
 }
 
 static void
