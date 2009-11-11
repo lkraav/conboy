@@ -1,2 +1,2 @@
-SUBDIRS = storage_xml storage_midgard
+SUBDIRS = storage_xml storage_midgard storage_evernote
 
