@@ -154,4 +154,5 @@ AC_OUTPUT([
     src/plugins/Makefile
     src/plugins/storage_xml/Makefile
     src/plugins/storage_midgard/Makefile
+    src/plugins/storage_evernote/Makefile
 ])
