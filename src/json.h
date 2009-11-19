@@ -32,12 +32,19 @@ typedef struct {
 } JsonUser;
 
 typedef struct {
+	gchar *request_token_url;
+	gchar *access_token_url;
+	gchar *authorize_url;
+} JsonApi;
+
+typedef struct {
 	GSList *notes;
 	gint   latest_sync_revision;
 } JsonNoteList;
 
 JsonNoteList* 	json_get_note_list(const gchar* json_string);
 JsonUser* 		json_get_user(const gchar* json_string);
+JsonApi*		json_get_api(const gchar* json_string);
 JsonNode* 		json_get_node_from_note(ConboyNote *note);
 ConboyNote*		json_get_note_from_node(JsonNode *node);
 ConboyNote*		json_get_note_from_string(const gchar *json_string);

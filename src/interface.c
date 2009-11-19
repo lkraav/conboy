@@ -396,6 +396,12 @@ do_sync (gpointer *user_data)
 	}
 	pulse_bar(bar);
 
+	g_printerr("###### Got User from server ########\n");
+	g_printerr("# First name: %s\n", user->first_name);
+	g_printerr("# Last name: %s\n", user->last_name);
+	g_printerr("#   Api ref: %s\n", user->api_ref);
+	g_printerr("####################################\n");
+
 	/* Create list of all local notes */
 	/* Just copy NoteStore to normal list */
 	ConboyNoteStore *note_store = app_data->note_store;
@@ -787,6 +793,34 @@ ungrab_volume_keys(GtkWidget *window)
                      GDK_WINDOW_XID (GDK_DRAWABLE(window->window)), atom, XA_INTEGER, 32,
                      PropModeReplace, (unsigned char *) &val, 1);
 #endif
+}
+
+static gboolean
+on_preedit_changed (GSignalInvocationHint *ihint, guint n_param_values, const GValue *param_values, gpointer data)
+{
+
+	g_printerr("### Preedit parameter count: %i\n", n_param_values);
+
+	GtkIMContext *ctx = (GtkIMContext*) g_value_peek_pointer(&(param_values[0]));
+
+	gchar *string = NULL;
+	PangoAttrList *list = NULL;
+	gint pos = 0;
+
+	gtk_im_context_get_preedit_string(ctx, &string, &list, &pos);
+
+	g_printerr("### String is: >%s<\n", string);
+
+	AppData *app_data = app_data_get();
+	GtkTextBuffer *buffer = app_data->note_window->buffer;
+
+	GtkTextIter start, end;
+	gtk_text_buffer_get_bounds(buffer, &start, &end);
+	gchar *text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
+	g_printerr("### TEXT: >%s<\n", text);
+
+
+	return TRUE; /* to stay connected */
 }
 
 /*
@@ -1474,6 +1508,10 @@ UserInterface* create_mainwin() {
 #ifdef HILDON_HAS_APP_MENU
 	fullscreen_manager_new(GTK_WINDOW(mainwin), ui_helper_toggle_fullscreen);
 #endif
+
+	/* Add signal hook to work with the word completion */
+	guint signal_id = g_signal_lookup("preedit-changed", GTK_TYPE_IM_CONTEXT);
+	g_signal_add_emission_hook(signal_id, 0, on_preedit_changed, textview, NULL);
 
 	return ui;
 }

@@ -63,10 +63,41 @@ dbus_handler(const gchar *interface, const gchar *method, GArray *arguments, gpo
 		 * whether the config/auth window is open
 		 * and if yes, that it is authorized.
 		 * Change the UI and so on...
+		 *
+		 * The parameter looks like this:
+		 * conboy://authenticate?oauth_token=kBFjXzLsKqzmxx9PGBX0&oauth_verifier=1ccaf32e-ec6e-4598-a77f-020af60f24b5&return=https://one.ubuntu.com
 		 */
 
-		g_printerr("___ CORRECTLY AUTHENTICATED ____");
+		g_printerr("___ CORRECTLY AUTHENTICATED ____\n");
 
+		if (arguments != NULL && arguments->len >= 1) {
+
+			osso_rpc_t value = g_array_index(arguments, osso_rpc_t, 0);
+
+			if (value.type == DBUS_TYPE_STRING) {
+				gchar *url = value.value.s;
+				g_printerr("URL: %s\n", url);
+
+				/* Find out verifier */
+				gchar **parts = g_strsplit_set(url, "?&", 4);
+
+				gchar *verifier = NULL;
+				int i = 0;
+				while (parts[i] != NULL) {
+
+					if (strncmp(parts[i], "oauth_verifier=", 15) == 0) {
+						verifier = g_strdup(&(parts[i][15])); /* Copy starting from character 15 */
+						break;
+					}
+
+					i++;
+				}
+
+				g_strfreev(parts);
+
+				g_printerr("OAuth Verifier: %s\n", verifier);
+			}
+		}
 
 	}
 	return OSSO_OK;
@@ -126,8 +157,10 @@ main (int argc, char *argv[])
 
 
 #ifdef HILDON_HAS_APP_MENU
+
   g_signal_connect(program, "notify::is-topmost", G_CALLBACK(on_window_is_topmost_changed), NULL);
   orientation_init(app_data);
+
 #endif
 
 
@@ -135,9 +168,11 @@ main (int argc, char *argv[])
   hildon_program_add_window(app_data->program, HILDON_WINDOW(app_data->note_window->window));
 
   /* Register URL listener */
+  /*
   if (osso_rpc_set_cb_f(app_data->osso_ctx, APP_SERVICE, APP_METHOD, APP_SERVICE, dbus_handler, app_data->note_window->window) != OSSO_OK) {
       g_printerr("Failed to set callback\n");
   }
+  */
 
   /* EXPERIEMNT */
 

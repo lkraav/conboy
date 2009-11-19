@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -41,10 +41,10 @@ JsonNoteList*
 web_sync_get_notes(JsonUser *user, int since_rev);
 
 gchar*
-conboy_get_auth_link(const gchar *base_url);
+conboy_get_auth_link(const gchar *call_url, const gchar *link_url);
 
 gboolean
-conboy_get_access_token(void);
+conboy_get_access_token(const gchar *url, const gchar *verifier);
 
 gchar*
 conboy_http_get(const gchar *url);

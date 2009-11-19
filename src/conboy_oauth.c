@@ -105,8 +105,14 @@ http_put(const gchar *url, const gchar *oauth_args, const gchar *body)
 	headers = curl_slist_append(headers, "User-Agent:");
 
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
 	curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
+
+	/* Skip https security */
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+	/* Follow redirects */
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 
 	/* Set the json string as the body of the request */
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
@@ -127,7 +133,7 @@ http_put(const gchar *url, const gchar *oauth_args, const gchar *body)
 
 
 
-static gchar*
+gchar*
 http_get(const gchar *url)
 {
 	CURL *curl;
@@ -157,6 +163,13 @@ http_get(const gchar *url)
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
 
+	/* Skip https security */
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+	/* Follow redirects */
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+
 	/* Setup function to read the reply */
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
@@ -176,32 +189,39 @@ http_get(const gchar *url)
 /*
  * Returns 0 on success, 1 otherwise
  */
-static int parse_reply(const char *reply, char **token, char **secret) {
-  int rc;
-  int ok=1;
-  char **rv = NULL;
-  rc = oauth_split_url_parameters(reply, &rv);
-  qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
-  if( rc==2
-      && !strncmp(rv[0],"oauth_token=",11)
-      && !strncmp(rv[1],"oauth_token_secret=",18) ) {
-    ok=0;
-    if (token)  *token = g_strdup(&(rv[0][12]));
-    if (secret) *secret = g_strdup(&(rv[1][19]));
-    printf("key:    '%s'\nsecret: '%s'\n",*token, *secret);
-  }
-  if(rv) free(rv);
-  return ok;
+static int
+parse_reply (const char *reply, char **token, char **secret) {
+	int rc;
+	int ok=1;
+	char **rv = NULL;
+	rc = oauth_split_url_parameters(reply, &rv);
+	qsort(rv, rc, sizeof(char *), oauth_cmpstringp);
+
+	/* Reply to request_token request returns three parameters */
+	if (rc == 3 && !strncmp(rv[1], "oauth_token=", 11) && !strncmp(rv[2], "oauth_token_secret=", 18) ) {
+		ok = 0;
+		if (token)   *token = g_strdup(&(rv[1][12]));
+		if (secret) *secret = g_strdup(&(rv[2][19]));
+		g_printerr("key:    '%s'\nsecret: '%s'\n", *token, *secret);
+	}
+
+	/* Reply to access_token request returns two parameters */
+	else if (rc == 2 && !strncmp(rv[0], "oauth_token=", 11) && !strncmp(rv[1], "oauth_token_secret=", 18) ) {
+		ok = 0;
+		if (token)   *token = g_strdup(&(rv[0][12]));
+		if (secret) *secret = g_strdup(&(rv[1][19]));
+		g_printerr("key:    '%s'\nsecret: '%s'\n", *token, *secret);
+	}
+
+	if(rv) free(rv);
+	return ok;
 }
 
 gchar*
-conboy_get_auth_link(const gchar *base_url)
+conboy_get_auth_link(const gchar *call_url, const gchar *link_url)
 {
 	gchar *tok = "";
 	gchar *sec = "";
-
-	gchar *call_url = g_strconcat(base_url, "/oauth/request_token/", NULL);
-	gchar *link_url = g_strconcat(base_url, "/oauth/authenticate/", NULL);
 
 	gchar *link = get_auth_link(call_url, link_url ,&tok, &sec);
 
@@ -229,11 +249,11 @@ http_post (const gchar *url, const gchar *postdata)
 	curl_easy_setopt(curl, CURLOPT_URL, url);
 
 	/* Skip https security */
-
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 
-	/**/
+	/* Follow redirects */
+	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postdata);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
@@ -255,14 +275,22 @@ get_auth_link(gchar *request_url, gchar *link_url, gchar **t_key, gchar **t_secr
 	gchar *reply   = NULL;
 	gchar *link = NULL;
 
-	gchar *req_url = oauth_sign_url2(request_url, &postarg, OA_HMAC, "POST", c_key, c_secret, NULL, NULL);
+	/*
+	 * TODO: oob does not work. Somehow we must transport the oauth_verifier from
+	 * the service to us. Usually this is done via the callback url, but then
+	 * we need to have a webserver....
+	 * No need for a webserver. It works with the the url handling of Maemo
+	 */
+	gchar *request = g_strconcat(request_url, "?oauth_callback=conboy://authenticate", NULL);
+
+	gchar *req_url = oauth_sign_url2(request, &postarg, OA_HMAC, "POST", c_key, c_secret, NULL, NULL);
+	g_free(request);
 
 	if (req_url == NULL) {
 		g_printerr("ERROR: REQ URL = NULL\n");
 		return NULL;
 	}
 
-	/*reply = oauth_http_post(req_url, postarg);*/
 	reply = http_post(req_url, postarg);
 
 	g_printerr("Reply: %s\n", reply);
@@ -273,8 +301,8 @@ get_auth_link(gchar *request_url, gchar *link_url, gchar **t_key, gchar **t_secr
 		return NULL;
 	}
 
-	if (strlen(reply) > 150) {
-		g_printerr("ERROR: Reply is longer then 150 characters, cannot be right\n");
+	if (strlen(reply) > 200) {
+		g_printerr("ERROR: Reply is longer then 200 characters, cannot be right\n");
 		g_free(req_url);
 		return NULL;
 	}
@@ -291,7 +319,9 @@ get_auth_link(gchar *request_url, gchar *link_url, gchar **t_key, gchar **t_secr
 	/* TODO: Use conboy:// instead of http://google.de. Problem is, it doesnt work for now.
 	 * There is some bug in Snowy/Piston/Django...
 	 * http://mail.gnome.org/archives/snowy-list/2009-July/msg00002.html */
-	link = g_strconcat(link_url, "?oauth_token=", *t_key, "&oauth_callback=conboy://", NULL);
+	/* We now don't need to add the callback here, because we provided it with the request already */
+	link = g_strconcat(link_url, "?oauth_token=", *t_key, NULL);
+	/*link = g_strconcat(link_url, "?oauth_token=", *t_key, "&oauth_callback=conboy://", NULL);*/
 	/*link = g_strconcat(link_url, "?oauth_token=", *t_key, "&oauth_callback=http://www.google.de", NULL);*/
 
 	return link;
@@ -311,7 +341,8 @@ get_access_token(gchar *url, gchar **t_key, gchar **t_secret)
 		return FALSE;
 	}
 
-	reply = oauth_http_post(req_url, postarg);
+	/*reply = oauth_http_post(req_url, postarg);*/
+	reply = http_post(req_url, postarg);
 	if (reply == NULL) {
 		g_printerr("ERROR: reply = NULL");
 		g_free(req_url);
@@ -320,16 +351,18 @@ get_access_token(gchar *url, gchar **t_key, gchar **t_secret)
 
 	g_printerr("Access Reply: >%s< \n", reply);
 
-	if (strlen(reply) > 150) {
+	if (strlen(reply) > 200) {
 		/* Answer is too long, cannot be correct */
-		g_printerr("WARN: Cannot get access token. Answer of server was longer than 150 characters.");
+		g_printerr("ERROR: Cannot get access token. Answer of server was longer than 200 characters.");
 		g_free(reply);
 		return FALSE;
 	}
 
 	if (parse_reply(reply, t_key, t_secret)) {
+		g_printerr("ERROR: Cannot parse access token reply\n");
 		g_free(reply);
 		return FALSE;
+
 	} else {
 		g_free(reply);
 		return TRUE;
@@ -337,22 +370,24 @@ get_access_token(gchar *url, gchar **t_key, gchar **t_secret)
 }
 
 gboolean
-conboy_get_access_token() {
+conboy_get_access_token(const gchar *url, const gchar *verifier) {
 
 	gchar *tok = settings_load_oauth_access_token();
 	gchar *sec = settings_load_oauth_access_secret();
-	gchar *url = settings_load_sync_base_url();
 
-	url = g_strconcat(url, "/oauth/access_token/", NULL);
+	gchar *full_url = g_strconcat(url, "?", "oauth_verifier=", verifier, NULL);
+	g_printerr("### AccessToken url: %s\n", full_url);
 
-	if (get_access_token(url, &tok, &sec)) {
+	if (get_access_token(full_url, &tok, &sec)) {
 		g_printerr("acc_tok: %s\n", tok);
 		g_printerr("acc_sec: %s\n", sec);
 		settings_save_oauth_access_token(tok);
 		settings_save_oauth_access_secret(sec);
+		g_free(full_url);
 		return TRUE;
 	}
 
+	g_free(full_url);
 	return FALSE;
 }
 

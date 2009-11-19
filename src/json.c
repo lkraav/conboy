@@ -43,11 +43,11 @@ remove_xml_tag_and_title(const gchar* content)
 	 * is missing the xmlns:link and xmlns:size attributes. We could add these first,
 	 * but that would mean to use a XmlTextWriter, add those attributes and then use a
 	 * XmlTextReader to remove them again.
-	 * 
+	 *
 	 * So we just go with normal string processing here.
 	 */
 	gchar *result;
-	
+
 	/* Remove <note-content> tags */
 	gchar **tokens1 = g_strsplit(content, ">", 2);
 	gchar **tokens2 = g_strsplit(tokens1[1], "</note-content>", 2);
@@ -63,7 +63,7 @@ remove_xml_tag_and_title(const gchar* content)
 		g_printerr("ERROR: PARTS0 IS NULL\n");
 		return "";
 	}
-	
+
 	/* If second line does not exist, there is no content */
 	if (parts[1] == NULL) {
 		result = "";
@@ -82,7 +82,7 @@ remove_xml_tag_and_title(const gchar* content)
 
 /**
  * Escapes only \ \n \r \t \b \f \ and " and leaves unicode characters
- * as they are. g_strescape is doing "Höllo" -> "H\303\266llo" which
+ * as they are. g_strescape is doing "H��llo" -> "H\303\266llo" which
  * is not JSON conform.
  */
 static gchar*
@@ -123,7 +123,7 @@ escape_string (gchar *orig)
 		case '\f':
 			*q++ = '\\';
 			*q++ = 'f';
-			break;	
+			break;
 		case '\\':
 			*q++ = '\\';
 			*q++ = '\\';
@@ -475,6 +475,35 @@ json_get_api_ref(const gchar* json_string)
 }
 
 
+JsonApi*
+json_get_api(const gchar* json_string)
+{
+	JsonParser *parser = json_parser_new();
+	JsonApi *result = g_new0(JsonApi, 1);
+	GError *error = NULL;
+
+	if (json_parser_load_from_data(parser, json_string, -1, &error)) {
+		JsonNode *node = json_parser_get_root(parser);
+		JsonObject *obj = json_node_get_object(node);
+
+		node = json_object_get_member(obj, "oauth_request_token_url");
+		result->request_token_url = json_node_dup_string(node);
+
+		node = json_object_get_member(obj, "oauth_access_token_url");
+		result->access_token_url = json_node_dup_string(node);
+
+		node = json_object_get_member(obj, "oauth_authorize_url");
+		result->authorize_url = json_node_dup_string(node);
+
+	} else {
+		g_printerr("ERROR: %s\n", error->message);
+		g_error_free(error);
+	}
+
+	g_object_unref(parser);
+	return result;
+}
+
 
 JsonUser*
 json_get_user(const gchar* json_string)
@@ -512,7 +541,7 @@ json_get_user(const gchar* json_string)
 		g_error_free(error);
 	}
 
-	g_object_unref(G_OBJECT(parser));
+	g_object_unref(parser);
 	return result;
 }
 
@@ -524,20 +553,20 @@ json_get_note_list(const gchar* json_string)
 		g_printerr("ERROR: Cannot parse empty string\n");
 		return NULL;
 	}
-	
+
 	if (strncmp(json_string, "{\"notes\":", 9) != 0) {
 		g_printerr("ERROR: Cannot parse string. Does not start with '{\"notes\":'\n");
 		return NULL;
 	}
-	
+
 	JsonParser *parser = json_parser_new();
 	JsonNoteList *result = NULL;
 	GError *error = NULL;
 
 	if (json_parser_load_from_data(parser, json_string, -1, &error)) {
-		
+
 		result = g_new0(JsonNoteList, 1);
-		
+
 		JsonNode *node = json_parser_get_root(parser);
 		JsonObject *obj = json_node_get_object(node);
 

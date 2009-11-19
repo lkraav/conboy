@@ -40,6 +40,7 @@
 #include "conboy_plugin_manager.h"
 #include "conboy_check_button.h"
 #include "ui_helper.h"
+#include "json.h"
 
 #include "settings_window.h"
 
@@ -97,6 +98,75 @@ on_color_but_changed(HildonColorButton *button, SettingsColorType *type)
 	settings_save_color(&color, GPOINTER_TO_INT(type));
 }
 
+struct DialogData {
+	GtkDialog *dialog;
+	gchar *verifier;
+};
+
+static gint
+url_callback_handler(const gchar *interface, const gchar *method, GArray *arguments, gpointer user_data, osso_rpc_t *retval)
+{
+	g_printerr("Method: %s\n", method);
+	struct DialogData *data = (struct DialogData*) user_data;
+
+	GtkWidget *dialog = GTK_WIDGET(data->dialog);
+	gtk_window_present(GTK_WINDOW(dialog));
+
+	if (g_strcasecmp(method, "authenticated") == 0) {
+
+		/*
+		 * TODO: Implement something that checks
+		 * whether the config/auth window is open
+		 * and if yes, that it is authorized.
+		 * Change the UI and so on...
+		 *
+		 * The parameter looks like this:
+		 * conboy://authenticate?oauth_token=kBFjXzLsKqzmxx9PGBX0&oauth_verifier=1ccaf32e-ec6e-4598-a77f-020af60f24b5&return=https://one.ubuntu.com
+		 */
+
+		g_printerr("___ CORRECTLY AUTHENTICATED ____\n");
+
+		if (arguments != NULL && arguments->len >= 1) {
+
+			osso_rpc_t value = g_array_index(arguments, osso_rpc_t, 0);
+
+			if (value.type == DBUS_TYPE_STRING) {
+				gchar *url = value.value.s;
+				g_printerr("URL: %s\n", url);
+
+				/* Find out verifier */
+				gchar **parts = g_strsplit_set(url, "?&", 4);
+
+				gchar *verifier = NULL;
+				int i = 0;
+				while (parts[i] != NULL) {
+
+					if (strncmp(parts[i], "oauth_verifier=", 15) == 0) {
+						verifier = g_strdup(&(parts[i][15])); /* Copy starting from character 15 */
+						break;
+					}
+					i++;
+				}
+
+				g_strfreev(parts);
+
+				if (verifier != NULL) {
+					g_printerr("OAuth Verifier: %s\n", verifier);
+					data->verifier = verifier;
+					/* Close the modal dialog and signal success */
+					g_signal_emit_by_name(data->dialog, "response", GTK_RESPONSE_OK);
+					return OSSO_OK;
+				}
+			}
+		}
+	}
+
+	/* Close the modal dialog and signal failure */
+	g_signal_emit_by_name(data->dialog, "response", GTK_RESPONSE_CANCEL);
+	return OSSO_OK;
+}
+
+
 static void
 on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 {
@@ -131,7 +201,31 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 
 	/* DO auth stuff */
 
-	gchar *link = conboy_get_auth_link(url);
+	/* Get URLs */
+	gchar *request = g_strconcat(url, "/api/1.0", NULL);
+
+	gchar *reply = http_get(request);
+
+	if (reply == NULL) {
+		gchar *msg = g_strconcat("Got no reply from: %s\n", request, NULL);
+		g_printerr(msg);
+		g_free(msg);
+		g_free(request);
+		return;
+	}
+	g_free(request);
+
+	JsonApi *api = json_get_api(reply);
+
+	g_printerr("###################################\n");
+	g_printerr("Request token url: %s\n", api->request_token_url);
+	g_printerr("Authenticate url : %s\n", api->authorize_url);
+	g_printerr("Access token url : %s\n", api->access_token_url);
+	g_printerr("###################################\n");
+
+
+	/* Get auth link url */
+	gchar *link = conboy_get_auth_link(api->request_token_url, api->authorize_url);
 
 	if (link == NULL) {
 		ui_helper_show_confirmation_dialog(parent, "Could not connect to host.", FALSE);
@@ -149,19 +243,51 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 
 	g_printerr("Opening browser with URL: >%s<\n", link);
 
-	ui_helper_show_confirmation_dialog(parent, "Click OK after authenticating on the website.", FALSE);
+	/*ui_helper_show_confirmation_dialog(parent, "Please grant access on the website, which just opened.", FALSE);*/
+	/* Show dialog */
+	GtkWidget *dialog = gtk_dialog_new_with_buttons(
+				" ",
+				parent,
+				GTK_DIALOG_MODAL,
+				GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+				NULL);
 
-	if (conboy_get_access_token()) {
-		/* Disable Authenticate button */
-		gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
-		/* Popup dialog */
-		ui_helper_show_confirmation_dialog(parent, "You're authenticated. Everything is good :)", FALSE);
+	GtkWidget *label = gtk_label_new("");
+	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+	gtk_label_set_markup(GTK_LABEL(label), "Please grant access on the website. This dialog will then automatically be closed.");
+	gtk_widget_show(label);
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), label);
 
-	} else {
-		ui_helper_show_confirmation_dialog(parent, "Something went wrong. Not good :(", FALSE);
-		settings_save_sync_base_url("");
+	/* Register DBus listener */
+
+	struct DialogData data;
+	data.dialog = GTK_DIALOG(dialog);
+
+	if (osso_rpc_set_cb_f(app_data->osso_ctx, "de.zwong.conboy", "de/zwong/conboy", "de.zwong.conboy", url_callback_handler, &data) != OSSO_OK) {
+		g_printerr("ERROR: Failed connect DBus url callback\n");
 	}
 
+	/* Open dialog and wait for result */
+	int result = gtk_dialog_run(GTK_DIALOG(dialog));
+
+	if (osso_rpc_unset_cb_f(app_data->osso_ctx, "de.zwong.conboy", "de/zwong/conboy", "de.zwong.conboy", url_callback_handler, &data) != OSSO_OK) {
+			g_printerr("ERROR: Failed disconnect DBus url callback\n");
+	}
+
+	if (result == GTK_RESPONSE_OK) {
+
+		if (conboy_get_access_token(api->access_token_url, data.verifier)) {
+
+			gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
+			ui_helper_show_confirmation_dialog(parent, "You're authenticated. Everything is good :)", FALSE);
+
+		} else {
+			ui_helper_show_confirmation_dialog(parent, "Something went wrong. Not good :(", FALSE);
+			settings_save_sync_base_url("");
+		}
+	} else {
+		ui_helper_show_confirmation_dialog(parent, "You have canceled the authentication process.", FALSE);
+	}
 
 }
 
