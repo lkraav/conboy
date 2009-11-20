@@ -115,11 +115,6 @@ url_callback_handler(const gchar *interface, const gchar *method, GArray *argume
 	if (g_strcasecmp(method, "authenticated") == 0) {
 
 		/*
-		 * TODO: Implement something that checks
-		 * whether the config/auth window is open
-		 * and if yes, that it is authorized.
-		 * Change the UI and so on...
-		 *
 		 * The parameter looks like this:
 		 * conboy://authenticate?oauth_token=kBFjXzLsKqzmxx9PGBX0&oauth_verifier=1ccaf32e-ec6e-4598-a77f-020af60f24b5&return=https://one.ubuntu.com
 		 */
@@ -162,10 +157,19 @@ url_callback_handler(const gchar *interface, const gchar *method, GArray *argume
 	}
 
 	/* Close the modal dialog and signal failure */
-	g_signal_emit_by_name(data->dialog, "response", GTK_RESPONSE_CANCEL);
+	g_signal_emit_by_name(data->dialog, "response", GTK_RESPONSE_REJECT);
 	return OSSO_OK;
 }
 
+static void
+clear_sync_settings()
+{
+	settings_save_last_sync_revision(0);
+	settings_save_last_sync_time(0);
+	settings_save_sync_base_url("");
+	settings_save_oauth_access_token("");
+	settings_save_oauth_access_secret("");
+}
 
 static void
 on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
@@ -179,22 +183,35 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 
 	GtkWindow *parent = GTK_WINDOW(widget->window);
 
-	if (url == NULL) {
+	if (url == NULL || strcmp(url, "") == 0) {
 		return;
 	}
 
 	gchar *old_url = settings_load_sync_base_url();
 
-	if (old_url != NULL && strcmp(old_url, "") != 0 && strcmp(url, old_url) != 0) {
-		GtkWidget *dialog = ui_helper_create_yes_no_dialog(parent, "Really reset the sync settings?");
+	if (old_url != NULL && strcmp(old_url, "") != 0) {
+
+		gchar *msg;
+
+		if (strcmp(url, old_url) == 0) {
+			msg = g_strconcat("You are already authenticated with\n'", old_url, "'. Are you sure you want to reset the synchonization settings?", NULL);
+		} else {
+			msg = g_strconcat("You are currently authenticated with\n'", old_url, "'. Are you sure you want to reset the synchonization settings?", NULL);
+		}
+
+		GtkWidget *dialog = ui_helper_create_yes_no_dialog(parent, msg);
 		int ret = gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy(dialog);
+		g_free(msg);
 		if (ret == GTK_RESPONSE_YES) {
-			/* Reset settings */
-			settings_save_last_sync_revision(0);
-			settings_save_last_sync_time(0);
-			settings_save_sync_base_url("");
+			clear_sync_settings();
 		} else {
+			gtk_widget_set_sensitive(button, FALSE);
+			#ifdef HILDON_HAS_APP_MENU
+			hildon_entry_set_text(HILDON_ENTRY(widget->url_entry), old_url);
+			#else
+			gtk_entry_set_text(GTK_ENTRY(widget->url_entry), old_url);
+			#endif
 			return;
 		}
 	}
@@ -233,7 +250,7 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 	}
 
 	/* If successfull, save url */
-	settings_save_sync_base_url(url);
+	/*settings_save_sync_base_url(url);*/
 
 	/* Open link in browser */
 	AppData *app_data = app_data_get();
@@ -243,33 +260,23 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 
 	g_printerr("Opening browser with URL: >%s<\n", link);
 
-	/*ui_helper_show_confirmation_dialog(parent, "Please grant access on the website, which just opened.", FALSE);*/
-	/* Show dialog */
-	GtkWidget *dialog = gtk_dialog_new_with_buttons(
-				" ",
-				parent,
-				GTK_DIALOG_MODAL,
-				GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-				NULL);
 
-	GtkWidget *label = gtk_label_new("");
-	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-	gtk_label_set_markup(GTK_LABEL(label), "Please grant access on the website. This dialog will then automatically be closed.");
-	gtk_widget_show(label);
-	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), label);
+	GtkWidget *dialog = ui_helper_create_cancel_dialog(parent, "Please grant access on the website of your service provider which was just opened.\nAfter that you will be automatically redirected to back Conboy.");
 
-	/* Register DBus listener */
 
 	struct DialogData data;
 	data.dialog = GTK_DIALOG(dialog);
 
+	/* Register DBus listener */
 	if (osso_rpc_set_cb_f(app_data->osso_ctx, "de.zwong.conboy", "de/zwong/conboy", "de.zwong.conboy", url_callback_handler, &data) != OSSO_OK) {
 		g_printerr("ERROR: Failed connect DBus url callback\n");
 	}
 
 	/* Open dialog and wait for result */
 	int result = gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
 
+	/* Unregister DBus listener */
 	if (osso_rpc_unset_cb_f(app_data->osso_ctx, "de.zwong.conboy", "de/zwong/conboy", "de.zwong.conboy", url_callback_handler, &data) != OSSO_OK) {
 			g_printerr("ERROR: Failed disconnect DBus url callback\n");
 	}
@@ -279,14 +286,19 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 		if (conboy_get_access_token(api->access_token_url, data.verifier)) {
 
 			gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
-			ui_helper_show_confirmation_dialog(parent, "You're authenticated. Everything is good :)", FALSE);
-
+			ui_helper_show_confirmation_dialog(parent, "<b>You are successfully authenticated</b>\nYou can now use the synchronization from the main menu.", FALSE);
+			settings_save_sync_base_url(url);
 		} else {
-			ui_helper_show_confirmation_dialog(parent, "Something went wrong. Not good :(", FALSE);
+			ui_helper_show_confirmation_dialog(parent, "Conboy could not get an access token from your service provider. Please try again.", FALSE);
 			settings_save_sync_base_url("");
 		}
+	} else if (result == 666) {
+		ui_helper_show_confirmation_dialog(parent, "You have manually canceled the authentication process.", FALSE);
+	} else if (result == GTK_RESPONSE_REJECT) {
+		ui_helper_show_confirmation_dialog(parent, "There were problems with the data received from your service provider. Please try again.", FALSE);
+		settings_save_sync_base_url("");
 	} else {
-		ui_helper_show_confirmation_dialog(parent, "You have canceled the authentication process.", FALSE);
+		ui_helper_show_confirmation_dialog(parent, "An unknown error occured, please try again.", FALSE);
 	}
 
 }

@@ -68,6 +68,25 @@ ui_helper_create_confirmation_dialog(GtkWindow *parent, const gchar *message)
 	return dialog;
 }
 
+GtkWidget*
+ui_helper_create_cancel_dialog(GtkWindow *parent, const gchar *message)
+{
+	GtkWidget *dialog = gtk_dialog_new_with_buttons(
+			" ",
+			parent,
+			GTK_DIALOG_MODAL,
+			GTK_STOCK_CANCEL, 666, /* for some reason GTK_RESPONSE_CANCEL does remove the button in the SDK ?!?! */
+			NULL);
+
+	GtkWidget *label = gtk_label_new("");
+	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+	gtk_label_set_markup(GTK_LABEL(label), message);
+	gtk_widget_show(label);
+	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), label);
+
+	return dialog;
+}
+
 void
 ui_helper_show_confirmation_dialog(GtkWindow *parent, const gchar *message, gboolean supports_portrait)
 {

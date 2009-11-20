@@ -26,6 +26,9 @@ ui_helper_create_yes_no_dialog(GtkWindow *parent, const gchar *message);
 GtkWidget*
 ui_helper_create_confirmation_dialog(GtkWindow *parent, const gchar *message);
 
+GtkWidget*
+ui_helper_create_cancel_dialog(GtkWindow *parent, const gchar *message);
+
 void
 ui_helper_show_confirmation_dialog(GtkWindow *parent, const gchar *message, gboolean supports_portrait);
 
