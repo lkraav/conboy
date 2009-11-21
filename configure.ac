@@ -102,7 +102,7 @@ AS_IF(
         [test "$with_midgard" = yes],
         [
         AC_MSG_RESULT([yes])
-        PKG_CHECK_MODULES(MIDGARD, midgard-2.0 >= 9.03)
+        PKG_CHECK_MODULES(MIDGARD, midgard2 >= 9.03)
         ],
         AC_MSG_RESULT([no])
 )
