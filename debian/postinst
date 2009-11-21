@@ -16,3 +16,32 @@ fi
 if [ -f /home/user/.cache/launch/de.zwong.conboy.pvr ]
 	then rm /home/user/.cache/launch/de.zwong.conboy.pvr
 fi
+
+#
+# Work around for bug #6263 
+#
+
+grep "5.0" /etc/maemo_version &> /dev/null
+if [ $? -eq 1 ]
+then
+        echo "Not running on Maemo5, not modifying file"
+        exit
+fi
+
+echo "Running on Maemo5, checking uri-action-defaults.list"
+
+grep "conboy=hildon-conboy.desktop" /usr/share/applications/uri-action-defaults.list &> /dev/null
+if [ $? -eq 1 ]
+then
+        echo "Modifying file"
+        cp /usr/share/applications/uri-action-defaults.list /usr/share/applications/uri-action-defaults.list.bak
+        echo "conboy=hildon-conboy.desktop" >> /usr/share/applications/uri-action-defaults.list
+else
+        echo "File already modified"
+fi
+
+update-desktop-database
+
+#
+# End work around
+#

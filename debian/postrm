@@ -8,3 +8,12 @@ fi
 if [ -f /home/user/.cache/launch/de.zwong.conboy.pvr ]
 	then rm /home/user/.cache/launch/de.zwong.conboy.pvr
 fi
+
+
+#
+# Work around for bug #6263 
+#
+
+# Remove the line from file if exits
+sed -i '/conboy=hildon-conboy.desktop/ d' uri-action-defaults.list
+

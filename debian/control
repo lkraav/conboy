@@ -10,11 +10,19 @@ Architecture: any
 Depends: libjson-glib-1.0-0 (>= 0.6.2-7), liboauth0 (>= 0.5.2-3), libcurl3 (>= 7.15.0), libglib2.0-0 (>= 2.14) | libpcre3 (>= 6.7)
 Conflicts: conboy
 Replaces: conboy
+XB-Maemo-Upgrade-Description: Changes since 0.5.x
+ * New single window user interface
+ * Improved portrait mode
+ * Automatic linking to various urls (web addresses, email addresses, etc.)
+ * Synchronization with Ubuntu One (Beta)
+ * Support for plugins
+ * Many new translations
 Description: Conboy is a note taking application.
  It is designed to be easy to use - yet powerful. Conboy can
  read and write the Tomboy file format to be compatible with
  Tomboy on Linux, Mac and Windows.
 XB-Maemo-Display-Name: Conboy (unstable)
+XSBC-Bugtracker: https://bugs.maemo.org/enter_bug.cgi?product=conboy
 XB-Maemo-Icon-26:
  iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABHNCSVQICAgI
  fAhkiAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAnm
