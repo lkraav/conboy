@@ -36,6 +36,7 @@
 #include "settings.h"
 #include "search.h"
 #include "ui_helper.h"
+#include "he-fullscreen-button.h"
 #include "search_window.h"
 
 typedef struct {
@@ -534,7 +535,8 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	g_signal_connect(button_sort_by_title, "toggled", G_CALLBACK(on_sort_by_title_changed), sorted_store);
 	g_signal_connect(button_sort_by_date, "toggled", G_CALLBACK(on_sort_by_date_changed), sorted_store);
 	/* Add transparent fullscreen button */
-	fullscreen_manager_new(GTK_WINDOW(win), ui_helper_toggle_fullscreen);
+	HeFullscreenButton *but = he_fullscreen_button_new(GTK_WINDOW(win));
+	g_signal_connect_swapped(but, "clicked", G_CALLBACK(ui_helper_toggle_fullscreen), he_fullscreen_button_get_window(but));
 #endif
 
 	return HILDON_WINDOW(win);

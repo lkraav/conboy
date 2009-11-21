@@ -59,8 +59,8 @@ conboy_SOURCES = \
         conboy_check_button.c \
         orientation.h \
         orientation.c \
-        fullscreenmanager.h \
-        fullscreenmanager.c \
+        he-fullscreen-button.h \
+        he-fullscreen-button.c \
         ui_helper.h \
         ui_helper.c \
         conboy_plugin_manager_row.h \

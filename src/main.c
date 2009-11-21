@@ -30,7 +30,6 @@
 #include "conboy_plugin.h"
 #include "conboy_note_store.h"
 #include "orientation.h"
-#include "fullscreenmanager.h"
 
 
 #define APP_NAME "conboy"

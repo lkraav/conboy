@@ -48,7 +48,7 @@
 #include "note.h"
 #include "json.h"
 #include "ui_helper.h"
-
+#include "he-fullscreen-button.h"
 #include "interface.h"
 
 static void initialize_tags(GtkTextBuffer *buffer) {
@@ -1506,7 +1506,8 @@ UserInterface* create_mainwin() {
 
 	/* Adding the transparent fullscreen button */
 #ifdef HILDON_HAS_APP_MENU
-	fullscreen_manager_new(GTK_WINDOW(mainwin), ui_helper_toggle_fullscreen);
+	HeFullscreenButton *but = he_fullscreen_button_new(GTK_WINDOW(mainwin));
+	g_signal_connect_swapped(but, "clicked", G_CALLBACK(ui_helper_toggle_fullscreen), he_fullscreen_button_get_window(but));
 #endif
 
 	/* Add signal hook to work with the word completion */

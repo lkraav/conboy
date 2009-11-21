@@ -26,7 +26,6 @@
 
 #include "conboy_note_store.h"
 #include "conboy_plugin_store.h"
-#include "fullscreenmanager.h"
 
 typedef struct
 {
