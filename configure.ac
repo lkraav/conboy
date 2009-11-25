@@ -19,7 +19,7 @@ if test "x$prefix" = "xNONE" ; then
     prefix='/usr'
 fi
 
-CFLAGS="$CFLAGS -Wall -ansi -Wmissing-prototypes -Wmissing-declarations"
+CFLAGS="$CFLAGS -Wall -Wmissing-prototypes -Wmissing-declarations"
 
 PKG_CHECK_MODULES(GMODULE, gmodule-2.0)
 AC_SUBST(GMODULE_LIBS)
