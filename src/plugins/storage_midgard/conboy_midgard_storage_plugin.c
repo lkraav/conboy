@@ -174,7 +174,7 @@ _conboy_midgard_storage_plugin_note_list (ConboyStoragePlugin *self)
 
 	for (i = 0; i < n_objects; i++) {
 
-		ConboyNote *note = __conboy_note_from_midgard_object (objects[i]);
+		ConboyNote *note = __conboy_note_from_midgard_object (MIDGARD_OBJECT(objects[i]));
 		slist = g_slist_prepend (slist, (gpointer) note);
 		g_object_unref (objects[i]);
 	}
@@ -355,9 +355,9 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 	}
 
 	/* Create base storage and one required for note */
-	midgard_config_create_midgard_tables (config, mgd_global);
+	midgard_storage_create_base_storage (mgd_global);
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME (CONBOY_MIDGARD_NOTE_NAME);
-	midgard_config_create_class_table (config, klass, mgd_global);
+	midgard_storage_create_class_storage (mgd_global, MIDGARD_DBOBJECT_CLASS (klass));
 
 	/* HACK */
 	g_file_set_contents (db_file_exists, "", 1, NULL);
