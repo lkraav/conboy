@@ -36,10 +36,33 @@ __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 	gchar *content = NULL;
 	gchar *title = NULL;
 
+	time_t last_change_date;
+        time_t last_metadata_change_date;
+        time_t create_date;
+        GList  *tags;
+
+	gboolean open_on_startup;
+	gboolean pinned;
+	gint cursor_position;
+	gint width;
+	gint height;
+	gint x;
+	gint y;
+
+	gdouble note_version;
+	gdouble content_version;
+
 	g_object_get (mgdobject, 
 			"guid", &guid,
 			"title", &title,
-			"text", &content, NULL);
+			"text", &content, 
+			"openonstartup", &open_on_startup,
+			"cursorposition", &cursor_position,
+			"width", &width,
+			"height", &height,
+			"x", &x,
+			"y", &y,
+			NULL);
 	
 	/* Create new conboy instance */
 	ConboyNote *note = conboy_note_new();
@@ -48,7 +71,14 @@ __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 	g_object_set (note, 
 			"guid", guid,
 			"title", title,
-			"content", content, NULL);
+			"content", content, 
+			"openonstartup", open_on_startup,
+			"cursorposition", cursor_position,
+			"width", width,
+			"height", height,
+			"x", x,
+			"y", y,
+			NULL);
 
 	g_free (guid);
 	g_free (content);
