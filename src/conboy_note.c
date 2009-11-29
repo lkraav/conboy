@@ -152,12 +152,15 @@ conboy_note_set_property (GObject *object, guint id, const GValue *value, GParam
 	switch (id)
 	{
 		case PROP_GUID:
+			g_free (note->guid);
 			note->guid = g_value_dup_string(value);
 			break;
 		case PROP_TITLE:
+			g_free (note->title);
 			note->title = g_value_dup_string(value);
 			break;
 		case PROP_CONTENT:
+			g_free (note->content);
 			note->content = g_value_dup_string(value);
 			break;
 		case PROP_CREATE_DATE:
