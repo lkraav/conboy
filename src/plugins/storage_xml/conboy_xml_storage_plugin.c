@@ -93,9 +93,9 @@ static void
 handle_start_element(xmlTextReader *reader, ConboyNote *note)
 {
 	/* TODO: Whats the official way to convert xmlChar to gchar? */
-	const gchar *name = xmlTextReaderConstName(reader);
-	gchar *value = xmlTextReaderReadString(reader);
-	gchar *attr_value = NULL;
+	const gchar *name = (const gchar *)xmlTextReaderConstName(reader);
+	gchar *value = (gchar *) xmlTextReaderReadString(reader);
+	xmlChar *attr_value = NULL;
 	XmlTag tag = string_to_enum(name);
 
 	switch (tag) {
@@ -103,8 +103,8 @@ handle_start_element(xmlTextReader *reader, ConboyNote *note)
 	case NOTE:
 		attr_value = xmlTextReaderGetAttribute(reader, BAD_CAST "version");
 		if (attr_value != NULL) {
-			g_object_set(note, "note-version", atof(attr_value), NULL);
-			g_free(attr_value);
+			g_object_set(note, "note-version", atof((const gchar *)attr_value), NULL);
+			xmlFree(attr_value);
 			attr_value = NULL;
 		} else {
 			g_printerr("ERROR: Couldn't parse note version.\n");
@@ -117,8 +117,8 @@ handle_start_element(xmlTextReader *reader, ConboyNote *note)
 	case NOTE_CONTENT:
 		attr_value = xmlTextReaderGetAttribute(reader, BAD_CAST "version");
 		if (attr_value != NULL) {
-			g_object_set(note, "content-version", atof(attr_value), NULL);
-			g_free(attr_value);
+			g_object_set(note, "content-version", atof((const gchar *)attr_value), NULL);
+			xmlFree(attr_value);
 			attr_value = NULL;
 		} else {
 			g_printerr("ERROR: Couldn't parse content version.\n");
@@ -360,9 +360,9 @@ save (ConboyStoragePlugin *self, ConboyNote *note)
 	GRegex *regex = g_regex_new(" xmlns(?:.*?)?=\".*?\"", 0, 0, NULL);
 	gchar *content_clean = g_regex_replace(regex, content, -1, 0, "", 0, NULL);
 
-	xmlTextWriterWriteRaw(writer, content_clean);
+	xmlTextWriterWriteRaw(writer, (const xmlChar *)content_clean);
 	g_free(content);
-	g_free(content_clean);
+	xmlFree(content_clean);
 
 	xmlTextWriterEndElement(writer); /*</text> */
 
