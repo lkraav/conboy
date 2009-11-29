@@ -1,0 +1,8 @@
+[Conboy Plugin]
+Module=storageevernote
+Kind=storage
+_Name=Evernote Storage Backend
+_Description=FIXME
+Version=0.1
+Authors=FIXME
+Copyright=FIXME
