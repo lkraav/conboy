@@ -5,7 +5,8 @@ INCLUDES = \
     -I$(top_srcdir)  \
     $(HILDON_CFLAGS) \
     $(CONBOY_CFLAGS) \
-    $(MIDGARD_CFLAGS) 
+    $(MIDGARD_CFLAGS) \
+    $(GCONF_CFLAGS)
            
 plugin_LTLIBRARIES = libstoragemidgard.la
 
@@ -25,7 +26,7 @@ plugin_in_files = conboy_storage_midgard.plugin.in
 
 plugin_DATA = $(plugin_in_files:.plugin.in=.plugin)
 
-nobase_dist_data_DATA = midgard-2.0/schema/org_gnome_tomboy.xml
+nobase_dist_data_DATA = midgard2/schema/org_gnome_tomboy.xml
 
 EXTRA_DIST = $(plugin_in_files)
 
