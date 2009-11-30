@@ -15,5 +15,5 @@ fi
 #
 
 # Remove the line from file if exits
-sed -i '/conboy=hildon-conboy.desktop/ d' uri-action-defaults.list
+sed -i '/conboy=hildon-conboy.desktop/ d' /usr/share/applications/uri-action-defaults.list
 
