@@ -19,6 +19,7 @@
 
 #include "../../conboy_note.h"
 #include "../../conboy_storage_plugin.h"
+#include "../../metadata.h"
 #include "conboy_midgard_storage_plugin.h"
 
 #define CONBOY_MIDGARD_NOTE_NAME "org_gnome_tomboy_note"
@@ -63,10 +64,28 @@ __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 			"x", &x,
 			"y", &y,
 			NULL);
+
+	/* Get metadata datetimes */
+	MidgardMetadata *metadata = mgdobject->metadata;
 	
+	GValue created_val = {0, };
+	g_value_init (&created_val, MIDGARD_TYPE_TIMESTAMP);
+	GValue updated_val = {0, };
+	g_value_init (&updated_val, MIDGARD_TYPE_TIMESTAMP);
+	GValue created_str = {0, };
+	g_value_init (&created_str, G_TYPE_STRING);
+	GValue updated_str = {0, };
+	g_value_init (&updated_str, G_TYPE_STRING);
+
+	g_object_get_property (G_OBJECT (metadata), "created", &created_val);
+	g_object_get_property (G_OBJECT (metadata), "updated", &updated_val);
+
+	g_value_transform ((const GValue *) &created_val, &created_str);
+	g_value_transform ((const GValue *) &updated_val, &updated_str);	
+
 	/* Create new conboy instance */
 	ConboyNote *note = conboy_note_new();
-
+	
 	/* and copy properties */
 	g_object_set (note, 
 			"guid", guid,
@@ -78,11 +97,19 @@ __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 			"height", height,
 			"x", x,
 			"y", y,
+			"last_change_date", get_iso8601_time_in_seconds (g_value_get_string (&updated_str)),
+        		"last_metadata_change_date", get_iso8601_time_in_seconds (g_value_get_string (&updated_str)),
+        		"create_date", get_iso8601_time_in_seconds (g_value_get_string (&created_str)),
 			NULL);
 
 	g_free (guid);
 	g_free (content);
 	g_free (title);
+
+	g_value_unset (&updated_val);
+	g_value_unset (&created_val);
+	g_value_unset (&updated_str);
+	g_value_unset (&created_str);
 
 	return note;
 }
