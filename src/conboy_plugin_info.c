@@ -335,9 +335,9 @@ conboy_plugin_info_is_configurable (ConboyPluginInfo *info)
 gboolean
 conboy_plugin_info_activate_plugin (ConboyPluginInfo *info)
 {
-	g_return_val_if_fail(info != NULL, NULL);
-	g_return_val_if_fail(info->file != NULL, NULL);
-	g_return_val_if_fail(info->module_name != NULL, NULL);
+	g_return_val_if_fail(info != NULL, FALSE);
+	g_return_val_if_fail(info->file != NULL, FALSE);
+	g_return_val_if_fail(info->module_name != NULL, FALSE);
 
 	if (info->plugin != NULL) {
 		g_printerr("ERROR: Plugin is already active\n");
@@ -368,7 +368,7 @@ conboy_plugin_info_activate_plugin (ConboyPluginInfo *info)
 	g_free(filename);
 	g_free(path);
 
-	return (CONBOY_PLUGIN(result));
+	return (CONBOY_PLUGIN(result)); /* FIXME, return TRUE or FALSE */
 }
 
 gboolean
