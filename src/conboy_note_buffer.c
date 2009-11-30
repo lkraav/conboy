@@ -510,7 +510,7 @@ gchar* peek_tag(ParseContext *ctx)
 static
 void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 {
-	const gchar *element_name = xmlTextReaderConstName(reader);
+	const gchar *element_name = (const gchar *) xmlTextReaderConstName(reader);
 
 	switch (peek_state(ctx)) {
 	case STATE_START:
@@ -527,7 +527,7 @@ void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 			ctx->depth++;
 			break;
 		}
-		push_tag(ctx, element_name);
+		push_tag(ctx, (gchar *)element_name);
 		break;
 
 	case STATE_LIST:
@@ -547,7 +547,7 @@ void handle_start_element(ParseContext *ctx, xmlTextReader *reader)
 static
 void handle_end_element(ParseContext *ctx, xmlTextReader *reader) {
 
-	const gchar *element_name = xmlTextReaderConstName(reader);
+	const gchar *element_name = (const gchar *) xmlTextReaderConstName(reader);
 
 	switch (peek_state(ctx)) {
 
@@ -621,7 +621,7 @@ void apply_tags(GSList *tags, GtkTextBuffer *buffer, GtkTextIter *start_iter, Gt
 static
 void handle_text_element(ParseContext *ctx, xmlTextReader *reader, GtkTextBuffer *buffer)
 {
-	const gchar *text = xmlTextReaderConstValue(reader);
+	const gchar *text = (const gchar *) xmlTextReaderConstValue(reader);
 	GtkTextIter *iter = ctx->iter;
 	GtkTextIter start_iter;
 	GtkTextMark *mark;
