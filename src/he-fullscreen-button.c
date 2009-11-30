@@ -252,6 +252,8 @@ fullscreen_button_on_clicked (GtkWidget *widget, GdkEventButton *event, gpointer
 {
 	HeFullscreenButton *self = HE_FULLSCREEN_BUTTON (data);
 	g_signal_emit_by_name (self, "clicked");
+
+	return TRUE;
 }
 
 
