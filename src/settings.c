@@ -29,6 +29,20 @@ free_data(gpointer data, gpointer ignore)
 }
 
 void
+settings_save_use_auto_portrait_mode(gboolean use)
+{
+	AppData *app_data = app_data_get();
+	gconf_client_set_bool(app_data->client, SETTINGS_USE_AUTO_PORTRAIT, use, NULL);
+}
+
+gboolean
+settings_load_use_auto_portrait_mode()
+{
+	AppData *app_data = app_data_get();
+	return gconf_client_get_bool(app_data->client, SETTINGS_USE_AUTO_PORTRAIT, NULL);
+}
+
+void
 settings_save_last_open_note(const gchar *guid)
 {
 	AppData *app_data = app_data_get();
@@ -124,7 +138,7 @@ settings_add_active_plugin(const gchar *name)
 	/* We need to duplicate name here, because later all elements get freed */
 	plugin_names = g_slist_prepend(plugin_names, g_strdup(name));
 	settings_save_active_plugins(plugin_names);
-	
+
 	g_slist_foreach(plugin_names, free_data, NULL);
 	g_slist_free(plugin_names);
 }
@@ -134,7 +148,7 @@ settings_remove_active_plugin(const gchar *name)
 {
 	GSList *plugin_names = settings_load_active_plugins();
 	gchar *found_element = NULL;
-	
+
 	/* Find the right element */
 	GSList *iter = plugin_names;
 	while (iter) {
@@ -145,7 +159,7 @@ settings_remove_active_plugin(const gchar *name)
 		}
 		iter = iter->next;
 	}
-	
+
 	/* Remove the element */
 	if (found_element != NULL) {
 		plugin_names = g_slist_remove(plugin_names, found_element);
@@ -153,7 +167,7 @@ settings_remove_active_plugin(const gchar *name)
 	} else {
 		g_printerr("WARN: settings_remove_active_plugin: Element not found \n");
 	}
-	
+
 	/* Free everything */
 	g_free(found_element);
 	g_slist_foreach(plugin_names, free_data, NULL);

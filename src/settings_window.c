@@ -54,7 +54,17 @@ typedef struct
 } SettingsWidget;
 
 
-
+static void
+on_portrait_but_toggled(GtkWidget *button, gpointer user_data)
+{
+	gboolean active;
+	#ifdef HILDON_HAS_APP_MENU
+	active = hildon_check_button_get_active(HILDON_CHECK_BUTTON(button));
+	#else
+	active = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(button));
+	#endif
+	settings_save_use_auto_portrait_mode(active);
+}
 
 static void
 on_scroll_but_toggled(GtkToggleButton *button, gpointer user_data)
@@ -206,7 +216,7 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 		if (ret == GTK_RESPONSE_YES) {
 			clear_sync_settings();
 		} else {
-			gtk_widget_set_sensitive(button, FALSE);
+			gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
 			#ifdef HILDON_HAS_APP_MENU
 			hildon_entry_set_text(HILDON_ENTRY(widget->url_entry), old_url);
 			#else
@@ -318,6 +328,7 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 #ifndef HILDON_HAS_APP_MENU
 	GtkWidget *scroll_vbox, *scroll_label, *scroll_but1, *scroll_but2;
 #endif
+	GtkWidget *portrait_vbox, *portrait_but;
 	GtkWidget *color_vbox, *color_but;
 	GtkWidget *text_color_hbox, *text_color_but, *text_color_label;
 	GtkWidget *back_color_hbox, *back_color_but, *back_color_label;
@@ -371,6 +382,19 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_container_add(GTK_CONTAINER(scroll_vbox), scroll_but2);
 #endif
 
+	/* Use auto portrait mode vbox */
+	portrait_vbox = gtk_vbox_new(FALSE, 0);
+	gtk_widget_show(portrait_vbox);
+	gtk_box_pack_start(GTK_BOX(config_vbox), portrait_vbox, FALSE, FALSE, 0);
+
+#ifdef HILDON_HAS_APP_MENU
+	portrait_but = hildon_check_button_new(HILDON_SIZE_FINGER_HEIGHT);
+	gtk_button_set_label(GTK_BUTTON(portrait_but), _("Use automatic portrait mode"));
+#else
+	portrait_but = gtk_check_button_new_with_label(_("Use automatic portrait mode"));
+#endif
+	gtk_widget_show(portrait_but);
+	gtk_box_pack_start(GTK_BOX(portrait_vbox), portrait_but, TRUE, TRUE, 0);
 
 	/* Select Colors vbox */
 	color_vbox = gtk_vbox_new(FALSE, 0);
@@ -494,6 +518,13 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	}
 #endif
 
+	/* Use automatic portrait mode */
+#ifdef HILDON_HAS_APP_MENU
+	hildon_check_button_set_active(HILDON_CHECK_BUTTON(portrait_but), settings_load_use_auto_portrait_mode());
+#else
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(portrait_but), settings_load_use_auto_portrait_mode());
+#endif
+
 	/* Use custom colors */
 	gboolean custom_colors = settings_load_use_costum_colors();
 	gtk_widget_set_sensitive(text_color_hbox, custom_colors);
@@ -530,6 +561,7 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 #ifndef HILDON_HAS_APP_MENU
 	g_signal_connect(scroll_but1, "toggled", G_CALLBACK(on_scroll_but_toggled), NULL);
 #endif
+	g_signal_connect(portrait_but, "toggled", G_CALLBACK(on_portrait_but_toggled), NULL);
 	g_signal_connect(color_but, "toggled", G_CALLBACK(on_use_colors_but_toggled), text_color_hbox);
 	g_signal_connect(text_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_TEXT));
 	g_signal_connect(link_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_LINKS));

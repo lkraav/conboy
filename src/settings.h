@@ -44,6 +44,7 @@
 #define SETTINGS_STORAGE_LAST_SYNC_TIME SETTINGS_ROOT"/last_sync_time"
 #define SETTINGS_LAST_SCROLL_POSITION SETTINGS_ROOT"/last_scroll_position"
 #define SETTINGS_LAST_OPEN_NOTE      SETTINGS_ROOT"/last_open_note"
+#define SETTINGS_USE_AUTO_PORTRAIT   SETTINGS_ROOT"/use_auto_portrait_mode"
 
 typedef enum {
 	SETTINGS_SCROLLBAR_SIZE_SMALL,
@@ -55,12 +56,15 @@ typedef enum {
 	SETTINGS_STARTUP_WINDOW_SEARCH
 } SettingsStartupWindow;
 
-typedef enum {	
+typedef enum {
 	SETTINGS_COLOR_TYPE_BACKGROUND,
 	SETTINGS_COLOR_TYPE_TEXT,
 	SETTINGS_COLOR_TYPE_LINKS
 } SettingsColorType;
 
+
+void settings_save_use_auto_portrait_mode(gboolean use);
+gboolean settings_load_use_auto_portrait_mode(void);
 
 void settings_save_last_open_note(const gchar *guid);
 gchar* settings_load_last_open_note(void);

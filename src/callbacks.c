@@ -693,8 +693,10 @@ open_url(gchar *url)
 	if (strncmp(url, "mailto", 6) == 0)
 	{
 		/* Open in Modest */
+		#ifdef WITH_MODEST
 		g_printerr("Trying to open with modest\n");
 		libmodest_dbus_client_mail_to(app_data->osso_ctx, url);
+		#endif
 		return;
 	}
 

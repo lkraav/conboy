@@ -46,6 +46,10 @@ set_orientation(const gchar* orientation)
 		return;
 	}
 
+	if (!settings_load_use_auto_portrait_mode()) {
+		return;
+	}
+
 	g_printerr("INFO: Setting to orientation: %s\n", orientation);
 
 	HildonPortraitFlags flags;
