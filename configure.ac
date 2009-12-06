@@ -4,7 +4,7 @@ AC_INIT(src/main.c)
 AM_CONFIG_HEADER(config.h)
 
 PACKAGE=conboy
-VERSION=0.6.1.5
+VERSION=0.6.1.6
 
 AM_INIT_AUTOMAKE($PACKAGE,$VERSION)
 
@@ -47,6 +47,8 @@ AC_SUBST(PCRE_CFLAGS)
 PKG_CHECK_MODULES(MODEST, libmodest-dbus-client-1.0 >= 1.0)
 AC_SUBST(MODEST_LIBS)
 AC_SUBST(MODEST_CFLAGS)
+
+PKG_CHECK_EXISTS([libmodest-dbus-client-1.0 >= 1.0], [AC_DEFINE([WITH_MODEST], [1], [Does have Modest support])])
 
 PKG_CHECK_MODULES(OSSO, libosso >= 0.8.4)
 AC_SUBST(OSSO_LIBS)
