@@ -94,6 +94,9 @@
 
 #ifdef HILDON_HAS_APP_MENU
 
+#include                                        <stdlib.h>
+#include                                        <hildon/hildon-button.h>
+#include                                        <hildon/hildon-check-button.h>
 #include                                        <hildon/hildon-enum-types.h>
 #include                                        <hildon/hildon-gtk.h>
 #include                                        "conboy_check_button.h"
@@ -307,9 +310,68 @@ set_logical_color                               (GtkWidget *button)
     }
 }
 
+static gint
+gtk_rc_properties_cmp (gconstpointer bsearch_node1,
+		       gconstpointer bsearch_node2)
+{
+  const GtkRcProperty *prop1 = bsearch_node1;
+  const GtkRcProperty *prop2 = bsearch_node2;
+
+  if (prop1->type_name == prop2->type_name)
+    return prop1->property_name < prop2->property_name ? -1 : prop1->property_name == prop2->property_name ? 0 : 1;
+  else
+    return prop1->type_name < prop2->type_name ? -1 : 1;
+}
+
+
+/*
+ * Returns a style property if it exists and if it is a long. If not, 0 is returned.
+ * Its a dirty hack. The proper way would be using gtk_style_get() which is only
+ * available with Gtk+ >= 2.16
+ */
+glong
+get_style_property_long                            (GtkStyle    *style,
+                                                    GType        widget_type,
+                                                    const gchar *property_name)
+{
+	GtkRcProperty *rcprop = NULL;
+	GtkWidgetClass *klass = g_type_class_ref (widget_type);
+	GParamSpec *pspec = gtk_widget_class_find_style_property (klass, property_name);
+
+	/* Style must be rc style */
+	g_return_val_if_fail(style->rc_style != NULL, 0);
+
+	if (!pspec) {
+		g_printerr("WARN: get_style_property_long: Property '%s' not found\n", property_name);
+		return 0;
+	}
+
+	if (style->rc_style->rc_properties) {
+		GtkRcProperty key;
+		key.type_name = g_type_qname(widget_type);
+		key.property_name = g_quark_from_string(pspec->name);
+		/* Search all properties for given key */
+		rcprop = bsearch (&key, style->rc_style->rc_properties->data, style->rc_style->rc_properties->len,
+				sizeof(GtkRcProperty), gtk_rc_properties_cmp);
+	}
+
+	if (rcprop == NULL) {
+		g_printerr("WARN: get_style_property_long: RcProperty '%s' not found\n", property_name);
+		return 0;
+	}
+
+	if (G_VALUE_HOLDS_LONG(&(rcprop->value))) {
+		return g_value_get_long(&(rcprop->value));
+	} else {
+		g_printerr("WARN: get_style_property_long: Property '%s' is not a long\n", property_name);
+		return 0;
+	}
+
+}
+
 static void
 conboy_check_button_style_set                         (GtkWidget *widget,
-                                                 GtkStyle  *previous_style)
+                                                       GtkStyle  *previous_style)
 {
     guint horizontal_spacing, vertical_spacing, image_spacing;
     ConboyCheckButtonPrivate *priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (widget);
@@ -322,12 +384,20 @@ conboy_check_button_style_set                         (GtkWidget *widget,
     if (priv->setting_style)
         return;
 
-    gtk_widget_style_get (widget,
-                          "horizontal-spacing", &horizontal_spacing,
-                          "vertical-spacing", &vertical_spacing,
-                          "image-spacing", &image_spacing,
-                          NULL);
+    /* Get horizontal-spacing style property from ourself */
+    gtk_widget_style_get (widget, "horizontal-spacing", &horizontal_spacing, NULL);
 
+    /* Get vertical-spacing style property of HildonButton from theme */
+    GtkStyle *style = gtk_rc_get_style_by_paths (gtk_widget_get_settings (widget),
+    		"*.*Button-finger", NULL, HILDON_TYPE_BUTTON);
+    vertical_spacing = get_style_property_long (style, HILDON_TYPE_BUTTON, "vertical-spacing");
+
+    /* Get image-spacing style property of HildonCheckButton from theme */
+    style = gtk_rc_get_style_by_paths (gtk_widget_get_settings (widget),
+    		NULL, "*.HildonCheckButton", HILDON_TYPE_CHECK_BUTTON);
+    image_spacing = get_style_property_long (style, GTK_TYPE_BUTTON, "image-spacing");
+
+    /* Setting values we got from above */
     if (GTK_IS_HBOX (priv->label_box)) {
         gtk_box_set_spacing (GTK_BOX (priv->label_box), horizontal_spacing);
     } else {
@@ -500,8 +570,13 @@ conboy_check_button_init                              (ConboyCheckButton *self)
 	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (priv->cell_view),
 								GTK_CELL_RENDERER (priv->toggle_renderer), TRUE);
 
+	/* Get checkbox-size style property of HildonCheckButton from theme */
+	style = gtk_rc_get_style_by_paths (gtk_widget_get_settings (GTK_WIDGET(self)),
+			NULL, "*.HildonCheckButton", HILDON_TYPE_CHECK_BUTTON);
+	glong checkbox_size = get_style_property_long (style, HILDON_TYPE_CHECK_BUTTON, "checkbox-size");
+
 	/* Set the indicator to the right size (the size of the pixmap) */
-	g_object_set (priv->toggle_renderer, "indicator-size", 38, NULL);
+	g_object_set (priv->toggle_renderer, "indicator-size", checkbox_size, NULL);
 
 	/* Setup the labels */
     gtk_widget_set_name (GTK_WIDGET (priv->title), "hildon-button-title");
