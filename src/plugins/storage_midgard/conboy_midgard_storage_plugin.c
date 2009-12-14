@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2009 Piotr Pokora <piotrek.pokora@gmail.com>
  * Copyright (C) 2009 Cornelius Hald <hald@icandy.de>
  *
@@ -6,16 +6,18 @@
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+
+#ifdef WITH_MIDGARD
 
 #include "../../conboy_note.h"
 #include "../../conboy_storage_plugin.h"
@@ -53,10 +55,10 @@ __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 	gdouble note_version;
 	gdouble content_version;
 
-	g_object_get (mgdobject, 
+	g_object_get (mgdobject,
 			"guid", &guid,
 			"title", &title,
-			"text", &content, 
+			"text", &content,
 			"openonstartup", &open_on_startup,
 			"cursorposition", &cursor_position,
 			"width", &width,
@@ -67,7 +69,7 @@ __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 
 	/* Get metadata datetimes */
 	MidgardMetadata *metadata = mgdobject->metadata;
-	
+
 	GValue created_val = {0, };
 	g_value_init (&created_val, MIDGARD_TYPE_TIMESTAMP);
 	GValue updated_val = {0, };
@@ -81,16 +83,16 @@ __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 	g_object_get_property (G_OBJECT (metadata), "updated", &updated_val);
 
 	g_value_transform ((const GValue *) &created_val, &created_str);
-	g_value_transform ((const GValue *) &updated_val, &updated_str);	
+	g_value_transform ((const GValue *) &updated_val, &updated_str);
 
 	/* Create new conboy instance */
 	ConboyNote *note = conboy_note_new();
-	
+
 	/* and copy properties */
-	g_object_set (note, 
+	g_object_set (note,
 			"guid", guid,
 			"title", title,
-			"content", content, 
+			"content", content,
 			"openonstartup", open_on_startup,
 			"cursorposition", cursor_position,
 			"width", width,
@@ -119,19 +121,19 @@ _conboy_midgard_storage_plugin_note_load (ConboyStoragePlugin *self, const gchar
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(uuid != NULL, FALSE);
-	
+
 	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);
-	
+
 	/* Get Midgard object and its properties */
 	GValue gval = {0, };
 	g_value_init (&gval, G_TYPE_STRING);
-	
+
 	if (uuid) g_value_set_string (&gval, uuid);
 
 	MidgardObject *mgdobject = midgard_object_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME, uuid ? &gval : NULL);
 
 	g_value_unset (&gval);
-	
+
 	/* Create new conboy instance */
 	ConboyNote *note = __conboy_note_from_midgard_object (mgdobject);
 
@@ -150,18 +152,18 @@ _conboy_midgard_storage_plugin_note_save (ConboyStoragePlugin *self, ConboyNote 
 	g_return_val_if_fail(CONBOY_IS_NOTE(note), FALSE);
 
 	MidgardObject *mgdobject = CONBOY_MIDGARD_STORAGE_PLUGIN (self)->object;
-	
+
 	gchar *guid = NULL;
 	gchar *title = NULL;
 	gchar *content = NULL;
 
 	/* Get note properties */
-	g_object_get (note, 
+	g_object_get (note,
 			"title", &title,
 			"content", &content, NULL);
 
 	/* Set Midgard object properties */
-	g_object_set (mgdobject, 
+	g_object_set (mgdobject,
 			"title", title,
 			"text", content, NULL);
 
@@ -174,7 +176,7 @@ _conboy_midgard_storage_plugin_note_save (ConboyStoragePlugin *self, ConboyNote 
 	gboolean created = FALSE;
 	/* Create case */
 	if (!guid || (guid && *guid == '\0')) {
-		
+
 		created = midgard_object_create (mgdobject);
 
 		g_free (guid);
@@ -194,7 +196,7 @@ _conboy_midgard_storage_plugin_note_save (ConboyStoragePlugin *self, ConboyNote 
 	return midgard_object_update (mgdobject);
 }
 
-static gboolean 
+static gboolean
 _conboy_midgard_storage_plugin_note_delete (ConboyStoragePlugin *self, ConboyNote *note)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
@@ -215,7 +217,7 @@ static GSList*
 _conboy_midgard_storage_plugin_note_list (ConboyStoragePlugin *self)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
-	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);	
+	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);
 
 	MidgardQueryBuilder *builder = midgard_query_builder_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME);
 	guint n_objects;
@@ -223,9 +225,9 @@ _conboy_midgard_storage_plugin_note_list (ConboyStoragePlugin *self)
 
 	g_object_unref (builder);
 
-	if (!objects) 
+	if (!objects)
 		return NULL;
-	
+
 	GSList *slist = NULL;
 	guint i = 0;
 
@@ -243,9 +245,9 @@ _conboy_midgard_storage_plugin_note_list (ConboyStoragePlugin *self)
 
 static GSList*
 _conboy_midgard_storage_plugin_note_list_ids (ConboyStoragePlugin *self)
-{	
+{
 	g_return_val_if_fail(self != NULL, FALSE);
-	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);	
+	g_return_val_if_fail(CONBOY_IS_MIDGARD_STORAGE_PLUGIN(self), FALSE);
 
 	MidgardQueryBuilder *builder = midgard_query_builder_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME);
 	guint n_objects;
@@ -253,9 +255,9 @@ _conboy_midgard_storage_plugin_note_list_ids (ConboyStoragePlugin *self)
 
 	g_object_unref (builder);
 
-	if (!objects) 
+	if (!objects)
 		return NULL;
-	
+
 	GSList *slist = NULL;
 	guint i = 0;
 	gchar *guid;
@@ -276,7 +278,7 @@ _conboy_midgard_storage_plugin_get_widget (ConboyPlugin *self)
 {
 	g_return_val_if_fail(self != NULL, NULL);
 	g_return_val_if_fail(CONBOY_IS_PLUGIN(self), NULL);
-	
+
 	/* First row */
 	GtkWidget *hbox1 = gtk_hbox_new(FALSE, 0);
 	GtkWidget *label1 = gtk_label_new("Host:");
@@ -286,7 +288,7 @@ _conboy_midgard_storage_plugin_get_widget (ConboyPlugin *self)
 	gtk_widget_show(label1);
 	gtk_widget_show(entry1);
 	gtk_widget_show(hbox1);
-	
+
 	/* First row */
 	GtkWidget *hbox2 = gtk_hbox_new(FALSE, 0);
 	GtkWidget *label2 = gtk_label_new("Username:");
@@ -296,7 +298,7 @@ _conboy_midgard_storage_plugin_get_widget (ConboyPlugin *self)
 	gtk_widget_show(label2);
 	gtk_widget_show(entry2);
 	gtk_widget_show(hbox2);
-		
+
 	/* First row */
 	GtkWidget *hbox3 = gtk_hbox_new(FALSE, 0);
 	GtkWidget *label3 = gtk_label_new("Password:");
@@ -306,13 +308,13 @@ _conboy_midgard_storage_plugin_get_widget (ConboyPlugin *self)
 	gtk_widget_show(label3);
 	gtk_widget_show(entry3);
 	gtk_widget_show(hbox3);
-	
+
 	/* Result widget */
 	GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(vbox), hbox1);
 	gtk_container_add(GTK_CONTAINER(vbox), hbox2);
 	gtk_container_add(GTK_CONTAINER(vbox), hbox3);
-	
+
 	return vbox;
 }
 
@@ -321,7 +323,7 @@ _conboy_midgard_storage_plugin_get_widget (ConboyPlugin *self)
 static GObject *
 _conboy_midgard_storage_plugin_constructor (GType type,
 		guint n_construct_properties,
-		GObjectConstructParam *construct_properties) 
+		GObjectConstructParam *construct_properties)
 {
 	GObject *object = (GObject *)
 		G_OBJECT_CLASS (conboy_midgard_storage_plugin_parent_class)->constructor (type,
@@ -339,10 +341,10 @@ _conboy_midgard_storage_plugin_dispose(GObject *object)
 {
 	g_printerr("INFO: Dispose() called on Midgard plugin\n");
 	ConboyMidgardStoragePlugin *self = CONBOY_MIDGARD_STORAGE_PLUGIN(object);
-	
+
 	g_free((gchar *)self->user);
 	self->user = NULL;
-	
+
 	g_free((gchar *)self->pass);
 	self->pass = NULL;
 
@@ -366,7 +368,7 @@ conboy_midgard_storage_plugin_class_init (ConboyMidgardStoragePluginClass *klass
 	storage_plugin_class->delete   = _conboy_midgard_storage_plugin_note_delete;
 	storage_plugin_class->list     = _conboy_midgard_storage_plugin_note_list;
 	storage_plugin_class->list_ids = _conboy_midgard_storage_plugin_note_list_ids;
-	
+
 	plugin_class->get_widget 		= _conboy_midgard_storage_plugin_get_widget;
 }
 
@@ -380,11 +382,11 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 
 	/* Initialize config for SQLite */
 	MidgardConfig *config = midgard_config_new();
-	g_object_set (config, 
+	g_object_set (config,
 			"dbtype", "SQLite",
 			"database", "ConboyNotes",
 			"dbuser", "midgard",
-			"dbpass", "midgard", 
+			"dbpass", "midgard",
 			"sharedir", "/usr/share/midgard-2.0", NULL);
 
 	midgard_config_save_file (config, "ConboyNotesStorage", TRUE, NULL);
@@ -430,3 +432,5 @@ ConboyMidgardStoragePlugin*
 conboy_plugin_new() {
 	return g_object_new(CONBOY_TYPE_MIDGARD_STORAGE_PLUGIN, NULL);
 }
+
+#endif /* WITH_MIDGARD */
