@@ -2,7 +2,7 @@ Source: conboy-unstable
 Section: user/utilities
 Priority: optional
 Maintainer: Cornelius Hald <hald@icandy.de>
-Build-Depends: debhelper (>= 4.0.0), intltool, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings, maemo-version-dev, libcurl3-dev, liboauth-dev, libssl-dev, tablet-browser-interface-dev, mce-dev, libpcre3-dev, libhildonmime-dev, libmodest-dbus-client-dev | maemo-version (=< 4.1), libmidgard2-dev, libgda3-dev
+Build-Depends: debhelper (>= 4.0.0), intltool, maemo-version-dev, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings, libcurl3-dev, liboauth-dev, libssl-dev, tablet-browser-interface-dev, mce-dev, libpcre3-dev, libhildonmime-dev, libmodest-dbus-client-dev | maemo-version-dev (<< 4.1), libmidgard2-dev | maemo-version-dev (<< 5.0), libgda3-dev
 Standards-Version: 3.6.0
 
 Package: conboy-unstable
@@ -10,9 +10,10 @@ Architecture: any
 Depends: libjson-glib-1.0-0 (>= 0.6.2-7), liboauth0 (>= 0.5.2-3), libcurl3 (>= 7.15.0), libglib2.0-0 (>= 2.14) | libpcre3 (>= 6.7)
 Conflicts: conboy
 Replaces: conboy
-XB-Maemo-Upgrade-Description: Changes since 0.5.x
+XB-Maemo-Upgrade-Description: Changes since 0.5.8
  * New single window user interface
  * Improved portrait mode
+ * Automatic rotation to portrait mode is configurable
  * Automatic linking to various urls (web addresses, email addresses, etc.)
  * Synchronization with Ubuntu One (Beta)
  * Support for plugins

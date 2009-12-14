@@ -36,7 +36,9 @@
 #include <glib/gprintf.h>
 #include <math.h>
 #include <tablet-browser-interface.h>
+#ifdef WITH_MODEST
 #include <libmodest-dbus-client/libmodest-dbus-client.h>
+#endif
 
 #include "metadata.h"
 #include "interface.h"

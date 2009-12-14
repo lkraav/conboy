@@ -4,7 +4,7 @@ AC_INIT(src/main.c)
 AM_CONFIG_HEADER(config.h)
 
 PACKAGE=conboy
-VERSION=0.6.1.6
+VERSION=0.6.1.7
 
 AM_INIT_AUTOMAKE($PACKAGE,$VERSION)
 
@@ -29,7 +29,7 @@ PKG_CHECK_MODULES(HILDON, hildon-1 >= 0.8.4)
 AC_SUBST(HILDON_LIBS)
 AC_SUBST(HILDON_CFLAGS)
 
-PKG_CHECK_MODULES(HILDON_MIME, libhildonmime >= 2.0.0)
+PKG_CHECK_MODULES(HILDON_MIME, libhildonmime >= 1.0.0)
 AC_SUBST(HILDON_MIME_LIBS)
 AC_SUBST(HILDON_MIME_CFLAGS)
 
@@ -39,16 +39,16 @@ PKG_CHECK_EXISTS([hildon-1 >= 2.1.62], [AC_DEFINE([HILDON_HAS_APP_MENU], [1], [D
 PKG_CHECK_EXISTS([glib-2.0 >= 2.14.0], [AC_DEFINE([GLIB_HAS_PCRE], [1], [Does glib have support for pearl regular expressions])])
 PKG_CHECK_EXISTS([glib-2.0 < 2.14.0], [ 
 	PKG_CHECK_MODULES([PCRE], [libpcre >= 6.7])  
+	AC_SUBST(PCRE_LIBS)
+	AC_SUBST(PCRE_CFLAGS)
 ])
 
-AC_SUBST(PCRE_LIBS)
-AC_SUBST(PCRE_CFLAGS)
-
-PKG_CHECK_MODULES(MODEST, libmodest-dbus-client-1.0 >= 1.0)
-AC_SUBST(MODEST_LIBS)
-AC_SUBST(MODEST_CFLAGS)
-
-PKG_CHECK_EXISTS([libmodest-dbus-client-1.0 >= 1.0], [AC_DEFINE([WITH_MODEST], [1], [Does have Modest support])])
+PKG_CHECK_EXISTS([libmodest-dbus-client-1.0 >= 1.0], [
+	AC_DEFINE([WITH_MODEST], [1], [Does have Modest support])
+	PKG_CHECK_MODULES(MODEST, libmodest-dbus-client-1.0 >= 1.0)
+	AC_SUBST(MODEST_LIBS)
+	AC_SUBST(MODEST_CFLAGS)
+])
 
 PKG_CHECK_MODULES(OSSO, libosso >= 0.8.4)
 AC_SUBST(OSSO_LIBS)
@@ -97,18 +97,25 @@ fi
 AC_MSG_NOTICE([Using backup category "$BACKUP_CATEGORY"])
 AC_SUBST(BACKUP_CATEGORY)
 
-AC_MSG_CHECKING([whether to build Midgard storage plugin])
-AC_ARG_WITH([midgard],[AS_HELP_STRING([--without-midgard], [disable Midgard storage])],
-            [], [with_midgard=yes])
-AS_IF(
-        [test "$with_midgard" = yes],
-        [
-        AC_MSG_RESULT([yes])
-        PKG_CHECK_MODULES(MIDGARD, midgard2 >= 9.03)
-        ],
-        AC_MSG_RESULT([no])
-)
+if [[ "$MAJOR" == "5" ]]; then
+
+  AC_MSG_CHECKING([whether to build Midgard storage plugin])
+  AC_ARG_WITH([midgard],[AS_HELP_STRING([--without-midgard], [disable Midgard storage])],
+              [], [with_midgard=yes])
+  AS_IF(
+          [test "$with_midgard" = yes],
+          [
+          AC_MSG_RESULT([yes])
+          PKG_CHECK_MODULES(MIDGARD, midgard2 >= 9.03)
+          AC_DEFINE([WITH_MIDGARD], [1], [Does have Midgard support])
+          ],
+          AC_MSG_RESULT([no])
+  )
+fi
+
 AM_CONDITIONAL([WITH_MIDGARD], [test x$with_midgard = xyes])
+
+
 
 # Application icon install directories
 icon_26x26dir=$datadir/icons/hicolor/26x26/hildon
