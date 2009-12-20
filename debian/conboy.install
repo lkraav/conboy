@@ -9,5 +9,5 @@ usr/share/icons/hicolor/64x64/hildon/*
 usr/share/icons/hicolor/scalable/hildon/*
 usr/share/dbus-1/services/de.zwong.conboy.service
 usr/share/locale/*
-usr/share/applications/hildon/conboy.inactive
+usr/share/applications/hildon/conboy.desktop
 etc/osso-backup/applications/conboy.conf

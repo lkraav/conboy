@@ -57,13 +57,8 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/tmp
-	#$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp/var/lib/install
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 
-	# See postinst for why we do this.
-	( cd $(CURDIR)/debian/tmp/usr/share/applications/hildon \
-      && mv conboy.desktop conboy.inactive                  \
-    )
 	dh_install --sourcedir=debian/tmp
 
 
@@ -84,6 +79,7 @@ binary-arch: install
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol
+	if [ `which maemo-optify` ]; then maemo-optify; fi
 	dh_md5sums
 	dh_builddeb
 

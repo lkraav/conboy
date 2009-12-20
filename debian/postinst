@@ -2,11 +2,6 @@
 #update the icon cache
 gtk-update-icon-cache -f /usr/share/icons/hicolor
 
-# copy the desktop file for use
-if [ -f /usr/share/applications/hildon/conboy.inactive ]
-	then ( cd /usr/share/applications/hildon/ && mv conboy.inactive conboy.desktop )
-fi
-
 # select the installation folder
 if [ -f /usr/bin/X11/maemo-select-menu-location ]
 	then /usr/bin/X11/maemo-select-menu-location conboy.desktop
@@ -21,8 +16,9 @@ fi
 # Work around for bug #6263 
 #
 
-grep "5.0" /etc/maemo_version &> /dev/null
-if [ $? -eq 1 ]
+#grep "5.0" /etc/maemo_version ## not working because maemo_version is not on the device
+#if [ $? -eq 1 ]
+if [ ! -e /etc/operator_settings ]
 then
         echo "Not running on Maemo5, not modifying file"
         exit
@@ -30,7 +26,7 @@ fi
 
 echo "Running on Maemo5, checking uri-action-defaults.list"
 
-grep "conboy=hildon-conboy.desktop" /usr/share/applications/uri-action-defaults.list &> /dev/null
+grep -q "conboy=hildon-conboy.desktop" /usr/share/applications/uri-action-defaults.list
 if [ $? -eq 1 ]
 then
         echo "Modifying file"

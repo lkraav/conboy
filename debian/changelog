@@ -1,5 +1,178 @@
-conboy-unstable (1:0.6.1.7) stable; urgency=low
+conboy (1:0.6.2) stable; urgency=low
 
-  * Development version
+  * New single window user interface
+  * Improved portrait mode
+  * Fullscreen mode on N900
+  * Automatic rotation to portrait mode is configurable
+  * Automatic linking to various urls (web addresses, email addresses, etc.)
+  * Synchronization with Ubuntu One (Alpha)
+  * Support for plugins
+  * New translations
   
- -- Cornelius Hald <hald@icandy.de>  Tue, 6 Dec 2009 13:07:12 +0200
+ -- Cornelius Hald <hald@icandy.de>  Sun, 20 Dec 2009 22:15:32 +0200
+
+conboy (1:0.5.8) stable; urgency=low
+
+  * Fixed #5572 Highlighted text 'Describe your new note here' is not removed automatically when typing
+  * Added new translations
+  
+ -- Cornelius Hald <hald@icandy.de>  Thu, 05 Nov 2009 20:54:22 +0200
+
+conboy (1:0.5.6) stable; urgency=low
+
+  * Fixes rotation with latest Fremantle firmware
+  
+ -- Cornelius Hald <hald@icandy.de>  Wed, 13 Oct 2009 18:36:32 +0200
+
+conboy (0.5.5) stable; urgency=low
+
+  * Fixes bug #5222 Backup not working
+  * Fixes bug #5118 XB-Maemo-Display-Name not used in debian/control
+  * Fixes bug #5176 Toolbar icons are scaled
+  * Fixes bug #5193 Find bar entry not focused when opened
+  * Fixes bug #5223 Use big package icon in Fremantle
+  * Fixes bug #5224 Zoom buttons do not work in Fremantle
+  * Fixes bug with virtual keyboard and portrait mode
+  
+ -- Cornelius Hald <hald@icandy.de>  Mon, 28 Sep 2009 12:20:31 +0200
+
+conboy (0.5.4) stable; urgency=low
+
+  * Fixed bug #5088. Conboy is saving a xml format that is incompatible with Tomboy
+  
+ -- Cornelius Hald <hald@icandy.de>  Sat, 5 Sep 2009 15:34:53 +0200
+
+conboy (0.5.3) stable; urgency=low
+
+  * Should now really auto-rotate on a Fremantle device
+  
+ -- Cornelius Hald <hald@icandy.de>  Tue, 25 Aug 2009 09:41:02 +0200
+
+conboy (0.5.2) stable; urgency=low
+
+  * Added pt_BR translation
+  * Should now auto-rotate on a Fremantle device
+  
+ -- Cornelius Hald <hald@icandy.de>  Wed, 19 Aug 2009 12:36:12 +0200
+
+conboy (0.5.1) stable; urgency=low
+
+  * Fixed bug #4777 (Notes are not properly deleted)
+  
+ -- Cornelius Hald <hald@icandy.de>  Sat, 11 Jul 2009 11:37:34 +0200
+
+conboy (0.5.0) stable; urgency=low
+
+  * Added full text search
+  * Added settings dialog
+  * Added setting to switch between small and large scroll bars
+  * Added setting to show note window or search window on startup
+  * Added settings to change colors
+  * Added support for portrait mode in Fremantle
+  * Added italian translation (Thanks to debernardis)
+  * Updated the UI for Fremantle
+  * Updated french translation (Thanks to fpp) 
+  * Bug fixes
+  
+ -- Cornelius Hald <hald@icandy.de>  Sat, 27 Jun 2009 20:13:14 +0200  
+
+conboy (0.4.5) stable; urgency=low
+
+  * Added support for tags. Tags aka Notebooks are now preserved.
+  * Added french translation. Thanks to fpp.
+  * Added support for JSON serialization.
+  * Note version and note content version are no longer hardcoded.
+  * Added support for JSON deserialization.
+ 
+ -- Cornelius Hald <hald@icandy.de>  Mo, 5 Jun 2009 17:41:12 +0200 
+
+conboy (0.4.4) stable; urgency=low
+
+  * Added support for maemo backup
+  * Added support for i18n
+  * Added german translation
+  * Fixed memory leaks
+  * Fixed bug 4121: Conboy freezes when title of a note is empty
+  * Fixed bug: That font size normal was ignored in the style menu
+  * Changed search window to be more Fremantle conform
+  * Keyboard shortcuts now working with Fremantle
+
+ -- Cornelius Hald <hald@icandy.de>  Tue, 26 May 2009 17:12:11 +0200
+
+conboy (0.4.3) stable; urgency=low
+
+  * Added Fremantle specific code for finger friendly UI
+  * Bugfix: Removed crasher when editing the title
+  * Bugfix: Removed crasher when adding notes while the search window is open
+ 
+ -- Cornelius Hald <hald@icandy.de>  Mon, 18 May 2009 11:45:13 +0200
+
+conboy (0.4.2) stable; urgency=low
+
+  * Bugfix: Reduced time to show search note window from ~5 to ~1 second
+  * Bugfix: Crasher with empty .conboy directory
+ 
+ -- Cornelius Hald <hald@icandy.de>  Tue, 12 May 2009 20:55:12 +0200
+
+conboy (0.4.1) stable; urgency=low
+
+  * Bugfix: Should now install in Fremantle
+ 
+ -- Cornelius Hald <hald@icandy.de>  Mon, 11 May 2009 20:55:09 +0200
+
+conboy (0.4.0) stable; urgency=low
+
+  * Added automatic linking to existing notes while typing
+  * Added new window for searching and selecting notes
+  * Bugfix: After pressing enter inside a bullet list, scroll to make cursor visible
+ 
+ -- Cornelius Hald <hald@icandy.de>  Mon, 11 May 2009 20:37:09 +0200
+
+conboy (0.3.2) stable; urgency=low
+
+  * When removing package also remove the desktop file
+  * Fixed bug, where the formatting of the first line was wrong
+  * Fixed bug, where formatting was wrong after formatting several list items
+ 
+ -- Cornelius Hald <hald@icandy.de>  Sun, 29 Apr 2009 20:35:02 +0200
+
+conboy (0.3.1) stable; urgency=low
+
+  * Removed debug code which showed bullet lists in organge
+
+ -- Cornelius Hald <hald@icandy.de>  Sun, 26 Apr 2009 16:44:02 +0200
+
+conboy (0.3.0) stable; urgency=low
+
+  * Creating nested bullet lists is now possible
+  * Increasing and decreasing the depth of bullets is working
+  * Pressing enter at the end of a list item creates a new list item on the same level
+  * There are now 3 different bullet characters for different levels
+  * When opening a note, it is automatically scrolled to the cursor position
+  * It's now possible to first select a text style and then write using this style
+  * Automatic creation of bullet lists if line starts with a dash (-) or asterix (*)
+  * Cleaned up the user interface
+  * Added text sizes "small", "normal", "large" and "huge" to the list of text styles
+
+ -- Cornelius Hald <hald@icandy.de>  Sun, 26 Apr 2009 11:34:02 +0200
+
+conboy (0.2.9) unstable; urgency=low
+
+  * Unstable. On the way to 0.3
+  
+ -- Cornelius Hald <hald@icandy.de>  Fri, 23 Apr 2009 14:01:00 -0100
+
+conboy (0.2.0) unstable; urgency=low
+
+  * Reading, writing and displaying of all Tomboy notes is now possible
+  * Added support for UTF-8 reading and writing
+  * On startup the last edited note is shown automatically
+  * The list of all notes is sorted by change date
+  
+ -- Cornelius Hald <hald@icandy.de>  Fri, 17 Apr 2009 17:07:00 -0100
+
+conboy (0.1.0) unstable; urgency=low
+
+  * Initial version
+
+ -- Cornelius Hald <hald@icandy.de>  Thu, 27 Mar 2009 17:22:00 -0100
