@@ -951,7 +951,7 @@ UserInterface* create_mainwin() {
 	action_zoom_in = GTK_ACTION(gtk_action_new("zoom_in", _("Zoom in"), NULL, GTK_STOCK_ZOOM_IN));
 	action_zoom_out = GTK_ACTION(gtk_action_new("zoom_out", _("Zoom out"), NULL, GTK_STOCK_ZOOM_OUT));
 	action_find = GTK_ACTION(gtk_action_new("find", _("Find in note"), NULL, GTK_STOCK_FIND));
-	gchar *sync_label = g_strconcat(_("Synchronize"), " (Beta)", NULL);
+	gchar *sync_label = g_strconcat(_("Synchronize"), " (Alpha)", NULL);
 	action_sync = GTK_ACTION(gtk_action_new("sync", sync_label, NULL, NULL));
 	action_back = GTK_ACTION(gtk_action_new("back", _("Back"), NULL, GTK_STOCK_GO_BACK));
 	action_forward = GTK_ACTION(gtk_action_new("forward", _("Forward"), NULL, GTK_STOCK_GO_FORWARD));
