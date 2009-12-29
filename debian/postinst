@@ -1,4 +1,5 @@
 #!/bin/sh
+
 #update the icon cache
 gtk-update-icon-cache -f /usr/share/icons/hicolor
 
@@ -26,12 +27,13 @@ fi
 
 echo "Running on Maemo5, checking uri-action-defaults.list"
 
-grep -q "conboy=hildon-conboy.desktop" /usr/share/applications/uri-action-defaults.list
+grep -q "conboy=hildon-conboy" /usr/share/applications/uri-action-defaults.list
 if [ $? -eq 1 ]
 then
         echo "Modifying file"
+        # Create backup and add line after line 2 to uri-action-defaults.list
         cp /usr/share/applications/uri-action-defaults.list /usr/share/applications/uri-action-defaults.list.bak
-        echo "conboy=hildon-conboy.desktop" >> /usr/share/applications/uri-action-defaults.list
+        sed -i '2a\conboy=hildon-conboy2.desktop' /usr/share/applications/uri-action-defaults.list
 else
         echo "File already modified"
 fi

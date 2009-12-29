@@ -1,5 +1,6 @@
 #!/bin/sh
 
+
 #if [ -f /usr/share/applications/hildon/conboy.desktop ]
 #	then rm /usr/share/applications/hildon/conboy.desktop
 #fi
@@ -15,5 +16,6 @@ fi
 #
 
 # Remove the line from file if exits
-sed -i '/conboy=hildon-conboy.desktop/ d' /usr/share/applications/uri-action-defaults.list
+sed -i '/conboy=hildon-conboy.desktop/ d'  /usr/share/applications/uri-action-defaults.list
+sed -i '/conboy=hildon-conboy2.desktop/ d' /usr/share/applications/uri-action-defaults.list
 

@@ -1129,7 +1129,9 @@ UserInterface* create_mainwin() {
 
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_new));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_delete));
+#ifdef WITH_SYNC
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_sync));
+#endif
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_settings));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_fullscreen));
 
@@ -1160,7 +1162,9 @@ UserInterface* create_mainwin() {
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_settings);
 	/*gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());*/
+#ifdef WITH_SYNC
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_sync);
+#endif
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_quit);
 
@@ -1209,9 +1213,11 @@ UserInterface* create_mainwin() {
 
 	gtk_widget_show_all(toolbar);
 
+	/*
 	if (app_data->portrait) {
 		on_orientation_changed(NULL, NULL);
 	}
+	*/
 
 	hildon_window_add_toolbar(HILDON_WINDOW(mainwin), GTK_TOOLBAR(toolbar));
 
@@ -1309,6 +1315,10 @@ UserInterface* create_mainwin() {
 	ui->action_find = GTK_ACTION(action_find);
 
 	ui->menu_open = menu_open;
+
+	if (app_data->portrait) {
+		on_orientation_changed(NULL, NULL);
+	}
 
 	/* Window signals */
 	g_signal_connect(mainwin, "delete-event",
@@ -1479,14 +1489,9 @@ UserInterface* create_mainwin() {
 	ui->listeners = g_list_prepend(ui->listeners, GINT_TO_POINTER(gconf_client_notify_add(app_data->client, SETTINGS_FONT_SIZE, on_font_size_changed, textview, NULL, NULL)));
 
 
-	/* TODO: When restructuring the UI, don't use the hash map anymore */
-	GHashTable *hash = g_hash_table_new(g_str_hash, g_str_equal);
-	g_hash_table_insert(hash, "toolbar", toolbar);
-	g_hash_table_insert(hash, "menu_new", menu_new);
-	g_hash_table_insert(hash, "menu_open", menu_open);
 	g_signal_connect((gpointer)screen, "size-changed",
 			G_CALLBACK(on_orientation_changed),
-			hash);
+			NULL);
 
 	link_internal_tag = gtk_text_tag_table_lookup(buffer->tag_table, "link:internal");
 	g_signal_connect ((gpointer) link_internal_tag, "event",

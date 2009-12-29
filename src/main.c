@@ -154,6 +154,8 @@ main (int argc, char *argv[])
   program = HILDON_PROGRAM(hildon_program_get_instance());
   g_set_application_name("Conboy");
 
+  app_data->note_window = create_mainwin();
+  hildon_program_add_window(app_data->program, HILDON_WINDOW(app_data->note_window->window));
 
 #ifdef HILDON_HAS_APP_MENU
 
@@ -161,10 +163,6 @@ main (int argc, char *argv[])
   orientation_init(app_data);
 
 #endif
-
-
-  app_data->note_window = create_mainwin();
-  hildon_program_add_window(app_data->program, HILDON_WINDOW(app_data->note_window->window));
 
   /* Register URL listener */
   /*

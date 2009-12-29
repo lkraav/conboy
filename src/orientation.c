@@ -171,6 +171,11 @@ orientation_init(AppData *app_data)
 
 	/* Add the callback, which should be called, once the device is rotated */
 	dbus_connection_add_filter(con, dbus_handle_mce_message, NULL, NULL);
+
+	/* Set mode */
+	if (app_data->portrait) {
+		set_orientation("portrait");
+	}
 }
 
 #endif /* HILDON_HAS_APP_MENU */

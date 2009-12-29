@@ -1,3 +1,11 @@
+conboy (1:0.6.3) stable; urgency=low
+
+  * Does not crash anymore when started in portrait mode
+  * Installs icon again
+  * Removes sync from menu and settings because it's not ready for end users yet
+  
+ -- Cornelius Hald <hald@icandy.de>  Sun, 23 Dec 2009 15:12:51 +0200
+
 conboy (1:0.6.2) stable; urgency=low
 
   * New single window user interface

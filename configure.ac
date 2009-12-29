@@ -158,7 +158,7 @@ AC_OUTPUT([
     po/Makefile.in 
     po/Makefile
     data/de.zwong.conboy.service
-    data/conboy.desktop
+    data/conboy2.desktop
     data/conboy.conf
     src/plugins/Makefile
     src/plugins/storage_xml/Makefile

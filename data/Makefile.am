@@ -18,7 +18,7 @@ dbusdir=$(datadir)/dbus-1/services
 dbus_DATA=de.zwong.conboy.service
 
 desktopdir=$(datadir)/applications/hildon
-desktop_DATA = conboy.desktop
+desktop_DATA = conboy2.desktop
 
 icon_26x26_DATA = icons/26x26/conboy.png
 icon_40x40_DATA = icons/40x40/conboy.png
