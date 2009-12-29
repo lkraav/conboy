@@ -17,8 +17,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef WITH_MIDGARD
-
 #ifndef CONBOY_MIDGARD_STORAGE_PLUGIN_H
 #define CONBOY_MIDGARD_STORAGE_PLUGIN_H
 
@@ -54,5 +52,3 @@ GType		conboy_midgard_storage_plugin_get_type			(void);
 ConboyMidgardStoragePlugin* conboy_plugin_new(void);
 
 #endif /* CONBOY_MIDGARD_STORAGE_PLUGIN_H */
-
-#endif /* WITH_MIDGARD */

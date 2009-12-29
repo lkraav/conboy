@@ -1,2 +1,9 @@
-SUBDIRS = storage_xml storage_midgard storage_evernote
 
+if HAVE_MIDGARD
+CONBOY_PLUGIN_MIDGARD=storage_midgard
+endif
+
+SUBDIRS = \
+	  storage_xml \
+	  storage_evernote \
+	  $(CONBOY_PLUGIN_MIDGARD)

@@ -17,8 +17,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef WITH_MIDGARD
-
 #include "../../conboy_note.h"
 #include "../../conboy_storage_plugin.h"
 #include "../../metadata.h"
@@ -429,8 +427,7 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 }
 
 ConboyMidgardStoragePlugin*
-conboy_plugin_new() {
+conboy_plugin_new () 
+{
 	return g_object_new(CONBOY_TYPE_MIDGARD_STORAGE_PLUGIN, NULL);
 }
-
-#endif /* WITH_MIDGARD */
