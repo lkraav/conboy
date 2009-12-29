@@ -20,11 +20,11 @@ libstoragexml_la_LIBADD = \
 
 libstoragexml_la_LDFLAGS = -module -avoid-version
 
-plugin_in_files = conboy_storage_xml.plugin.in
+plugin_in_files = conboy_storage_xml.plugin.desktop.in
 
-%.plugin: %.plugin.in $(INTLTOOL_MERGE) $(wildcard $(top_srcdir)/po/*po) ; $(INTLTOOL_MERGE) $(top_srcdir)/po $< $@ -d -u -c $(top_builddir)/po/.intltool-merge-cache
+%.plugin: %.plugin.desktop.in $(INTLTOOL_MERGE) $(wildcard $(top_srcdir)/po/*po) ; $(INTLTOOL_MERGE) $(top_srcdir)/po $< $@ -d -u -c $(top_builddir)/po/.intltool-merge-cache
 
-plugin_DATA = $(plugin_in_files:.plugin.in=.plugin)
+plugin_DATA = $(plugin_in_files:.plugin.desktop.in=.plugin)
 
 EXTRA_DIST = $(plugin_in_files)
 

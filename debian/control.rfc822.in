@@ -18,14 +18,10 @@ XB-Maemo-Upgrade-Description: Changes since 0.5.8
  * Automatic linking to various urls (web addresses, email addresses, etc.)
  * Support for plugins
  * Many new translations
-Description: Conboy is a note taking application.
+_Description: Conboy is a note taking application.
  It is designed to be easy to use - yet powerful. Conboy can
  read and write the Tomboy file format to be compatible with
  Tomboy on Linux, Mac and Windows.
-Description-de.UTF-8: Conboy ist eine Notizzettel Anwendung.
- Es ist einfach zu bedienen - aber trotzdem mächtig. Conboy kann das
- Tomboy Dateiformat lesen und schreiben und ist deswegen kompatibel mit
- Tomboy auf Linux, Mac und Windows.
 XB-Maemo-Display-Name: Conboy
 XSBC-Bugtracker: https://bugs.maemo.org/enter_bug.cgi?product=conboy
 XB-Maemo-Icon-26:
@@ -154,3 +150,4 @@ XB-Maemo-Icon-26:
  zmq7O9t0QX+vi4gDFAHFQDjQUI5mS7UTaPCy22+XZgETqA94wTEdaE+gaSAF
  JIAuIGXtgFDow3ax3wdEevfAehASueDzd7v5JHKBp4JrHzD2AoH9Xz5wBCQL
  yoUCu+B7Dbcv9Rcr/wNmArLWkmPEkQAAAABJRU5ErkJggg==
+
