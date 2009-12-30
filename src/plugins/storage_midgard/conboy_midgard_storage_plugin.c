@@ -385,7 +385,7 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 			"database", "ConboyNotes",
 			"dbuser", "midgard",
 			"dbpass", "midgard",
-			"sharedir", "/usr/share/midgard-2.0", NULL);
+			"sharedir", "/usr/share/midgard2", NULL);
 
 	midgard_config_save_file (config, "ConboyNotesStorage", TRUE, NULL);
 
@@ -396,7 +396,7 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 
 	midgard_connection_set_loglevel (mgd_global, "debug", NULL);
 
-	gchar *db_file_exists = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), ".midgard-2.0/.conboy_db_exists", NULL);
+	gchar *db_file_exists = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), ".midgard2/.conboy_db_exists", NULL);
 
 	/* Check if database already exists */
 	if (g_file_test (db_file_exists, G_FILE_TEST_EXISTS)) { /* HACK */
