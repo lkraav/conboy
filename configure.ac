@@ -100,8 +100,8 @@ AC_SUBST(BACKUP_CATEGORY)
 if [[ "$MAJOR" == "5" ]]; then
 
   AC_MSG_CHECKING([whether to build Midgard storage plugin])
-  AC_ARG_WITH([midgard],[AS_HELP_STRING([--with-midgard], [disable Midgard storage])],
-              [], [with_midgard=no])
+  AC_ARG_WITH([midgard],[AS_HELP_STRING([--with-midgard], [enable Midgard storage])],
+              [], [with_midgard=yes])
   AS_IF(
           [test "$with_midgard" = yes],
           [
@@ -113,7 +113,7 @@ if [[ "$MAJOR" == "5" ]]; then
   )
 fi
 
-AM_CONDITIONAL([WITH_MIDGARD], [test x$with_midgard = xyes])
+AM_CONDITIONAL([MIDGARD], [test x$with_midgard = xyes])
 
 
 
@@ -150,9 +150,6 @@ AC_SUBST(icon_64x64dir)
 AC_SUBST(icon_scalabledir)
 
 AC_CONFIG_FILES([src/conboy_config.h])
-
-dnl Plugins
-AC_SUBST(WITH_MIDGARD)
 
 AC_OUTPUT([
     Makefile 

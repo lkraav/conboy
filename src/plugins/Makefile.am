@@ -1,5 +1,5 @@
 
-if HAVE_MIDGARD
+if MIDGARD
 CONBOY_PLUGIN_MIDGARD=storage_midgard
 endif
 
