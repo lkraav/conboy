@@ -21,7 +21,8 @@ msgid "New Note %i"
 msgstr "Nová poznámka %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
 #: ../src/interface.c:936 ../src/interface.c:1045 ../src/interface.c:1083
 msgid "Bold"
 msgstr "Tučné"
@@ -138,11 +139,11 @@ msgid "Search all notes"
 msgstr "Hľadať vo všetkých poznámkach"
 
 #. Add New Note item
-#.
+#. 
 #. menu_new_note = gtk_button_new();
 #. gtk_action_connect_proxy(new_note_action, menu_new_note);
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#.
+#. 
 #. Add sort filters
 #: ../src/search_window.c:376
 msgid "Sort by title"
@@ -165,13 +166,11 @@ msgstr "Naposledy upravené"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name "
-"for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
 msgstr ""
 "<b>Duplicitný názov poznámky</b>\n"
 "\n"
-"Poznámka s názvom <b>%s</b> už existuje. Prosím, skôr ako budete pokračovať, "
-"vytvorte iný názov pre poznámku."
+"Poznámka s názvom <b>%s</b> už existuje. Prosím, skôr ako budete pokračovať, vytvorte iný názov pre poznámku."
 
 #: ../src/callbacks.c:804
 msgid "Really delete this note?"
@@ -243,24 +242,23 @@ msgstr "Nastaviť plugin"
 
 #: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
 msgid "Loads and saves notes from the local filesystem."
-msgstr ""
+msgstr "Nahráva a ukladá poznámky z lokálne súborového systému."
 
 #: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
 msgid "XML Storage Backend"
-msgstr ""
+msgstr "Backend pre XML úložisko"
 
 #. Description
 #: ../debian/control.in:21
 msgid "Conboy is a note taking application."
-msgstr ""
+msgstr "Conboy je aplikácia na písanie poznámok."
 
 #. Description
 #: ../debian/control.in:21
-msgid ""
-"It is designed to be easy to use - yet powerful. Conboy can read and write "
-"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
-"Windows."
+msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
 msgstr ""
+"Je vytvorený aby bol jednoduchý, ale zároveň výkonným.\r\n"
+"Conboy dokáže prečítať a zapísať poznámky v Tomboy formáte, ktoré sú kompatibilné s Tomboy-om pre Linux, Mac a Windows."
 
 #~ msgid "Show note"
 #~ msgstr "Zobraziť poznámku"

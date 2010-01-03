@@ -245,21 +245,21 @@ msgstr "Liitännäisen asetukset"
 
 #: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
 msgid "Loads and saves notes from the local filesystem."
-msgstr ""
+msgstr "Lataa ja tallentaa muistilaput paikallisesta muistista."
 
 #: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
 msgid "XML Storage Backend"
-msgstr ""
+msgstr "XML-tallennus"
 
 #. Description
 #: ../debian/control.in:21
 msgid "Conboy is a note taking application."
-msgstr ""
+msgstr "Conboy on ohjelma muistiinpanojen tekemiseen."
 
 #. Description
 #: ../debian/control.in:21
 msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
-msgstr ""
+msgstr "Se on suunniteltu helppokäyttöiseksi ja tehokkaaksi. Conboy voi lukea ja kirjoittaa Tomboyn Linux, MAC ja Windows versioiden tiedostomuotoa. "
 
 #~ msgid "On startup"
 #~ msgstr "Aloituksessa"
