@@ -466,7 +466,6 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	#endif
 
 	/* Adding sync section */
-#if WITH_SYNC
 	GtkWidget *sync_hbox = gtk_hbox_new(FALSE, 0);
 	gtk_widget_show(sync_hbox);
 	gtk_box_pack_start(GTK_BOX(config_vbox), sync_hbox, TRUE, TRUE, 0);
@@ -490,7 +489,6 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_button_set_label(GTK_BUTTON(sync_auth_but), "Authenticate");
 	gtk_widget_show(sync_auth_but);
 	gtk_box_pack_start(GTK_BOX(sync_hbox), sync_auth_but, FALSE, FALSE, 0);
-#endif
 
 	/* Add the plugin manager widget */
 	GtkWidget *plugin_manager = conboy_plugin_manager_new();
@@ -549,7 +547,6 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	hildon_color_button_set_color(HILDON_COLOR_BUTTON(link_color_but), &color);
 
 	/* Sync URL */
-#ifdef WITH_SYNC
 	if (settings_load_sync_base_url() != NULL) {
 #ifdef HILDON_HAS_APP_MENU
 		hildon_entry_set_text(HILDON_ENTRY(sync_entry), settings_load_sync_base_url());
@@ -558,7 +555,6 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 #endif
 		gtk_widget_set_sensitive(GTK_WIDGET(sync_auth_but), FALSE);
 	}
-#endif
 
 
 	/* Connect signals */
@@ -570,11 +566,8 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	g_signal_connect(text_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_TEXT));
 	g_signal_connect(link_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_LINKS));
 	g_signal_connect(back_color_but, "released", G_CALLBACK(on_color_but_changed), GINT_TO_POINTER(SETTINGS_COLOR_TYPE_BACKGROUND));
-
-#ifdef WITH_SYNC
 	g_signal_connect(sync_auth_but, "clicked", G_CALLBACK(on_sync_auth_but_clicked), widget);
 	g_signal_connect(sync_entry, "changed", G_CALLBACK(on_sync_entry_changed), sync_auth_but);
-#endif
 
 	/* Set to something big to make sure the maximum dialog area is used */
 	gtk_widget_set_size_request(pannable, -1, 800);

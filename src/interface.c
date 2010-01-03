@@ -1129,9 +1129,7 @@ UserInterface* create_mainwin() {
 
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_new));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_delete));
-#ifdef WITH_SYNC
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_sync));
-#endif
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_settings));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_fullscreen));
 
@@ -1162,9 +1160,7 @@ UserInterface* create_mainwin() {
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_settings);
 	/*gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());*/
-#ifdef WITH_SYNC
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_sync);
-#endif
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_quit);
 

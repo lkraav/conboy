@@ -1,3 +1,9 @@
+conboy (1:0.6.3.1) stable; urgency=low
+
+  * Developer stuff
+  
+ -- Cornelius Hald <hald@icandy.de>  Sun, 03 Dec 2010 18:29:51 +0200
+  
 conboy (1:0.6.3) stable; urgency=low
 
   * Does not crash anymore when started in portrait mode
