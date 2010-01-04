@@ -23,11 +23,18 @@ ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
 	INSTALL_PROGRAM += -s
 endif
 
+# Only if we have Maemo 5 we include Midgard support
+MAJOR := $(shell pkg-config --modversion maemo-version | cut -b1 -)
+ifeq ($(MAJOR),5)
+	CONF_ARGS := --with-midgard=yes
+else
+	CONF_ARGS := --with-midgard=no
+endif
+
 config.status: configure
 	dh_testdir
-	# Add here commands to configure the package.
-	CFLAGS="$(CFLAGS)" ./configure --with-midgard --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
-
+	
+	CFLAGS="$(CFLAGS)" ./configure $(CONF_ARGS) --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
 
 build: build-stamp
 
