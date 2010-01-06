@@ -27,7 +27,7 @@ endif
 MAJOR := $(shell pkg-config --modversion maemo-version | cut -b1 -)
 ifeq ($(MAJOR),5)
 	CONF_ARGS := --with-midgard=yes
-	cp debian/control_with_midgard debian/control
+	TRASH := $(shell cp debian/control_with_midgard debian/control)
 else
 	CONF_ARGS := --with-midgard=no
 endif
