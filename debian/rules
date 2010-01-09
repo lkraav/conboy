@@ -30,6 +30,7 @@ ifeq ($(MAJOR),5)
 	TRASH := $(shell cp debian/control_with_midgard debian/control)
 else
 	CONF_ARGS := --with-midgard=no
+	TRASH := $(shell cp debian/control_without_midgard debian/control)
 endif
 
 config.status: configure
