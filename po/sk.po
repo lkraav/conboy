@@ -174,7 +174,7 @@ msgstr ""
 
 #: ../src/callbacks.c:804
 msgid "Really delete this note?"
-msgstr "Naozaj zmazať túto poznamku?"
+msgstr "Naozaj zmazať túto poznámku?"
 
 #: ../src/callbacks.c:806
 msgid "If you delete a note it is permanently lost."
@@ -194,7 +194,7 @@ msgstr "Široký"
 
 #: ../src/settings_window.c:392 ../src/settings_window.c:394
 msgid "Use automatic portrait mode"
-msgstr ""
+msgstr "Použiť automatické zobrazenie na výšku"
 
 #: ../src/settings_window.c:406 ../src/settings_window.c:408
 msgid "Use custom colors"
