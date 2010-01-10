@@ -1,8 +1,0 @@
-[Conboy Plugin]
-Module=storageevernote
-Kind=storage
-Name=Evernote Storage Backend
-Description=Loads and saves notes from the Evernote Online Service.
-Version=0.1
-Authors=Mike Jipping <jipping@hope.edu>
-Copyright=Copyright (C) 2009 Mike Jipping
