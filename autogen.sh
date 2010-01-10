@@ -2,7 +2,7 @@
 
 set -x
 glib-gettextize --copy --force
-libtoolize --automake
+libtoolize --copy --force --automake
 intltoolize --copy --force --automake
 
 aclocal-1.9
