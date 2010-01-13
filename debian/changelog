@@ -1,4 +1,4 @@
-conboy (1:0.6.3.1-1) stable; urgency=low
+conboy (1:0.6.3.1-6) stable; urgency=low
 
   * Removed maemo optification (Maemo bug #7707)
   
