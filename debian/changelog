@@ -1,3 +1,9 @@
+conboy (1:0.6.3.1-1) stable; urgency=low
+
+  * Removed maemo optification (Maemo bug #7707)
+  
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Wed, 13 Jan 2010 18:28:01 +0200
+
 conboy (1:0.6.3.1) stable; urgency=low
 
   * Developer stuff
