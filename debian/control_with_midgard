@@ -91,7 +91,7 @@ XB-Maemo-Icon-26:
 
 Package: conboy-midgard
 Architecture: any
-Depends: conboy (>= 0.6.3), libmidgard2-2009, midgard2-common
+Depends: conboy (>= 0.6.3), libmidgard2-2009, midgard2-common, libgda3-sqlite
 XB-Maemo-Display-Name: Conboy Midgard Plugin
 Description: Conboy plugin to store notes in Midgard content repository.
 XB-Maemo-Icon-26:

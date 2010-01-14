@@ -1,3 +1,9 @@
+conboy (1:0.6.3.1-7) stable; urgency=low
+
+  * Added mandatory libgda3-sqlite dependency to conboy-midgard package 
+  
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Wed, 14 Jan 2010 19:47:14 +0200
+
 conboy (1:0.6.3.1-6) stable; urgency=low
 
   * Removed maemo optification (Maemo bug #7707)
