@@ -9,7 +9,7 @@ EXTRA_DIST = \
         debian/postinst
 
 # Sub directories
-SUBDIRS = src data po debian
+SUBDIRS = src data po
 
 #deb: dist
 #	-mkdir $(top_builddir)/debian-build

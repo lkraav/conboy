@@ -1,3 +1,9 @@
+conboy (1:0.6.3.1-9) stable; urgency=low
+
+  * Slightly changed creation of debian/control to not duplicate parts of the control file
+  
+ -- Cornelius Hald <hald@icandy.de>  Sat, 18 Jan 2010 20:52:32 +0200
+
 conboy (1:0.6.3.1-7) stable; urgency=low
 
   * Added mandatory libgda3-sqlite dependency to conboy-midgard package 

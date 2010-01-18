@@ -160,7 +160,6 @@ AC_OUTPUT([
     data/de.zwong.conboy.service
     data/conboy2.desktop
     data/conboy.conf
-    debian/Makefile
     src/plugins/Makefile
     src/plugins/storage_xml/Makefile
     src/plugins/storage_midgard/Makefile

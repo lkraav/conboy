@@ -22,10 +22,29 @@ Description: Conboy is a note taking application.
  It is designed to be easy to use - yet powerful. Conboy can
  read and write the Tomboy file format to be compatible with
  Tomboy on Linux, Mac and Windows.
-Description-de.UTF-8: Conboy ist eine Notizzettel Anwendung.
+Description-de_DE: Conboy ist eine Notizzettel Anwendung.
  Es ist einfach zu bedienen - aber trotzdem mächtig. Conboy kann das
  Tomboy Dateiformat lesen und schreiben und ist deswegen kompatibel mit
  Tomboy auf Linux, Mac und Windows.
+Description-fi_FI: Conboy on ohjelma muistiinpanojen tekemiseen.
+ Se on suunniteltu helppokäyttöiseksi ja tehokkaaksi. Conboy voi lukea ja
+ kirjoittaa Tomboyn Linux, MAC ja Windows versioiden tiedostomuotoa.
+Description-pl_PL: Conboy to program do robienia notatek.
+ Jest zaprojektowany tak, aby był łatwy w użytkowaniu, a jednocześnie
+ funkcjonalny. Program Conboy może odczytywać i zapisywać format pliku
+ programu Tomboy z systemów Linux, Mac i Windows.
+Description-ro_RO: Conboy este o aplicație pentru notițe.
+ Este proiectată pentru a fi ușor de folosit, dar și puternică. Conboy
+ poate citi și scrie formatul de fișiere Tomboy pentru a fi compatibil cu
+ Tomboy pe Linux, Mac și Windows.
+Description-sk_SK: Conboy je aplikácia na písanie poznámok.
+ Je vytvorený aby bol jednoduchý, ale zároveň výkonným.
+ Conboy dokáže prečítať a zapísať poznámky v Tomboy formáte,
+ ktoré sú kompatibilné s Tomboy-om pre Linux, Mac a Windows.
+Description-sv_SV: Conboy är en applikation för att ta anteckningar med
+ Den är utformad för att vara lätt att använda - men ändå kraftfull.
+ Conboy kan läsa och skriva Tomboys filformat för att vara kompatibel med
+ Tomboy på Linux, Mac och Windows.
 XB-Maemo-Display-Name: Conboy
 XSBC-Bugtracker: https://bugs.maemo.org/enter_bug.cgi?product=conboy
 XB-Maemo-Icon-26:
@@ -88,3 +107,4 @@ XB-Maemo-Icon-26:
  zmq7O9t0QX+vi4gDFAHFQDjQUI5mS7UTaPCy22+XZgETqA94wTEdaE+gaSAF
  JIAuIGXtgFDow3ax3wdEevfAehASueDzd7v5JHKBp4JrHzD2AoH9Xz5wBCQL
  yoUCu+B7Dbcv9Rcr/wNmArLWkmPEkQAAAABJRU5ErkJggg==
+

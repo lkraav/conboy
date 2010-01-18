@@ -27,10 +27,10 @@ endif
 MAJOR := $(shell pkg-config --modversion maemo-version | cut -b1 -)
 ifeq ($(MAJOR),5)
 	CONF_ARGS := --with-midgard=yes
-	TRASH := $(shell cp debian/control_with_midgard debian/control)
+	TRASH := $(shell sh debian/modify_control.sh add)
 else
 	CONF_ARGS := --with-midgard=no
-	TRASH := $(shell cp debian/control_without_midgard debian/control)
+	TRASH := $(shell sh debian/modify_control.sh remove)
 endif
 
 config.status: configure
