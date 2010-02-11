@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -21,7 +21,8 @@ msgid "New Note %i"
 msgstr "Neue Notiz %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
 #: ../src/interface.c:936 ../src/interface.c:1045 ../src/interface.c:1083
 msgid "Bold"
 msgstr "Fett"
@@ -138,11 +139,11 @@ msgid "Search all notes"
 msgstr "Alle Notizen durchsuchen"
 
 #. Add New Note item
-#.
+#. 
 #. menu_new_note = gtk_button_new();
 #. gtk_action_connect_proxy(new_note_action, menu_new_note);
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#.
+#. 
 #. Add sort filters
 #: ../src/search_window.c:376
 msgid "Sort by title"
@@ -165,9 +166,11 @@ msgstr "Zuletzt geändert"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name "
-"for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
 msgstr ""
+"<b>Titel schon verwendet</b>\n"
+"\n"
+"Eine Notiz mit dem Titel <b>%s</b> existiert schon. Bitte wählen Sie einen anderen Name für diese Notiz, bevor sie weiter machen."
 
 #: ../src/callbacks.c:804
 msgid "Really delete this note?"
@@ -191,7 +194,7 @@ msgstr "Groß"
 
 #: ../src/settings_window.c:392 ../src/settings_window.c:394
 msgid "Use automatic portrait mode"
-msgstr ""
+msgstr "Automatischen Porträt-Modus nutzen"
 
 #: ../src/settings_window.c:406 ../src/settings_window.c:408
 msgid "Use custom colors"
@@ -252,14 +255,8 @@ msgstr "Conboy ist eine Notizzettel Anwendung."
 
 #. Description
 #: ../debian/control.in:21
-msgid ""
-"It is designed to be easy to use - yet powerful. Conboy can read and write "
-"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
-"Windows."
-msgstr ""
-"Es ist einfach zu bedienen - aber trotzdem mächtig. Conboy kann das Tomboy "
-"Dateiformat lesen und schreiben und ist deswegen kompatibel mit Tomboy auf "
-"Linux, Mac und Windows."
+msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
+msgstr "Es ist einfach zu bedienen - aber trotzdem mächtig. Conboy kann das Tomboy Dateiformat lesen und schreiben und ist deswegen kompatibel mit Tomboy auf Linux, Mac und Windows."
 
 #~ msgid "On startup"
 #~ msgstr "Beim Starten"
