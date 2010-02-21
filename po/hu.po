@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: fi_FI\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-12-29 16:54+0100\n"
-"PO-Revision-Date: 2010-02-21 11:52-0000\n"
+"PO-Revision-Date: 2010-02-21 12:34-0000\n"
 "Last-Translator: Gyorgy Lakatos <redon13@gmail.com>\n"
 "Language-Team: fi_FI\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,7 @@ msgstr ""
 #: ../src/note.c:169
 #, c-format
 msgid "New Note %i"
-msgstr ""
+msgstr "Új jegyzet %i"
 
 #. ACTIONS
 #. TODO: Write a function, which takes GtkActions that contain markup code and
@@ -36,11 +36,11 @@ msgstr "Félkövér"
 
 #: ../src/interface.c:937
 msgid "Bullets"
-msgstr ""
+msgstr "Gömbök"
 
 #: ../src/interface.c:938
 msgid "Decrease indent"
-msgstr ""
+msgstr "Behúzás csökkentése"
 
 #: ../src/interface.c:939
 msgid "Delete note"
@@ -60,7 +60,7 @@ msgstr "Korostus"
 
 #: ../src/interface.c:942
 msgid "Increase indent"
-msgstr ""
+msgstr "Behúzás növelése"
 
 #: ../src/interface.c:943
 msgid "Link"
@@ -94,7 +94,7 @@ msgstr "Itáliai"
 #: ../src/interface.c:1047
 #: ../src/interface.c:1085
 msgid "Strikeout"
-msgstr ""
+msgstr "Áthúzott"
 
 #: ../src/interface.c:950
 msgid "Style"
@@ -150,7 +150,7 @@ msgstr "Nagy"
 #: ../src/interface.c:1052
 #: ../src/interface.c:1090
 msgid "Huge"
-msgstr ""
+msgstr "Legnagyobb"
 
 #. FIND TOOL BAR
 #: ../src/interface.c:1225
@@ -183,7 +183,7 @@ msgstr "Jegyzet"
 
 #: ../src/search_window.c:501
 msgid "Last changed"
-msgstr "Utolsó változtatás"
+msgstr "Legutóbb változtava"
 
 #: ../src/callbacks.c:80
 #, c-format
@@ -192,6 +192,9 @@ msgid ""
 "\n"
 "A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
 msgstr ""
+"<b>Jegyzet cím azonosság</b>\n"
+"\n"
+"Már van egy ilyen című jegyzeted<b>%s</b>. Válassz másik címet mielőtt folytatod."
 
 #: ../src/callbacks.c:804
 msgid "Really delete this note?"
@@ -199,7 +202,7 @@ msgstr "Valóban törlöd ezt a jegyzetet?"
 
 #: ../src/callbacks.c:806
 msgid "If you delete a note it is permanently lost."
-msgstr ""
+msgstr "Ha törlöd ezt a jegyzetet véglegesen törlődik."
 
 #: ../src/settings_window.c:371
 msgid "Scrollbar size"
@@ -216,12 +219,12 @@ msgstr "Vastag"
 #: ../src/settings_window.c:392
 #: ../src/settings_window.c:394
 msgid "Use automatic portrait mode"
-msgstr ""
+msgstr "Autómatikus portré mód"
 
 #: ../src/settings_window.c:406
 #: ../src/settings_window.c:408
 msgid "Use custom colors"
-msgstr ""
+msgstr "Egyéni színek használata"
 
 #: ../src/settings_window.c:422
 msgid "Text"
@@ -237,7 +240,7 @@ msgstr "Linkek"
 
 #: ../src/conboy_note.c:344
 msgid "Describe your new note here."
-msgstr ""
+msgstr "Írj rövid leírást az új jegyzetedről."
 
 #: ../src/conboy_plugin_manager.c:46
 msgid "Plugin"
@@ -266,21 +269,21 @@ msgstr "Bővítmények testreszabása"
 
 #: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
 msgid "Loads and saves notes from the local filesystem."
-msgstr ""
+msgstr "Jegyzetek betöltése és mentése a helyi file-rendszerről"
 
 #: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
 msgid "XML Storage Backend"
-msgstr ""
+msgstr "XML tároló"
 
 #. Description
 #: ../debian/control.in:21
 msgid "Conboy is a note taking application."
-msgstr "Conboy egy egyszerü jegyzettömb"
+msgstr "A Conboy egy egyszerü de nagyszerű jegyzettömb."
 
 #. Description
 #: ../debian/control.in:21
 msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
-msgstr ""
+msgstr "Úgy tervezték, hogy könnyen lehessen használni , de mégis sokrétű. A Conboy úgy tudja írni és olvasni a Tomboy fájlformátumot, hogy kompatibilis maradjon a Tomboy Linux, Mac és Windows változatával."
 
 #~ msgid "On startup"
 #~ msgstr "Aloituksessa"
