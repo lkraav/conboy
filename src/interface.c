@@ -391,6 +391,7 @@ do_sync (gpointer *user_data)
 	/* Revision checks */
 	JsonUser *user = json_get_user(reply);
 	if (user->latest_sync_revision < last_sync_rev) {
+		g_printerr("U1 rev: %i   Local rev: %i\n", user->latest_sync_revision, last_sync_rev);
 		show_message(data, "Server revision older than our revision.");
 		return;
 	}
@@ -508,6 +509,7 @@ do_sync (gpointer *user_data)
 
 	if (note == NULL) {
 		/* TODO: Show demo note */
+		note = conboy_note_new();
 		g_printerr("ERROR: No notes to display\n");
 	}
 
