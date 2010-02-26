@@ -153,7 +153,8 @@ convert_content(const gchar *content)
 	if (tmp == NULL || strcmp(tmp, "") == 0) {
 		return "";
 	} else {
-		result = escape_string(tmp);
+		/*result = escape_string(tmp);*/ /* TODO: It looks like newer version of glib-json escape those already */
+		result = g_strdup(tmp);
 		g_free(tmp);
 		return result;
 	}
