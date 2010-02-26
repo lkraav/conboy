@@ -174,7 +174,7 @@ url_callback_handler(const gchar *interface, const gchar *method, GArray *argume
 static void
 clear_sync_settings()
 {
-	settings_save_last_sync_revision(0);
+	settings_save_last_sync_revision(-1);
 	settings_save_last_sync_time(0);
 	settings_save_sync_base_url("");
 	settings_save_oauth_access_token("");
