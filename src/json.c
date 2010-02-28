@@ -360,7 +360,8 @@ json_get_note_from_node(JsonNode *node)
 	g_ascii_formatd(tmp_version, 10, "%.1f", version);
 
 	gchar *full_content = g_strconcat(
-			"<note-content version=\"",
+			"<note-content xmlns:link=\"http://beatniksoftware.com/tomboy/link\" xmlns:size=\"http://beatniksoftware.com/tomboy/size\" xmlns=\"http://beatniksoftware.com/tomboy\" ",
+			"version=\"",
 			tmp_version,
 			"\">",
 			tmp_title,
