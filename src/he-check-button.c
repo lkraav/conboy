@@ -1,8 +1,10 @@
 /*
- * This file is a part of Conboy. Based on hildon. Original copyright below:
+ * This file is a part of hildon-extras
  *
- * Copyright (C) 2008, 2009 Nokia Corporation, all rights reserved.
+ * Copyright (C) 2009 Cornelius Hald <hald@icandy.de>
  *
+ * Almost completely based on code by:
+ * Copyright (C) 2008, 2009 Nokia Corporation
  * Contact: Rodrigo Novo <rodrigo.novo@nokia.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,50 +19,42 @@
  */
 
 /**
- * SECTION:hildon-button
- * @short_description: Two-label buttons in the Hildon framework.
+ * SECTION:he-check-button
+ * @short_description: Two-label check buttons in Hildon-Extras
  *
- * #ConboyCheckButton is a clickable button for Hildon applications. It is
+ * #HeCheckButton is a clickable button for Hildon applications. It is
  * derived from the #GtkButton widget and provides additional
  * commodities specific to the Hildon framework.
  *
- * The height of a #ConboyCheckButton can be set to either "finger" height
+ * The height of a #HeCheckButton can be set to either "finger" height
  * or "thumb" height. It can also be configured to use halfscreen or
  * fullscreen width. Alternatively, either dimension can be set to
  * "auto" so it behaves like a standard #GtkButton.
  *
- * A #ConboyCheckButton can hold any valid child widget, but it usually
- * contains two labels, named title and value, and it can also contain
- * an image. The contents of the button are packed together inside a
- * #GtkAlignment and they do not expand by default (they don't use the
- * full space of the button).
+ * A #HeCheckButton can hold any valid child widget, but it usually
+ * contains two labels, named title and value. The contents of the button
+ * are packed together inside a #GtkAlignment and they do not expand by
+ * default (they don't use the full space of the button).
  *
  * To change the alignment of both labels, use gtk_button_set_alignment()
  *
  * To make them expand and use the full space of the button, use
- * conboy_check_button_set_alignment().
+ * he_check_button_set_alignment().
  *
  * To change the relative alignment of each label, use
- * conboy_check_button_set_title_alignment() and
- * conboy_check_button_set_value_alignment().
- *
- * In hildon-button-example.c included in the Hildon distribution you
- * can see examples of how to create the most common button
- * layouts.
- *
- * If only one label is needed, #GtkButton can be used as well, see
- * also hildon_gtk_button_new().
+ * he_check_button_set_title_alignment() and
+ * he_check_button_set_value_alignment().
  *
  * <example>
- * <title>Creating a ConboyCheckButton</title>
+ * <title>Creating a HeCheckButton</title>
  * <programlisting>
  * void
- * button_clicked (ConboyCheckButton *button, gpointer user_data)
+ * button_clicked (HeCheckButton *button, gpointer user_data)
  * {
  *     const gchar *title, *value;
  * <!-- -->
- *     title = conboy_check_button_get_title (button);
- *     value = conboy_check_button_get_value (button);
+ *     title = he_check_button_get_title (button);
+ *     value = he_check_button_get_value (button);
  *     g_debug ("Button clicked with title '&percnt;s' and value '&percnt;s'", title, value);
  * }
  * <!-- -->
@@ -70,13 +64,13 @@
  *     GtkWidget *button;
  *     GtkWidget *image;
  * <!-- -->
- *     button = conboy_check_button_new (HILDON_SIZE_AUTO_WIDTH | HILDON_SIZE_FINGER_HEIGHT,
- *                                 CONBOY_CHECK_BUTTON_ARRANGEMENT_VERTICAL);
- *     conboy_check_button_set_text (CONBOY_CHECK_BUTTON (button), "Some title", "Some value");
+ *     button = he_check_button_new (HILDON_SIZE_AUTO_WIDTH | HILDON_SIZE_FINGER_HEIGHT,
+ *                                 HE_CHECK_BUTTON_ARRANGEMENT_VERTICAL);
+ *     he_check_button_set_text (HE_CHECK_BUTTON (button), "Some title", "Some value");
  * <!-- -->
  *     image = gtk_image_new_from_stock (GTK_STOCK_INFO, GTK_ICON_SIZE_BUTTON);
- *     conboy_check_button_set_image (CONBOY_CHECK_BUTTON (button), image);
- *     conboy_check_button_set_image_position (CONBOY_CHECK_BUTTON (button), GTK_POS_RIGHT);
+ *     he_check_button_set_image (HE_CHECK_BUTTON (button), image);
+ *     he_check_button_set_image_position (HE_CHECK_BUTTON (button), GTK_POS_RIGHT);
  * <!-- -->
  *     gtk_button_set_alignment (GTK_BUTTON (button), 0.0, 0.5);
  * <!-- -->
@@ -99,7 +93,7 @@
 #include                                        <hildon/hildon-check-button.h>
 #include                                        <hildon/hildon-enum-types.h>
 #include                                        <hildon/hildon-gtk.h>
-#include                                        "conboy_check_button.h"
+#include                                        "he-check-button.h"
 
 enum {
 	TOGGLED,
@@ -108,13 +102,13 @@ enum {
 
 static guint									signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_TYPE                                   (ConboyCheckButton, conboy_check_button, GTK_TYPE_BUTTON);
+G_DEFINE_TYPE                                   (HeCheckButton, he_check_button, GTK_TYPE_BUTTON);
 
-#define                                         CONBOY_CHECK_BUTTON_GET_PRIVATE(obj) \
+#define                                         HE_CHECK_BUTTON_GET_PRIVATE(obj) \
                                                 (G_TYPE_INSTANCE_GET_PRIVATE ((obj), \
-                                                CONBOY_TYPE_CHECK_BUTTON, ConboyCheckButtonPrivate));
+                                                HE_TYPE_CHECK_BUTTON, HeCheckButtonPrivate));
 
-struct                                          _ConboyCheckButtonPrivate
+struct                                          _HeCheckButtonPrivate
 {
     GtkLabel *title;
     GtkLabel *value;
@@ -123,7 +117,7 @@ struct                                          _ConboyCheckButtonPrivate
     GtkWidget *alignment;
     GtkCellRendererToggle *toggle_renderer;
     GtkWidget *cell_view;
-    ConboyCheckButtonStyle style;
+    HeCheckButtonStyle style;
     guint setting_style : 1;
 };
 
@@ -136,43 +130,43 @@ enum {
 };
 
 /**
- * conboy_check_button_toggled:
- * @button: A #ConboyCheckButton
+ * he_check_button_toggled:
+ * @button: A #HeCheckButton
  *
- * Emits the #ConboyCheckButton::toggled signal on the #ConboyCheckButton.
+ * Emits the #HeCheckButton::toggled signal on the #HeCheckButton.
  * There is no good reason for an application ever to call this function.
  *
  * Since: 2.2
  */
 void
-conboy_check_button_toggled                     (ConboyCheckButton *button)
+he_check_button_toggled                     (HeCheckButton *button)
 {
-    g_return_if_fail (CONBOY_IS_CHECK_BUTTON (button));
+    g_return_if_fail (HE_IS_CHECK_BUTTON (button));
 
     g_signal_emit (button, signals[TOGGLED], 0);
 }
 
 
 /**
- * conboy_check_button_set_active:
- * @button: A #ConboyCheckButton
+ * he_check_button_set_active:
+ * @button: A #HeCheckButton
  * @is_active: new state for the button
  *
- * Sets the status of a #ConboyCheckButton. Set to %TRUE if you want
+ * Sets the status of a #HeCheckButton. Set to %TRUE if you want
  * @button to be 'pressed-in', and %FALSE to raise it. This action
- * causes the #ConboyCheckButton::toggled signal to be emitted.
+ * causes the #HeCheckButton::toggled signal to be emitted.
  *
  * Since: 2.2
  **/
 void
-conboy_check_button_set_active                  (ConboyCheckButton *button,
+he_check_button_set_active                  (HeCheckButton *button,
                                                  gboolean           is_active)
 {
     gboolean prev_is_active;
 
-    g_return_if_fail (CONBOY_IS_CHECK_BUTTON (button));
+    g_return_if_fail (HE_IS_CHECK_BUTTON (button));
 
-    prev_is_active = conboy_check_button_get_active (button);
+    prev_is_active = he_check_button_get_active (button);
 
     if (prev_is_active != is_active) {
         gtk_button_clicked (GTK_BUTTON (button));
@@ -181,8 +175,8 @@ conboy_check_button_set_active                  (ConboyCheckButton *button,
 }
 
 /**
- * conboy_check_button_get_active:
- * @button: A #ConboyCheckButton
+ * he_check_button_get_active:
+ * @button: A #HeCheckButton
  *
  * Gets the current state of @button.
  *
@@ -191,44 +185,44 @@ conboy_check_button_set_active                  (ConboyCheckButton *button,
  * Since: 2.2
  **/
 gboolean
-conboy_check_button_get_active                  (ConboyCheckButton *button)
+he_check_button_get_active                  (HeCheckButton *button)
 {
-    g_return_val_if_fail (CONBOY_IS_CHECK_BUTTON (button), FALSE);
+    g_return_val_if_fail (HE_IS_CHECK_BUTTON (button), FALSE);
 
     return gtk_cell_renderer_toggle_get_active (button->priv->toggle_renderer);
 }
 
 static void
-conboy_check_button_set_arrangement                   (ConboyCheckButton            *button,
-                                                 ConboyCheckButtonArrangement  arrangement);
+he_check_button_set_arrangement                   (HeCheckButton            *button,
+                                                 HeCheckButtonArrangement  arrangement);
 
 static void
-conboy_check_button_construct_child                   (ConboyCheckButton *button);
+he_check_button_construct_child                   (HeCheckButton *button);
 
 static void
-conboy_check_button_set_property                      (GObject      *object,
+he_check_button_set_property                      (GObject      *object,
                                                  guint         prop_id,
                                                  const GValue *value,
                                                  GParamSpec   *pspec)
 {
-    ConboyCheckButton *button = CONBOY_CHECK_BUTTON (object);
+    HeCheckButton *button = HE_CHECK_BUTTON (object);
 
     switch (prop_id)
     {
     case PROP_TITLE:
-        conboy_check_button_set_title (button, g_value_get_string (value));
+        he_check_button_set_title (button, g_value_get_string (value));
         break;
     case PROP_VALUE:
-        conboy_check_button_set_value (button, g_value_get_string (value));
+        he_check_button_set_value (button, g_value_get_string (value));
         break;
     case PROP_SIZE:
         hildon_gtk_widget_set_theme_size (GTK_WIDGET (button), g_value_get_flags (value));
         break;
     case PROP_ARRANGEMENT:
-        conboy_check_button_set_arrangement (button, g_value_get_enum (value));
+        he_check_button_set_arrangement (button, g_value_get_enum (value));
         break;
     case PROP_STYLE:
-        conboy_check_button_set_style (button, g_value_get_enum (value));
+        he_check_button_set_style (button, g_value_get_enum (value));
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -237,23 +231,23 @@ conboy_check_button_set_property                      (GObject      *object,
 }
 
 static void
-conboy_check_button_get_property                      (GObject    *object,
+he_check_button_get_property                      (GObject    *object,
                                                  guint       prop_id,
                                                  GValue     *value,
                                                  GParamSpec *pspec)
 {
-    ConboyCheckButton *button = CONBOY_CHECK_BUTTON (object);
+    HeCheckButton *button = HE_CHECK_BUTTON (object);
 
     switch (prop_id)
     {
     case PROP_TITLE:
-        g_value_set_string (value, conboy_check_button_get_title (button));
+        g_value_set_string (value, he_check_button_get_title (button));
         break;
     case PROP_VALUE:
-        g_value_set_string (value, conboy_check_button_get_value (button));
+        g_value_set_string (value, he_check_button_get_value (button));
         break;
     case PROP_STYLE:
-        g_value_set_enum (value, conboy_check_button_get_style (button));
+        g_value_set_enum (value, he_check_button_get_style (button));
         break;
     default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -264,7 +258,7 @@ conboy_check_button_get_property                      (GObject    *object,
 static void
 set_logical_font                                (GtkWidget *button)
 {
-    ConboyCheckButtonPrivate *priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    HeCheckButtonPrivate *priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
 
     /* In buttons with vertical arrangement, the 'value' label uses a
      * different font */
@@ -287,14 +281,14 @@ set_logical_color                               (GtkWidget *button)
 {
     GdkColor color;
     const gchar *colorname;
-    ConboyCheckButtonPrivate *priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    HeCheckButtonPrivate *priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
     GtkWidget *label = GTK_WIDGET (priv->value);
 
     switch (priv->style) {
-    case CONBOY_CHECK_BUTTON_STYLE_NORMAL:
+    case HE_CHECK_BUTTON_STYLE_NORMAL:
         colorname = "SecondaryTextColor";
         break;
-    case CONBOY_CHECK_BUTTON_STYLE_PICKER:
+    case HE_CHECK_BUTTON_STYLE_PICKER:
         colorname = "ActiveTextColor";
         break;
     default:
@@ -323,13 +317,12 @@ gtk_rc_properties_cmp (gconstpointer bsearch_node1,
     return prop1->type_name < prop2->type_name ? -1 : 1;
 }
 
-
 /*
  * Returns a style property if it exists and if it is a long. If not, 0 is returned.
  * Its a dirty hack. The proper way would be using gtk_style_get() which is only
  * available with Gtk+ >= 2.16
  */
-glong
+static glong
 get_style_property_long                            (GtkStyle    *style,
                                                     GType        widget_type,
                                                     const gchar *property_name)
@@ -366,18 +359,17 @@ get_style_property_long                            (GtkStyle    *style,
 		g_printerr("WARN: get_style_property_long: Property '%s' is not a long\n", property_name);
 		return 0;
 	}
-
 }
 
 static void
-conboy_check_button_style_set                         (GtkWidget *widget,
-                                                       GtkStyle  *previous_style)
+he_check_button_style_set                         (GtkWidget *widget,
+                                                 GtkStyle  *previous_style)
 {
     guint horizontal_spacing, vertical_spacing, image_spacing;
-    ConboyCheckButtonPrivate *priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (widget);
+    HeCheckButtonPrivate *priv = HE_CHECK_BUTTON_GET_PRIVATE (widget);
 
-    if (GTK_WIDGET_CLASS (conboy_check_button_parent_class)->style_set)
-        GTK_WIDGET_CLASS (conboy_check_button_parent_class)->style_set (widget, previous_style);
+    if (GTK_WIDGET_CLASS (he_check_button_parent_class)->style_set)
+        GTK_WIDGET_CLASS (he_check_button_parent_class)->style_set (widget, previous_style);
 
     /* Prevent infinite recursion when calling set_logical_font() and
      * set_logical_color() */
@@ -413,46 +405,46 @@ conboy_check_button_style_set                         (GtkWidget *widget,
 }
 
 static void
-conboy_check_button_finalize                          (GObject *object)
+he_check_button_finalize                          (GObject *object)
 {
-    ConboyCheckButtonPrivate *priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (object);
+    HeCheckButtonPrivate *priv = HE_CHECK_BUTTON_GET_PRIVATE (object);
 
     g_object_unref (priv->alignment);
     g_object_unref (priv->label_box);
 
-    G_OBJECT_CLASS (conboy_check_button_parent_class)->finalize (object);
+    G_OBJECT_CLASS (he_check_button_parent_class)->finalize (object);
 }
 
 static void
-conboy_check_button_clicked                     (GtkButton *button)
+he_check_button_clicked                     (GtkButton *button)
 {
-    ConboyCheckButton *checkbutton = CONBOY_CHECK_BUTTON (button);
-    gboolean current = conboy_check_button_get_active (checkbutton);
+    HeCheckButton *checkbutton = HE_CHECK_BUTTON (button);
+    gboolean current = he_check_button_get_active (checkbutton);
 
     gtk_cell_renderer_toggle_set_active (checkbutton->priv->toggle_renderer, !current);
 
-    conboy_check_button_toggled (checkbutton);
+    he_check_button_toggled (checkbutton);
 }
 
 static void
-conboy_check_button_class_init                        (ConboyCheckButtonClass *klass)
+he_check_button_class_init                        (HeCheckButtonClass *klass)
 {
     GObjectClass *gobject_class = (GObjectClass *)klass;
     GtkWidgetClass *widget_class = (GtkWidgetClass *)klass;
     GtkButtonClass *button_class = (GtkButtonClass *)klass;
 
-    gobject_class->set_property = conboy_check_button_set_property;
-    gobject_class->get_property = conboy_check_button_get_property;
-    gobject_class->finalize = conboy_check_button_finalize;
-    widget_class->style_set = conboy_check_button_style_set;
-    button_class->clicked = conboy_check_button_clicked;
+    gobject_class->set_property = he_check_button_set_property;
+    gobject_class->get_property = he_check_button_get_property;
+    gobject_class->finalize = he_check_button_finalize;
+    widget_class->style_set = he_check_button_style_set;
+    button_class->clicked = he_check_button_clicked;
 
     klass->toggled = NULL;
 
     /**
-     * ConboyCheckButton::toggled
+     * HeCheckButton::toggled
      *
-     * Emitted when the #ConboyCheckButton's state is changed.
+     * Emitted when the #HeCheckButton's state is changed.
      *
      * Since: 2.2
      */
@@ -460,7 +452,7 @@ conboy_check_button_class_init                        (ConboyCheckButtonClass *k
         g_signal_new ("toggled",
                       G_OBJECT_CLASS_TYPE (gobject_class),
                       G_SIGNAL_RUN_FIRST,
-                      G_STRUCT_OFFSET (ConboyCheckButtonClass, toggled),
+                      G_STRUCT_OFFSET (HeCheckButtonClass, toggled),
                       NULL, NULL,
                       g_cclosure_marshal_VOID__VOID,
                       G_TYPE_NONE, 0);
@@ -504,7 +496,7 @@ conboy_check_button_class_init                        (ConboyCheckButtonClass *k
             "Arrangement",
             "How the button contents must be arranged",
             HILDON_TYPE_BUTTON_ARRANGEMENT,
-            CONBOY_CHECK_BUTTON_ARRANGEMENT_HORIZONTAL,
+            HE_CHECK_BUTTON_ARRANGEMENT_HORIZONTAL,
             G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY));
 
     g_object_class_install_property (
@@ -515,7 +507,7 @@ conboy_check_button_class_init                        (ConboyCheckButtonClass *k
             "Style",
             "Visual style of the button",
             HILDON_TYPE_BUTTON_STYLE,
-            CONBOY_CHECK_BUTTON_STYLE_NORMAL,
+            HE_CHECK_BUTTON_STYLE_NORMAL,
             G_PARAM_READWRITE));
 
     gtk_widget_class_install_style_property (
@@ -536,13 +528,13 @@ conboy_check_button_class_init                        (ConboyCheckButtonClass *k
             0, G_MAXUINT, 5,
             G_PARAM_READABLE));
 
-    g_type_class_add_private (klass, sizeof (ConboyCheckButtonPrivate));
+    g_type_class_add_private (klass, sizeof (HeCheckButtonPrivate));
 }
 
 static void
-conboy_check_button_init                              (ConboyCheckButton *self)
+he_check_button_init                              (HeCheckButton *self)
 {
-    ConboyCheckButtonPrivate *priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (self);
+    HeCheckButtonPrivate *priv = HE_CHECK_BUTTON_GET_PRIVATE (self);
 
     /* Store private part */
     self->priv = priv;
@@ -554,7 +546,7 @@ conboy_check_button_init                              (ConboyCheckButton *self)
     priv->cell_view = gtk_cell_view_new ();
     priv->hbox = NULL;
     priv->label_box = NULL;
-    priv->style = CONBOY_CHECK_BUTTON_STYLE_NORMAL;
+    priv->style = HE_CHECK_BUTTON_STYLE_NORMAL;
     priv->setting_style = FALSE;
 
     /* Setup the cell renderer */
@@ -582,14 +574,14 @@ conboy_check_button_init                              (ConboyCheckButton *self)
     gtk_widget_set_name (GTK_WIDGET (priv->title), "hildon-button-title");
     gtk_widget_set_name (GTK_WIDGET (priv->value), "hildon-button-value");
 
-    conboy_check_button_set_style (self, CONBOY_CHECK_BUTTON_STYLE_NORMAL);
+    he_check_button_set_style (self, HE_CHECK_BUTTON_STYLE_NORMAL);
 
     gtk_misc_set_alignment (GTK_MISC (priv->title), 0, 0.5);
     gtk_misc_set_alignment (GTK_MISC (priv->value), 0, 0.5);
 
     g_object_ref_sink (priv->alignment);
 
-    /* The labels are not shown automatically, see conboy_check_button_set_(title|value) */
+    /* The labels are not shown automatically, see he_check_button_set_(title|value) */
     gtk_widget_set_no_show_all (GTK_WIDGET (priv->title), TRUE);
     gtk_widget_set_no_show_all (GTK_WIDGET (priv->value), TRUE);
 
@@ -597,8 +589,8 @@ conboy_check_button_init                              (ConboyCheckButton *self)
 }
 
 /**
- * conboy_check_button_add_title_size_group:
- * @button: a #ConboyCheckButton
+ * he_check_button_add_title_size_group:
+ * @button: a #HeCheckButton
  * @size_group: A #GtkSizeGroup for the button title (main label)
  *
  * Adds the title label of @button to @size_group.
@@ -606,22 +598,22 @@ conboy_check_button_init                              (ConboyCheckButton *self)
  * Since: 2.2
  **/
 void
-conboy_check_button_add_title_size_group              (ConboyCheckButton *button,
+he_check_button_add_title_size_group              (HeCheckButton *button,
                                                  GtkSizeGroup *size_group)
 {
-    ConboyCheckButtonPrivate *priv;
+    HeCheckButtonPrivate *priv;
 
-    g_return_if_fail (CONBOY_IS_CHECK_BUTTON (button));
+    g_return_if_fail (HE_IS_CHECK_BUTTON (button));
     g_return_if_fail (GTK_IS_SIZE_GROUP (size_group));
 
-    priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
 
     gtk_size_group_add_widget (size_group, GTK_WIDGET (priv->title));
 }
 
 /**
- * conboy_check_button_add_value_size_group:
- * @button: a #ConboyCheckButton
+ * he_check_button_add_value_size_group:
+ * @button: a #HeCheckButton
  * @size_group: A #GtkSizeGroup for the button value (secondary label)
  *
  * Adds the value label of @button to @size_group.
@@ -629,22 +621,22 @@ conboy_check_button_add_title_size_group              (ConboyCheckButton *button
  * Since: 2.2
  **/
 void
-conboy_check_button_add_value_size_group              (ConboyCheckButton *button,
+he_check_button_add_value_size_group              (HeCheckButton *button,
                                                  GtkSizeGroup *size_group)
 {
-    ConboyCheckButtonPrivate *priv;
+    HeCheckButtonPrivate *priv;
 
-    g_return_if_fail (CONBOY_IS_CHECK_BUTTON (button));
+    g_return_if_fail (HE_IS_CHECK_BUTTON (button));
     g_return_if_fail (GTK_IS_SIZE_GROUP (size_group));
 
-    priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
 
     gtk_size_group_add_widget (size_group, GTK_WIDGET (priv->value));
 }
 
 /**
- * conboy_check_button_add_size_groups:
- * @button: a #ConboyCheckButton
+ * he_check_button_add_size_groups:
+ * @button: a #HeCheckButton
  * @title_size_group: A #GtkSizeGroup for the button title (main label), or %NULL
  * @value_size_group: A #GtkSizeGroup group for the button value (secondary label), or %NULL
  * @image_size_group: A #GtkSizeGroup group for the button image, or %NULL
@@ -655,67 +647,67 @@ conboy_check_button_add_value_size_group              (ConboyCheckButton *button
  * Since: 2.2
  **/
 void
-conboy_check_button_add_size_groups                   (ConboyCheckButton *button,
+he_check_button_add_size_groups                   (HeCheckButton *button,
                                                  GtkSizeGroup *title_size_group,
                                                  GtkSizeGroup *value_size_group,
                                                  GtkSizeGroup *image_size_group)
 {
     if (title_size_group)
-        conboy_check_button_add_title_size_group (button, title_size_group);
+        he_check_button_add_title_size_group (button, title_size_group);
 
     if (value_size_group)
-        conboy_check_button_add_value_size_group (button, value_size_group);
+        he_check_button_add_value_size_group (button, value_size_group);
 
 }
 
 /**
- * conboy_check_button_new:
+ * he_check_button_new:
  * @size: Flags to set the size of the button.
  * @arrangement: How the labels must be arranged.
  *
- * Creates a new #ConboyCheckButton. To set text in the labels, use
- * conboy_check_button_set_title() and
- * conboy_check_button_set_value(). Alternatively, you can add a custom
+ * Creates a new #HeCheckButton. To set text in the labels, use
+ * he_check_button_set_title() and
+ * he_check_button_set_value(). Alternatively, you can add a custom
  * child widget using gtk_container_add().
  *
- * Returns: a new #ConboyCheckButton
+ * Returns: a new #HeCheckButton
  *
  * Since: 2.2
  **/
 GtkWidget *
-conboy_check_button_new                               (HildonSizeType          size,
-                                                 ConboyCheckButtonArrangement arrangement)
+he_check_button_new                               (HildonSizeType          size,
+                                                 HeCheckButtonArrangement arrangement)
 {
-    return conboy_check_button_new_with_text (size, arrangement, NULL, NULL);
+    return he_check_button_new_with_text (size, arrangement, NULL, NULL);
 }
 
 /**
- * conboy_check_button_new_with_text:
+ * he_check_button_new_with_text:
  * @size: Flags to set the size of the button.
  * @arrangement: How the labels must be arranged.
  * @title: Title of the button (main label), or %NULL
  * @value: Value of the button (secondary label), or %NULL
  *
- * Creates a new #ConboyCheckButton with two labels, @title and @value.
+ * Creates a new #HeCheckButton with two labels, @title and @value.
  *
  * If you just don't want to use one of the labels, set it to
  * %NULL. You can set it to a non-%NULL value at any time later using
- * conboy_check_button_set_title() or conboy_check_button_set_value() .
+ * he_check_button_set_title() or he_check_button_set_value() .
  *
- * Returns: a new #ConboyCheckButton
+ * Returns: a new #HeCheckButton
  *
  * Since: 2.2
  **/
 GtkWidget *
-conboy_check_button_new_with_text                     (HildonSizeType           size,
-                                                 ConboyCheckButtonArrangement  arrangement,
+he_check_button_new_with_text                     (HildonSizeType           size,
+                                                 HeCheckButtonArrangement  arrangement,
                                                  const gchar             *title,
                                                  const gchar             *value)
 {
     GtkWidget *button;
 
     /* Create widget */
-    button = g_object_new (CONBOY_TYPE_CHECK_BUTTON,
+    button = g_object_new (HE_TYPE_CHECK_BUTTON,
                            "size", size,
                            "title", title,
                            "value", value,
@@ -726,15 +718,15 @@ conboy_check_button_new_with_text                     (HildonSizeType           
 }
 
 static void
-conboy_check_button_set_arrangement                   (ConboyCheckButton            *button,
-                                                 ConboyCheckButtonArrangement  arrangement)
+he_check_button_set_arrangement                   (HeCheckButton            *button,
+                                                 HeCheckButtonArrangement  arrangement)
 {
-    ConboyCheckButtonPrivate *priv;
+    HeCheckButtonPrivate *priv;
 
-    priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
 
     /* Pack everything */
-    if (arrangement == CONBOY_CHECK_BUTTON_ARRANGEMENT_VERTICAL) {
+    if (arrangement == HE_CHECK_BUTTON_ARRANGEMENT_VERTICAL) {
         priv->label_box = gtk_vbox_new (FALSE, 0);
         set_logical_font (GTK_WIDGET (button));
     } else {
@@ -749,12 +741,12 @@ conboy_check_button_set_arrangement                   (ConboyCheckButton        
     gtk_box_pack_start (GTK_BOX (priv->label_box), GTK_WIDGET (priv->title), FALSE, FALSE, 0);
     gtk_box_pack_start (GTK_BOX (priv->label_box), GTK_WIDGET (priv->value), TRUE, TRUE, 0);
 
-    conboy_check_button_construct_child (button);
+    he_check_button_construct_child (button);
 }
 
 /**
- * conboy_check_button_set_title:
- * @button: a #ConboyCheckButton
+ * he_check_button_set_title:
+ * @button: a #HeCheckButton
  * @title: a new title (main label) for the button, or %NULL
  *
  * Sets the title (main label) of @button to @title.
@@ -767,20 +759,20 @@ conboy_check_button_set_arrangement                   (ConboyCheckButton        
  * Since: 2.2
  **/
 void
-conboy_check_button_set_title                         (ConboyCheckButton *button,
+he_check_button_set_title                         (HeCheckButton *button,
                                                  const gchar  *title)
 {
-    ConboyCheckButtonPrivate *priv;
+    HeCheckButtonPrivate *priv;
 
-    g_return_if_fail (CONBOY_IS_CHECK_BUTTON (button));
+    g_return_if_fail (HE_IS_CHECK_BUTTON (button));
 
-    priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
     gtk_label_set_text (priv->title, title);
 
     /* If the button has no title, hide the label so the value is
      * properly aligned */
     if (title && title[0] != '\0') {
-        conboy_check_button_construct_child (button);
+        he_check_button_construct_child (button);
         gtk_widget_show (GTK_WIDGET (priv->title));
     } else {
         gtk_widget_hide (GTK_WIDGET (priv->title));
@@ -790,8 +782,8 @@ conboy_check_button_set_title                         (ConboyCheckButton *button
 }
 
 /**
- * conboy_check_button_set_value:
- * @button: a #ConboyCheckButton
+ * he_check_button_set_value:
+ * @button: a #HeCheckButton
  * @value: a new value (secondary label) for the button, or %NULL
  *
  * Sets the value (secondary label) of @button to @value.
@@ -804,20 +796,20 @@ conboy_check_button_set_title                         (ConboyCheckButton *button
  * Since: 2.2
  **/
 void
-conboy_check_button_set_value                         (ConboyCheckButton *button,
+he_check_button_set_value                         (HeCheckButton *button,
                                                  const gchar  *value)
 {
-    ConboyCheckButtonPrivate *priv;
+    HeCheckButtonPrivate *priv;
 
-    g_return_if_fail (CONBOY_IS_CHECK_BUTTON (button));
+    g_return_if_fail (HE_IS_CHECK_BUTTON (button));
 
-    priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
     gtk_label_set_text (priv->value, value);
 
     /* If the button has no value, hide the label so the title is
      * properly aligned */
     if (value && value[0] != '\0') {
-        conboy_check_button_construct_child (button);
+        he_check_button_construct_child (button);
         gtk_widget_show (GTK_WIDGET (priv->value));
     } else {
         gtk_widget_hide (GTK_WIDGET (priv->value));
@@ -827,14 +819,14 @@ conboy_check_button_set_value                         (ConboyCheckButton *button
 }
 
 /**
- * conboy_check_button_get_title:
- * @button: a #ConboyCheckButton
+ * he_check_button_get_title:
+ * @button: a #HeCheckButton
  *
  * Fetches the text from the main label (title) of @button,
- * as set by conboy_check_button_set_title() or conboy_check_button_set_text().
+ * as set by he_check_button_set_title() or he_check_button_set_text().
  * If the label text has not been set the return value will be %NULL.
  * This will be the case if you create an empty button with
- * conboy_check_button_new() to use as a container.
+ * he_check_button_new() to use as a container.
  *
  * Returns: The text of the title label. This string is owned by the
  * widget and must not be modified or freed.
@@ -842,25 +834,25 @@ conboy_check_button_set_value                         (ConboyCheckButton *button
  * Since: 2.2
  **/
 const gchar *
-conboy_check_button_get_title                         (ConboyCheckButton *button)
+he_check_button_get_title                         (HeCheckButton *button)
 {
-    ConboyCheckButtonPrivate *priv;
+    HeCheckButtonPrivate *priv;
 
-    g_return_val_if_fail (CONBOY_IS_CHECK_BUTTON (button), NULL);
+    g_return_val_if_fail (HE_IS_CHECK_BUTTON (button), NULL);
 
-    priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
 
     return gtk_label_get_text (priv->title);
 }
 
 /**
- * conboy_check_button_get_value:
- * @button: a #ConboyCheckButton
+ * he_check_button_get_value:
+ * @button: a #HeCheckButton
  *
  * Fetches the text from the secondary label (value) of @button,
- * as set by conboy_check_button_set_value() or conboy_check_button_set_text().
+ * as set by he_check_button_set_value() or he_check_button_set_text().
  * If the label text has not been set the return value will be %NULL.
- * This will be the case if you create an empty button with conboy_check_button_new()
+ * This will be the case if you create an empty button with he_check_button_new()
  * to use as a container.
  *
  * Returns: The text of the value label. This string is owned by the
@@ -869,39 +861,39 @@ conboy_check_button_get_title                         (ConboyCheckButton *button
  * Since: 2.2
  **/
 const gchar *
-conboy_check_button_get_value                         (ConboyCheckButton *button)
+he_check_button_get_value                         (HeCheckButton *button)
 {
-    ConboyCheckButtonPrivate *priv;
+    HeCheckButtonPrivate *priv;
 
-    g_return_val_if_fail (CONBOY_IS_CHECK_BUTTON (button), NULL);
+    g_return_val_if_fail (HE_IS_CHECK_BUTTON (button), NULL);
 
-    priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
 
     return gtk_label_get_text (priv->value);
 }
 
 /**
- * conboy_check_button_set_text:
- * @button: a #ConboyCheckButton
+ * he_check_button_set_text:
+ * @button: a #HeCheckButton
  * @title: new text for the button title (main label)
  * @value: new text for the button value (secondary label)
  *
- * Convenience function to change both labels of a #ConboyCheckButton
+ * Convenience function to change both labels of a #HeCheckButton
  *
  * Since: 2.2
  **/
 void
-conboy_check_button_set_text                          (ConboyCheckButton *button,
+he_check_button_set_text                          (HeCheckButton *button,
                                                  const gchar  *title,
                                                  const gchar  *value)
 {
-    conboy_check_button_set_title (button, title);
-    conboy_check_button_set_value (button, value);
+    he_check_button_set_title (button, title);
+    he_check_button_set_value (button, value);
 }
 
 /**
- * conboy_check_button_set_alignment:
- * @button: a #ConboyCheckButton
+ * he_check_button_set_alignment:
+ * @button: a #HeCheckButton
  * @xalign: the horizontal alignment of the contents, from 0 (left) to 1 (right).
  * @yalign: the vertical alignment of the contents, from 0 (top) to 1 (bottom).
  * @xscale: the amount that the child widget expands horizontally to fill up unused space, from 0 to 1
@@ -912,25 +904,25 @@ conboy_check_button_set_text                          (ConboyCheckButton *button
  * gtk_button_set_alignment() instead.
  *
  * Note that for this method to work properly, the child widget of
- * @button must be a #GtkAlignment. That's what #ConboyCheckButton uses by
+ * @button must be a #GtkAlignment. That's what #HeCheckButton uses by
  * default, so this function will work unless you add a custom widget
  * to @button.
  *
  * Since: 2.2
  **/
 void
-conboy_check_button_set_alignment                     (ConboyCheckButton *button,
+he_check_button_set_alignment                     (HeCheckButton *button,
                                                  gfloat        xalign,
                                                  gfloat        yalign,
                                                  gfloat        xscale,
                                                  gfloat        yscale)
 {
-    ConboyCheckButtonPrivate *priv;
+    HeCheckButtonPrivate *priv;
     GtkWidget *child;
 
-    g_return_if_fail (CONBOY_IS_CHECK_BUTTON (button));
+    g_return_if_fail (HE_IS_CHECK_BUTTON (button));
 
-    priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
 
     child = gtk_bin_get_child (GTK_BIN (button));
 
@@ -944,80 +936,80 @@ conboy_check_button_set_alignment                     (ConboyCheckButton *button
 }
 
 /**
- * conboy_check_button_set_title_alignment:
- * @button: a #ConboyCheckButton
+ * he_check_button_set_title_alignment:
+ * @button: a #HeCheckButton
  * @xalign: the horizontal alignment of the title label, from 0 (left) to 1 (right).
  * @yalign: the vertical alignment of the title label, from 0 (top) to 1 (bottom).
  *
  * Sets the alignment of the title label. See also
- * conboy_check_button_set_alignment() to set the alignment of the whole
+ * he_check_button_set_alignment() to set the alignment of the whole
  * contents of the button.
  *
  * Since: 2.2
  **/
 void
-conboy_check_button_set_title_alignment               (ConboyCheckButton *button,
+he_check_button_set_title_alignment               (HeCheckButton *button,
                                                  gfloat        xalign,
                                                  gfloat        yalign)
 {
-    ConboyCheckButtonPrivate *priv;
+    HeCheckButtonPrivate *priv;
 
-    g_return_if_fail (CONBOY_IS_CHECK_BUTTON (button));
+    g_return_if_fail (HE_IS_CHECK_BUTTON (button));
 
-    priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
 
     gtk_misc_set_alignment (GTK_MISC (priv->title), xalign, yalign);
 }
 
 /**
- * conboy_check_button_set_value_alignment:
- * @button: a #ConboyCheckButton
+ * he_check_button_set_value_alignment:
+ * @button: a #HeCheckButton
  * @xalign: the horizontal alignment of the value label, from 0 (left) to 1 (right).
  * @yalign: the vertical alignment of the value label, from 0 (top) to 1 (bottom).
  *
  * Sets the alignment of the value label. See also
- * conboy_check_button_set_alignment() to set the alignment of the whole
+ * he_check_button_set_alignment() to set the alignment of the whole
  * contents of the button.
  *
  * Since: 2.2
  **/
 void
-conboy_check_button_set_value_alignment               (ConboyCheckButton *button,
+he_check_button_set_value_alignment               (HeCheckButton *button,
                                                  gfloat        xalign,
                                                  gfloat        yalign)
 {
-    ConboyCheckButtonPrivate *priv;
+    HeCheckButtonPrivate *priv;
 
-    g_return_if_fail (CONBOY_IS_CHECK_BUTTON (button));
+    g_return_if_fail (HE_IS_CHECK_BUTTON (button));
 
-    priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
 
     gtk_misc_set_alignment (GTK_MISC (priv->value), xalign, yalign);
 }
 
 /**
- * conboy_check_button_set_style:
- * @button: A #ConboyCheckButton
- * @style: A #ConboyCheckButtonStyle for @button
+ * he_check_button_set_style:
+ * @button: A #HeCheckButton
+ * @style: A #HeCheckButtonStyle for @button
  *
  * Sets the style of @button to @style. This changes the visual
  * appearance of the button (colors, font sizes) according to the
  * particular style chosen, but the general layout is not altered.
  *
- * Use %CONBOY_CHECK_BUTTON_STYLE_NORMAL to make it look like a normal
- * #ConboyCheckButton, or %CONBOY_CHECK_BUTTON_STYLE_PICKER to make it look like
+ * Use %HE_CHECK_BUTTON_STYLE_NORMAL to make it look like a normal
+ * #HeCheckButton, or %HE_CHECK_BUTTON_STYLE_PICKER to make it look like
  * a #HildonPickerButton.
  *
  * Since: 2.2
  */
 void
-conboy_check_button_set_style                         (ConboyCheckButton      *button,
-                                                 ConboyCheckButtonStyle  style)
+he_check_button_set_style                         (HeCheckButton      *button,
+                                                 HeCheckButtonStyle  style)
 {
-    ConboyCheckButtonPrivate *priv;
+    HeCheckButtonPrivate *priv;
 
-    g_return_if_fail (CONBOY_IS_CHECK_BUTTON (button));
-    priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    g_return_if_fail (HE_IS_CHECK_BUTTON (button));
+    priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
 
     priv->style = style;
     set_logical_color (GTK_WIDGET (button));
@@ -1026,31 +1018,31 @@ conboy_check_button_set_style                         (ConboyCheckButton      *b
 }
 
 /**
- * conboy_check_button_get_style:
- * @button: A #ConboyCheckButton
+ * he_check_button_get_style:
+ * @button: A #HeCheckButton
  *
  * Gets the visual style of the button.
  *
- * Returns: a #ConboyCheckButtonStyle
+ * Returns: a #HeCheckButtonStyle
  *
  * Since: 2.2
  */
-ConboyCheckButtonStyle
-conboy_check_button_get_style                         (ConboyCheckButton *button)
+HeCheckButtonStyle
+he_check_button_get_style                         (HeCheckButton *button)
 {
-    ConboyCheckButtonPrivate *priv;
+    HeCheckButtonPrivate *priv;
 
-    g_return_val_if_fail (CONBOY_IS_CHECK_BUTTON (button), CONBOY_CHECK_BUTTON_STYLE_NORMAL);
+    g_return_val_if_fail (HE_IS_CHECK_BUTTON (button), HE_CHECK_BUTTON_STYLE_NORMAL);
 
-    priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
 
     return priv->style;
 }
 
 static void
-conboy_check_button_construct_child                   (ConboyCheckButton *button)
+he_check_button_construct_child                   (HeCheckButton *button)
 {
-    ConboyCheckButtonPrivate *priv = CONBOY_CHECK_BUTTON_GET_PRIVATE (button);
+    HeCheckButtonPrivate *priv = HE_CHECK_BUTTON_GET_PRIVATE (button);
     GtkWidget *child;
     gint image_spacing;
     const gchar *title, *value;

@@ -55,8 +55,8 @@ conboy_SOURCES = \
         conboy_note_buffer.c \
         conboy_plugin_store.h \
         conboy_plugin_store.c \
-        conboy_check_button.h \
-        conboy_check_button.c \
+        he-check-button.h \
+        he-check-button.c \
         orientation.h \
         orientation.c \
         he-fullscreen-button.h \

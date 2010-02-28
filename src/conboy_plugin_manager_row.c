@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -22,16 +22,16 @@
 
 #include <hildon/hildon-gtk.h>
 
-#include "conboy_check_button.h"
+#include "he-check-button.h"
 #include "conboy_plugin_manager_row.h"
 
 
 G_DEFINE_TYPE(ConboyPluginManagerRow, conboy_plugin_manager_row, GTK_TYPE_HBOX);
 
 static void
-on_main_button_toggled (ConboyCheckButton *button, ConboyPluginManagerRow *self)
+on_main_button_toggled (HeCheckButton *button, ConboyPluginManagerRow *self)
 {
-	if (conboy_check_button_get_active(button)) {
+	if (he_check_button_get_active(button)) {
 		conboy_plugin_info_activate_plugin(self->plugin_info);
 	} else {
 		conboy_plugin_info_deactivate_plugin(self->plugin_info);
@@ -44,10 +44,10 @@ update_row (ConboyPluginInfo *info, ConboyPluginManagerRow *self)
 	g_signal_handlers_block_by_func(self->main_but, on_main_button_toggled, self);
 
 	if (conboy_plugin_info_is_active(info)) {
-		conboy_check_button_set_active(self->main_but, TRUE);
+		he_check_button_set_active(HE_CHECK_BUTTON(self->main_but), TRUE);
 		gtk_widget_set_sensitive(self->conf_but, conboy_plugin_info_is_configurable(info));
 	} else {
-		conboy_check_button_set_active(self->main_but, FALSE);
+		he_check_button_set_active(HE_CHECK_BUTTON(self->main_but), FALSE);
 		gtk_widget_set_sensitive(self->conf_but, FALSE);
 	}
 
@@ -66,7 +66,7 @@ conboy_plugin_manager_row_set_plugin_info (ConboyPluginManagerRow *self, ConboyP
 	/*g_object_ref(info);*/
 	self->plugin_info = info;
 
-	conboy_check_button_set_text(CONBOY_CHECK_BUTTON(self->main_but), info->name, info->desc);
+	he_check_button_set_text(HE_CHECK_BUTTON(self->main_but), info->name, info->desc);
 
 	update_row(info, self);
 
@@ -90,7 +90,7 @@ conboy_plugin_manager_row_get_active (ConboyPluginManagerRow *self)
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(CONBOY_PLUGIN_MANAGER_ROW(self), FALSE);
 
-	return conboy_check_button_get_active(self->main_but);
+	return he_check_button_get_active(HE_CHECK_BUTTON(self->main_but));
 }
 
 void
@@ -100,11 +100,11 @@ conboy_plugin_manager_row_set_active (ConboyPluginManagerRow *self, gboolean act
 	g_return_if_fail(CONBOY_PLUGIN_MANAGER_ROW(self));
 
 	if (active) {
-		conboy_check_button_set_active(self->main_but, TRUE);
+		he_check_button_set_active(HE_CHECK_BUTTON(self->main_but), TRUE);
 		gtk_widget_set_sensitive(self->conf_but, conboy_plugin_info_is_configurable(self->plugin_info));
 
 	} else {
-		conboy_check_button_set_active(self->main_but, FALSE);
+		he_check_button_set_active(HE_CHECK_BUTTON(self->main_but), FALSE);
 		gtk_widget_set_sensitive(self->conf_but, FALSE);
 	}
 }
@@ -222,7 +222,7 @@ conboy_plugin_manager_row_init (ConboyPluginManagerRow *self)
 	gtk_box_set_spacing(GTK_BOX(self), 0);
 
 	/* Main button */
-	GtkWidget *main_but = conboy_check_button_new(HILDON_SIZE_FINGER_HEIGHT, CONBOY_CHECK_BUTTON_ARRANGEMENT_VERTICAL);
+	GtkWidget *main_but = he_check_button_new(HILDON_SIZE_FINGER_HEIGHT, HE_CHECK_BUTTON_ARRANGEMENT_VERTICAL);
 	gtk_widget_show(main_but);
 	gtk_box_pack_start(GTK_BOX(self), main_but, TRUE, TRUE, 0);
 

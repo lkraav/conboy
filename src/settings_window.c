@@ -38,7 +38,6 @@
 #include "settings.h"
 #include "app_data.h"
 #include "conboy_plugin_manager.h"
-#include "conboy_check_button.h"
 #include "ui_helper.h"
 #include "json.h"
 
