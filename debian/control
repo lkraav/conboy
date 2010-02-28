@@ -45,6 +45,18 @@ Description-sv_SV: Conboy är en applikation för att ta anteckningar med
  Den är utformad för att vara lätt att använda - men ändå kraftfull.
  Conboy kan läsa och skriva Tomboys filformat för att vara kompatibel med
  Tomboy på Linux, Mac och Windows.
+Description-hu_HU: A Conboy egy egyszerü de nagyszerű jegyzettömb.
+ Úgy tervezték, hogy könnyen lehessen használni , de mégis sokrétű. A
+ Conboy úgy tudja írni és olvasni a Tomboy fájlformátumot, hogy
+ kompatibilis maradjon a Tomboy Linux, Mac és Windows változatával.
+Description-it_IT: Conboy è un'applicazione per prendere appunti.
+ E' pensato per essere semplice da usare, ma potente. Conboy può
+ leggere e scrivere il formato di memorizzazione di Tomboy per
+ essere compatibile con Tomboy su Linux, Mac e Windows.
+Description-ru_RU: Conboy это приложение для создания заметок
+ Conboy прост в использовании, однако многофункционален.
+ Conboy может читать и редактировать заметки в формате Tomboy,
+ поэтому совместим с Tomboy на Linux, Mac и Windows.
 XB-Maemo-Display-Name: Conboy
 XSBC-Bugtracker: https://bugs.maemo.org/enter_bug.cgi?product=conboy
 XB-Maemo-Icon-26:
@@ -108,3 +120,68 @@ XB-Maemo-Icon-26:
  JIAuIGXtgFDow3ax3wdEevfAehASueDzd7v5JHKBp4JrHzD2AoH9Xz5wBCQL
  yoUCu+B7Dbcv9Rcr/wNmArLWkmPEkQAAAABJRU5ErkJggg==
 
+Package: conboy-midgard
+Architecture: any
+Depends: conboy (>= 0.6.3), libmidgard2-2009, midgard2-common, libgda3-sqlite
+XB-Maemo-Display-Name: Conboy Midgard Plugin
+Description: Conboy plugin to store notes in Midgard content repository.
+XB-Maemo-Icon-26:
+ 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

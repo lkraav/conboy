@@ -4,7 +4,7 @@ AC_INIT(src/main.c)
 AM_CONFIG_HEADER(config.h)
 
 PACKAGE=conboy
-VERSION=0.6.3.1
+VERSION=0.6.3.2
 
 AM_INIT_AUTOMAKE($PACKAGE,$VERSION)
 
@@ -136,7 +136,7 @@ AC_PROG_INTLTOOL([0.23])
 GETTEXT_PACKAGE=conboy
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED( GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Name of gettext package ])
-ALL_LINGUAS="de fr it pt_BR pl fi da nl sk sv ro tr"
+ALL_LINGUAS="de fr it pt_BR pl fi da nl sk sv ro tr hu ru"
 AM_GLIB_GNU_GETTEXT
 AC_SUBST(ALL_LINGUAS)
 AC_SUBST(localedir)
