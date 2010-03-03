@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ G_DEFINE_TYPE(ConboyPluginStore, conboy_plugin_store, G_TYPE_OBJECT);
  * Returns the path set by the environment variable
  * CONBOY_PLUGIN_DIR or if not set, the default path
  * $prefix/lib/conboy
- * 
+ *
  * Return value needs to be freed
  */
 static gchar*
@@ -56,7 +56,7 @@ get_plugin_base_dir()
 /**
  * Returns a GList of all ConboyPluginInfo objects found in the given
  * plugin_base_dir or one level deeper in the directory hierarchy.
- * 
+ *
  * Looks at all files in plugin_base_dir if those are .plugin files,
  * ConboyPluginInfo objects are created. Also all directories of
  * plugin_base_dir are searched.
@@ -68,7 +68,7 @@ create_all_plugin_infos (const gchar *plugin_base_dir)
 	 * for each file with .plugin ending create ConboyPluginInfo
 	 */
 	GList *result = NULL;
-	
+
 	const gchar *filename;
 	GDir *dir = g_dir_open(plugin_base_dir, 0, NULL);
 	while ((filename = g_dir_read_name(dir)) != NULL) {
@@ -88,7 +88,7 @@ create_all_plugin_infos (const gchar *plugin_base_dir)
 				}
 			}
 			g_dir_close(inner_dir);
-			
+
 		/* If it's a file, check if it's a .plugin file */
 		} else if (g_file_test(full_path, G_FILE_TEST_EXISTS)) {
 			if (g_str_has_suffix(full_path, ".plugin")) {
@@ -96,10 +96,10 @@ create_all_plugin_infos (const gchar *plugin_base_dir)
 				result = g_list_prepend(result, info);
 			}
 		}
-		
+
 		g_free(full_path);
 	}
-	
+
 	g_dir_close(dir);
 
 	return result;
@@ -132,8 +132,8 @@ static void
 on_plugin_activated(ConboyPluginInfo *info, ConboyPluginStore *self)
 {
 	/* Add to list of active plugins */
-	settings_add_active_plugin(conboy_plugin_info_get_name(info));
-	
+	settings_add_active_plugin(conboy_plugin_info_get_module_name(info));
+
 	g_signal_emit_by_name(self, "plugin-activated", info);
 }
 
@@ -147,8 +147,8 @@ static void
 on_plugin_deactivated(ConboyPluginInfo *info, ConboyPluginStore *self)
 {
 	/* Remove from list of active plugins */
-	settings_remove_active_plugin(conboy_plugin_info_get_name(info));
-	
+	settings_remove_active_plugin(conboy_plugin_info_get_module_name(info));
+
 	g_signal_emit_by_name(self, "plugin-deactivated", info);
 }
 
@@ -167,7 +167,7 @@ conboy_plugin_store_get_plugin_infos (ConboyPluginStore *self)
 {
 	g_return_val_if_fail(self != NULL, NULL);
 	g_return_val_if_fail(CONBOY_IS_PLUGIN_STORE(self), NULL);
-	
+
 	return self->plugins;
 }
 
@@ -198,9 +198,9 @@ conboy_plugin_store_dispose(GObject *object)
 {
 	g_return_if_fail(object != NULL);
 	g_return_if_fail(CONBOY_IS_PLUGIN_STORE(object));
-	
+
 	ConboyPluginStore *self = CONBOY_PLUGIN_STORE(object);
-	
+
 	/* Deactivate all plugins */
 	GList *plugins = self->plugins;
 	while (plugins) {
@@ -208,7 +208,7 @@ conboy_plugin_store_dispose(GObject *object)
 		conboy_plugin_info_deactivate_plugin(info);
 		plugins = plugins->next;
 	}
-	
+
 	/* Remove signal handlers */
 	plugins = self->plugins;
 	while (plugins) {
@@ -218,7 +218,7 @@ conboy_plugin_store_dispose(GObject *object)
 		 */
 		plugins = plugins->next;
 	}
-	
+
 	/* Remove info objects */
 	plugins = self->plugins;
 	while (plugins) {
@@ -226,7 +226,7 @@ conboy_plugin_store_dispose(GObject *object)
 		g_object_unref(info);
 		plugins = plugins->next;
 	}
-	
+
 	g_list_free(self->plugins);
 
 	G_OBJECT_CLASS(conboy_plugin_store_parent_class)->dispose(object);
@@ -246,14 +246,14 @@ static void
 conboy_plugin_store_class_init (ConboyPluginStoreClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
-	
+
 	object_class->dispose = conboy_plugin_store_dispose;
-	
+
 	klass->plugin_activate		= NULL;
 	klass->plugin_activated 	= NULL;
 	klass->plugin_deactivate	= NULL;
 	klass->plugin_deactivated 	= NULL;
-	
+
 	signals[PLUGIN_ACTIVATE] =
 		g_signal_new(
 				"plugin-activate",
@@ -265,7 +265,7 @@ conboy_plugin_store_class_init (ConboyPluginStoreClass *klass)
 				G_TYPE_NONE,
 				1,
 				CONBOY_TYPE_PLUGIN_INFO);
-	
+
 	signals[PLUGIN_ACTIVATED] =
 		g_signal_new(
 				"plugin-activated",
@@ -277,7 +277,7 @@ conboy_plugin_store_class_init (ConboyPluginStoreClass *klass)
 				G_TYPE_NONE,
 				1,
 				CONBOY_TYPE_PLUGIN_INFO);
-	
+
 	signals[PLUGIN_DEACTIVATE] =
 		g_signal_new(
 				"plugin-deactivate",
@@ -289,7 +289,7 @@ conboy_plugin_store_class_init (ConboyPluginStoreClass *klass)
 				G_TYPE_NONE,
 				1,
 				CONBOY_TYPE_PLUGIN_INFO);
-	
+
 	signals[PLUGIN_DEATIVATED] =
 		g_signal_new(
 				"plugin-deactivated",
@@ -301,27 +301,30 @@ conboy_plugin_store_class_init (ConboyPluginStoreClass *klass)
 				G_TYPE_NONE,
 				1,
 				CONBOY_TYPE_PLUGIN_INFO);
-	
+
 }
 
 static void
 conboy_plugin_store_init (ConboyPluginStore *self)
 {
 	g_return_if_fail(CONBOY_PLUGIN_STORE(self));
-	
+
 	self->plugin_path = get_plugin_base_dir();
 	g_printerr("INFO: Looking for plugins in: %s\n", self->plugin_path);
 
 	self->plugins = create_all_plugin_infos(self->plugin_path);
-	
+
 	/* Activate all plugins that should get activated */
 	GSList *active_plugins = settings_load_active_plugins();
+	if (active_plugins == NULL) {
+		active_plugins = g_slist_append(active_plugins, "storagexml");
+	}
 	while (active_plugins) {
 		gchar *plugin_name = (gchar*) active_plugins->data;
 		conboy_plugin_store_activate_by_name(self, plugin_name);
 		active_plugins = active_plugins->next;
 	}
-	
+
 	/* Connect signal handler */
 	GList *plugin_infos = self->plugins;
 	while (plugin_infos) {

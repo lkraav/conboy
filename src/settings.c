@@ -124,10 +124,6 @@ settings_load_active_plugins()
 {
 	AppData *app_data = app_data_get();
 	GSList *list = gconf_client_get_list(app_data->client, SETTINGS_ACTIVE_PLUGINS, GCONF_VALUE_STRING, NULL);
-	if (list == NULL) {
-		list = g_slist_append(list, "storagexml");
-		settings_save_active_plugins(list);
-	}
 	return list;
 }
 
