@@ -28,6 +28,13 @@ static MidgardConnection *mgd_global = NULL;
 
 G_DEFINE_TYPE(ConboyMidgardStoragePlugin, conboy_midgard_storage_plugin, CONBOY_TYPE_STORAGE_PLUGIN);
 
+static time_t _time_t_from_iso8601 (const gchar *time_string) 
+{
+	struct tm _time;
+  	strptime(time_string, "%Y-%m-%d %H:%M:%S", &_time);
+	return mktime(&_time);
+}
+
 static ConboyNote *
 __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 {
@@ -97,9 +104,9 @@ __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 			"height", height,
 			"x", x,
 			"y", y,
-			"last_change_date", get_iso8601_time_in_seconds (g_value_get_string (&updated_str)),
-        		"last_metadata_change_date", get_iso8601_time_in_seconds (g_value_get_string (&updated_str)),
-        		"create_date", get_iso8601_time_in_seconds (g_value_get_string (&created_str)),
+			"last_change_date", _time_t_from_iso8601 (g_value_get_string (&updated_str)),
+        		"last_metadata_change_date", _time_t_from_iso8601 (g_value_get_string (&updated_str)),
+        		"create_date", _time_t_from_iso8601 (g_value_get_string (&created_str)),
 			NULL);
 
 	g_free (guid);
