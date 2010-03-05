@@ -43,19 +43,42 @@
 #include <config.h>
 #endif
 
-#define HILDON_HAS_APP_MENU
-
 #ifdef HILDON_HAS_APP_MENU
 
 #include <gtk/gtk.h>
+#include <hildon/hildon.h>
+#include <string.h>
 #include "he-fullscreen-button.h"
 
 #define FULLSCREEN_BUTTON_WIDTH          80
 #define FULLSCREEN_BUTTON_HEIGHT         70
 #define FULLSCREEN_BUTTON_HIDE_DELAY	 5000
 #define FULLSCREEN_BUTTON_CORNER_RADIUS  20
+#define FULLSCREEN_BUTTON_ICON           "general_fullsize"
+#define FULLSCREEN_BUTTON_ICON_SIZE      48
 #define OFFSET 0
 
+typedef struct				_HeFullscreenButtonPrivate HeFullscreenButtonPrivate;
+
+struct _HeFullscreenButtonPrivate
+{
+        gboolean     release_event;
+        guint32      last_event_time;
+
+        guint        button_press_signal_id;
+        guint        button_release_signal_id;
+
+        gulong       button_press_hook_id;
+        gulong       button_release_hook_id;
+
+        gboolean     act_on_state_change;
+
+        GtkWidget   *overlay;
+};
+
+#define						HE_FULLSCREEN_BUTTON_GET_PRIVATE(object) \
+							(G_TYPE_INSTANCE_GET_PRIVATE((object), \
+							HE_TYPE_FULLSCREEN_BUTTON, HeFullscreenButtonPrivate))
 
 G_DEFINE_TYPE(HeFullscreenButton, he_fullscreen_button, G_TYPE_OBJECT)
 
@@ -68,11 +91,14 @@ fullscreen_button_hide (HeFullscreenButton *self)
 {
     g_return_if_fail (HE_IS_FULLSCREEN_BUTTON (self));
 
+    HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+    g_return_if_fail (priv != NULL);
+
     /* Reset timer */
     g_source_remove_by_user_data ((gpointer) self);
 
-    if (self->overlay != NULL && GTK_IS_WIDGET (self->overlay)) {
-    	gtk_widget_hide (self->overlay);
+    if (priv->overlay != NULL && GTK_IS_WIDGET (priv->overlay)) {
+    	gtk_widget_hide (priv->overlay);
     }
 }
 
@@ -84,7 +110,12 @@ static void
 fullscreen_button_set_position (HeFullscreenButton *self)
 {
 	GtkWidget *parent = GTK_WIDGET (self->parent_window);
-	GtkWidget *overlay = GTK_WIDGET (self->overlay);
+	GtkWidget *overlay = NULL;
+
+	HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+	g_return_if_fail (priv != NULL);
+
+	overlay = GTK_WIDGET (priv->overlay);
 
 	/* For some reason I have to call hide/show to make it appear at the new position */
 	gint x = parent->allocation.width - overlay->allocation.width;
@@ -115,16 +146,20 @@ static void
 fullscreen_button_show (HeFullscreenButton *self)
 {
     g_return_if_fail (self != NULL);
-    g_return_if_fail (GTK_IS_WIDGET (self->overlay));
+
+    HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+    g_return_if_fail (priv != NULL);
+
+    g_return_if_fail (GTK_IS_WIDGET (priv->overlay));
 
     /* Stop return button hide timeout */
     g_source_remove_by_user_data ((gpointer) self);
 
     /* Only show overlay if we come here through a button release event, not a button press event */
-    if (self->release_event) {
+    if (priv->release_event) {
 
     	fullscreen_button_set_position (self);
-    	gtk_widget_show (self->overlay);
+    	gtk_widget_show (priv->overlay);
 
         /* Set the return button hide timeout */
         g_timeout_add (FULLSCREEN_BUTTON_HIDE_DELAY,
@@ -138,13 +173,16 @@ fullscreen_button_show (HeFullscreenButton *self)
  * button release on the parent window.
  */
 static gboolean
-fullscreen_button_input_activity_hook (GSignalInvocationHint *ihint,
+fullscreen_button_input_activity_hook (GSignalInvocationHint *ihint G_GNUC_UNUSED,
                                        guint n_param_values,
                                        const GValue *param_values,
                                        gpointer data)
 {
     HeFullscreenButton *self = HE_FULLSCREEN_BUTTON (data);
     g_return_val_if_fail (self, FALSE);
+
+    HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+    g_return_val_if_fail (priv != NULL, FALSE);
 
     GdkEventAny *event = NULL;
 
@@ -170,15 +208,15 @@ fullscreen_button_input_activity_hook (GSignalInvocationHint *ihint,
 
     /* We're likely to get events multiple times as they're propagated, so
        filter out events that we've already seen. */
-    if (time == self->last_event_time) {
+    if (time == priv->last_event_time) {
         return TRUE;
     }
-    self->last_event_time = time;
+    priv->last_event_time = time;
 
     if (event && (event->type == GDK_BUTTON_PRESS)) {
-        self->release_event = FALSE;
+        priv->release_event = FALSE;
     } else {
-        self->release_event = TRUE;
+        priv->release_event = TRUE;
     }
 
     fullscreen_button_show (self);
@@ -191,26 +229,35 @@ fullscreen_button_input_activity_hook (GSignalInvocationHint *ihint,
  * This function makes the full screen button visible and hooks mouse and
  * key event signal emissions. The button is hidden after some time and
  * is reshown when ever one of the signal hooks are activated.
+ *
+ * Note: The button may be shown automatically by itself
+ * if you have not set the act_on_state_change property to
+ * FALSE.
+ *
+ * @param self A HeFullscreenButton instance.
  */
-static void
-fullscreen_button_enable (HeFullscreenButton *self)
+void
+he_fullscreen_button_enable (HeFullscreenButton *self)
 {
     g_return_if_fail(HE_IS_FULLSCREEN_BUTTON(self));
 
-    if (self->button_press_hook_id == 0) {
-        self->button_press_signal_id =
+    HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+    g_return_if_fail (priv != NULL);
+
+    if (priv->button_press_hook_id == 0) {
+        priv->button_press_signal_id =
         	g_signal_lookup ("button-press-event", GTK_TYPE_WIDGET);
-        self->button_press_hook_id =
-            g_signal_add_emission_hook (self->button_press_signal_id, 0,
+        priv->button_press_hook_id =
+            g_signal_add_emission_hook (priv->button_press_signal_id, 0,
             		fullscreen_button_input_activity_hook,
             		(gpointer) self, NULL);
     }
 
-    if (self->button_release_hook_id == 0) {
-        self->button_release_signal_id =
+    if (priv->button_release_hook_id == 0) {
+        priv->button_release_signal_id =
         	g_signal_lookup ("button-release-event", GTK_TYPE_WIDGET);
-        self->button_release_hook_id =
-            g_signal_add_emission_hook (self->button_release_signal_id, 0,
+        priv->button_release_hook_id =
+            g_signal_add_emission_hook (priv->button_release_signal_id, 0,
             		fullscreen_button_input_activity_hook,
             		(gpointer) self, NULL);
     }
@@ -222,24 +269,33 @@ fullscreen_button_enable (HeFullscreenButton *self)
 /**
  * Hides the full screen button and releases mouse and
  * key event signal emission hooks.
+ *
+ * Note: The button may be hidden automatically by itself
+ * if you have not set the act_on_state_change property to
+ * FALSE.
+ *
+ * @param self A HeFullscreenButton instance.
  */
-static void
-fullscreen_button_disable (HeFullscreenButton *self)
+void
+he_fullscreen_button_disable (HeFullscreenButton *self)
 {
     g_return_if_fail (HE_IS_FULLSCREEN_BUTTON (self));
 
+    HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+    g_return_if_fail (priv != NULL);
+
     fullscreen_button_hide (self);
 
-    if (self->button_release_hook_id > 0) {
-        g_signal_remove_emission_hook (self->button_release_signal_id,
-                                       self->button_release_hook_id);
-        self->button_release_hook_id = 0;
+    if (priv->button_release_hook_id > 0) {
+        g_signal_remove_emission_hook (priv->button_release_signal_id,
+                                       priv->button_release_hook_id);
+        priv->button_release_hook_id = 0;
     }
 
-    if (self->button_press_hook_id > 0) {
-        g_signal_remove_emission_hook (self->button_press_signal_id,
-                                       self->button_press_hook_id);
-        self->button_press_hook_id = 0;
+    if (priv->button_press_hook_id > 0) {
+        g_signal_remove_emission_hook (priv->button_press_signal_id,
+                                       priv->button_press_hook_id);
+        priv->button_press_hook_id = 0;
     }
 }
 
@@ -248,7 +304,7 @@ fullscreen_button_disable (HeFullscreenButton *self)
  * Everytime the button is clicked, be emmit the "clicked" signal.
  */
 static gboolean
-fullscreen_button_on_clicked (GtkWidget *widget, GdkEventButton *event, gpointer data)
+fullscreen_button_on_clicked (GtkWidget *widget, GdkEventButton *event G_GNUC_UNUSED, gpointer data)
 {
 	HeFullscreenButton *self = HE_FULLSCREEN_BUTTON (data);
 	g_signal_emit_by_name (self, "clicked");
@@ -278,7 +334,7 @@ fullscreen_button_create_rectangle (cairo_t *ctx, double x, double y, double w, 
  * Does the actuall drawing of the semi transparent button graphic.
  */
 static gboolean
-fullscreen_button_on_expose_event (GtkWidget *widget, GdkEventExpose *event, gpointer data)
+fullscreen_button_on_expose_event (GtkWidget *widget, GdkEventExpose *event G_GNUC_UNUSED, gpointer data)
 {
     cairo_t *ctx;
     GdkPixbuf *pixbuf = GDK_PIXBUF (data);
@@ -314,7 +370,7 @@ fullscreen_button_create_gfx (HeFullscreenButton *self)
 {
     g_return_val_if_fail(HE_IS_FULLSCREEN_BUTTON(self), NULL);
 
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file ("/usr/share/icons/hicolor/48x48/hildon/general_fullsize.png", NULL);
+    GdkPixbuf *pixbuf = gtk_icon_theme_load_icon (gtk_icon_theme_get_default (), FULLSCREEN_BUTTON_ICON, FULLSCREEN_BUTTON_ICON_SIZE, 0, NULL);
     GtkWidget *img = gtk_image_new_from_pixbuf (pixbuf);
     gtk_widget_show (img);
     g_object_unref (pixbuf);
@@ -343,23 +399,70 @@ fullscreen_button_create_gfx (HeFullscreenButton *self)
 }
 
 /**
+ * Called when the parent_window's is on the screen/not on the screen.
+ * Only called if parent_window is a HildonWindow (or derived from it).
+ *
+ * We check if the window is on the screen or not on the screen.
+ * If it is, and the window is in fullscreen mode, we enable the fullscreen button. If not, we disable the button.
+ */
+static void
+fullscreen_button_on_is_topmost_changed (GObject *object G_GNUC_UNUSED,
+		                                 GParamSpec *property G_GNUC_UNUSED,
+		                                 gpointer data)
+{
+	HeFullscreenButton *self = HE_FULLSCREEN_BUTTON (data);
+
+	HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+	g_return_if_fail (priv != NULL);
+
+	/* Only run if the "act-on-state-change" property is TRUE. */
+	if (!priv->act_on_state_change) {
+		return;
+	}
+
+	if (hildon_window_get_is_topmost (HILDON_WINDOW(self->parent_window))) {
+		if (gdk_window_get_state (GTK_WIDGET (self->parent_window)->window) & GDK_WINDOW_STATE_FULLSCREEN) {
+			he_fullscreen_button_enable (self);
+		}
+	}
+	else {
+		he_fullscreen_button_disable (self);
+	}
+}
+
+/**
  * Called, whenever the state of the parents window's GdkWindow changes.
  * We check if the new state is fullscreen or non-fullscreen.
  * If it is fullscreen, we enable the fullscreen button. If not, not.
  */
 static gboolean
-fullscreen_button_on_window_state_changed (GtkWidget *widget,
+fullscreen_button_on_window_state_changed (GtkWidget *widget G_GNUC_UNUSED,
 		                                   GdkEventWindowState *event,
 		                                   gpointer data)
 {
 	HeFullscreenButton *self = HE_FULLSCREEN_BUTTON (data);
 
+	HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+	g_return_val_if_fail (priv != NULL, FALSE);
+
+	/* Only run if the "act-on-state-change" property is TRUE. */
+	if (!priv->act_on_state_change) {
+		return FALSE;
+	}
+
+	/* Only run if this window is topmost. */
+	if (HILDON_IS_WINDOW (self->parent_window)) {
+		if (!hildon_window_get_is_topmost (HILDON_WINDOW(self->parent_window))) {
+			return FALSE;
+		}
+	}
+
 	if (event->changed_mask & GDK_WINDOW_STATE_FULLSCREEN) {
 
 		if (event->new_window_state == GDK_WINDOW_STATE_FULLSCREEN) {
-			fullscreen_button_enable (self);
+			he_fullscreen_button_enable (self);
 		} else {
-			fullscreen_button_disable (self);
+			he_fullscreen_button_disable (self);
 		}
 
 	}
@@ -372,20 +475,26 @@ fullscreen_button_on_window_state_changed (GtkWidget *widget,
  * Destroys the fullscreen button and disconnects itself from the parent window.
  */
 static void
-fullscreen_button_destroy (GtkWidget *parent_window, HeFullscreenButton *self)
+fullscreen_button_destroy (GtkWidget *parent_window G_GNUC_UNUSED, HeFullscreenButton *self)
 {
 	g_return_if_fail (self != NULL);
 
-    if (self->parent_window != NULL) {
-        g_signal_handlers_disconnect_by_func (self->parent_window, fullscreen_button_destroy, self);
-        g_signal_handlers_disconnect_by_func (self->parent_window, fullscreen_button_on_window_state_changed, self);
-    }
+	HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+	g_return_if_fail (priv != NULL);
 
-    fullscreen_button_disable (self);
+	if (self->parent_window != NULL) {
+		g_signal_handlers_disconnect_by_func (self->parent_window, fullscreen_button_destroy, self);
+		g_signal_handlers_disconnect_by_func (self->parent_window, fullscreen_button_on_window_state_changed, self);
+		if (HILDON_IS_WINDOW(parent_window)) {
+			g_signal_handlers_disconnect_by_func (self->parent_window, fullscreen_button_on_is_topmost_changed, self);
+		}
+	}
 
-    if (self->overlay != NULL && GTK_IS_WIDGET(self->overlay)) {
-		gtk_widget_destroy (GTK_WIDGET(self->overlay));
-		self->overlay = NULL;
+	he_fullscreen_button_disable (self);
+
+	if (priv->overlay != NULL && GTK_IS_WIDGET(priv->overlay)) {
+		gtk_widget_destroy (GTK_WIDGET(priv->overlay));
+		priv->overlay = NULL;
 	}
 }
 
@@ -406,10 +515,13 @@ fullscreen_button_on_parent_size_changed (GtkWidget     *widget,
     HeFullscreenButton *self = HE_FULLSCREEN_BUTTON(user_data);
     g_return_if_fail (self != NULL);
 
-    GtkWidget *ui_win = GTK_WIDGET(self->overlay);
+    HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+    g_return_if_fail (priv != NULL);
+
+    GtkWidget *ui_win = GTK_WIDGET(priv->overlay);
     g_return_if_fail (ui_win != NULL);
 
-    if (gdk_window_is_visible(self->overlay->window)) {
+    if (gdk_window_is_visible(priv->overlay->window)) {
     	fullscreen_button_set_position(self);
     }
 }
@@ -433,15 +545,18 @@ fullscreen_button_clicked_default_handler (HeFullscreenButton *self)
 	}
 }
 
-
 /**
  * Create new full screen button instance.
  * This function attaches the full screen button to the given parent window.
- * Because of the button automatically gets visible if the parent window
- * changes to fullscreen.
+ * By default, the button automatically becomes visible if the parent window
+ * changes to fullscreen and vice versa. Change the "act-on-state-change"
+ * property to modify this behaviour.
  *
  * If you destroy the parent window, this HeFullscreenButton instance get
  * destroyed as well.
+ *
+ * Pass it a HildonWindow (or one of its deriatives) to ensure the widget disables/
+ * enables itself on focus-out/focus-in respectively.
  *
  * @param parent_window A GtkWindow instance.
  * @return New HeFullscreenButton instance.
@@ -454,8 +569,11 @@ he_fullscreen_button_new (GtkWindow *parent_window)
 
     HeFullscreenButton *self = g_object_new (HE_TYPE_FULLSCREEN_BUTTON, NULL);
 
+    HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+    g_return_val_if_fail (priv != NULL, NULL);
+
     self->parent_window = parent_window;
-    self->overlay = fullscreen_button_create_gfx (self);
+    priv->overlay = fullscreen_button_create_gfx (self);
 
     g_signal_connect (parent_window, "destroy",
     		G_CALLBACK(fullscreen_button_destroy), self);
@@ -466,9 +584,28 @@ he_fullscreen_button_new (GtkWindow *parent_window)
     g_signal_connect_after (parent_window, "size-allocate",
     		G_CALLBACK(fullscreen_button_on_parent_size_changed), self);
 
+    if (HILDON_IS_WINDOW(parent_window)) {
+        g_signal_connect (parent_window, "notify::is-topmost",
+            G_CALLBACK(fullscreen_button_on_is_topmost_changed), self);
+    }
+
     return self;
 }
 
+/**
+ * Returns the GtkWidget displaying the actual overlaid button.
+ *
+ * @param self An instance of HeFullscreenButton
+ * @return The GtkWidget of the overlaid button. This widget belongs to HeFullscreenButton and must not be destroyed or modified.
+ */
+GtkWidget *
+he_fullscreen_button_get_overlay (HeFullscreenButton *self)
+{
+    HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+    g_return_val_if_fail (priv != NULL, NULL);
+
+    return priv->overlay;
+}
 
 /**
  * Returns the GtkWindow that this HeFullscreenButton
@@ -495,9 +632,67 @@ enum {
 
 static guint signals[LAST_SIGNAL] = {0};
 
+enum {
+    PROP_0,
+    PROP_ACT_ON_STATE_CHANGE
+};
+
+static void
+fullscreen_button_get_property (GObject *object,
+                                guint property_id,
+                                GValue *value,
+                                GParamSpec * pspec)
+{
+    HeFullscreenButton *self = HE_FULLSCREEN_BUTTON (object);
+    g_return_if_fail (self);
+
+    HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+    g_return_if_fail (priv != NULL);
+
+    switch (property_id) {
+        case PROP_ACT_ON_STATE_CHANGE:
+            g_value_set_boolean (value, priv->act_on_state_change);
+            break;
+
+        default:
+            G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
+            break;
+    }
+}
+
+static void
+fullscreen_button_set_property (GObject *object,
+                                guint property_id,
+                                const GValue *value,
+                                GParamSpec * pspec)
+{
+    HeFullscreenButton *self = HE_FULLSCREEN_BUTTON (object);
+    g_return_if_fail (self);
+
+    HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+    g_return_if_fail (priv != NULL);
+
+    switch (property_id) {
+        case PROP_ACT_ON_STATE_CHANGE:
+            priv->act_on_state_change = g_value_get_boolean (value);
+            g_object_notify (G_OBJECT (object), "act-on-state-change");
+            break;
+
+        default:
+            G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
+            break;
+    }
+}
+
+
 static void
 he_fullscreen_button_class_init (HeFullscreenButtonClass *klass)
 {
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+	object_class->get_property = fullscreen_button_get_property;
+	object_class->set_property = fullscreen_button_set_property;
+
 	klass->clicked = fullscreen_button_clicked_default_handler;
 
 	/**
@@ -515,6 +710,18 @@ he_fullscreen_button_class_init (HeFullscreenButtonClass *klass)
 				g_cclosure_marshal_VOID__VOID,
 				G_TYPE_NONE,
 				0);
+
+	g_object_class_install_property(
+				object_class, PROP_ACT_ON_STATE_CHANGE,
+				g_param_spec_boolean ("act-on-state-change",
+				"Act on window state changes",
+				"Whether to automatically enable/disable the button "
+				"when its parent window fullscreens/unfullscreens "
+				"itself.",
+				TRUE,
+				G_PARAM_READWRITE));
+
+	g_type_class_add_private (klass, sizeof (HeFullscreenButtonPrivate));
 }
 
 
@@ -523,16 +730,23 @@ he_fullscreen_button_init (HeFullscreenButton *self)
 {
     g_return_if_fail (self != NULL);
 
+    HeFullscreenButtonPrivate *priv = HE_FULLSCREEN_BUTTON_GET_PRIVATE (self);
+    g_return_if_fail (priv != NULL);
+
+    memset (priv, 0, sizeof (HeFullscreenButtonPrivate));
+
     self->parent_window = NULL;
-    self->overlay = NULL;
-    self->release_event = TRUE;
-    self->last_event_time = 0;
+    priv->overlay = NULL;
+    priv->release_event = TRUE;
+    priv->last_event_time = 0;
 
-    self->button_press_signal_id = 0;
-    self->button_release_signal_id = 0;
+    priv->act_on_state_change = TRUE;
 
-    self->button_press_hook_id = 0;
-	self->button_release_hook_id = 0;
+    priv->button_press_signal_id = 0;
+    priv->button_release_signal_id = 0;
+
+    priv->button_press_hook_id = 0;
+    priv->button_release_hook_id = 0;
 }
 
 #endif /* HILDON_HAS_APP_MENU */

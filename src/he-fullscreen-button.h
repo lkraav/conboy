@@ -18,6 +18,8 @@
 
 #include <gtk/gtk.h>
 
+G_BEGIN_DECLS
+
 #define						HE_TYPE_FULLSCREEN_BUTTON \
 							(he_fullscreen_button_get_type())
 
@@ -51,24 +53,11 @@ struct _HeFullscreenButton
         GObject      parent;
 
         GtkWindow   *parent_window;
-        GtkWidget   *overlay;
-
-        gboolean     release_event;
-        guint32      last_event_time;
-
-        guint        button_press_signal_id;
-        guint        button_release_signal_id;
-
-        gulong       button_press_hook_id;
-        gulong       button_release_hook_id;
 };
 
 struct _HeFullscreenButtonClass
 {
         GObjectClass parent_class;
-
-        guint        signal_id_fullscreen_mode_enabled;
-        guint        signal_id_fullscreen_mode_disabled;
 
         void (*clicked) (HeFullscreenButton *manager);
 };
@@ -80,8 +69,18 @@ he_fullscreen_button_get_type (void);
 HeFullscreenButton *
 he_fullscreen_button_new (GtkWindow *window);
 
-GtkWindow *
-he_fullscreen_button_get_window (HeFullscreenButton *manager);
+void
+he_fullscreen_button_disable (HeFullscreenButton *self);
 
+void
+he_fullscreen_button_enable (HeFullscreenButton *self);
+
+GtkWidget *
+he_fullscreen_button_get_overlay (HeFullscreenButton *self);
+
+GtkWindow *
+he_fullscreen_button_get_window (HeFullscreenButton *self);
+
+G_END_DECLS
 
 #endif /* _HE_FULLSCREEN_BUTTON_ */
