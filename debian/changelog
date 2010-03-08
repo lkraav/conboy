@@ -1,3 +1,12 @@
+conboy (1:0.6.3.3) stable; urgency=low
+
+  * Added about dialog
+  * Updated to the latest version of HeFullscreenButton
+  * Improved editing of lists
+  * Applied datetime patch for the midgard plug-in (Piotras)
+  
+ -- Cornelius Hald <hald@icandy.de>  Mo, 08 Mar 2010 15:12:12 +0200
+
 conboy (1:0.6.3.2) stable; urgency=low
 
   * Depending on new version of json library, which should fix some sync issues.
