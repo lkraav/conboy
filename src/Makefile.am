@@ -68,7 +68,9 @@ conboy_SOURCES = \
         gregex.h \
         gregex.c \
         conboy_xml.h \
-        conboy_xml.c
+        conboy_xml.c \
+        he-about-dialog.h \
+        he-about-dialog.c
         
 # LDADD
 conboy_LDADD = \

@@ -25,6 +25,7 @@
 #include <hildon/hildon-program.h>
 #ifdef HILDON_HAS_APP_MENU
 #include <hildon/hildon-pannable-area.h>
+#include <he-about-dialog.h>
 #endif
 #include <hildon/hildon-banner.h>
 #include <hildon/hildon-defines.h>
@@ -432,56 +433,6 @@ disable_bullets(GtkTextBuffer *buffer)
 	}
 }
 
-void
-on_bullets_button_clicked				(GtkAction		*action,
-										 gpointer		 user_data)
-{
-	UserInterface *ui = (UserInterface*)user_data;
-	GtkTextBuffer *buffer = ui->buffer;
-
-	if (gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action))) {
-		/* The button just became active, so we should enable the formatting */
-		enable_bullets(buffer);
-	} else {
-		/* The button just became deactive, so we should remove the formatting */
-		disable_bullets(buffer);
-	}
-
-}
-
-void
-on_link_button_clicked				   (GtkAction		*action,
-										gpointer		 user_data)
-{
-	UserInterface *ui = (UserInterface*)user_data;
-	GtkTextBuffer *buffer = ui->buffer;
-	GtkTextIter start, end;
-	const gchar *text;
-
-	if (!gtk_text_buffer_get_has_selection(buffer)) {
-		return;
-	}
-
-	gtk_text_buffer_get_selection_bounds(buffer, &start, &end);
-	text = gtk_text_iter_get_text(&start, &end);
-	gtk_text_buffer_apply_tag_by_name(buffer, "link:internal", &start, &end);
-
-	/* Make it save */
-	gtk_text_buffer_set_modified(buffer, TRUE);
-
-	note_show_by_title(text);
-}
-
-void
-on_notes_button_clicked				   (GtkAction		*action,
-										gpointer		 user_data) {
-
-	AppData *app_data = app_data_get();
-	g_return_if_fail(app_data->note_store != NULL);
-
-	search_window_open();
-}
-
 static void
 update_button_states(UserInterface *ui)
 {
@@ -495,6 +446,7 @@ update_button_states(UserInterface *ui)
 	g_signal_handlers_block_by_func(ui->action_fixed, on_format_button_clicked, ui);
 	g_signal_handlers_block_by_func(ui->action_bullets, on_bullets_button_clicked, ui);
 	g_signal_handlers_block_by_func(ui->action_font_small, on_font_size_radio_group_changed, ui);
+	g_signal_handlers_block_by_func(ui->action_dec_indent, on_dec_indent_button_clicked, ui);
 
 
 
@@ -550,6 +502,7 @@ update_button_states(UserInterface *ui)
 	g_signal_handlers_unblock_by_func(ui->action_fixed, on_format_button_clicked, ui);
 	g_signal_handlers_unblock_by_func(ui->action_bullets, on_bullets_button_clicked, ui);
 	g_signal_handlers_unblock_by_func(ui->action_font_small, on_font_size_radio_group_changed, ui);
+	g_signal_handlers_unblock_by_func(ui->action_dec_indent, on_dec_indent_button_clicked, ui);
 }
 
 static void
@@ -573,6 +526,61 @@ update_active_tags(GtkTextBuffer *buffer, GtkTextIter *location)
 		conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(buffer), "list");
 	}
 }
+
+void
+on_bullets_button_clicked				(GtkAction		*action,
+										 gpointer		 user_data)
+{
+	UserInterface *ui = (UserInterface*)user_data;
+	GtkTextBuffer *buffer = ui->buffer;
+
+	if (gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action))) {
+		/* The button just became active, so we should enable the formatting */
+		enable_bullets(buffer);
+		gtk_action_set_sensitive(ui->action_dec_indent, TRUE);
+	} else {
+		/* The button just became deactive, so we should remove the formatting */
+		disable_bullets(buffer);
+		gtk_action_set_sensitive(ui->action_dec_indent, FALSE);
+	}
+}
+
+void
+on_link_button_clicked				   (GtkAction		*action,
+										gpointer		 user_data)
+{
+	UserInterface *ui = (UserInterface*)user_data;
+	GtkTextBuffer *buffer = ui->buffer;
+	GtkTextIter start, end;
+	const gchar *text;
+
+	if (!gtk_text_buffer_get_has_selection(buffer)) {
+		return;
+	}
+
+	gtk_text_buffer_get_selection_bounds(buffer, &start, &end);
+	text = gtk_text_iter_get_text(&start, &end);
+	gtk_text_buffer_apply_tag_by_name(buffer, "link:internal", &start, &end);
+
+	/* Make it save */
+	gtk_text_buffer_set_modified(buffer, TRUE);
+
+	note_show_by_title(text);
+}
+
+void
+on_notes_button_clicked				   (GtkAction		*action,
+										gpointer		 user_data) {
+
+	AppData *app_data = app_data_get();
+	g_return_if_fail(app_data->note_store != NULL);
+
+	search_window_open();
+}
+
+
+
+
 
 /* TODO: The signal "mark-set" is emitted 4 times when clicking into the text. While selecting
  * it's emitted continuesly. */
@@ -1028,13 +1036,17 @@ static gboolean add_new_line(UserInterface *ui)
 			/* Delete the bullet and the last newline */
 			gtk_text_iter_set_line_offset(&start, 0);
 			gtk_text_iter_backward_char(&start);
+			gtk_text_iter_forward_char(&iter); /* Also remove tag on comming linebreak */
 			gtk_text_buffer_remove_all_tags(buffer, &start, &iter);
+			gtk_text_iter_backward_char(&iter);
 			gtk_text_buffer_delete(buffer, &start, &iter);
 
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 
 			/* Disable the bullet button */
-			on_textview_cursor_moved(buffer, &iter, gtk_text_buffer_get_insert(buffer) ,ui);
+			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+			update_active_tags(buffer, &iter);
+			update_button_states(ui);
 
 			return TRUE;
 		}
@@ -1097,22 +1109,6 @@ static gboolean add_new_line(UserInterface *ui)
 
 }
 
-gboolean
-on_text_view_key_pressed                      (GtkWidget   *widget,
-                                               GdkEventKey *event,
-                                               gpointer     user_data)
-{
-	UserInterface *ui = (UserInterface*)user_data;
-
-	switch (event->keyval) {
-		case GDK_Return:
-		case GDK_KP_Enter:
-			return add_new_line(ui);
-		default:
-			return FALSE;
-	}
-
-}
 
 static void
 apply_active_tags(GtkTextBuffer *buffer, GtkTextIter *iter, const gchar *input, UserInterface *ui)
@@ -1146,7 +1142,7 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 {
 	UserInterface *ui = (UserInterface*)user_data;
 	GtkTextIter start_iter, end_iter;
-	GTimer *timer;
+	/*GTimer *timer;*/
 	gulong micro;
 
 	/* Don't do anything when in the title line */
@@ -1159,7 +1155,7 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 
 	apply_active_tags(buffer, iter, text, ui);
 
-	timer = g_timer_new();
+	/*timer = g_timer_new();*/
 
 	start_iter = *iter;
 	end_iter = *iter;
@@ -1171,10 +1167,12 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 
 	auto_highlight_urls(ui, &start_iter, &end_iter);
 
+	/*
 	g_timer_stop(timer);
 	g_timer_elapsed(timer, &micro);
 	g_timer_destroy(timer);
 	g_printerr("Insert text: %lu micro seconds. \n", micro);
+	*/
 }
 
 void
@@ -1320,7 +1318,6 @@ void decrease_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 			gtk_text_iter_set_line_offset(&end_iter, 2);
 
 			if (depth == 1) {
-				g_printerr("Remove bullets\n");
 				remove_bullets(buffer, &start_iter, &end_iter);
 				return;
 			}
@@ -1339,6 +1336,218 @@ void decrease_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 		}
 	}
 }
+
+static gboolean
+line_is_bullet_line(GtkTextIter *line_iter)
+{
+	GtkTextIter iter = *line_iter;
+	gtk_text_iter_set_line(&iter, gtk_text_iter_get_line(line_iter));
+	if (iter_get_depth_tag(&iter)) {
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+}
+
+
+static gboolean
+backspace(UserInterface* ui)
+{
+	GtkTextBuffer *buffer = ui->buffer;
+	GtkTextIter iter;
+	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+
+	if (gtk_text_iter_get_line_offset(&iter) <= 2) {
+
+		/* If cursor in list, decrease indent */
+		if (line_is_bullet_line(&iter)) {
+
+			/* Decrease indent */
+			int line = gtk_text_iter_get_line(&iter);
+			decrease_indent(buffer, line, line);
+
+			/* Update UI */
+			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+			update_active_tags(buffer, &iter);
+			update_button_states(ui);
+
+			/* Stop normal backspace effect */
+			return TRUE;
+		}
+
+		/* If cursor not in list and on the very left and above is a list, add line to list */
+		if (gtk_text_iter_get_line_offset(&iter) == 0) {
+
+			GtkTextIter line_above = iter;
+			gtk_text_iter_backward_line(&line_above);
+
+			//if (gtk_text_iter_has_tag(&line_above, gtk_text_tag_table_lookup(buffer->tag_table, "list"))) {
+			if (line_is_bullet_line(&line_above)) {
+				/* Remove the line break */
+				gtk_text_iter_forward_to_line_end(&line_above);
+				gtk_text_buffer_delete(buffer, &line_above, &iter);
+				/* Add list and list-item tags to complete line */
+				gtk_text_iter_set_line(&iter, gtk_text_iter_get_line(&iter));
+				gtk_text_iter_forward_to_line_end(&iter);
+				gtk_text_buffer_apply_tag_by_name(buffer, "list", &line_above, &iter);
+				gtk_text_buffer_apply_tag_by_name(buffer, "list-item", &line_above, &iter);
+
+				/* Update UI */
+				gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+				update_active_tags(buffer, &iter);
+				update_button_states(ui);
+
+				/* Stop normal backspace effect */
+				return TRUE;
+			}
+		}
+	}
+
+	/* Do normal backspace */
+	return FALSE;
+}
+
+
+static gboolean
+delete(UserInterface* ui)
+{
+	GtkTextBuffer *buffer = ui->buffer;
+	GtkTextIter iter;
+	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+
+	/* If the cursor is directly before or after a bullet */
+	if (gtk_text_iter_get_line_offset(&iter) <= 1) {
+		//if (gtk_text_iter_has_tag(&iter, gtk_text_tag_table_lookup(buffer->tag_table, "list"))) {
+		if (line_is_bullet_line(&iter)) {
+
+			/* Decrease indent */
+			int line = gtk_text_iter_get_line(&iter);
+			decrease_indent(buffer, line, line);
+
+			/* Update UI */
+			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+			update_active_tags(buffer, &iter);
+			update_button_states(ui);
+
+			/* Stop normal delete effect */
+			return TRUE;
+		}
+	}
+
+	/* If the cursor is at the end of a bulleted line */
+	GtkTextIter line_end = iter;
+	/* First set to line start, then move to line end. This avoids that we forward over the linebreak */
+	gtk_text_iter_set_line(&line_end, gtk_text_iter_get_line(&iter));
+	gtk_text_iter_forward_to_line_end(&line_end);
+
+	/* If cursor is at the end of the line */
+	if (gtk_text_iter_equal(&iter, &line_end)) {
+
+		/* If the current line is a list-item */
+		gtk_text_iter_backward_char(&iter);
+		//if (gtk_text_iter_has_tag(&iter, gtk_text_tag_table_lookup(buffer->tag_table, "list"))) {
+		if (line_is_bullet_line(&iter)) {
+
+			/* Move over line break */
+			gtk_text_iter_forward_line(&iter);
+
+			/* If next line has bullet, remove two chars additional, else remove only linebreak */
+			//if (gtk_text_iter_has_tag(&iter, gtk_text_tag_table_lookup(buffer->tag_table, "list"))) {
+			if (line_is_bullet_line(&iter)) {
+				gtk_text_iter_forward_chars(&iter, 2);
+				gtk_text_buffer_delete(buffer, &line_end, &iter);
+			} else {
+				gtk_text_buffer_delete(buffer, &line_end, &iter);
+				/* First set to line start, then move to line end. This avoids that we forward over the linebreak */
+				gtk_text_iter_set_line(&iter, gtk_text_iter_get_line(&iter));
+				gtk_text_iter_forward_to_line_end(&iter);
+				gtk_text_buffer_apply_tag_by_name(buffer, "list", &line_end, &iter);
+				gtk_text_buffer_apply_tag_by_name(buffer, "list-item", &line_end, &iter);
+			}
+
+			/* Stop normal delete effect */
+			return TRUE;
+		}
+
+		/* If the current line is not a list-item */
+		/* Move over line break */
+		gtk_text_iter_forward_line(&iter);
+
+		/* If next line has bullet, remove two chars additional */
+		//if (gtk_text_iter_has_tag(&iter, gtk_text_tag_table_lookup(buffer->tag_table, "list"))) {
+		if (line_is_bullet_line(&iter)) {
+			gtk_text_iter_forward_chars(&iter, 2);
+			gtk_text_buffer_delete(buffer, &line_end, &iter);
+			/* First set to line start, then move to line end. This avoids that we forward over the linebreak */
+			gtk_text_iter_set_line(&iter, gtk_text_iter_get_line(&iter));
+			gtk_text_iter_forward_to_line_end(&iter);
+			gtk_text_iter_forward_char(&iter);
+			gtk_text_buffer_remove_tag_by_name(buffer, "list", &line_end, &iter);
+			gtk_text_buffer_remove_tag_by_name(buffer, "list-item", &line_end, &iter);
+
+			return TRUE;
+		}
+
+	}
+
+	/* Do normal delete */
+	return FALSE;
+}
+
+
+static void
+jump_bullet(UserInterface *ui)
+{
+	GtkTextBuffer *buffer = ui->buffer;
+	GtkTextIter iter;
+	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+
+	if (gtk_text_iter_get_line_offset(&iter) <= 1) {
+		if (gtk_text_iter_has_tag(&iter, gtk_text_tag_table_lookup(buffer->tag_table, "list"))) {
+
+			gtk_text_iter_set_line_offset(&iter, 2);
+			gtk_text_buffer_place_cursor(buffer, &iter);
+		}
+	}
+}
+
+
+gboolean
+on_text_view_key_pressed                      (GtkWidget   *widget,
+                                               GdkEventKey *event,
+                                               gpointer     user_data)
+{
+	UserInterface *ui = (UserInterface*)user_data;
+
+	switch (event->keyval) {
+		case GDK_Return:
+		case GDK_KP_Enter:
+			return add_new_line(ui);
+
+		case GDK_BackSpace:
+			return backspace(ui);
+
+		case GDK_Delete:
+		case GDK_KP_Delete:
+			return delete(ui);
+
+		case GDK_KP_Left:
+		case GDK_KP_Right:
+		case GDK_KP_Up:
+		case GDK_KP_Down:
+		case GDK_Left:
+		case GDK_Right:
+		case GDK_Up:
+		case GDK_Down:
+			return FALSE; // Do nothing
+
+		default:
+			jump_bullet(ui);
+			return FALSE;
+	}
+
+}
+
 
 void
 on_inc_indent_button_clicked			   (GtkAction		*action,
@@ -1498,5 +1707,26 @@ on_fullscreen_button_clicked		   (GtkAction		*action,
 {
 	UserInterface *ui = (UserInterface*) user_data;
 	ui_helper_toggle_fullscreen(GTK_WINDOW(ui->window));
+}
+
+void
+on_about_button_clicked				   (GtkAction		*action,
+										gpointer		 user_data)
+{
+	UserInterface *ui = (UserInterface*)user_data;
+
+	HeAboutDialog *dia = HE_ABOUT_DIALOG(he_about_dialog_new());
+	gtk_window_set_transient_for(GTK_WINDOW(dia), GTK_WINDOW(ui->window));
+
+	he_about_dialog_set_app_name(dia, "Conboy");
+	he_about_dialog_set_bugtracker(dia, "https://bugs.maemo.org/enter_bug.cgi?product=Conboy");
+	he_about_dialog_set_copyright(dia, "(c) Cornelius Hald 2010");
+	he_about_dialog_set_description(dia, "Conboy is a note taking application.");
+	he_about_dialog_set_icon_name(dia, "conboy");
+	he_about_dialog_set_version(dia, VERSION);
+	he_about_dialog_set_website(dia, "http://conboy.garage.maemo.org");
+
+	gtk_dialog_run(GTK_DIALOG(dia));
+	gtk_widget_destroy(GTK_WIDGET(dia));
 }
 

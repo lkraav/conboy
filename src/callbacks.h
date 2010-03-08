@@ -73,6 +73,10 @@ on_fullscreen_button_clicked		   (GtkAction		*action,
 										gpointer		 user_data);
 
 void
+on_about_button_clicked				   (GtkAction		*action,
+										gpointer		 user_data);
+
+void
 on_smaller_button_clicked			   (GtkAction		*action,
 										gpointer		 user_data);
 

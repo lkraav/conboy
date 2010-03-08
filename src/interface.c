@@ -860,6 +860,7 @@ UserInterface* create_mainwin() {
 	GtkWidget *menu_sync;
 	GtkWidget *menu_delete;
 	GtkWidget *menu_fullscreen;
+	GtkWidget *menu_about;
 
 	GtkWidget *toolbar;
 	GtkWidget *find_bar;
@@ -903,6 +904,7 @@ UserInterface* create_mainwin() {
 	GtkAction *action_back;
 	GtkAction *action_forward;
 	GtkAction *action_fullscreen;
+	GtkAction *action_about;
 
 	GtkActionGroup *action_group;
 
@@ -958,6 +960,7 @@ UserInterface* create_mainwin() {
 	action_back = GTK_ACTION(gtk_action_new("back", _("Back"), NULL, GTK_STOCK_GO_BACK));
 	action_forward = GTK_ACTION(gtk_action_new("forward", _("Forward"), NULL, GTK_STOCK_GO_FORWARD));
 	action_fullscreen = GTK_ACTION(gtk_action_new("fullscreen", _("Fullscreen"), NULL, NULL));
+	action_about = GTK_ACTION(gtk_action_new("about", _("About"), NULL, NULL));
 	/* TODO: Use an enum instead of 0 to 3 */
 	action_font_small = GTK_ACTION(gtk_radio_action_new("size:small", _("Small"), NULL, NULL, 0));
 	action_font_normal = GTK_ACTION(gtk_radio_action_new("size:normal", _("Normal"), NULL, NULL, 1));
@@ -1120,6 +1123,7 @@ UserInterface* create_mainwin() {
 	menu_quit = gtk_button_new();
 	menu_delete = gtk_button_new();
 	menu_fullscreen = gtk_button_new();
+	menu_about = gtk_button_new();
 
 	gtk_action_connect_proxy(action_new, menu_new);
 	gtk_action_connect_proxy(action_notes, menu_open);
@@ -1128,12 +1132,14 @@ UserInterface* create_mainwin() {
 	gtk_action_connect_proxy(action_quit, menu_quit);
 	gtk_action_connect_proxy(action_delete, menu_delete);
 	gtk_action_connect_proxy(action_fullscreen, menu_fullscreen);
+	gtk_action_connect_proxy(action_about, menu_about);
 
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_new));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_delete));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_sync));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_settings));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_fullscreen));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_about));
 
 	if (app_data->portrait) {
 		gtk_widget_hide(menu_settings);
@@ -1153,6 +1159,7 @@ UserInterface* create_mainwin() {
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_text_style), text_style_menu);*/
 	menu_settings = gtk_action_create_menu_item(action_settings);
 	menu_sync = gtk_action_create_menu_item(action_sync);
+	menu_about = gtk_action_create_menu_item(action_about);
 	menu_quit = gtk_action_create_menu_item(action_quit);
 
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_new);
@@ -1164,6 +1171,7 @@ UserInterface* create_mainwin() {
 	/*gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());*/
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_sync);
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
+	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_about);
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_quit);
 
 
@@ -1418,6 +1426,9 @@ UserInterface* create_mainwin() {
 			G_CALLBACK(on_fullscreen_button_clicked),
 			ui);
 
+	g_signal_connect(action_about, "activate",
+			G_CALLBACK(on_about_button_clicked),
+			ui);
 
 	/* OTHER SIGNALS */
 	g_signal_connect ((gpointer) buffer, "mark-set",
