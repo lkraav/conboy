@@ -26,6 +26,7 @@
 
 #include <gdk/gdkkeysyms.h>
 #include <gtk/gtk.h>
+#include <gtk/gtkimcontext.h>
 #include <glib/gprintf.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-find-toolbar.h>
@@ -147,6 +148,7 @@ on_orientation_changed(GdkScreen *screen, gpointer data)
 
 		/* Other */
 		gtk_text_view_set_editable(ui->view, FALSE);
+		/*hildon_gtk_text_view_set_input_mode(GTK_TEXT_VIEW(ui->view), HILDON_GTK_INPUT_MODE_FULL | HILDON_GTK_INPUT_MODE_AUTOCAP | HILDON_GTK_INPUT_MODE_NO_SCREEN_PLUGINS);*/
 
 	} else {
 		/* Toolbar */
@@ -165,6 +167,7 @@ on_orientation_changed(GdkScreen *screen, gpointer data)
 
 		/* Other */
 		gtk_text_view_set_editable(ui->view, TRUE);
+		/*hildon_gtk_text_view_set_input_mode(GTK_TEXT_VIEW(ui->view), HILDON_GTK_INPUT_MODE_FULL | HILDON_GTK_INPUT_MODE_AUTOCAP);*/
 	}
 }
 
@@ -801,6 +804,10 @@ static gboolean
 on_preedit_changed (GSignalInvocationHint *ihint, guint n_param_values, const GValue *param_values, gpointer data)
 {
 
+	GtkIMContext *ctx;
+	hildon_gtk_im_context_hide(ctx);
+
+	/*
 	g_printerr("### Preedit parameter count: %i\n", n_param_values);
 
 	GtkIMContext *ctx = (GtkIMContext*) g_value_peek_pointer(&(param_values[0]));
@@ -820,7 +827,7 @@ on_preedit_changed (GSignalInvocationHint *ihint, guint n_param_values, const GV
 	gtk_text_buffer_get_bounds(buffer, &start, &end);
 	gchar *text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
 	g_printerr("### TEXT: >%s<\n", text);
-
+	 */
 
 	return TRUE; /* to stay connected */
 }
@@ -1526,8 +1533,16 @@ UserInterface* create_mainwin() {
 #endif
 
 	/* Add signal hook to work with the word completion */
+
+	/*
 	guint signal_id = g_signal_lookup("preedit-changed", GTK_TYPE_IM_CONTEXT);
 	g_signal_add_emission_hook(signal_id, 0, on_preedit_changed, textview, NULL);
+	 */
+
+	/* Disable word completion (no HILDON_GTK_INPUT_MODE_DICTIONARY and no HILDON_GTK_INPUT_MODE_MULTILINE) */
+	hildon_gtk_text_view_set_input_mode(GTK_TEXT_VIEW(textview), HILDON_GTK_INPUT_MODE_FULL | HILDON_GTK_INPUT_MODE_AUTOCAP);
+
+
 
 	return ui;
 }
