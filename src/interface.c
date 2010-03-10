@@ -44,7 +44,7 @@
 #include "app_data.h"
 #include "settings.h"
 #include "conboy_note_buffer.h"
-
+#include "conboy_web_sync.h"
 #include "conboy_oauth.h"
 #include "note.h"
 #include "json.h"
@@ -264,12 +264,6 @@ on_font_size_changed(GConfClient *client, guint cnxn_id, GConfEntry *entry, gpoi
 	gtk_widget_modify_font(GTK_WIDGET(textview), font);
 	pango_font_description_free(font);
 }
-
-
-
-
-
-
 
 static WebSyncDialogData*
 create_sync_dialog(GtkWindow *parent)

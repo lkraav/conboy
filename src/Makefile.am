@@ -70,7 +70,11 @@ conboy_SOURCES = \
         conboy_xml.h \
         conboy_xml.c \
         he-about-dialog.h \
-        he-about-dialog.c
+        he-about-dialog.c \
+        conboy_http.h \
+        conboy_http.c \
+        conboy_web_sync.h \
+        conboy_web_sync.c
         
 # LDADD
 conboy_LDADD = \

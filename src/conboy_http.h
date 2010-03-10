@@ -16,17 +16,16 @@
  * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONBOY_OAUTH_H_
-#define CONBOY_OAUTH_H_
+#ifndef CONBOY_HTTP_H_
+#define CONBOY_HTTP_H_
+
 
 #include <glib/gtypes.h>
 
+gchar* conboy_http_get(const gchar *url, gboolean auth);
 
-gchar*
-conboy_get_request_token_and_auth_link (const gchar *call_url, const gchar *link_url);
+gchar* conboy_http_post (const gchar *url, gchar *postdata, gboolean auth);
 
-gboolean
-conboy_get_access_token (const gchar *url, const gchar *verifier);
+gchar* conboy_http_put(const gchar *url, const gchar *putdata, gboolean auth);
 
-
-#endif /*CONBOY_OAUTH_H_*/
+#endif /*CONBOY_HTTP_H_*/

@@ -16,17 +16,26 @@
  * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONBOY_OAUTH_H_
-#define CONBOY_OAUTH_H_
 
-#include <glib/gtypes.h>
+#ifndef CONBOY_WEB_SYNC_H_
+#define CONBOY_WEB_SYNC_H_
 
+#include <gtk/gtk.h>
 
-gchar*
-conboy_get_request_token_and_auth_link (const gchar *call_url, const gchar *link_url);
+typedef struct
+{
+	GtkDialog *dialog;
+	GtkProgressBar *bar;
+	GtkVBox   *box;
+	GtkLabel *label;
+	GtkButton *button;
+} WebSyncDialogData;
 
 gboolean
-conboy_get_access_token (const gchar *url, const gchar *verifier);
+web_sync_authenticate (gchar *url, GtkWindow *parent);
+
+void
+web_sync_do_sync (gpointer *user_data);
 
 
-#endif /*CONBOY_OAUTH_H_*/
+#endif /* CONBOY_WEB_SYNC_H_ */
