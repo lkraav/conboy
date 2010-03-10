@@ -34,11 +34,13 @@ get_access_token(gchar *url, gchar **t_key, gchar **t_secret);
 gchar*
 get_all_notes(gboolean inc_notes);
 
+/*
 gint
 web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_sync_time, gint *uploaded_notes, GError **error);
 
 JsonNoteList*
 web_sync_get_notes(JsonUser *user, int since_rev);
+*/
 
 gchar*
 conboy_get_auth_link(const gchar *call_url, const gchar *link_url);
@@ -48,5 +50,16 @@ conboy_get_access_token(const gchar *url, const gchar *verifier);
 
 gchar*
 conboy_http_get(const gchar *url);
+
+typedef struct
+{
+	GtkDialog *dialog;
+	GtkProgressBar *bar;
+	GtkVBox   *box;
+	GtkLabel *label;
+	GtkButton *button;
+} WebSyncDialogData;
+
+void web_sync_do_sync (gpointer *user_data);
 
 #endif /*CONBOY_OAUTH_H_*/
