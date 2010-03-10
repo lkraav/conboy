@@ -23,13 +23,18 @@ ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
 	INSTALL_PROGRAM += -s
 endif
 
+# Support for maemo-launcher
+ifeq (,$(findstring nolauncher,$(DEB_BUILD_OPTIONS)))
+	CONF_ARGS += --enable-maemo-launcher
+endif
+
 # Only if we have Maemo 5 we include Midgard support
 MAJOR := $(shell pkg-config --modversion maemo-version | cut -b1 -)
 ifeq ($(MAJOR),5)
-	CONF_ARGS := --with-midgard=yes
+	CONF_ARGS += --with-midgard=yes
 	TRASH := $(shell sh debian/modify_control.sh add)
 else
-	CONF_ARGS := --with-midgard=no
+	CONF_ARGS += --with-midgard=no
 	TRASH := $(shell sh debian/modify_control.sh remove)
 endif
 
@@ -82,6 +87,7 @@ binary-arch: install
 	dh_testdir
 	dh_testroot
 	dh_link
+	if [ `which dh_maemolauncher` ]; then dh_maemolauncher; fi 
 	dh_strip
 	dh_compress
 	dh_fixperms
