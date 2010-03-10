@@ -115,6 +115,24 @@ fi
 
 AM_CONDITIONAL([MIDGARD], [test x$with_midgard = xyes])
 
+# Support for maemo-launcher
+AC_ARG_ENABLE([maemo-launcher],
+	[AS_HELP_STRING([--enable-maemo-launcher],
+		[build with maemo-launcher support])],
+		[case "${enableval}" in
+		yes) maemo_launcher=true ;;
+		no)  maemo_launcher=false ;;
+		*) AC_MSG_ERROR([bad value ${enableval} for --enable-maemo-launcher]) ;;
+		esac], [maemo_launcher=false])
+
+if test x$maemo_launcher = xtrue
+then
+	PKG_CHECK_MODULES(MAEMO_LAUNCHER, [maemo-launcher-app])
+	AC_SUBST(MAEMO_LAUNCHER_CFLAGS)
+	AC_SUBST(MAEMO_LAUNCHER_LIBS)
+fi
+
+
 
 
 # Application icon install directories
