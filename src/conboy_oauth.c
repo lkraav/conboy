@@ -30,160 +30,13 @@
 #include "note.h"
 #include "json.h"
 #include "app_data.h"
+#include "conboy_http.h"
 
 
 #define c_key    "anyone"  /*< consumer key */
 #define c_secret "anyone" /*/< consumer secret */
 
 
-struct MemoryStruct {
-  char *data;
-  size_t size;
-};
-
-static size_t
-WriteMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data) {
-  size_t realsize = size * nmemb;
-  struct MemoryStruct *mem = (struct MemoryStruct *)data;
-
-  mem->data = (char *)xrealloc(mem->data, mem->size + realsize + 1);
-  if (mem->data) {
-    memcpy(&(mem->data[mem->size]), ptr, realsize);
-    mem->size += realsize;
-    mem->data[mem->size] = 0;
-  }
-  return realsize;
-}
-
-
-static gchar*
-add_quotes(gchar *param)
-{
-	gchar **tokens = g_strsplit(param, "=", 2);
-	gchar *result = g_strconcat(tokens[0], "=\"", tokens[1], "\"", NULL);
-	return result;
-}
-
-static gchar*
-http_put(const gchar *url, const gchar *oauth_args, const gchar *body)
-{
-	CURL *curl;
-	CURLcode res;
-
-	struct MemoryStruct chunk;
-	chunk.data=NULL;
-	chunk.size = 0;
-
-	curl = curl_easy_init();
-	if(!curl) return NULL;
-
-	/* Enable debugging */
-	/*
-	curl_easy_setopt(curl, CURLOPT_VERBOSE, TRUE);
-	curl_easy_setopt(curl, CURLOPT_HEADER, TRUE);
-	*/
-
-	/* We make the request like POST, but put PUT into the header.
-	 * It's easier to do with libcurl and it works. */
-	curl_easy_setopt(curl, CURLOPT_URL, url);
-	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
-
-	/* Create OAuth Header */
-	gchar *oauth_header = "Authorization: OAuth realm=\"Snowy\"";
-	gchar **params = g_strsplit(oauth_args, "&", -1);
-	int num = 0;
-	while (params[num] != NULL) {
-		oauth_header = g_strconcat(oauth_header, ", ", add_quotes(params[num]), NULL);
-		num++;
-	}
-
-	/* Enable and disable headers to look as similar as possibele like Tomboy */
-	struct curl_slist *headers = NULL;
-	headers = curl_slist_append(headers, oauth_header);
-	headers = curl_slist_append(headers, "Content-Type: application/json");
-	headers = curl_slist_append(headers, "Connection: keep-alive");
-	headers = curl_slist_append(headers, "Accept:");
-	headers = curl_slist_append(headers, "User-Agent:");
-
-	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-	curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
-
-	/* Skip https security */
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-
-	/* Follow redirects */
-	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-
-	/* Set the json string as the body of the request */
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body);
-
-	/* Setup function to read the reply */
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-
-	/* Perfome the request */
-	res = curl_easy_perform(curl);
-	if (res) {
-	  return NULL;
-	}
-
-	curl_easy_cleanup(curl);
-	return (chunk.data);
-}
-
-
-
-gchar*
-http_get(const gchar *url)
-{
-	CURL *curl;
-	CURLcode res;
-
-	struct MemoryStruct chunk;
-	chunk.data=NULL;
-	chunk.size = 0;
-
-	curl = curl_easy_init();
-	if(!curl) return NULL;
-
-	/* Enable debugging */
-	/*
-	curl_easy_setopt(curl, CURLOPT_VERBOSE, TRUE);
-	curl_easy_setopt(curl, CURLOPT_HEADER, TRUE);
-	*/
-
-	curl_easy_setopt(curl, CURLOPT_URL, url);
-
-	/* Enable and disable headers to look as similar as possibele like Tomboy */
-	struct curl_slist *headers = NULL;
-	headers = curl_slist_append(headers, "Connection: keep-alive");
-	headers = curl_slist_append(headers, "Accept:");
-	headers = curl_slist_append(headers, "User-Agent:");
-
-	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-	curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
-
-	/* Skip https security */
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-
-	/* Follow redirects */
-	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-
-	/* Setup function to read the reply */
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-
-	/* Perfome the request */
-	res = curl_easy_perform(curl);
-	if (res) {
-	  return NULL;
-	}
-
-	curl_easy_cleanup(curl);
-	return (chunk.data);
-}
 
 
 
@@ -218,6 +71,29 @@ parse_reply (const char *reply, char **token, char **secret) {
 	return ok;
 }
 
+
+
+
+/*
+ *
+ *
+ *
+ *
+ *
+ */
+
+
+
+
+
+/**
+ *
+ *
+ *
+ *
+ */
+
+
 gchar*
 conboy_get_auth_link(const gchar *call_url, const gchar *link_url)
 {
@@ -235,38 +111,6 @@ conboy_get_auth_link(const gchar *call_url, const gchar *link_url)
 	return link;
 }
 
-static gchar*
-http_post (const gchar *url, const gchar *postdata)
-{
-	CURL *curl;
-	CURLcode res;
-
-	struct MemoryStruct chunk;
-	chunk.data=NULL;
-	chunk.size = 0;
-
-	curl = curl_easy_init();
-	if(!curl) return NULL;
-	curl_easy_setopt(curl, CURLOPT_URL, url);
-
-	/* Skip https security */
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-
-	/* Follow redirects */
-	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
-
-	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postdata);
-	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-	res = curl_easy_perform(curl);
-	if (res) {
-		return NULL;
-	}
-
-	curl_easy_cleanup(curl);
-	return (chunk.data);
-}
 
 /* TODO: Improve error checking */
 gchar*
@@ -284,6 +128,7 @@ get_auth_link(gchar *request_url, gchar *link_url, gchar **t_key, gchar **t_secr
 	 */
 	gchar *request = g_strconcat(request_url, "?oauth_callback=conboy://authenticate", NULL);
 
+	/* Request the token, therefore use NULL, NULL */
 	gchar *req_url = oauth_sign_url2(request, &postarg, OA_HMAC, "POST", c_key, c_secret, NULL, NULL);
 	g_free(request);
 
@@ -292,7 +137,7 @@ get_auth_link(gchar *request_url, gchar *link_url, gchar **t_key, gchar **t_secr
 		return NULL;
 	}
 
-	reply = http_post(req_url, postarg);
+	reply = conboy_http_post(req_url, postarg, FALSE);
 
 	g_printerr("Reply: %s\n", reply);
 
@@ -343,7 +188,7 @@ get_access_token(gchar *url, gchar **t_key, gchar **t_secret)
 	}
 
 	/*reply = oauth_http_post(req_url, postarg);*/
-	reply = http_post(req_url, postarg);
+	reply = conboy_http_post(req_url, postarg, FALSE);
 	if (reply == NULL) {
 		g_printerr("ERROR: reply = NULL");
 		g_free(req_url);
@@ -392,32 +237,27 @@ conboy_get_access_token(const gchar *url, const gchar *verifier) {
 	return FALSE;
 }
 
-/*
- * Works
- */
-gchar*
-conboy_http_get(const gchar *url) {
-
-	gchar *tok = settings_load_oauth_access_token();
-	gchar *sec = settings_load_oauth_access_secret();
-
-	gchar *req_url = oauth_sign_url2(url, NULL, OA_HMAC, "GET", c_key, c_secret, tok, sec);
-	g_printerr("Request: %s\n", req_url);
-	gchar *reply = http_get(req_url);
-
-	g_free(tok);
-	g_free(sec);
-	g_free(req_url);
-
-	return reply;
-}
 
 
 
 
 /*
  *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  * New FILE
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  *
  */
 
@@ -468,16 +308,7 @@ web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_syn
 	g_printerr("&&&&&&&&&&&&&&&&&&\n");
 
 
-	/*gchar *json_string = "{ \"note-changes\" : [ { \"note-content\" : \"One line of super Inhalt\\nAnd another\\n\", \"tags\" : [], \"pinned\" : false, \"last-meta-data-change-date\" : \"2009-08-07T10:00:45.0000000+02:00\", \"guid\" : \"4621178a-5c4a-2222-a473-1bff040ea575\", \"create-date\" : \"2009-08-07T10:00:32.0000000+02:00\", \"open-on-startup\" : false, \"note-content-version\" : 0.1, \"last-change-date\" : \"2009-08-07T10:00:45.0000000+02:00\", \"title\" : \"New Note mit mehr Inhalt\" } ], \"latest-sync-revision\" : 12 }";*/
-
-	gchar *oauth_args = "";
-
-	/*gchar *uri = g_strconcat(base_url, "/api/1.0/root/notes/", NULL); */
-
-
-	gchar *req_url = oauth_sign_url2(url, &oauth_args, OA_HMAC, "PUT", c_key, c_secret, t_key, t_secret);
-
-	gchar *reply = http_put(req_url, oauth_args, json_string);
+	gchar *reply = conboy_http_put(url, json_string, TRUE);
 
 
 	g_printerr("Reply from Snowy:\n");
@@ -509,7 +340,7 @@ web_sync_get_notes(JsonUser *user, int since_rev)
 
 	g_sprintf(get_all_notes_url, "%s?include_notes=true&since=%i", user->api_ref, since_rev);
 
-	json_string = conboy_http_get(get_all_notes_url);
+	json_string = conboy_http_get(get_all_notes_url, TRUE);
 	result = json_get_note_list(json_string);
 
 	g_free(json_string);
@@ -608,7 +439,7 @@ web_sync_do_sync (gpointer *user_data)
 
 	gchar *request = g_strconcat(url, "/api/1.0/", NULL);
 
-	gchar *reply = conboy_http_get(request);
+	gchar *reply = conboy_http_get(request, FALSE);
 
 	if (reply == NULL) {
 		gchar *msg = g_strconcat("Got no reply from: %s\n", request, NULL);
@@ -619,11 +450,13 @@ web_sync_do_sync (gpointer *user_data)
 	g_free(request);
 	web_sync_pulse_bar(bar);
 
-	/*g_printerr("Reply from /api/1.0/:: %s\n", reply);*/
+	g_printerr("Reply from /api/1.0/:: %s\n", reply);
 
 	gchar *api_ref = json_get_api_ref(reply);
 
-	reply = conboy_http_get(api_ref);
+	g_printerr("Now asking::: %s\n", api_ref);
+
+	reply = conboy_http_get(api_ref, TRUE);
 
 	if (reply == NULL) {
 		gchar *msg = g_strconcat("Got no reply from: \n", api_ref, NULL);
@@ -633,7 +466,7 @@ web_sync_do_sync (gpointer *user_data)
 	}
 	web_sync_pulse_bar(bar);
 
-	/*g_printerr("Reply from /root/:: %s\n", reply);*/
+	g_printerr("Reply from /user/:: %s\n", reply);
 
 	/* Revision checks */
 	JsonUser *user = json_get_user(reply);

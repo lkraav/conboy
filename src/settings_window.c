@@ -230,7 +230,7 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 	/* Get URLs */
 	gchar *request = g_strconcat(url, "/api/1.0", NULL);
 
-	gchar *reply = http_get(request);
+	gchar *reply = conboy_http_get(request, FALSE);
 
 	if (reply == NULL) {
 		gchar *msg = g_strconcat("Got no reply from: %s\n", request, NULL);
@@ -258,8 +258,6 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 		return;
 	}
 
-	/* If successfull, save url */
-	/*settings_save_sync_base_url(url);*/
 
 	/* Open link in browser */
 	AppData *app_data = app_data_get();

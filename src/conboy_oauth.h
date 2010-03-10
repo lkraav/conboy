@@ -49,7 +49,7 @@ gboolean
 conboy_get_access_token(const gchar *url, const gchar *verifier);
 
 gchar*
-conboy_http_get(const gchar *url);
+conboy_http_auth_get(const gchar *url);
 
 typedef struct
 {
