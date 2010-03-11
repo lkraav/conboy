@@ -542,37 +542,6 @@ ungrab_volume_keys(GtkWidget *window)
 #endif
 }
 
-static gboolean
-on_preedit_changed (GSignalInvocationHint *ihint, guint n_param_values, const GValue *param_values, gpointer data)
-{
-
-	GtkIMContext *ctx;
-	hildon_gtk_im_context_hide(ctx);
-
-	/*
-	g_printerr("### Preedit parameter count: %i\n", n_param_values);
-
-	GtkIMContext *ctx = (GtkIMContext*) g_value_peek_pointer(&(param_values[0]));
-
-	gchar *string = NULL;
-	PangoAttrList *list = NULL;
-	gint pos = 0;
-
-	gtk_im_context_get_preedit_string(ctx, &string, &list, &pos);
-
-	g_printerr("### String is: >%s<\n", string);
-
-	AppData *app_data = app_data_get();
-	GtkTextBuffer *buffer = app_data->note_window->buffer;
-
-	GtkTextIter start, end;
-	gtk_text_buffer_get_bounds(buffer, &start, &end);
-	gchar *text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
-	g_printerr("### TEXT: >%s<\n", text);
-	 */
-
-	return TRUE; /* to stay connected */
-}
 
 /*
  * I'm not sure what is better:
@@ -743,8 +712,6 @@ UserInterface* create_mainwin() {
 	gtk_action_group_add_action_with_accel(action_group, action_quit,      "<Ctrl>q");
 	gtk_action_group_add_action_with_accel(action_group, action_new,       "<Ctrl>n");
 	gtk_action_group_add_action_with_accel(action_group, action_find,      "<Ctrl>f");
-	gtk_action_group_add_action_with_accel(action_group, action_new,       "<Ctrl>n");
-	gtk_action_group_add_action_with_accel(action_group, action_quit,      "<Ctrl>q");
 	gtk_action_group_add_action_with_accel(action_group, action_fullscreen,"<Ctrl>u");
 
 	gtk_action_set_accel_group(action_bold,      accel_group);
@@ -1274,17 +1241,8 @@ UserInterface* create_mainwin() {
 	g_signal_connect_swapped(but, "clicked", G_CALLBACK(ui_helper_toggle_fullscreen), he_fullscreen_button_get_window(but));
 #endif
 
-	/* Add signal hook to work with the word completion */
-
-	/*
-	guint signal_id = g_signal_lookup("preedit-changed", GTK_TYPE_IM_CONTEXT);
-	g_signal_add_emission_hook(signal_id, 0, on_preedit_changed, textview, NULL);
-	 */
-
 	/* Disable word completion (no HILDON_GTK_INPUT_MODE_DICTIONARY and no HILDON_GTK_INPUT_MODE_MULTILINE) */
 	hildon_gtk_text_view_set_input_mode(GTK_TEXT_VIEW(textview), HILDON_GTK_INPUT_MODE_FULL | HILDON_GTK_INPUT_MODE_AUTOCAP);
-
-
 
 	return ui;
 }
