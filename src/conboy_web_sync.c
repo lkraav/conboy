@@ -440,7 +440,7 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 	gchar *reply = conboy_http_get(request, FALSE);
 
 	if (reply == NULL) {
-		gchar *msg = g_strconcat("Got no reply from: %s\n", request, NULL);
+		gchar *msg = g_strconcat("Got no reply from: ", request, "\n", NULL);
 		ui_helper_show_confirmation_dialog(parent, msg, FALSE);
 		g_free(msg);
 		g_free(request);
@@ -482,8 +482,12 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 	}
 
 	/* Open dialog and wait for result */
+	g_printerr("Before dialog run\n");
 	int result = gtk_dialog_run(GTK_DIALOG(dialog));
+	g_printerr("Before widget destroy\n");
+	gtk_widget_hide(dialog);
 	gtk_widget_destroy(dialog);
+	g_printerr("After widget destroy\n");
 
 	/* Unregister DBus listener */
 	if (osso_rpc_unset_cb_f(app_data->osso_ctx, "de.zwong.conboy", "de/zwong/conboy", "de.zwong.conboy", url_callback_handler, &data) != OSSO_OK) {
@@ -493,7 +497,19 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 	/* Handle return values of the dialog */
 	if (result == GTK_RESPONSE_OK) {
 
+		GtkWidget *wait_dialog = gtk_dialog_new();
+		gtk_window_set_title(GTK_WINDOW(wait_dialog), "Connecting to server");
+		hildon_gtk_window_set_progress_indicator(GTK_WINDOW(wait_dialog), TRUE);
+		gtk_window_set_modal(GTK_WINDOW(wait_dialog), TRUE);
+		gtk_window_set_transient_for(GTK_WINDOW(wait_dialog), parent);
+		gtk_window_set_destroy_with_parent(GTK_WINDOW(wait_dialog), TRUE);
+		gtk_widget_show_all(wait_dialog);
+		while (gtk_events_pending()) {
+			gtk_main_iteration_do(FALSE);
+		}
+
 		if (conboy_get_access_token(api->access_token_url, data.verifier)) {
+			gtk_widget_destroy(wait_dialog);
 			ui_helper_show_confirmation_dialog(parent, "<b>You are successfully authenticated</b>\nYou can now use the synchronization from the main menu.", FALSE);
 			settings_save_sync_base_url(url);
 			/* Everything is good */
@@ -501,6 +517,7 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 		}
 
 		/* We did not get the access token */
+		gtk_widget_destroy(wait_dialog);
 		ui_helper_show_confirmation_dialog(parent, "Conboy could not get an access token from your service provider. Please try again.", FALSE);
 		settings_save_sync_base_url("");
 		return FALSE;
