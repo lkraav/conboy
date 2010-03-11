@@ -17,8 +17,6 @@ fi
 # Work around for bug #6263 
 #
 
-#grep "5.0" /etc/maemo_version ## not working because maemo_version is not on the device
-#if [ $? -eq 1 ]
 if [ ! -e /etc/operator_settings ]
 then
         echo "Not running on Maemo5, not modifying file"

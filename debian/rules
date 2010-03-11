@@ -94,7 +94,6 @@ binary-arch: install
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol
-#	if [ `which maemo-optify` ]; then maemo-optify; fi
 	dh_md5sums
 	dh_builddeb
 
