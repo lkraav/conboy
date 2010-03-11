@@ -101,6 +101,12 @@ get_request_token_and_auth_link(const gchar *request_url, const gchar *link_url,
 		return NULL;
 	}
 
+	if (strstr(reply, "Expired timestamp")) {
+		g_printerr("ERROR: Timestamp is expired. Probably clock running wrong.\n");
+		g_free(req_url);
+		return NULL;
+	}
+
 	if (strlen(reply) > 200) {
 		g_printerr("ERROR: Reply is longer then 200 characters, cannot be right\n");
 		g_free(req_url);
@@ -195,6 +201,10 @@ conboy_get_access_token(const gchar *url, const gchar *verifier) {
 /**
  * Gets a request token, saves it into gconf and returns an authentication
  * link. This link can be used to authenticate a person with the web service.
+ *
+ * TODO: Check reply. If it contains the string "expired timestamp" like in
+ * "Expired timestamp: given 1268315701 and now 1268317299 has a greater difference than threshold 900"
+ * return different error object/code.
  */
 gchar*
 conboy_get_request_token_and_auth_link(const gchar *call_url, const gchar *link_url)
