@@ -1354,7 +1354,76 @@ static gboolean
 backspace(UserInterface* ui)
 {
 	GtkTextBuffer *buffer = ui->buffer;
-	GtkTextIter iter;
+	GtkTextIter iter, sel_start, sel_end;
+
+	if (gtk_text_buffer_get_selection_bounds(buffer, &sel_start, &sel_end)) {
+
+
+		if (!line_is_bullet_line(&sel_start) && !line_is_bullet_line(&sel_end)) {
+			return FALSE; /* Do normal backspace */
+		}
+
+		if (line_is_bullet_line(&sel_start) && line_is_bullet_line(&sel_end)) {
+
+			/* Don't delete the bullet on the left if it is selected */
+			int line_offset = gtk_text_iter_get_line_offset(&sel_start);
+			if (line_offset <= 2) {
+				gtk_text_iter_forward_chars(&sel_start, 2-line_offset);
+			}
+
+			gtk_text_buffer_delete(buffer, &sel_start, &sel_end);
+			gtk_text_buffer_select_range(buffer, &sel_start, &sel_start);
+
+			return TRUE;
+		}
+
+		if (line_is_bullet_line(&sel_start) && !line_is_bullet_line(&sel_end)) {
+
+			/* Don't delete the bullet on the left if it is selected */
+			int line_offset = gtk_text_iter_get_line_offset(&sel_start);
+			if (line_offset <= 2) {
+				gtk_text_iter_forward_chars(&sel_start, 2-line_offset);
+			}
+
+			gtk_text_buffer_delete(buffer, &sel_start, &sel_end);
+
+			/* Add list and list-item tags to complete line */
+			gtk_text_iter_set_line(&sel_start, gtk_text_iter_get_line(&sel_start));
+			gtk_text_iter_forward_chars(&sel_start, 2);
+			gtk_text_iter_forward_to_line_end(&sel_end);
+			gtk_text_buffer_apply_tag_by_name(buffer, "list", &sel_start, &sel_end);
+			gtk_text_buffer_apply_tag_by_name(buffer, "list-item", &sel_start, &sel_end);
+
+			/* Remove selection */
+			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+			gtk_text_buffer_select_range(buffer, &iter, &iter);
+
+			return TRUE;
+		}
+
+		if (!line_is_bullet_line(&sel_start) && line_is_bullet_line(&sel_end)) {
+
+			gtk_text_buffer_delete(buffer, &sel_start, &sel_end);
+
+			/* Remove list and list-item tags from complete line */
+			gtk_text_iter_set_line(&sel_start, gtk_text_iter_get_line(&sel_start));
+			gtk_text_iter_forward_to_line_end(&sel_end);
+			gtk_text_iter_forward_char(&sel_end);
+			gtk_text_buffer_remove_tag_by_name(buffer, "list", &sel_start, &sel_end);
+			gtk_text_buffer_remove_tag_by_name(buffer, "list-item", &sel_start, &sel_end);
+
+			/* Remove selection */
+			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
+			gtk_text_buffer_select_range(buffer, &iter, &iter);
+
+			return TRUE;
+		}
+	}
+
+	/*
+	 * Nothing is selected
+	 */
+
 	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
 
 	if (gtk_text_iter_get_line_offset(&iter) <= 2) {
@@ -1381,7 +1450,6 @@ backspace(UserInterface* ui)
 			GtkTextIter line_above = iter;
 			gtk_text_iter_backward_line(&line_above);
 
-			//if (gtk_text_iter_has_tag(&line_above, gtk_text_tag_table_lookup(buffer->tag_table, "list"))) {
 			if (line_is_bullet_line(&line_above)) {
 				/* Remove the line break */
 				gtk_text_iter_forward_to_line_end(&line_above);
