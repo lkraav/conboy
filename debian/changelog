@@ -1,3 +1,18 @@
+conboy (1:0.6.3.5) stable; urgency=low
+
+  * Disabled optification again, since the maemo-optify bug is still not fixed
+  * Backspace with selections that contain lists should now work correctly
+  
+ -- Cornelius Hald <hald@icandy.de>  Sat, 13 Mar 2010 17:28:42 +0200
+ 
+conboy (1:0.6.3.4) stable; urgency=low
+
+  * Refactored sync code
+  * Uses maemo-launcher for faster startup
+  * Reenabled optification to save rootfs space
+  
+ -- Cornelius Hald <hald@icandy.de>  Mo, 11 Mar 2010 10:57:12 +0200
+
 conboy (1:0.6.3.3) stable; urgency=low
 
   * Added about dialog
