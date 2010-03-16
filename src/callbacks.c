@@ -433,100 +433,6 @@ disable_bullets(GtkTextBuffer *buffer)
 	}
 }
 
-static void
-update_button_states(UserInterface *ui)
-{
-	/* Blocking signals here because the ..set_active() method makes the buttons
-	 * emit the clicked signal. And because of this the formatting changes.
-	 */
-	g_signal_handlers_block_by_func(ui->action_bold, on_format_button_clicked, ui);
-	g_signal_handlers_block_by_func(ui->action_italic, on_format_button_clicked, ui);
-	g_signal_handlers_block_by_func(ui->action_strike, on_format_button_clicked, ui);
-	g_signal_handlers_block_by_func(ui->action_highlight, on_format_button_clicked, ui);
-	g_signal_handlers_block_by_func(ui->action_fixed, on_format_button_clicked, ui);
-	g_signal_handlers_block_by_func(ui->action_bullets, on_bullets_button_clicked, ui);
-	g_signal_handlers_block_by_func(ui->action_font_small, on_font_size_radio_group_changed, ui);
-	g_signal_handlers_block_by_func(ui->action_dec_indent, on_dec_indent_button_clicked, ui);
-
-
-
-	/* TODO: This can be optimized: Note disable all and then enable selected, but determine state and then
-	 * set the state. */
-	gtk_toggle_action_set_active(ui->action_bold, FALSE);
-	gtk_toggle_action_set_active(ui->action_italic, FALSE);
-	gtk_toggle_action_set_active(ui->action_strike, FALSE);
-	gtk_toggle_action_set_active(ui->action_highlight, FALSE);
-	gtk_toggle_action_set_active(ui->action_fixed, FALSE);
-	gtk_toggle_action_set_active(ui->action_bullets, FALSE);
-	gtk_radio_action_set_current_value(ui->action_font_small, 1); /* Enable normal font size */
-
-	/* Disable indent actions */
-	/*gtk_action_set_sensitive(ui->action_inc_indent, TRUE);*/
-	gtk_action_set_sensitive(ui->action_dec_indent, FALSE);
-
-	/* Copy pointer for iteration */
-	GSList *tags = conboy_note_buffer_get_active_tags(CONBOY_NOTE_BUFFER(ui->buffer));
-	while (tags != NULL) {
-		GtkTextTag *tag = GTK_TEXT_TAG(tags->data);
-		if (strcmp(tag->name, "bold") == 0) {
-			gtk_toggle_action_set_active(ui->action_bold, TRUE);
-		} else if (strcmp(tag->name, "italic") == 0) {
-			gtk_toggle_action_set_active(ui->action_italic, TRUE);
-		} else if (strcmp(tag->name, "strikethrough") == 0) {
-			gtk_toggle_action_set_active(ui->action_strike, TRUE);
-		} else if (strcmp(tag->name, "highlight") == 0) {
-			gtk_toggle_action_set_active(ui->action_highlight, TRUE);
-		} else if (strcmp(tag->name, "monospace") == 0) {
-			gtk_toggle_action_set_active(ui->action_fixed, TRUE);
-		} else if (strncmp(tag->name, "list-item", 9) == 0) {
-			gtk_toggle_action_set_active(ui->action_bullets, TRUE);
-		} else if (strcmp(tag->name, "size:small") == 0) {
-			gtk_radio_action_set_current_value(ui->action_font_small, 0);
-		} else if (strcmp(tag->name, "size:large") == 0) {
-			gtk_radio_action_set_current_value(ui->action_font_small, 2);
-		} else if (strcmp(tag->name, "size:huge") == 0) {
-			gtk_radio_action_set_current_value(ui->action_font_small, 3);
-		} else if (strcmp(tag->name, "list") == 0) {
-			/*gtk_action_set_sensitive(ui->action_inc_indent, TRUE);*/
-			gtk_action_set_sensitive(ui->action_dec_indent, TRUE);
-		}
-
-		tags = tags->next;
-	}
-
-	/* unblock signals */
-	g_signal_handlers_unblock_by_func(ui->action_bold, on_format_button_clicked, ui);
-	g_signal_handlers_unblock_by_func(ui->action_italic, on_format_button_clicked, ui);
-	g_signal_handlers_unblock_by_func(ui->action_strike, on_format_button_clicked, ui);
-	g_signal_handlers_unblock_by_func(ui->action_highlight, on_format_button_clicked, ui);
-	g_signal_handlers_unblock_by_func(ui->action_fixed, on_format_button_clicked, ui);
-	g_signal_handlers_unblock_by_func(ui->action_bullets, on_bullets_button_clicked, ui);
-	g_signal_handlers_unblock_by_func(ui->action_font_small, on_font_size_radio_group_changed, ui);
-	g_signal_handlers_unblock_by_func(ui->action_dec_indent, on_dec_indent_button_clicked, ui);
-}
-
-static void
-update_active_tags(GtkTextBuffer *buffer, GtkTextIter *location)
-{
-	/* Clean the list of active tags */
-	conboy_note_buffer_clear_active_tags(CONBOY_NOTE_BUFFER(buffer));
-
-	/* Add tags at this location */
-	GSList *tags = gtk_text_iter_get_tags(location);
-	if (tags != NULL) {
-		conboy_note_buffer_set_active_tags(CONBOY_NOTE_BUFFER(buffer), tags);
-	}
-
-	/* Go the beginning of line and check if there is a bullet.
-	 * If yes, add list-item and list tags and enable the indent actions */
-	gtk_text_iter_set_line_offset(location, 0);
-	if (iter_get_depth_tag(location) != NULL) {
-		/* Add tags */
-		conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(buffer), "list-item");
-		conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(buffer), "list");
-	}
-}
-
 void
 on_bullets_button_clicked				(GtkAction		*action,
 										 gpointer		 user_data)
@@ -604,8 +510,8 @@ on_textview_cursor_moved			   (GtkTextBuffer	*buffer,
 
 	check_title(ui);
 
-	update_active_tags(ui->buffer, location);
-	update_button_states(ui);
+	conboy_note_buffer_update_active_tags(CONBOY_NOTE_BUFFER(ui->buffer));
+	conboy_note_window_update_button_states(ui);
 }
 
 void
@@ -846,12 +752,18 @@ gboolean note_save_callback(UserInterface *ui)
 {
 	/* Test, to see if the window is still open */
 	if (ui->note != NULL && GTK_IS_TEXT_BUFFER(ui->buffer)) {
-		note_save(ui);
+		if (gtk_text_buffer_get_modified(ui->buffer)) {
+			gtk_text_view_set_editable(ui->view, FALSE);
+			note_save(ui);
+			gtk_text_view_set_editable(ui->view, TRUE);
+		}
 	}
 
 	/* Return FALSE to make the Timer stop */
 	return FALSE;
 }
+
+guint event_src_id = 0;
 
 void
 on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
@@ -865,8 +777,17 @@ on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 
 	g_printerr("Buffer is dirty\n");
 
+	/* Remove last timer, if exists. Not strictly needed, most of the time there won't be another timer */
+	if (event_src_id > 0) {
+		g_source_remove(event_src_id);
+	}
+
 	/* Save 4 seconds after the buffer got dirty */
-	g_timeout_add(4000, (GSourceFunc)note_save_callback, ui);
+	#ifdef HILDON_HAS_APP_MENU
+	event_src_id = g_timeout_add_seconds(4, (GSourceFunc)note_save_callback, ui);
+	#else
+	event_src_id = g_timeout_add(4000, (GSourceFunc)note_save_callback, ui);
+	#endif
 }
 
 static
@@ -1044,9 +965,8 @@ static gboolean add_new_line(UserInterface *ui)
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 
 			/* Disable the bullet button */
-			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
-			update_active_tags(buffer, &iter);
-			update_button_states(ui);
+			conboy_note_buffer_update_active_tags(CONBOY_NOTE_BUFFER(buffer));
+			conboy_note_window_update_button_states(ui);
 
 			return TRUE;
 		}
@@ -1436,9 +1356,8 @@ backspace(UserInterface* ui)
 			decrease_indent(buffer, line, line);
 
 			/* Update UI */
-			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
-			update_active_tags(buffer, &iter);
-			update_button_states(ui);
+			conboy_note_buffer_update_active_tags(CONBOY_NOTE_BUFFER(buffer));
+			conboy_note_window_update_button_states(ui);
 
 			/* Stop normal backspace effect */
 			return TRUE;
@@ -1461,9 +1380,8 @@ backspace(UserInterface* ui)
 				gtk_text_buffer_apply_tag_by_name(buffer, "list-item", &line_above, &iter);
 
 				/* Update UI */
-				gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
-				update_active_tags(buffer, &iter);
-				update_button_states(ui);
+				conboy_note_buffer_update_active_tags(CONBOY_NOTE_BUFFER(buffer));
+				conboy_note_window_update_button_states(ui);
 
 				/* Stop normal backspace effect */
 				return TRUE;
@@ -1493,9 +1411,8 @@ delete(UserInterface* ui)
 			decrease_indent(buffer, line, line);
 
 			/* Update UI */
-			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
-			update_active_tags(buffer, &iter);
-			update_button_states(ui);
+			conboy_note_buffer_update_active_tags(CONBOY_NOTE_BUFFER(buffer));
+			conboy_note_window_update_button_states(ui);
 
 			/* Stop normal delete effect */
 			return TRUE;
@@ -1637,10 +1554,8 @@ on_inc_indent_button_clicked			   (GtkAction		*action,
 		increase_indent(buffer, start_line, start_line);
 	}
 
-	GtkTextIter iter;
-	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
-	update_active_tags(buffer, &iter);
-	update_button_states(ui);
+	conboy_note_buffer_update_active_tags(CONBOY_NOTE_BUFFER(buffer));
+	conboy_note_window_update_button_states(ui);
 
 	gtk_text_buffer_set_modified(buffer, TRUE);
 }
@@ -1666,10 +1581,8 @@ on_dec_indent_button_clicked			   (GtkAction		*action,
 		decrease_indent(buffer, start_line, start_line);
 	}
 
-	GtkTextIter iter;
-	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
-	update_active_tags(buffer, &iter);
-	update_button_states(ui);
+	conboy_note_buffer_update_active_tags(CONBOY_NOTE_BUFFER(buffer));
+	conboy_note_window_update_button_states(ui);
 
 	gtk_text_buffer_set_modified(buffer, TRUE);
 }

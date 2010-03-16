@@ -68,5 +68,6 @@ UserInterface* create_mainwin(void);
 
 void conboy_note_window_show_note(UserInterface *ui, ConboyNote *note);
 
+void conboy_note_window_update_button_states(UserInterface *ui);
 
 #endif /* INTERFACE_H */

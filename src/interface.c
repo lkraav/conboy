@@ -81,10 +81,8 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 	gtk_text_buffer_create_tag(buffer, "list-item", NULL);
 	gtk_text_buffer_create_tag(buffer, "list", NULL);
 
-	/*
-	gtk_text_buffer_create_tag(buffer, "list-item", "foreground", "orange", NULL);
-	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
-	*/
+	//gtk_text_buffer_create_tag(buffer, "list-item", "foreground", "orange", NULL);
+	//gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
 }
 
 static void
@@ -1247,8 +1245,81 @@ UserInterface* create_mainwin() {
 	return ui;
 }
 
-void conboy_note_window_show_note(UserInterface *ui, ConboyNote *note)
+void
+conboy_note_window_show_note(UserInterface *ui, ConboyNote *note)
 {
 	conboy_note_buffer_set_xml(CONBOY_NOTE_BUFFER(ui->buffer), note->content);
 	ui->note = note;
+}
+
+void
+conboy_note_window_update_button_states(UserInterface *ui)
+{
+	/* Blocking signals here because the ..set_active() method makes the buttons
+	 * emit the clicked signal. And because of this the formatting changes.
+	 */
+	g_signal_handlers_block_by_func(ui->action_bold, on_format_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->action_italic, on_format_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->action_strike, on_format_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->action_highlight, on_format_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->action_fixed, on_format_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->action_bullets, on_bullets_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->action_font_small, on_font_size_radio_group_changed, ui);
+	g_signal_handlers_block_by_func(ui->action_dec_indent, on_dec_indent_button_clicked, ui);
+
+
+
+	/* TODO: This can be optimized: Note disable all and then enable selected, but determine state and then
+	 * set the state. */
+	gtk_toggle_action_set_active(ui->action_bold, FALSE);
+	gtk_toggle_action_set_active(ui->action_italic, FALSE);
+	gtk_toggle_action_set_active(ui->action_strike, FALSE);
+	gtk_toggle_action_set_active(ui->action_highlight, FALSE);
+	gtk_toggle_action_set_active(ui->action_fixed, FALSE);
+	gtk_toggle_action_set_active(ui->action_bullets, FALSE);
+	gtk_radio_action_set_current_value(ui->action_font_small, 1); /* Enable normal font size */
+
+	/* Disable indent actions */
+	/*gtk_action_set_sensitive(ui->action_inc_indent, TRUE);*/
+	gtk_action_set_sensitive(ui->action_dec_indent, FALSE);
+
+	/* Copy pointer for iteration */
+	GSList *tags = conboy_note_buffer_get_active_tags(CONBOY_NOTE_BUFFER(ui->buffer));
+	while (tags != NULL) {
+		GtkTextTag *tag = GTK_TEXT_TAG(tags->data);
+		if (strcmp(tag->name, "bold") == 0) {
+			gtk_toggle_action_set_active(ui->action_bold, TRUE);
+		} else if (strcmp(tag->name, "italic") == 0) {
+			gtk_toggle_action_set_active(ui->action_italic, TRUE);
+		} else if (strcmp(tag->name, "strikethrough") == 0) {
+			gtk_toggle_action_set_active(ui->action_strike, TRUE);
+		} else if (strcmp(tag->name, "highlight") == 0) {
+			gtk_toggle_action_set_active(ui->action_highlight, TRUE);
+		} else if (strcmp(tag->name, "monospace") == 0) {
+			gtk_toggle_action_set_active(ui->action_fixed, TRUE);
+		} else if (strncmp(tag->name, "list-item", 9) == 0) {
+			gtk_toggle_action_set_active(ui->action_bullets, TRUE);
+		} else if (strcmp(tag->name, "size:small") == 0) {
+			gtk_radio_action_set_current_value(ui->action_font_small, 0);
+		} else if (strcmp(tag->name, "size:large") == 0) {
+			gtk_radio_action_set_current_value(ui->action_font_small, 2);
+		} else if (strcmp(tag->name, "size:huge") == 0) {
+			gtk_radio_action_set_current_value(ui->action_font_small, 3);
+		} else if (strcmp(tag->name, "list") == 0) {
+			/*gtk_action_set_sensitive(ui->action_inc_indent, TRUE);*/
+			gtk_action_set_sensitive(ui->action_dec_indent, TRUE);
+		}
+
+		tags = tags->next;
+	}
+
+	/* unblock signals */
+	g_signal_handlers_unblock_by_func(ui->action_bold, on_format_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->action_italic, on_format_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->action_strike, on_format_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->action_highlight, on_format_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->action_fixed, on_format_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->action_bullets, on_bullets_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->action_font_small, on_font_size_radio_group_changed, ui);
+	g_signal_handlers_unblock_by_func(ui->action_dec_indent, on_dec_indent_button_clicked, ui);
 }

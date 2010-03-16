@@ -201,6 +201,17 @@ void note_save(UserInterface *ui)
 
 	/* Clear note content, then set it with fresh data from the text buffer */
 	content = conboy_note_buffer_get_xml(CONBOY_NOTE_BUFFER(buffer));
+
+	/****/
+	g_printerr("\n**%s**\n", content);
+	if (!g_str_has_suffix(content, "</note-content>\n")) {
+		hildon_banner_show_information(ui->window, NULL, "NOTE NOTE SAVED! NOTE CORRUPTED!");
+		g_free(content);
+		gtk_text_buffer_set_modified(buffer, FALSE);
+		return;
+	}
+	/****/
+
 	g_object_set(note, "content", content, NULL);
 	g_free(content);
 
@@ -387,5 +398,11 @@ void note_show(ConboyNote *note, gboolean modify_history, gboolean scroll, gbool
 
 	/* unblock signals */
 	g_signal_handlers_unblock_matched(buffer, G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL, ui);
+
+	/* Update active tags */
+	conboy_note_buffer_update_active_tags(CONBOY_NOTE_BUFFER(buffer));
+
+	/* Update the state of the buttons */
+	conboy_note_window_update_button_states(ui);
 }
 

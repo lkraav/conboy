@@ -162,6 +162,33 @@ conboy_note_buffer_set_active_tags (ConboyNoteBuffer *self, GSList *tags)
 	}
 }
 
+void
+conboy_note_buffer_update_active_tags (ConboyNoteBuffer *self)
+{
+	g_return_if_fail(self != NULL);
+	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
+
+	/* Clean the list of active tags */
+	conboy_note_buffer_clear_active_tags(self);
+
+	/* Add tags at this location */
+	GtkTextIter location;
+	gtk_text_buffer_get_iter_at_mark(GTK_TEXT_BUFFER(self), &location, gtk_text_buffer_get_insert(GTK_TEXT_BUFFER(self)));
+	GSList *tags = gtk_text_iter_get_tags(&location);
+	if (tags != NULL) {
+		conboy_note_buffer_set_active_tags(self, tags);
+	}
+
+	/* Go the beginning of line and check if there is a bullet.
+	 * If yes, add list-item and list tags */
+	gtk_text_iter_set_line_offset(&location, 0);
+	if (iter_get_depth_tag(&location) != NULL) {
+		/* Add tags */
+		conboy_note_buffer_add_active_tag_by_name(self, "list-item");
+		conboy_note_buffer_add_active_tag_by_name(self, "list");
+	}
+}
+
 
 /*
  * XML handling
