@@ -124,7 +124,9 @@ handle_start_element(xmlTextReader *reader, ConboyNote *note)
 			g_printerr("ERROR: Couldn't parse content version.\n");
 		}
 
-		g_object_set(note, "content", (gchar*)xmlTextReaderReadOuterXml(reader), NULL);
+		xmlChar *content = xmlTextReaderReadOuterXml(reader);
+		g_object_set(note, "content", (gchar*)content, NULL);
+		xmlFree(content);
 		break;
 
 	case LAST_CHANGE_DATE:
@@ -355,10 +357,11 @@ save (ConboyStoragePlugin *self, ConboyNote *note)
 	write_header(writer, note);
 
 	/* Write the complete content, but before writing it we need to
-	 * remove the redundant namespace declaration from it. Sady libxml2
+	 * remove the redundant namespace declaration from it. Sadly libxml2
 	 * wont do that for us :( */
 	GRegex *regex = g_regex_new(" xmlns(?:.*?)?=\".*?\"", 0, 0, NULL);
 	gchar *content_clean = g_regex_replace(regex, content, -1, 0, "", 0, NULL);
+	g_regex_unref(regex);
 
 	xmlTextWriterWriteRaw(writer, (const xmlChar *)content_clean);
 	g_free(content);

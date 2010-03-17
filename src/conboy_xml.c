@@ -50,6 +50,7 @@ conboy_xml_get_reader_for_file(const gchar *file_name)
 	/* Reusing the parser is not possible due to a bug in libxml2 */
 	if (__xml_text_reader != NULL) {
 		xmlFreeTextReader(__xml_text_reader);
+		__xml_text_reader = NULL;
 	}
 
 	__xml_text_reader = xmlReaderForFile(file_name, "UTF-8", 0);

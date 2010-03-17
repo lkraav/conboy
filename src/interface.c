@@ -101,6 +101,7 @@ set_item_label(GtkContainer *item, const gchar *open_tag, const gchar *text, con
 	/* TODO: Add checks, that it is really a label and the widget is really a Button or a MenuItem */
 	gtk_label_set_markup(GTK_LABEL(children->data), string);
 
+	g_list_free(children);
 	g_free(string);
 }
 
@@ -352,6 +353,7 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 	/* Try to open last viewed note */
 	if (guid != NULL) {
 		note = conboy_note_store_find_by_guid(app_data->note_store, guid);
+		g_free(guid);
 
 		if (note) {
 

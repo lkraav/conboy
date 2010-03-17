@@ -113,12 +113,13 @@ gboolean is_empty_str(const gchar* str)
 	g_strstrip(tmp);
 
 	if (strcmp(tmp, "") == 0) {
+		g_free(tmp);
 		return TRUE;
 	} else {
+		g_free(tmp);
 		return FALSE;
 	}
 
-	g_free(tmp);
 }
 
 
@@ -202,11 +203,23 @@ void note_save(UserInterface *ui)
 	/* Clear note content, then set it with fresh data from the text buffer */
 	content = conboy_note_buffer_get_xml(CONBOY_NOTE_BUFFER(buffer));
 
-	/****/
-	g_printerr("\n**%s**\n", content);
+	/** DEBUG **/
 	if (!g_str_has_suffix(content, "</note-content>\n")) {
-		hildon_banner_show_information(ui->window, NULL, "NOTE NOTE SAVED! NOTE CORRUPTED!");
+		/*hildon_banner_show_information(ui->window, NULL, "NOTE NOTE SAVED! NOTE CORRUPTED!");*/
+		g_printerr("\n**%s**\n", content);
 		g_free(content);
+		content = NULL;
+
+		/* Get XML again. See wheter is's ok now */
+		content = conboy_note_buffer_get_xml(CONBOY_NOTE_BUFFER(buffer));
+		if (!g_str_has_suffix(content, "</note-content>\n")) {
+			g_printerr("Second save NOT successful\n");
+			hildon_banner_show_information(ui->window, NULL, "Second save NOT successful!");
+		} else {
+			g_printerr("Second save successfull\n");
+			hildon_banner_show_information(ui->window, NULL, "Second save successful!");
+		}
+
 		gtk_text_buffer_set_modified(buffer, FALSE);
 		return;
 	}

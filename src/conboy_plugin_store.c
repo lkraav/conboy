@@ -324,6 +324,7 @@ conboy_plugin_store_init (ConboyPluginStore *self)
 		conboy_plugin_store_activate_by_name(self, plugin_name);
 		active_plugins = active_plugins->next;
 	}
+	g_slist_free(active_plugins);
 
 	/* Connect signal handler */
 	GList *plugin_infos = self->plugins;

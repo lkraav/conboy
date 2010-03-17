@@ -406,10 +406,12 @@ on_storage_activated(ConboyStorage *storage, ConboyNoteStore *self)
 
 	/* Add all notes from Storage to NoteStore */
 	GSList *notes = conboy_storage_note_list(storage);
-	while (notes) {
-		conboy_note_store_add(self, notes->data, NULL);
-		notes = notes->next;
+	GSList *iter = notes;
+	while (iter) {
+		conboy_note_store_add(self, iter->data, NULL);
+		iter = iter->next;
 	}
+	g_slist_free(notes);
 }
 
 static void

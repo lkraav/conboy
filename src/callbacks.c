@@ -775,7 +775,7 @@ on_text_buffer_modified_changed			(GtkTextBuffer *buffer,
 		return;
 	}
 
-	g_printerr("Buffer is dirty\n");
+	/*g_printerr("Buffer is dirty\n");*/
 
 	/* Remove last timer, if exists. Not strictly needed, most of the time there won't be another timer */
 	if (event_src_id > 0) {
@@ -999,26 +999,27 @@ static gboolean add_new_line(UserInterface *ui)
 			/* TODO: Copied from above */
 
 			/* Remove all tags but <list> from active tags */
-			tmp = g_slist_copy(conboy_note_buffer_get_active_tags(CONBOY_NOTE_BUFFER(ui->buffer)));
-			conboy_note_buffer_clear_active_tags(CONBOY_NOTE_BUFFER(ui->buffer));
-			conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
+			tmp = g_slist_copy(conboy_note_buffer_get_active_tags(CONBOY_NOTE_BUFFER(buffer)));
+			conboy_note_buffer_clear_active_tags(CONBOY_NOTE_BUFFER(buffer));
+			conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(buffer), "list");
 
 			/* Insert newline and bullet */
 			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
 			line = gtk_text_iter_get_line(&iter);
 			add_bullets(buffer, line, line, buffer_get_depth_tag(buffer, 1));
+			gtk_text_view_scroll_mark_onscreen(view, gtk_text_buffer_get_insert(buffer));
 
 			/* Add all tags back to active tags */
-			/*ui->active_tags = tmp;*/
-			conboy_note_buffer_set_active_tags(CONBOY_NOTE_BUFFER(ui->buffer), tmp);
+			if (tmp != NULL) {
+				conboy_note_buffer_set_active_tags(CONBOY_NOTE_BUFFER(buffer), tmp);
+			}
 
 			/* Turn on the list-item tag from here on */
-			conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
+			conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(buffer), "list-item");
 
 			/* Revaluate (turn on) the bullet button */
-			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
-			on_textview_cursor_moved(buffer, &iter, gtk_text_buffer_get_insert(buffer), ui);
+			conboy_note_window_update_button_states(ui);
 
 			return TRUE;
 		}

@@ -42,6 +42,9 @@ static void cleanup()
 	AppData *app_data = app_data_get();
 	gtk_list_store_clear(GTK_LIST_STORE(app_data->note_store));
 
+	/* Deinitialize OSSO */
+	osso_deinitialize(app_data->osso_ctx);
+
 	/* Free AppData */
 	app_data_free();
 
@@ -189,9 +192,6 @@ main (int argc, char *argv[])
   gdk_threads_leave();
 
   cleanup();
-
-  /* Deinitialize OSSO */
-  osso_deinitialize(app_data->osso_ctx);
 
   return 0;
 }

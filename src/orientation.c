@@ -106,11 +106,11 @@ dbus_is_portrait_mode(osso_context_t* ctx)
 			result = TRUE;
 		}
 
-		osso_rpc_free_val(&ret);
-
 	} else {
 		g_printerr("ERROR: Call do DBus failed\n");
 	}
+
+	osso_rpc_free_val(&ret);
 
 	return result;
 }

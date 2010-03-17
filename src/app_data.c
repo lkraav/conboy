@@ -91,6 +91,7 @@ void app_data_free()
 	if (app_data->search_window != NULL) {
 		gtk_widget_destroy(GTK_WIDGET(app_data->search_window));
 	}
-	
+
+	g_list_free(app_data->note_history);
 	g_free(app_data);
 }
