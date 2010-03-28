@@ -234,9 +234,11 @@ web_sync_do_sync (gpointer *user_data)
 	/* Revision checks */
 	JsonUser *user = json_get_user(reply);
 	if (user->latest_sync_revision < last_sync_rev) {
-		g_printerr("U1 rev: %i   Local rev: %i\n", user->latest_sync_revision, last_sync_rev);
-		web_sync_show_message(data, "Server revision older than our revision.");
-		return;
+		g_printerr("Server revision older than our revision\nU1 rev: %i   Local rev: %i\n", user->latest_sync_revision, last_sync_rev);
+		/* Looks like checking this does not help anything */
+		//web_sync_show_message(data, "Server revision older than our revision.");
+		//return;
+		last_sync_rev = user->latest_sync_revision;
 	}
 	web_sync_pulse_bar(bar);
 
@@ -260,7 +262,7 @@ web_sync_do_sync (gpointer *user_data)
 	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(note_store), &iter));
 
 
-	/* Get all notes since last syncRef*/
+	/* Get all notes since last syncRev*/
 	JsonNoteList *note_list = web_sync_get_notes(user, last_sync_rev);
 	last_sync_rev = note_list->latest_sync_revision;
 	web_sync_pulse_bar(bar);
