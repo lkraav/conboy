@@ -1089,20 +1089,25 @@ static gboolean add_new_line(UserInterface *ui)
 		} else {
 			/* Remove bullet and insert newline */
 			GtkTextIter start = iter;
+			GtkTextIter end = iter;
 
 			/* Disable list and list-item tags */
-			conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list-item");
-			conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(ui->buffer), "list");
+			conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(buffer), "list-item");
+			conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(buffer), "list");
 
 			/* Delete the bullet and the last newline */
 			gtk_text_iter_set_line_offset(&start, 0);
-			gtk_text_iter_backward_char(&start);
-			gtk_text_iter_forward_char(&iter); /* Also remove tag on comming linebreak */
+			gtk_text_iter_set_line_offset(&end, 0);
+			gtk_text_iter_set_line_offset(&iter, 0);
+			gtk_text_iter_forward_to_line_end(&end);
+			gtk_text_iter_forward_to_line_end(&iter);
+			gtk_text_iter_forward_char(&iter);
 			gtk_text_buffer_remove_all_tags(buffer, &start, &iter);
-			gtk_text_iter_backward_char(&iter); /* XXX */
-			gtk_text_buffer_delete(buffer, &start, &iter);
+			gtk_text_buffer_delete(buffer, &start, &end);
 
-			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
+			gtk_text_buffer_insert(buffer, &end, "\n", -1);
+
+			gtk_text_view_scroll_mark_onscreen(ui->view, gtk_text_buffer_get_insert(buffer));
 
 			/* Disable the bullet button */
 			conboy_note_buffer_update_active_tags(CONBOY_NOTE_BUFFER(buffer));
