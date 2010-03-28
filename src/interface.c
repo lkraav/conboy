@@ -147,7 +147,7 @@ on_orientation_changed(GdkScreen *screen, gpointer data)
 
 		/* Other */
 		gtk_text_view_set_editable(ui->view, FALSE);
-		/*hildon_gtk_text_view_set_input_mode(GTK_TEXT_VIEW(ui->view), HILDON_GTK_INPUT_MODE_FULL | HILDON_GTK_INPUT_MODE_AUTOCAP | HILDON_GTK_INPUT_MODE_NO_SCREEN_PLUGINS);*/
+		gtk_text_view_set_cursor_visible(ui->view, FALSE);
 
 	} else {
 		/* Toolbar */
@@ -166,7 +166,7 @@ on_orientation_changed(GdkScreen *screen, gpointer data)
 
 		/* Other */
 		gtk_text_view_set_editable(ui->view, TRUE);
-		/*hildon_gtk_text_view_set_input_mode(GTK_TEXT_VIEW(ui->view), HILDON_GTK_INPUT_MODE_FULL | HILDON_GTK_INPUT_MODE_AUTOCAP);*/
+		gtk_text_view_set_cursor_visible(ui->view, TRUE);
 	}
 }
 
