@@ -965,6 +965,7 @@ void decrease_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 	GtkTextTag *old_tag;
 	GtkTextTag *new_tag;
 	gint i;
+
 	for (i = start_line; i <= end_line; i++) {
 
 		gtk_text_buffer_get_iter_at_line(buffer, &start_iter, i);
@@ -1004,79 +1005,20 @@ void decrease_indent(GtkTextBuffer *buffer, gint start_line, gint end_line)
 }
 
 
+/**
+ * If nothing is selected and the cursor is very close to a bullet,
+ * then do not delete, but instead decrease the indent.
+ */
 static gboolean
 backspace(UserInterface* ui)
 {
 	GtkTextBuffer *buffer = ui->buffer;
 	GtkTextIter iter, sel_start, sel_end;
 
-	if (gtk_text_buffer_get_selection_bounds(buffer, &sel_start, &sel_end)) {
-
-
-		if (!line_is_bullet_line(&sel_start) && !line_is_bullet_line(&sel_end)) {
-			return FALSE; /* Do normal backspace */
-		}
-
-		if (line_is_bullet_line(&sel_start) && line_is_bullet_line(&sel_end)) {
-
-			/* Don't delete the bullet on the left if it is selected */
-			int line_offset = gtk_text_iter_get_line_offset(&sel_start);
-			if (line_offset <= 2) {
-				gtk_text_iter_forward_chars(&sel_start, 2-line_offset);
-			}
-
-			gtk_text_buffer_delete(buffer, &sel_start, &sel_end);
-			gtk_text_buffer_select_range(buffer, &sel_start, &sel_start);
-
-			return TRUE;
-		}
-
-		if (line_is_bullet_line(&sel_start) && !line_is_bullet_line(&sel_end)) {
-
-			/* Don't delete the bullet on the left if it is selected */
-			int line_offset = gtk_text_iter_get_line_offset(&sel_start);
-			if (line_offset <= 2) {
-				gtk_text_iter_forward_chars(&sel_start, 2-line_offset);
-			}
-
-			gtk_text_buffer_delete(buffer, &sel_start, &sel_end);
-
-			/* Add list and list-item tags to complete line */
-			gtk_text_iter_set_line(&sel_start, gtk_text_iter_get_line(&sel_start));
-			gtk_text_iter_forward_chars(&sel_start, 2);
-			gtk_text_iter_forward_to_line_end(&sel_end);
-			gtk_text_buffer_apply_tag_by_name(buffer, "list", &sel_start, &sel_end);
-			gtk_text_buffer_apply_tag_by_name(buffer, "list-item", &sel_start, &sel_end);
-
-			/* Remove selection */
-			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
-			gtk_text_buffer_select_range(buffer, &iter, &iter);
-
-			return TRUE;
-		}
-
-		if (!line_is_bullet_line(&sel_start) && line_is_bullet_line(&sel_end)) {
-
-			gtk_text_buffer_delete(buffer, &sel_start, &sel_end);
-
-			/* Remove list and list-item tags from complete line */
-			gtk_text_iter_set_line(&sel_start, gtk_text_iter_get_line(&sel_start));
-			gtk_text_iter_forward_to_line_end(&sel_end);
-			gtk_text_iter_forward_char(&sel_end);
-			gtk_text_buffer_remove_tag_by_name(buffer, "list", &sel_start, &sel_end);
-			gtk_text_buffer_remove_tag_by_name(buffer, "list-item", &sel_start, &sel_end);
-
-			/* Remove selection */
-			gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
-			gtk_text_buffer_select_range(buffer, &iter, &iter);
-
-			return TRUE;
-		}
+	/* If something is selected, do nothing */
+	if (gtk_text_buffer_get_selection_bounds(buffer, NULL, NULL)) {
+		return FALSE; /* Normal backspace */
 	}
-
-	/*
-	 * Nothing is selected
-	 */
 
 	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
 
@@ -1095,31 +1037,6 @@ backspace(UserInterface* ui)
 
 			/* Stop normal backspace effect */
 			return TRUE;
-		}
-
-		/* If cursor not in list and on the very left and above is a list, add line to list */
-		if (gtk_text_iter_get_line_offset(&iter) == 0) {
-
-			GtkTextIter line_above = iter;
-			gtk_text_iter_backward_line(&line_above);
-
-			if (line_is_bullet_line(&line_above)) {
-				/* Remove the line break */
-				gtk_text_iter_forward_to_line_end(&line_above);
-				gtk_text_buffer_delete(buffer, &line_above, &iter);
-				/* Add list and list-item tags to complete line */
-				gtk_text_iter_set_line(&iter, gtk_text_iter_get_line(&iter));
-				gtk_text_iter_forward_to_line_end(&iter);
-				gtk_text_buffer_apply_tag_by_name(buffer, "list", &line_above, &iter);
-				gtk_text_buffer_apply_tag_by_name(buffer, "list-item", &line_above, &iter);
-
-				/* Update UI */
-				conboy_note_buffer_update_active_tags(CONBOY_NOTE_BUFFER(buffer));
-				conboy_note_window_update_button_states(ui);
-
-				/* Stop normal backspace effect */
-				return TRUE;
-			}
 		}
 	}
 
@@ -1140,11 +1057,6 @@ static gboolean add_new_line(UserInterface *ui)
 	gtk_text_buffer_get_iter_at_mark(buffer, &iter, gtk_text_buffer_get_insert(buffer));
 	gtk_text_iter_set_line_offset(&iter, 0);
 	depth_tag = iter_get_depth_tag(&iter);
-
-	/* If something is selected, Enter is like Backspace */
-	if (gtk_text_buffer_get_selection_bounds(buffer, NULL, NULL)) {
-		return backspace(ui);
-	}
 
 	/* If line starts with a bullet */
 	if (depth_tag != NULL) {
@@ -1187,7 +1099,7 @@ static gboolean add_new_line(UserInterface *ui)
 			gtk_text_iter_backward_char(&start);
 			gtk_text_iter_forward_char(&iter); /* Also remove tag on comming linebreak */
 			gtk_text_buffer_remove_all_tags(buffer, &start, &iter);
-			gtk_text_iter_backward_char(&iter);
+			gtk_text_iter_backward_char(&iter); /* XXX */
 			gtk_text_buffer_delete(buffer, &start, &iter);
 
 			gtk_text_buffer_insert(buffer, &iter, "\n", -1);
@@ -1324,6 +1236,44 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 	*/
 }
 
+/**
+ * Add or remove list and list-item tags, depending whether or not the
+ * cursor is in a list.
+ */
+void
+fix_list_tags(GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_iter)
+{
+	GtkTextIter start = *start_iter;
+	GtkTextIter end   = *end_iter;
+
+	if (line_is_bullet_line(start_iter)) {
+		/* Add list and list-item tags to complete line */
+		gtk_text_iter_set_line(&start, gtk_text_iter_get_line(&start));
+		gtk_text_iter_set_line(&end, gtk_text_iter_get_line(&end));
+		gtk_text_iter_forward_to_line_end(&end);
+		gtk_text_buffer_apply_tag_by_name(buffer, "list", &start, &end);
+		gtk_text_iter_forward_chars(&start, 2);
+		gtk_text_buffer_apply_tag_by_name(buffer, "list-item", &start, &end);
+		conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(buffer), "list");
+		conboy_note_buffer_add_active_tag_by_name(CONBOY_NOTE_BUFFER(buffer), "list-item");
+	} else {
+
+		/* Remove list and list-item tags from complete line */
+		gtk_text_iter_set_line(&start, gtk_text_iter_get_line(&start));
+		gtk_text_iter_set_line(&end, gtk_text_iter_get_line(&end));
+		/* Remove tags, only if the line is not empty. Otherwise the next line would be taken. */
+		gunichar c = gtk_text_iter_get_char(&end);
+		if (g_unichar_break_type(c) != G_UNICODE_BREAK_LINE_FEED) {
+			gtk_text_iter_forward_to_line_end(&end);
+			gtk_text_iter_forward_char(&end);
+			gtk_text_buffer_remove_tag_by_name(buffer, "list", &start, &end);
+			gtk_text_buffer_remove_tag_by_name(buffer, "list-item", &start, &end);
+			conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(buffer), "list");
+			conboy_note_buffer_remove_active_tag_by_name(CONBOY_NOTE_BUFFER(buffer), "list-item");
+		}
+	}
+}
+
 void
 on_text_buffer_delete_range					(GtkTextBuffer *buffer,
 											 GtkTextIter   *start_iter,
@@ -1332,13 +1282,15 @@ on_text_buffer_delete_range					(GtkTextBuffer *buffer,
 {
 	UserInterface *ui = (UserInterface*)user_data;
 
-	g_printerr("on delete\n");
-
 	/* Don't do anything when in the title line */
 	if (gtk_text_iter_get_line(start_iter) == 0 || gtk_text_iter_get_line(end_iter) == 0) {
 		__editing_title = TRUE;
 		return;
 	}
+
+	fix_list_tags(buffer, start_iter, end_iter);
+
+	conboy_note_window_update_button_states(ui);
 
 	check_title(ui);
 
@@ -1420,7 +1372,6 @@ delete(UserInterface* ui)
 
 	/* If the cursor is directly before or after a bullet */
 	if (gtk_text_iter_get_line_offset(&iter) <= 1) {
-		//if (gtk_text_iter_has_tag(&iter, gtk_text_tag_table_lookup(buffer->tag_table, "list"))) {
 		if (line_is_bullet_line(&iter)) {
 
 			/* Decrease indent */
@@ -1447,14 +1398,12 @@ delete(UserInterface* ui)
 
 		/* If the current line is a list-item */
 		gtk_text_iter_backward_char(&iter);
-		//if (gtk_text_iter_has_tag(&iter, gtk_text_tag_table_lookup(buffer->tag_table, "list"))) {
 		if (line_is_bullet_line(&iter)) {
 
 			/* Move over line break */
 			gtk_text_iter_forward_line(&iter);
 
 			/* If next line has bullet, remove two chars additional, else remove only linebreak */
-			//if (gtk_text_iter_has_tag(&iter, gtk_text_tag_table_lookup(buffer->tag_table, "list"))) {
 			if (line_is_bullet_line(&iter)) {
 				gtk_text_iter_forward_chars(&iter, 2);
 				gtk_text_buffer_delete(buffer, &line_end, &iter);
@@ -1476,7 +1425,6 @@ delete(UserInterface* ui)
 		gtk_text_iter_forward_line(&iter);
 
 		/* If next line has bullet, remove two chars additional */
-		//if (gtk_text_iter_has_tag(&iter, gtk_text_tag_table_lookup(buffer->tag_table, "list"))) {
 		if (line_is_bullet_line(&iter)) {
 			gtk_text_iter_forward_chars(&iter, 2);
 			gtk_text_buffer_delete(buffer, &line_end, &iter);
