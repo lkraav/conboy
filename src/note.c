@@ -216,7 +216,7 @@ void note_save(UserInterface *ui)
 			g_printerr("Second save NOT successful\n");
 			hildon_banner_show_information(ui->window, NULL, "Second save NOT successful!");
 		} else {
-			g_printerr("Second save successfull\n");
+			g_printerr("Second save successful\n");
 			hildon_banner_show_information(ui->window, NULL, "Second save successful!");
 		}
 
