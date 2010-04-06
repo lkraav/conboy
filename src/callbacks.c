@@ -1031,7 +1031,7 @@ on_about_button_clicked				   (GtkAction		*action,
 	he_about_dialog_set_app_name(dia, "Conboy");
 	he_about_dialog_set_bugtracker(dia, "https://bugs.maemo.org/enter_bug.cgi?product=Conboy");
 	he_about_dialog_set_copyright(dia, "(c) Cornelius Hald 2010");
-	he_about_dialog_set_description(dia, "Conboy is a note taking application.");
+	he_about_dialog_set_description(dia, _("Conboy is a note taking application."));
 	he_about_dialog_set_icon_name(dia, "conboy");
 	he_about_dialog_set_version(dia, VERSION);
 	he_about_dialog_set_website(dia, "http://conboy.garage.maemo.org");
