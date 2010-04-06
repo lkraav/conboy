@@ -147,11 +147,11 @@ msgstr "Alle Notizen durchsuchen"
 #. Add sort filters
 #: ../src/search_window.c:376
 msgid "Sort by title"
-msgstr "Nach Titel sortieren"
+msgstr "Titel sortieren"
 
 #: ../src/search_window.c:377
 msgid "Sort by date"
-msgstr "Nach Datum sortieren"
+msgstr "Datum sortieren"
 
 #: ../src/search_window.c:484
 msgid "Note"
