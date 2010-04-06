@@ -1,3 +1,12 @@
+conboy (1:0.6.3.7) stable; urgency=low
+
+  * Reworked handling of bullet lists with selections
+  * Increasing and decreasing of multiple bullets now working properly
+  * Hide cursor when in portrait mode
+  * Added Norwegian Bokmål translation  
+  
+ -- Cornelius Hald <hald@icandy.de>  Sat, 17 Mar 2010 09:15:14 +0200
+ 
 conboy (1:0.6.3.6) stable; urgency=low
 
   * Fixed memory leaks
