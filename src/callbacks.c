@@ -729,17 +729,7 @@ on_textview_tap_and_hold(GtkWidget *widget, gpointer user_data)
 }
 
 
-static gboolean
-line_is_bullet_line(GtkTextIter *line_iter)
-{
-	GtkTextIter iter = *line_iter;
-	gtk_text_iter_set_line(&iter, gtk_text_iter_get_line(line_iter));
-	if (conboy_note_buffer_find_depth_tag(&iter)) {
-		return TRUE;
-	} else {
-		return FALSE;
-	}
-}
+
 
 
 static void
@@ -895,7 +885,6 @@ on_inc_indent_button_clicked			   (GtkAction		*action,
 		conboy_note_buffer_increase_indent(buffer, start_line, start_line);
 	}
 
-	conboy_note_buffer_update_active_tags(CONBOY_NOTE_BUFFER(buffer));
 	conboy_note_window_update_button_states(ui);
 
 	gtk_text_buffer_set_modified(buffer, TRUE);
@@ -922,7 +911,6 @@ on_dec_indent_button_clicked			   (GtkAction		*action,
 		conboy_note_buffer_decrease_indent(buffer, start_line, start_line);
 	}
 
-	conboy_note_buffer_update_active_tags(CONBOY_NOTE_BUFFER(buffer));
 	conboy_note_window_update_button_states(ui);
 
 	gtk_text_buffer_set_modified(buffer, TRUE);

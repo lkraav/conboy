@@ -77,6 +77,11 @@ conboy_note_buffer_add_active_tag (ConboyNoteBuffer *self, GtkTextTag *tag)
 	g_return_if_fail(CONBOY_IS_NOTE_BUFFER(self));
 	g_return_if_fail(GTK_IS_TEXT_TAG(tag));
 
+	if (strncmp(tag->name, "depth", 5) == 0) {
+		g_printerr("WARNING: Trying to add depth tag. Not added\n", tag->name);
+		return;
+	}
+
 	GSList *tags = tags = self->active_tags;
 	while (tags != NULL) {
 		if (strcmp(GTK_TEXT_TAG(tags->data)->name, tag->name) == 0) {
@@ -155,9 +160,12 @@ conboy_note_buffer_set_active_tags (ConboyNoteBuffer *self, GSList *tags)
 	g_slist_free(self->active_tags);
 	self->active_tags = NULL;
 
-	/* Copy elements of given list */
+	/* Copy elements of given list, but ignore depth tags */
 	while (tags != NULL) {
-		self->active_tags = g_slist_prepend(self->active_tags, tags->data);
+		GtkTextTag *tag = GTK_TEXT_TAG(tags->data);
+		if (strncmp(tag->name, "depth", 5 != 0)) {
+			self->active_tags = g_slist_prepend(self->active_tags, tag);
+		}
 		tags = tags->next;
 	}
 }
@@ -264,8 +272,14 @@ add_bullets(ConboyNoteBuffer *buffer, gint start_line, gint end_line, GtkTextTag
 	/* For each selected line */
 	for (i = start_line; i <= end_line; i++) {
 
-		/* Insert bullet character */
 		gtk_text_buffer_get_iter_at_line(buf, &start_iter, i);
+		/* If there is already a bullet, skip this line */
+		if (conboy_note_buffer_find_depth_tag(&start_iter)) {
+			continue;
+		}
+
+		/* Insert bullet character */
+		//gtk_text_buffer_get_iter_at_line(buf, &start_iter, i);
 		gtk_text_buffer_insert(buf, &start_iter, get_bullet_by_depth_tag(depth_tag), -1);
 
 		/* Remove existing tags from the bullet and add the <depth> tag */
@@ -289,7 +303,7 @@ add_bullets(ConboyNoteBuffer *buffer, gint start_line, gint end_line, GtkTextTag
 	/* Check line above and below. If one or both are bullet lines, include the newline chars at the beginning and the end */
 	/* This is done, so that there are no gaps in the <list> tag and that it really surrounds the whole list. */
 
-	/* Set start iter TODO: This if statement is not elegant at all.*/
+	/* Set start iter */
 	if (start_line > 0) {
 		gtk_text_buffer_get_iter_at_line(buf, &start_iter, start_line - 1);
 		if (conboy_note_buffer_find_depth_tag(&start_iter) != NULL) {
@@ -301,7 +315,7 @@ add_bullets(ConboyNoteBuffer *buffer, gint start_line, gint end_line, GtkTextTag
 		gtk_text_buffer_get_iter_at_line(buf, &start_iter, start_line);
 	}
 
-	/* Set end iter TODO: This if statement is not elegant at all. */
+	/* Set end iter */
 	if (end_line < total_lines - 1) {
 		gtk_text_buffer_get_iter_at_line(buf, &end_iter, end_line + 1);
 		if (conboy_note_buffer_find_depth_tag(&end_iter) == NULL) {
@@ -313,12 +327,6 @@ add_bullets(ConboyNoteBuffer *buffer, gint start_line, gint end_line, GtkTextTag
 		gtk_text_iter_forward_to_line_end(&end_iter);
 	}
 
-	/****/
-	/*
-	gtk_text_buffer_get_iter_at_line(buffer, &start_iter, start_line);
-	gtk_text_buffer_get_iter_at_line(buffer, &end_iter, end_line);
-	gtk_text_iter_forward_to_line_end(&end_iter);
-	*/
 	gtk_text_buffer_apply_tag_by_name(buf, "list", &start_iter, &end_iter);
 }
 
@@ -432,7 +440,6 @@ conboy_note_buffer_decrease_indent(ConboyNoteBuffer *buffer, gint start_line, gi
 			gtk_text_iter_set_line_offset(&end_iter, 2);
 
 			if (depth == 1) {
-				g_printerr("Depth == 1. Removing bullet... Start: %i  End: %i\n", gtk_text_iter_get_line_offset(&start_iter), gtk_text_iter_get_line_offset(&end_iter));
 				remove_bullets(buffer, &start_iter, &end_iter);
 				continue;
 			}
@@ -450,6 +457,8 @@ conboy_note_buffer_decrease_indent(ConboyNoteBuffer *buffer, gint start_line, gi
 			add_bullets(buffer, i, i, new_tag);
 		}
 	}
+
+	conboy_note_buffer_update_active_tags(buffer);
 }
 
 void
@@ -488,6 +497,7 @@ conboy_note_buffer_increase_indent(ConboyNoteBuffer *buffer, gint start_line, gi
 		add_bullets(buffer, i, i, new_tag);
 	}
 
+	conboy_note_buffer_update_active_tags(buffer);
 }
 
 
@@ -832,9 +842,6 @@ conboy_note_buffer_fix_list_tags(ConboyNoteBuffer *buffer, GtkTextIter *start_it
 
 	if (line_is_bullet_line(&start)) {
 		/* Add list and list-item tags to complete line */
-		//g_printerr("Is bullet line\n");
-		//g_printerr("Start: %i\n", gtk_text_iter_get_offset(&start));
-		//g_printerr("  End: %i\n\n", gtk_text_iter_get_offset(&end));
 		gtk_text_iter_set_line(&start, gtk_text_iter_get_line(&start));
 		gtk_text_iter_set_line(&end, gtk_text_iter_get_line(&end));
 		gtk_text_iter_forward_to_line_end(&end);
@@ -844,21 +851,16 @@ conboy_note_buffer_fix_list_tags(ConboyNoteBuffer *buffer, GtkTextIter *start_it
 		conboy_note_buffer_add_active_tag_by_name(buffer, "list");
 		conboy_note_buffer_add_active_tag_by_name(buffer, "list-item");
 	} else {
-		//g_printerr("Is not bullet line\n");
-		//g_printerr("Start: %i\n", gtk_text_iter_get_line(&start));
-		//g_printerr("  End: %i\n", gtk_text_iter_get_line(&end));
 		/* Remove list and list-item tags from complete line */
 		gtk_text_iter_set_line(&start, gtk_text_iter_get_line(&start));
 		gtk_text_iter_set_line(&end, gtk_text_iter_get_line(&end));
 		/* Remove tags, only if the line is not empty. Otherwise the next line would be taken. */
 		gunichar c = gtk_text_iter_get_char(&end);
 		if (g_unichar_break_type(c) != G_UNICODE_BREAK_LINE_FEED) {
-			//g_printerr("Is empty line\n");
 			gtk_text_iter_forward_to_line_end(&end);
 			gtk_text_iter_forward_char(&end);
 			gtk_text_buffer_remove_tag_by_name(buf, "list", &start, &end);
 			gtk_text_buffer_remove_tag_by_name(buf, "list-item", &start, &end);
-			//g_printerr("Remove from %i to %i\n\n", gtk_text_iter_get_offset(&start), gtk_text_iter_get_offset(&end));
 			conboy_note_buffer_remove_active_tag_by_name(buffer, "list");
 			conboy_note_buffer_remove_active_tag_by_name(buffer, "list-item");
 		}
@@ -958,7 +960,6 @@ static void write_start_element(GtkTextTag *tag, xmlTextWriter *writer)
 	/* If there was an increase in depth, we need to add a <list> tag */
 	if (_new_depth > _depth) {
 		gint diff = _new_depth - _depth;
-		/*g_printerr("new_depth > depth. DIFF: %i \n", new_depth - depth);*/
 
 		while (diff > 0) {
 			xmlTextWriterStartElement(writer, BAD_CAST "list");
