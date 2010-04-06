@@ -1,7 +1,7 @@
 # translation of pl.po to Polish
 # Anna Karwowska <anna@zwong.de>, 2009.
 # Piotr Drąg <piotrdrag@gmail.com>, 2009.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: conboy\n"
@@ -16,18 +16,15 @@ msgstr ""
 "X-Poedit-Language: Polish\n"
 "X-Poedit-Country: Poland\n"
 
-#: ../src/interface.c:644
-#: ../src/callbacks.c:287
-#: ../src/note.c:169
+#: ../src/interface.c:644 ../src/callbacks.c:287 ../src/note.c:169
 #, c-format
 msgid "New Note %i"
 msgstr "Nowa notatka %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
-#: ../src/interface.c:936
-#: ../src/interface.c:1045
-#: ../src/interface.c:1083
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
+#: ../src/interface.c:936 ../src/interface.c:1045 ../src/interface.c:1083
 msgid "Bold"
 msgstr "Pogrubienie"
 
@@ -43,15 +40,11 @@ msgstr "Zmniejsz wcięcie"
 msgid "Delete note"
 msgstr "Usuń notatkę"
 
-#: ../src/interface.c:940
-#: ../src/interface.c:1049
-#: ../src/interface.c:1087
+#: ../src/interface.c:940 ../src/interface.c:1049 ../src/interface.c:1087
 msgid "Fixed width"
 msgstr "Stała szerokość"
 
-#: ../src/interface.c:941
-#: ../src/interface.c:1048
-#: ../src/interface.c:1086
+#: ../src/interface.c:941 ../src/interface.c:1048 ../src/interface.c:1086
 msgid "Highlight"
 msgstr "Wyróżnienie"
 
@@ -71,8 +64,7 @@ msgstr "Nowa notatka"
 msgid "Open note"
 msgstr "Otwórz notatkę"
 
-#: ../src/interface.c:946
-#: ../src/settings_window.c:588
+#: ../src/interface.c:946 ../src/settings_window.c:588
 #: ../src/settings_window.c:596
 msgid "Settings"
 msgstr "Ustawienia"
@@ -81,15 +73,11 @@ msgstr "Ustawienia"
 msgid "Quit"
 msgstr "Zakończ"
 
-#: ../src/interface.c:948
-#: ../src/interface.c:1046
-#: ../src/interface.c:1084
+#: ../src/interface.c:948 ../src/interface.c:1046 ../src/interface.c:1084
 msgid "Italic"
 msgstr "Pochylenie"
 
-#: ../src/interface.c:949
-#: ../src/interface.c:1047
-#: ../src/interface.c:1085
+#: ../src/interface.c:949 ../src/interface.c:1047 ../src/interface.c:1085
 msgid "Strikeout"
 msgstr "Przekreślenie"
 
@@ -121,15 +109,12 @@ msgstr "Wstecz"
 msgid "Forward"
 msgstr "Dalej"
 
-#: ../src/interface.c:958
-#: ../src/search_window.c:357
+#: ../src/interface.c:958 ../src/search_window.c:357
 msgid "Fullscreen"
 msgstr "Pełny ekran"
 
 #. TODO: Use an enum instead of 0 to 3
-#: ../src/interface.c:960
-#: ../src/interface.c:1050
-#: ../src/interface.c:1088
+#: ../src/interface.c:960 ../src/interface.c:1050 ../src/interface.c:1088
 msgid "Small"
 msgstr "Mały"
 
@@ -137,21 +122,16 @@ msgstr "Mały"
 msgid "Normal"
 msgstr "Normalny"
 
-#: ../src/interface.c:962
-#: ../src/interface.c:1051
-#: ../src/interface.c:1089
+#: ../src/interface.c:962 ../src/interface.c:1051 ../src/interface.c:1089
 msgid "Large"
 msgstr "Duży"
 
-#: ../src/interface.c:963
-#: ../src/interface.c:1052
-#: ../src/interface.c:1090
+#: ../src/interface.c:963 ../src/interface.c:1052 ../src/interface.c:1090
 msgid "Huge"
 msgstr "Wielki"
 
 #. FIND TOOL BAR
-#: ../src/interface.c:1225
-#: ../src/search_window.c:411
+#: ../src/interface.c:1225 ../src/search_window.c:411
 msgid "Search:"
 msgstr "Wyszukaj:"
 
@@ -160,19 +140,19 @@ msgid "Search all notes"
 msgstr "Wyszukaj we wszystkich notatkach"
 
 #. Add New Note item
-#.
+#. 
 #. menu_new_note = gtk_button_new();
 #. gtk_action_connect_proxy(new_note_action, menu_new_note);
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#.
+#. 
 #. Add sort filters
 #: ../src/search_window.c:376
 msgid "Sort by title"
-msgstr "Posortuj według tytułów"
+msgstr "Sortuj wg tytułu"
 
 #: ../src/search_window.c:377
 msgid "Sort by date"
-msgstr "Posortuj według daty"
+msgstr "Sortuj wg daty"
 
 #: ../src/search_window.c:484
 msgid "Note"
@@ -213,13 +193,11 @@ msgstr "Cienki"
 msgid "Thick"
 msgstr "Gruby"
 
-#: ../src/settings_window.c:392
-#: ../src/settings_window.c:394
+#: ../src/settings_window.c:392 ../src/settings_window.c:394
 msgid "Use automatic portrait mode"
 msgstr "Użycie automatycznego trybu pionowego"
 
-#: ../src/settings_window.c:406
-#: ../src/settings_window.c:408
+#: ../src/settings_window.c:406 ../src/settings_window.c:408
 msgid "Use custom colors"
 msgstr "Użycie własnych kolorów"
 
@@ -247,8 +225,7 @@ msgstr "Wtyczka"
 msgid "Enabled"
 msgstr "Włączona"
 
-#: ../src/conboy_plugin_manager.c:129
-#: ../src/conboy_plugin_manager_row.c:132
+#: ../src/conboy_plugin_manager.c:129 ../src/conboy_plugin_manager_row.c:132
 msgid "Plugin settings"
 msgstr "Ustawienia wtyczki"
 
@@ -281,4 +258,3 @@ msgstr "Conboy to program do robienia notatek."
 #: ../debian/control.in:21
 msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
 msgstr "Jest zaprojektowany tak, aby był łatwy w użytkowaniu, a jednocześnie funkcjonalny. Program Conboy może odczytywać i zapisywać format pliku programu Tomboy z systemów Linux, Mac i Windows."
-
