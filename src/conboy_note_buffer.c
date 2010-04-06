@@ -182,10 +182,686 @@ conboy_note_buffer_update_active_tags (ConboyNoteBuffer *self)
 	/* Go the beginning of line and check if there is a bullet.
 	 * If yes, add list-item and list tags */
 	gtk_text_iter_set_line_offset(&location, 0);
-	if (iter_get_depth_tag(&location) != NULL) {
+	if (conboy_note_buffer_find_depth_tag(&location) != NULL) {
 		/* Add tags */
 		conboy_note_buffer_add_active_tag_by_name(self, "list-item");
 		conboy_note_buffer_add_active_tag_by_name(self, "list");
+	}
+}
+
+GtkTextTag*
+conboy_note_buffer_get_depth_tag(ConboyNoteBuffer *buffer, gint depth)
+{
+	GtkTextBuffer *buf = GTK_TEXT_BUFFER(buffer);
+	GtkTextTag *tag;
+	gchar depth_str[5] = {0};
+	gchar *tag_name;
+
+	if (depth < 1) {
+		g_printerr("ERROR: buffer_get_depth_tag(): depth must be at least 1. Not: %i \n", depth);
+	}
+
+	g_sprintf(depth_str, "%i", depth);
+	tag_name = g_strconcat("depth", ":", depth_str, NULL);
+
+	tag = gtk_text_tag_table_lookup(buf->tag_table, tag_name);
+
+	if (tag == NULL) {
+		tag = gtk_text_buffer_create_tag(buf, tag_name, "indent", -20, "left-margin", depth * 25, NULL);
+	}
+
+	g_free(tag_name);
+
+	return tag;
+}
+
+static gboolean
+tag_is_depth_tag(GtkTextTag *tag)
+{
+	if (tag == NULL) {
+		return FALSE;
+	}
+	return (strncmp(tag->name, "depth", 5) == 0);
+}
+
+static gint
+tag_get_depth(GtkTextTag *tag)
+{
+	if (tag_is_depth_tag(tag)) {
+		char **strings = g_strsplit(tag->name, ":", 2);
+		int depth = atoi(strings[1]);
+		g_strfreev(strings);
+		return depth;
+	}
+	return 0;
+}
+
+/* char *_bullets[] = {"\u2022 ", "\u2218 ", "\u2023 ", "\u2043 ", "\u204d ", "\u2219 ", "\u25e6 "}; */
+/* These 3 bullets work with diablo and standard font */
+char *_bullets[] = {"\u2022 ", "\u25e6 ", "\u2219 "};
+static const gchar*
+get_bullet_by_depth(gint depth) {
+	if (depth <= 0) {
+		g_printerr("ERROR: get_bullets_by_depth(): depth must be at least 1.\n");
+		return "\u2022 ";
+	}
+	return _bullets[(depth - 1) % 3];
+}
+
+static const gchar*
+get_bullet_by_depth_tag(GtkTextTag *tag) {
+	return get_bullet_by_depth(tag_get_depth(tag));
+}
+
+static void
+add_bullets(ConboyNoteBuffer *buffer, gint start_line, gint end_line, GtkTextTag *depth_tag)
+{
+	GtkTextBuffer *buf = GTK_TEXT_BUFFER(buffer);
+	gint i = 0;
+	GtkTextIter start_iter, end_iter;
+	gint total_lines = gtk_text_buffer_get_line_count(buf);
+
+	/* For each selected line */
+	for (i = start_line; i <= end_line; i++) {
+
+		/* Insert bullet character */
+		gtk_text_buffer_get_iter_at_line(buf, &start_iter, i);
+		gtk_text_buffer_insert(buf, &start_iter, get_bullet_by_depth_tag(depth_tag), -1);
+
+		/* Remove existing tags from the bullet and add the <depth> tag */
+		gtk_text_buffer_get_iter_at_line_offset(buf, &start_iter, i, 0);
+		gtk_text_buffer_get_iter_at_line_offset(buf, &end_iter, i, 2);
+		gtk_text_buffer_remove_all_tags(buf, &start_iter, &end_iter);
+		gtk_text_buffer_apply_tag(buf, depth_tag, &start_iter, &end_iter);
+
+		/* Surround line (starting after BULLET) with "list-item" tags */
+		gtk_text_buffer_get_iter_at_line_offset(buf, &start_iter, i, 2); /* Jump bullet */
+		if (i == end_line) {
+			gtk_text_buffer_get_iter_at_line(buf, &end_iter, i);
+			gtk_text_iter_forward_to_line_end(&end_iter);
+		} else {
+			gtk_text_buffer_get_iter_at_line(buf, &end_iter, i + 1);
+		}
+		gtk_text_buffer_apply_tag_by_name(buf, "list-item", &start_iter, &end_iter);
+	}
+
+	/* Surround everything it with "list" tags */
+	/* Check line above and below. If one or both are bullet lines, include the newline chars at the beginning and the end */
+	/* This is done, so that there are no gaps in the <list> tag and that it really surrounds the whole list. */
+
+	/* Set start iter TODO: This if statement is not elegant at all.*/
+	if (start_line > 0) {
+		gtk_text_buffer_get_iter_at_line(buf, &start_iter, start_line - 1);
+		if (conboy_note_buffer_find_depth_tag(&start_iter) != NULL) {
+			gtk_text_iter_forward_to_line_end(&start_iter);
+		} else {
+			gtk_text_buffer_get_iter_at_line(buf, &start_iter, start_line);
+		}
+	} else {
+		gtk_text_buffer_get_iter_at_line(buf, &start_iter, start_line);
+	}
+
+	/* Set end iter TODO: This if statement is not elegant at all. */
+	if (end_line < total_lines - 1) {
+		gtk_text_buffer_get_iter_at_line(buf, &end_iter, end_line + 1);
+		if (conboy_note_buffer_find_depth_tag(&end_iter) == NULL) {
+			gtk_text_buffer_get_iter_at_line(buf, &end_iter, end_line);
+			gtk_text_iter_forward_to_line_end(&end_iter);
+		}
+	} else {
+		gtk_text_buffer_get_iter_at_line(buf, &end_iter, end_line);
+		gtk_text_iter_forward_to_line_end(&end_iter);
+	}
+
+	/****/
+	/*
+	gtk_text_buffer_get_iter_at_line(buffer, &start_iter, start_line);
+	gtk_text_buffer_get_iter_at_line(buffer, &end_iter, end_line);
+	gtk_text_iter_forward_to_line_end(&end_iter);
+	*/
+	gtk_text_buffer_apply_tag_by_name(buf, "list", &start_iter, &end_iter);
+}
+
+
+
+
+
+
+static void
+remove_bullets(ConboyNoteBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_iter)
+{
+	GtkTextBuffer *buf = GTK_TEXT_BUFFER(buffer);
+	gint i = 0;
+	GtkTextIter start = *start_iter;
+	GtkTextIter end = *end_iter;
+	gint start_line = gtk_text_iter_get_line(&start);
+	gint end_line = gtk_text_iter_get_line(&end);
+
+	/* Remove tags */
+	gtk_text_iter_set_line_offset(&start, 0);
+	gtk_text_iter_set_line_offset(&end, 0);
+	gtk_text_iter_forward_to_line_end(&end);
+
+	/* Include the newline char before and after this line */
+	gtk_text_iter_backward_char(&start);
+	gtk_text_iter_forward_char(&end);
+
+	gtk_text_buffer_remove_tag_by_name(buf, "list-item", &start, &end);
+	gtk_text_buffer_remove_tag_by_name(buf, "list", &start, &end);
+
+	conboy_note_buffer_remove_active_tag_by_name(buffer, "list");
+	conboy_note_buffer_remove_active_tag_by_name(buffer, "list-item");
+
+	/* Remove bullets */
+	for (i = start_line; i <= end_line; i++) {
+		gtk_text_buffer_get_iter_at_line(buf, &start, i);
+		gtk_text_buffer_get_iter_at_line(buf, &end, i);
+		gtk_text_iter_forward_chars(&end, 2);
+		//gtk_text_buffer_remove_all_tags(buf, &start, &end); /* NEW */
+		gtk_text_buffer_delete(buf, &start, &end);
+	}
+}
+
+void
+conboy_note_buffer_enable_bullets(ConboyNoteBuffer *buffer)
+{
+	GtkTextBuffer *buf = GTK_TEXT_BUFFER(buffer);
+	GtkTextIter start_iter, end_iter;
+
+	if (gtk_text_buffer_get_has_selection(buf)) {
+		/* Something is selected */
+		gtk_text_buffer_get_selection_bounds(buf, &start_iter, &end_iter);
+		add_bullets(buffer, gtk_text_iter_get_line(&start_iter), gtk_text_iter_get_line(&end_iter), conboy_note_buffer_get_depth_tag(buffer, 1));
+
+	} else {
+		/* Nothing is selected */
+		int line;
+		gtk_text_buffer_get_iter_at_mark(buf, &start_iter, gtk_text_buffer_get_insert(buf));
+		line = gtk_text_iter_get_line(&start_iter);
+		add_bullets(buffer, line, line, conboy_note_buffer_get_depth_tag(buffer, 1));
+
+		conboy_note_buffer_add_active_tag_by_name(buffer, "list-item");
+		conboy_note_buffer_add_active_tag_by_name(buffer, "list");
+	}
+}
+
+void
+conboy_note_buffer_disable_bullets(ConboyNoteBuffer *buffer)
+{
+	GtkTextBuffer *buf = GTK_TEXT_BUFFER(buffer);
+	GtkTextIter start_iter, end_iter;
+
+	if (gtk_text_buffer_get_has_selection(buf)) {
+		/* Something is selected */
+		gtk_text_buffer_get_selection_bounds(buf, &start_iter, &end_iter);
+		remove_bullets(buffer, &start_iter, &end_iter);
+
+		conboy_note_buffer_remove_active_tag_by_name(buffer, "list-item");
+		conboy_note_buffer_remove_active_tag_by_name(buffer, "list");
+
+	} else {
+		/* Nothing is selected */
+		gtk_text_buffer_get_iter_at_mark(buf, &start_iter, gtk_text_buffer_get_insert(buf));
+		gtk_text_buffer_get_iter_at_mark(buf, &end_iter, gtk_text_buffer_get_insert(buf));
+		remove_bullets(buffer, &start_iter, &end_iter);
+
+		conboy_note_buffer_remove_active_tag_by_name(buffer, "list-item");
+		conboy_note_buffer_remove_active_tag_by_name(buffer, "list");
+	}
+}
+
+
+void
+conboy_note_buffer_decrease_indent(ConboyNoteBuffer *buffer, gint start_line, gint end_line)
+{
+	GtkTextBuffer *buf = GTK_TEXT_BUFFER(buffer);
+	GtkTextIter start_iter, end_iter;
+	GtkTextTag *old_tag;
+	GtkTextTag *new_tag;
+	gint i;
+
+	for (i = start_line; i <= end_line; i++) {
+
+		gtk_text_buffer_get_iter_at_line(buf, &start_iter, i);
+		end_iter = start_iter;
+
+		old_tag = conboy_note_buffer_find_depth_tag(&start_iter);
+
+		if (old_tag != NULL) {
+			gint depth = tag_get_depth(old_tag);
+			gtk_text_iter_set_line_offset(&end_iter, 2);
+
+			if (depth == 1) {
+				g_printerr("Depth == 1. Removing bullet... Start: %i  End: %i\n", gtk_text_iter_get_line_offset(&start_iter), gtk_text_iter_get_line_offset(&end_iter));
+				remove_bullets(buffer, &start_iter, &end_iter);
+				continue;
+			}
+
+			/* Remove old tag */
+			gtk_text_buffer_remove_tag(buf, old_tag, &start_iter, &end_iter);
+
+			/* Delete old bullet */
+			gtk_text_buffer_delete(buf, &start_iter, &end_iter);
+
+			depth--;
+			new_tag = conboy_note_buffer_get_depth_tag(buffer, depth);
+
+			/* Add new bullet with new tag */
+			add_bullets(buffer, i, i, new_tag);
+		}
+	}
+}
+
+void
+conboy_note_buffer_increase_indent(ConboyNoteBuffer *buffer, gint start_line, gint end_line)
+{
+	GtkTextBuffer *buf = GTK_TEXT_BUFFER(buffer);
+	GtkTextIter start_iter, end_iter;
+	GtkTextTag *old_tag;
+	GtkTextTag *new_tag;
+	gint i;
+
+	for (i = start_line; i <= end_line; i++) {
+
+		gtk_text_buffer_get_iter_at_line(buf, &start_iter, i);
+		end_iter = start_iter;
+
+		old_tag = conboy_note_buffer_find_depth_tag(&start_iter);
+
+		gint depth = 0;
+		/* If already bullet list, remove bullet and tags */
+		if (old_tag != NULL) {
+			depth = tag_get_depth(old_tag);
+			gtk_text_iter_set_line_offset(&end_iter, 2);
+
+			/* Remove old tag */
+			gtk_text_buffer_remove_tag(buf, old_tag, &start_iter, &end_iter);
+
+			/* Delete old bullet */
+			gtk_text_buffer_delete(buf, &start_iter, &end_iter);
+		}
+
+		depth++;
+		new_tag = conboy_note_buffer_get_depth_tag(buffer, depth);
+
+		/* Add new bullet with new tag */
+		add_bullets(buffer, i, i, new_tag);
+	}
+
+}
+
+
+static gboolean
+line_needs_bullet(GtkTextBuffer *buffer, gint line_number)
+{
+	GtkTextIter iter;
+	gtk_text_buffer_get_iter_at_line(buffer, &iter, line_number);
+
+	while (!gtk_text_iter_ends_line(&iter)) {
+		switch (gtk_text_iter_get_char(&iter))
+		{
+		case ' ':
+			gtk_text_iter_forward_char(&iter);
+			break;
+
+		case '*':
+		case '-':
+			gtk_text_iter_forward_char(&iter);
+			return (gtk_text_iter_get_char(&iter) == ' ');
+			break;
+
+		default:
+			return FALSE;
+		}
+	}
+	return FALSE;
+}
+
+gboolean
+conboy_note_buffer_add_new_line(UserInterface *ui)
+{
+	GtkTextBuffer *buf = ui->buffer;
+	ConboyNoteBuffer *buffer = CONBOY_NOTE_BUFFER(buf);
+	GtkTextView *view = ui->view;
+	GtkTextIter iter;
+	GtkTextTag *depth_tag;
+	gint line;
+
+	gtk_text_buffer_get_iter_at_mark(buf, &iter, gtk_text_buffer_get_insert(buf));
+	gtk_text_iter_set_line_offset(&iter, 0);
+	depth_tag = conboy_note_buffer_find_depth_tag(&iter);
+
+	/* If line starts with a bullet */
+	if (depth_tag != NULL) {
+
+		/* If line is not empty, add new bullet. Else remove bullet. */
+		gtk_text_iter_forward_to_line_end(&iter);
+		if (gtk_text_iter_get_line_offset(&iter) > 2) {
+			GSList *tmp;
+
+			/* Remove all tags but <list> from active tags */
+			tmp = g_slist_copy(conboy_note_buffer_get_active_tags(CONBOY_NOTE_BUFFER(buffer)));
+			conboy_note_buffer_clear_active_tags(buffer);
+			conboy_note_buffer_add_active_tag_by_name(buffer, "list");
+
+			/* Insert newline and bullet */
+			gtk_text_buffer_get_iter_at_mark(buf, &iter, gtk_text_buffer_get_insert(buf));
+			if (gtk_text_iter_get_line_offset(&iter) < 2) {
+				gtk_text_iter_set_line_offset(&iter, 2);
+			}
+			gtk_text_buffer_insert(buf, &iter, "\n", -1);
+			gtk_text_view_scroll_mark_onscreen(view, gtk_text_buffer_get_insert(buf));
+			line = gtk_text_iter_get_line(&iter);
+			add_bullets(buffer, line, line, depth_tag);
+
+			/* Add all tags back to active tags */
+			conboy_note_buffer_set_active_tags(buffer, tmp);
+
+			return TRUE;
+
+		} else {
+			/* Remove bullet and insert newline */
+			GtkTextIter start = iter;
+			GtkTextIter end = iter;
+
+			/* Disable list and list-item tags */
+			conboy_note_buffer_remove_active_tag_by_name(buffer, "list-item");
+			conboy_note_buffer_remove_active_tag_by_name(buffer, "list");
+
+			/* Delete the bullet and the last newline */
+			gtk_text_iter_set_line_offset(&start, 0);
+			gtk_text_iter_set_line_offset(&end, 0);
+			gtk_text_iter_set_line_offset(&iter, 0);
+			gtk_text_iter_forward_to_line_end(&end);
+			gtk_text_iter_forward_to_line_end(&iter);
+			gtk_text_iter_forward_char(&iter);
+			gtk_text_buffer_remove_all_tags(buf, &start, &iter);
+			gtk_text_buffer_delete(buf, &start, &end);
+
+			gtk_text_buffer_insert(buf, &end, "\n", -1);
+
+			gtk_text_view_scroll_mark_onscreen(ui->view, gtk_text_buffer_get_insert(buf));
+
+			/* Disable the bullet button */
+			conboy_note_buffer_update_active_tags(buffer);
+			conboy_note_window_update_button_states(ui);
+
+			return TRUE;
+		}
+
+	} else {
+
+		/* If line start with a "- " or "- *" */
+		if (line_needs_bullet(buf, gtk_text_iter_get_line(&iter))) {
+			GSList *tmp;
+			GtkTextIter end_iter;
+
+			gtk_text_iter_set_line_offset(&iter, 0);
+			end_iter = iter;
+			line = gtk_text_iter_get_line(&iter);
+
+			/* Skip trailing spaces */
+			while (gtk_text_iter_get_char(&end_iter) == ' ') {
+				gtk_text_iter_forward_char(&end_iter);
+			}
+			/* Skip "* " or "- " */
+			gtk_text_iter_forward_chars(&end_iter, 2);
+
+			/* Delete this part */
+			gtk_text_buffer_delete(buf, &iter, &end_iter);
+
+			/* Add bullet for this line */
+			add_bullets(buffer, line, line, conboy_note_buffer_get_depth_tag(buffer, 1));
+
+
+			/* TODO: Copied from above */
+
+			/* Remove all tags but <list> from active tags */
+			tmp = g_slist_copy(conboy_note_buffer_get_active_tags(buffer));
+			conboy_note_buffer_clear_active_tags(buffer);
+			conboy_note_buffer_add_active_tag_by_name(buffer, "list");
+
+			/* Insert newline and bullet */
+			gtk_text_buffer_get_iter_at_mark(buf, &iter, gtk_text_buffer_get_insert(buf));
+			gtk_text_buffer_insert(buf, &iter, "\n", -1);
+			line = gtk_text_iter_get_line(&iter);
+			add_bullets(buffer, line, line, conboy_note_buffer_get_depth_tag(buffer, 1));
+			gtk_text_view_scroll_mark_onscreen(view, gtk_text_buffer_get_insert(buf));
+
+			/* Add all tags back to active tags */
+			if (tmp != NULL) {
+				conboy_note_buffer_set_active_tags(buffer, tmp);
+			}
+
+			/* Turn on the list-item tag from here on */
+			conboy_note_buffer_add_active_tag_by_name(buffer, "list-item");
+
+			/* Revaluate (turn on) the bullet button */
+			conboy_note_window_update_button_states(ui);
+
+			return TRUE;
+		}
+
+	}
+
+	return FALSE;
+
+}
+
+/*
+static
+gboolean tag_is_depth_tag(GtkTextTag *tag)
+{
+	if (tag == NULL) {
+		return FALSE;
+	}
+	return (strncmp(tag->name, "depth", 5) == 0);
+}*/
+
+GtkTextTag*
+conboy_note_buffer_find_depth_tag(GtkTextIter* iter)
+{
+	GSList *tags = gtk_text_iter_get_tags(iter);
+	while (tags != NULL) {
+		if (tag_is_depth_tag(tags->data)) {
+			return tags->data;
+		}
+		tags = tags->next;
+	}
+	return NULL;
+}
+
+/**
+ * Change the selection on the buffer to not cut through any bullets.
+ */
+static void
+augment_selection(ConboyNoteBuffer *buffer, GtkTextIter *start, GtkTextIter *end)
+{
+	GtkTextBuffer *buf = GTK_TEXT_BUFFER(buffer);
+
+	GtkTextTag *start_depth = conboy_note_buffer_find_depth_tag(start);
+	GtkTextTag *end_depth = conboy_note_buffer_find_depth_tag(end);
+
+	GtkTextIter inside_end = *end;
+	gtk_text_iter_backward_char(&inside_end);
+
+	GtkTextTag *inside_end_depth = conboy_note_buffer_find_depth_tag(&inside_end);
+
+	/* Start inside bullet region */
+	if (start_depth != NULL) {
+		gtk_text_iter_set_line_offset(start, 2);
+		gtk_text_buffer_select_range(buf, start, end);
+	}
+
+	/* End inside another bullet */
+	if (inside_end_depth != NULL) {
+		gtk_text_iter_set_line_offset(end, 2);
+		gtk_text_buffer_select_range(buf, start, end);
+	}
+
+	/* Check if the end is right before the start of the bullet */
+	if (end_depth != NULL){
+		gtk_text_iter_set_line_offset(end, 2);
+		gtk_text_buffer_select_range(buf, start, end);
+	}
+
+}
+
+void
+conboy_note_buffer_check_selection(ConboyNoteBuffer *buffer)
+{
+	GtkTextBuffer *buf = GTK_TEXT_BUFFER(buffer);
+	GtkTextIter start;
+	GtkTextIter end;
+
+	if (gtk_text_buffer_get_selection_bounds(buf, &start, &end)) {
+		augment_selection(buffer, &start, &end);
+	} else {
+		if (gtk_text_iter_get_line_offset(&start) < 2 && conboy_note_buffer_find_depth_tag(&start) != NULL) {
+			gtk_text_iter_set_line_offset(&start, 2);
+			gtk_text_buffer_select_range(buf, &start, &start); // Needed?
+		}
+	}
+}
+
+static gboolean
+line_is_bullet_line(GtkTextIter *line_iter)
+{
+	GtkTextIter iter = *line_iter;
+	gtk_text_iter_set_line(&iter, gtk_text_iter_get_line(line_iter));
+	if (conboy_note_buffer_find_depth_tag(&iter)) {
+		return TRUE;
+	} else {
+		return FALSE;
+	}
+}
+
+gboolean
+conboy_note_buffer_backspace_handler(ConboyNoteBuffer *buffer)
+{
+	GtkTextBuffer *buf = GTK_TEXT_BUFFER(buffer);
+	GtkTextIter start;
+	GtkTextIter end;
+	gboolean selection = gtk_text_buffer_get_selection_bounds(buf, &start, &end);
+	GtkTextTag *depth = conboy_note_buffer_find_depth_tag(&start);
+
+	if (selection) {
+		augment_selection(buffer, &start, &end);
+		gtk_text_buffer_delete(buf, &start, &end);
+		return TRUE;
+
+	} else {
+		GtkTextIter prev = start;
+		if (gtk_text_iter_get_line_offset(&prev) != 0) {
+			gtk_text_iter_backward_char(&prev);
+		}
+		GtkTextTag *prev_depth = conboy_note_buffer_find_depth_tag(&prev);
+		if (depth != NULL || prev_depth != NULL) {
+			int lineNr = gtk_text_iter_get_line(&start);
+			conboy_note_buffer_decrease_indent(buffer, lineNr, lineNr);
+			return TRUE;
+		} else {
+			/* Check if cursor is on the right side of a soft line break. If yes, remove it */
+			prev = start;
+			gtk_text_iter_backward_chars(&prev, 2);
+			if (gtk_text_iter_get_char(&prev) == "\u2028") {
+				GtkTextIter end_break = prev;
+				gtk_text_iter_forward_char(&end_break);
+				gtk_text_buffer_delete(buf, &prev, &end_break);
+			}
+		}
+	}
+
+	return FALSE;
+}
+
+gboolean
+conboy_note_buffer_delete_handler(ConboyNoteBuffer *buffer)
+{
+	GtkTextBuffer *buf = GTK_TEXT_BUFFER(buffer);
+	GtkTextIter start;
+	GtkTextIter end;
+
+	if (gtk_text_buffer_get_selection_bounds(buf, &start, &end)) {
+		augment_selection(buffer, &start, &end);
+		gtk_text_buffer_delete(buf, &start, &end);
+		return TRUE;
+
+	} else if (gtk_text_iter_ends_line(&start) && gtk_text_iter_get_line(&start) < gtk_text_buffer_get_line_count(buf)) {
+		GtkTextIter next;
+		gtk_text_buffer_get_iter_at_line(buf, &next, gtk_text_iter_get_line(&start) + 1);
+		end = start;
+		gtk_text_iter_forward_chars(&end, 3);
+
+		GtkTextTag *depth = conboy_note_buffer_find_depth_tag(&next);
+
+		if (depth != NULL) {
+			gtk_text_buffer_delete(buf, &start, &end);
+			return TRUE;
+		}
+
+	} else {
+		GtkTextIter next = start;
+
+		if (gtk_text_iter_get_line_offset(&next) != 0) {
+			gtk_text_iter_forward_char(&next);
+		}
+
+		GtkTextTag *depth = conboy_note_buffer_find_depth_tag(&start);
+		GtkTextTag *nextDepth = conboy_note_buffer_find_depth_tag(&next);
+		if (depth != NULL || nextDepth != NULL) {
+			gint lineNr = gtk_text_iter_get_line(&start);
+			conboy_note_buffer_decrease_indent(buffer, lineNr, lineNr);
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+/**
+ * Add or remove list and list-item tags, depending whether or not the
+ * cursor is in a list.
+ */
+void
+conboy_note_buffer_fix_list_tags(ConboyNoteBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_iter)
+{
+	GtkTextBuffer *buf = GTK_TEXT_BUFFER(buffer);
+	GtkTextIter start = *start_iter;
+	GtkTextIter end   = *end_iter;
+
+	if (line_is_bullet_line(&start)) {
+		/* Add list and list-item tags to complete line */
+		//g_printerr("Is bullet line\n");
+		//g_printerr("Start: %i\n", gtk_text_iter_get_offset(&start));
+		//g_printerr("  End: %i\n\n", gtk_text_iter_get_offset(&end));
+		gtk_text_iter_set_line(&start, gtk_text_iter_get_line(&start));
+		gtk_text_iter_set_line(&end, gtk_text_iter_get_line(&end));
+		gtk_text_iter_forward_to_line_end(&end);
+		gtk_text_buffer_apply_tag_by_name(buf, "list", &start, &end);
+		gtk_text_iter_forward_chars(&start, 2);
+		gtk_text_buffer_apply_tag_by_name(buf, "list-item", &start, &end);
+		conboy_note_buffer_add_active_tag_by_name(buffer, "list");
+		conboy_note_buffer_add_active_tag_by_name(buffer, "list-item");
+	} else {
+		//g_printerr("Is not bullet line\n");
+		//g_printerr("Start: %i\n", gtk_text_iter_get_line(&start));
+		//g_printerr("  End: %i\n", gtk_text_iter_get_line(&end));
+		/* Remove list and list-item tags from complete line */
+		gtk_text_iter_set_line(&start, gtk_text_iter_get_line(&start));
+		gtk_text_iter_set_line(&end, gtk_text_iter_get_line(&end));
+		/* Remove tags, only if the line is not empty. Otherwise the next line would be taken. */
+		gunichar c = gtk_text_iter_get_char(&end);
+		if (g_unichar_break_type(c) != G_UNICODE_BREAK_LINE_FEED) {
+			//g_printerr("Is empty line\n");
+			gtk_text_iter_forward_to_line_end(&end);
+			gtk_text_iter_forward_char(&end);
+			gtk_text_buffer_remove_tag_by_name(buf, "list", &start, &end);
+			gtk_text_buffer_remove_tag_by_name(buf, "list-item", &start, &end);
+			//g_printerr("Remove from %i to %i\n\n", gtk_text_iter_get_offset(&start), gtk_text_iter_get_offset(&end));
+			conboy_note_buffer_remove_active_tag_by_name(buffer, "list");
+			conboy_note_buffer_remove_active_tag_by_name(buffer, "list-item");
+		}
 	}
 }
 

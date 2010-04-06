@@ -24,14 +24,6 @@
 
 #include "conboy_note_store.h"
 
-/*#define BULLET "\342\200\242 "*/
-/*#define BULLET "\u2022 "*/
-
-
-const gchar* get_bullet_by_depth(gint depth);
-
-const gchar* get_bullet_by_depth_tag(GtkTextTag *tag);
-
 gboolean is_note_list_changed(void);
 
 GList* sort_note_list_by_change_date(GList* note_list);

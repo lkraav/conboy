@@ -63,6 +63,22 @@ void	conboy_note_buffer_set_active_tags				(ConboyNoteBuffer *self, GSList *tags
 void	conboy_note_buffer_clear_active_tags			(ConboyNoteBuffer *self);
 void    conboy_note_buffer_update_active_tags           (ConboyNoteBuffer *self);
 
+GtkTextTag* conboy_note_buffer_find_depth_tag           (GtkTextIter* iter);
+GtkTextTag* conboy_note_buffer_get_depth_tag            (ConboyNoteBuffer *buffer, gint depth);
+
+void conboy_note_buffer_increase_indent(ConboyNoteBuffer *buffer, gint start_line, gint end_line);
+void conboy_note_buffer_decrease_indent(ConboyNoteBuffer *buffer, gint start_line, gint end_line);
+
+void conboy_note_buffer_enable_bullets                  (ConboyNoteBuffer *buffer);
+void conboy_note_buffer_disable_bullets                 (ConboyNoteBuffer *buffer);
+
+void     conboy_note_buffer_check_selection             (ConboyNoteBuffer *buffer);
+gboolean conboy_note_buffer_backspace_handler           (ConboyNoteBuffer *buffer);
+gboolean conboy_note_buffer_delete_handler              (ConboyNoteBuffer *buffer);
+gboolean conboy_note_buffer_add_new_line                (UserInterface *ui);
+
+void     conboy_note_buffer_fix_list_tags               (ConboyNoteBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_iter);
+
 gchar*	conboy_note_buffer_get_xml				(ConboyNoteBuffer *self);
 void	conboy_note_buffer_set_xml				(ConboyNoteBuffer *self, const gchar *xmlString);
 

@@ -165,7 +165,7 @@ on_text_buffer_insert_text					(GtkTextBuffer *buffer,
 											 gpointer		user_data);
 
 void
-on_text_buffer_delete_range					(GtkTextBuffer *buffer,
+after_text_buffer_delete_range					(GtkTextBuffer *buffer,
 											 GtkTextIter   *start_iter,
 											 GtkTextIter   *end_iter,
 											 gpointer		user_data);

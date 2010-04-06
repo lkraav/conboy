@@ -38,27 +38,8 @@
 #include "app_data.h"
 
 
-
-
-
-
-/* char *_bullets[] = {"\u2022 ", "\u2218 ", "\u2023 ", "\u2043 ", "\u204d ", "\u2219 ", "\u25e6 "}; */
-/* These 3 bullets work with diablo and standard font */
-char *_bullets[] = {"\u2022 ", "\u25e6 ", "\u2219 "};
-const gchar* get_bullet_by_depth(gint depth) {
-	if (depth <= 0) {
-		g_printerr("ERROR: get_bullets_by_depth(): depth must be at least 1.\n");
-		return "\u2022 ";
-	}
-	return _bullets[(depth - 1) % 3];
-}
-
-const gchar* get_bullet_by_depth_tag(GtkTextTag *tag) {
-	return get_bullet_by_depth(tag_get_depth(tag));
-}
-
-
-gchar* get_uuid()
+gchar*
+get_uuid()
 {
 	gchar *content;
 	gchar *result;
@@ -114,11 +95,13 @@ const gchar* get_time_in_seconds_as_iso8601(time_t time_in_seconds) {
  * g_time_val_to_iso8601() does only produce the short format without
  * milliseconds. E.g. 2009-04-17T13:14:52Z
  */
-const gchar* get_current_time_in_iso8601() {
+const gchar*
+get_current_time_in_iso8601() {
 	return get_time_in_seconds_as_iso8601(time(NULL));
 }
 
-time_t get_iso8601_time_in_seconds(const gchar *time_string) {
+time_t
+get_iso8601_time_in_seconds(const gchar *time_string) {
 
 	time_t result;
 	struct tm local_time;
@@ -132,7 +115,8 @@ time_t get_iso8601_time_in_seconds(const gchar *time_string) {
 	return result;
 }
 
-gboolean is_portrait_mode()
+gboolean
+is_portrait_mode()
 {
 	GdkScreen *screen = gdk_screen_get_default();
 	int width = gdk_screen_get_width(screen);
