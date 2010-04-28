@@ -78,11 +78,11 @@ static void initialize_tags(GtkTextBuffer *buffer) {
 
 	gtk_text_buffer_create_tag(buffer, "_title", "foreground", "blue", "underline", PANGO_UNDERLINE_SINGLE, "scale", PANGO_SCALE_X_LARGE, NULL);
 
-	//gtk_text_buffer_create_tag(buffer, "list-item", NULL);
-	//gtk_text_buffer_create_tag(buffer, "list", NULL);
+	gtk_text_buffer_create_tag(buffer, "list-item", NULL);
+	gtk_text_buffer_create_tag(buffer, "list", NULL);
 
-	gtk_text_buffer_create_tag(buffer, "list-item", "foreground", "orange", NULL);
-	gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
+	//gtk_text_buffer_create_tag(buffer, "list-item", "foreground", "orange", NULL);
+	//gtk_text_buffer_create_tag(buffer, "list", "background", "gray", NULL);
 }
 
 static void

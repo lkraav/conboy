@@ -1025,6 +1025,7 @@ on_about_button_clicked				   (GtkAction		*action,
 {
 	UserInterface *ui = (UserInterface*)user_data;
 
+#ifdef HILDON_HAS_APP_MENU
 	HeAboutDialog *dia = HE_ABOUT_DIALOG(he_about_dialog_new());
 	gtk_window_set_transient_for(GTK_WINDOW(dia), GTK_WINDOW(ui->window));
 
@@ -1035,6 +1036,13 @@ on_about_button_clicked				   (GtkAction		*action,
 	he_about_dialog_set_icon_name(dia, "conboy");
 	he_about_dialog_set_version(dia, VERSION);
 	he_about_dialog_set_website(dia, "http://conboy.garage.maemo.org");
+#else
+	GtkAboutDialog *dia = GTK_ABOUT_DIALOG(gtk_about_dialog_new());
+	gtk_about_dialog_set_program_name(dia, "Conboy");
+	gtk_about_dialog_set_copyright(dia, "(c) Cornelius Hald 2010");
+	gtk_about_dialog_set_logo_icon_name(dia, "conboy");
+	gtk_about_dialog_set_website(dia, "http://conboy.garage.maemo.org");
+#endif
 
 	gtk_dialog_run(GTK_DIALOG(dia));
 	gtk_widget_destroy(GTK_WIDGET(dia));
