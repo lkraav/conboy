@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?fileVersion 4.0.0?>
 
 <cproject>
@@ -360,84 +360,96 @@
 <languageData contentTypeIds="org.eclipse.cdt.core.cxxSource;org.eclipse.cdt.core.cxxHeader" id="Scratchbox 1~FREMANTLE_X86.1257449132065.1152405978.472442944" languageId="org.eclipse.cdt.core.g++" name="GNU C++" supportedEntryKinds="includePath;includeFile;macro;macroFile">
 <settingEntries>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy/src"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/home/maemo/workspace/conboy"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/home/maemo/workspace/conboy/src"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/hildon-1"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/cairo"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/pixman-1"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/freetype2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libpng12"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gconf/2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libmodest-dbus-client-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-module-2.0"/>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/home/${USERNAME}/workspace/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/home/${USERNAME}/workspace/conboy/src"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/pixman-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libmodest-dbus-client-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/gnome-vfs-module-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/tragets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/curl"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/"/>
 <entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
 </settingEntries>
 </languageData>
 <languageData contentTypeIds="org.eclipse.cdt.core.cSource;org.eclipse.cdt.core.cHeader" id="Scratchbox 1~FREMANTLE_X86.1257449132065.1152405978.778505974" languageId="org.eclipse.cdt.core.gcc" name="GNU C" supportedEntryKinds="includePath;includeFile;macro;macroFile">
 <settingEntries>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy/src"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/home/maemo/workspace/conboy"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/home/maemo/workspace/conboy/src"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/hildon-1"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/cairo"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/pixman-1"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/freetype2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libpng12"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gconf/2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libmodest-dbus-client-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-module-2.0"/>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/home/${USERNAME}/workspace/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/home/${USERNAME}/workspace/conboy/src"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/pixman-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libmodest-dbus-client-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/gnome-vfs-module-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/tragets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/curl"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/"/>
 <entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
 </settingEntries>
 </languageData>
 <languageData contentTypeIds="org.eclipse.cdt.core.asmSource" id="Scratchbox 1~FREMANTLE_X86.1257449132065.1152405978.499161089" languageId="org.eclipse.cdt.core.assembly" name="Assembly" supportedEntryKinds="includePath;includeFile;macro;macroFile">
 <settingEntries>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy/src"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/home/maemo/workspace/conboy"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/home/maemo/workspace/conboy/src"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/hildon-1"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/cairo"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/pixman-1"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/freetype2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libpng12"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gconf/2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libmodest-dbus-client-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-module-2.0"/>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/home/${USERNAME}/workspace/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/home/${USERNAME}/workspace/conboy/src"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/pixman-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libmodest-dbus-client-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/gnome-vfs-module-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/tragets/FREMANTLE_X86/usr/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libxml2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/curl"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/"/>
 <entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
 </settingEntries>
 </languageData>
