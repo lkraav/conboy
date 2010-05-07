@@ -1030,17 +1030,17 @@ on_about_button_clicked				   (GtkAction		*action,
 	gtk_window_set_transient_for(GTK_WINDOW(dia), GTK_WINDOW(ui->window));
 
 	he_about_dialog_set_app_name(dia, "Conboy");
-	he_about_dialog_set_bugtracker(dia, "https://bugs.maemo.org/enter_bug.cgi?product=Conboy");
+	he_about_dialog_set_bugtracker(dia, PACKAGE_BUGREPORT);
 	he_about_dialog_set_copyright(dia, "(c) Cornelius Hald 2010");
 	he_about_dialog_set_description(dia, _("Conboy is a note taking application."));
-	he_about_dialog_set_icon_name(dia, "conboy");
-	he_about_dialog_set_version(dia, VERSION);
+	he_about_dialog_set_icon_name(dia, PACKAGE_NAME);
+	he_about_dialog_set_version(dia, PACKAGE_VERSION);
 	he_about_dialog_set_website(dia, "http://conboy.garage.maemo.org");
 #else
 	GtkAboutDialog *dia = GTK_ABOUT_DIALOG(gtk_about_dialog_new());
 	gtk_about_dialog_set_program_name(dia, "Conboy");
 	gtk_about_dialog_set_copyright(dia, "(c) Cornelius Hald 2010");
-	gtk_about_dialog_set_logo_icon_name(dia, "conboy");
+	gtk_about_dialog_set_logo_icon_name(dia, PACKAGE_NAME);
 	gtk_about_dialog_set_website(dia, "http://conboy.garage.maemo.org");
 #endif
 

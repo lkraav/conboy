@@ -1,12 +1,11 @@
-#!/bin/sh
+#!/bin/sh -e
 
-set -x
-glib-gettextize --copy --force
-libtoolize --copy --force --automake
-intltoolize --copy --force --automake
-
-aclocal-1.9
-autoconf
-autoheader
-automake-1.9 --add-missing --foreign
-./configure --enable-maintainer-mode
+test -n "$srcdir" || srcdir=`dirname "$0"`
+test -n "$srcdir" || srcdir=.
+(
+  cd "$srcdir" &&
+  glib-gettextize --copy --force &&
+  intltoolize --automake --copy --force &&
+  autoreconf --force --install
+) || exit
+test -n "$NOCONFIGURE" || "$srcdir/configure" --enable-maintainer-mode "$@"

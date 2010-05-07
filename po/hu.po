@@ -267,11 +267,11 @@ msgstr "Bővítményekről"
 msgid "Configure plugin"
 msgstr "Bővítmények testreszabása"
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:1
 msgid "Loads and saves notes from the local filesystem."
 msgstr "Jegyzetek betöltése és mentése a helyi file-rendszerről"
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:2
 msgid "XML Storage Backend"
 msgstr "XML tároló"
 

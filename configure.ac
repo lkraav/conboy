@@ -1,185 +1,105 @@
-dnl Process this file with autoconf to produce a configure script.
+AC_INIT([conboy], [0.6.3.8], [https://bugs.maemo.org/enter_bug.cgi?product=conboy], [conboy])
+AC_CONFIG_AUX_DIR([build])
+AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([macros])
+AC_CONFIG_SRCDIR([src/conboy_note.c])
 
-AC_INIT(src/main.c)
-AM_CONFIG_HEADER(config.h)
-
-PACKAGE=conboy
-VERSION=0.6.3.8
-
-AM_INIT_AUTOMAKE($PACKAGE,$VERSION)
+AC_ARG_VAR([ACLOCAL_FLAGS], [aclocal flags, for example -I <macro dir>])
+AM_INIT_AUTOMAKE([-Wall foreign no-define nostdinc subdir-objects])
 
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_STDC_HEADERS
 AC_PROG_INSTALL
+#LT_INIT
+AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
-AC_PREFIX_DEFAULT(/usr)
+AC_PREFIX_DEFAULT([/usr])
 
-# AC_PREFIX_DEFAULT does not get expanded until too late so we need to do this to use prefix in this script
-if test "x$prefix" = "xNONE" ; then
-    prefix='/usr'
-fi
-
-CFLAGS="$CFLAGS -Wall -Wmissing-prototypes -Wmissing-declarations"
-
-PKG_CHECK_MODULES(GMODULE, gmodule-2.0)
-AC_SUBST(GMODULE_LIBS)
-AC_SUBST(GMODULE_CFLAGS)
-
-PKG_CHECK_MODULES(HILDON, hildon-1 >= 0.8.4)  
-AC_SUBST(HILDON_LIBS)
-AC_SUBST(HILDON_CFLAGS)
-
-PKG_CHECK_MODULES(HILDON_MIME, libhildonmime >= 1.0.0)
-AC_SUBST(HILDON_MIME_LIBS)
-AC_SUBST(HILDON_MIME_CFLAGS)
-
+PKG_CHECK_EXISTS([osso-af-settings >= 0.8.4])
 PKG_CHECK_EXISTS([hildon-1 >= 2.1.62], [AC_DEFINE([HILDON_HAS_APP_MENU], [1], [Does hildon app menu exist])])
 
-# If glib >= 2.14 it has pcre support build in. If not we need the libpcre3 package
-PKG_CHECK_EXISTS([glib-2.0 >= 2.14.0], [AC_DEFINE([GLIB_HAS_PCRE], [1], [Does glib have support for pearl regular expressions])])
-PKG_CHECK_EXISTS([glib-2.0 < 2.14.0], [ 
-	PKG_CHECK_MODULES([PCRE], [libpcre >= 6.7])  
-	AC_SUBST(PCRE_LIBS)
-	AC_SUBST(PCRE_CFLAGS)
-])
+# If glib >= 2.14, pcre support is builtin. If not we need the libpcre3 package
+PKG_CHECK_EXISTS([glib-2.0 >= 2.14.0], [AC_DEFINE([GLIB_HAS_PCRE], [1], [Does glib have support for perl-compatible regular expressions])])
+PKG_CHECK_EXISTS([glib-2.0 < 2.14.0], [COMMON_DEPS="$COMMON_DEPS libpcre >= 6.7"])
 
 PKG_CHECK_EXISTS([libmodest-dbus-client-1.0 >= 1.0], [
 	AC_DEFINE([WITH_MODEST], [1], [Does have Modest support])
-	PKG_CHECK_MODULES(MODEST, libmodest-dbus-client-1.0 >= 1.0)
-	AC_SUBST(MODEST_LIBS)
-	AC_SUBST(MODEST_CFLAGS)
-])
-
-PKG_CHECK_MODULES(OSSO, libosso >= 0.8.4)
-AC_SUBST(OSSO_LIBS)
-AC_SUBST(OSSO_CFLAGS)
-
-PKG_CHECK_MODULES(GCONF, gconf-2.0 >= 0.22)
-AC_SUBST(GCONF_LIBS)
-AC_SUBST(GCONF_CFLAGS)
-
-PKG_CHECK_MODULES(XML2, libxml-2.0 >= 2.6.0)
-AC_SUBST(XML2_CFLAGS)
-AC_SUBST(XML2_LIBS)
-
-PKG_CHECK_MODULES(JSON, json-glib-1.0 >= 0.6.2)
-AC_SUBST(JSON_CFLAGS)
-AC_SUBST(JSON_LIBS)
-
-PKG_CHECK_MODULES(CURL, libcurl >= 7.15.0)
-AC_SUBST(CURL_CFLAGS)
-AC_SUBST(CURL_LIBS)
-
-PKG_CHECK_MODULES(OAUTH, oauth >= 0.5.2)
-AC_SUBST(OAUTH_CFLAGS)
-AC_SUBST(OAUTH_LIBS)
-
-PKG_CHECK_MODULES(OSSOSETTINGS, osso-af-settings >= 0.8.4)
+	COMMON_DEPS="$COMMON_DEPS libmodest-dbus-client-1.0 >= 1.0"])
 
 # Find out maemo version
-PKG_CHECK_EXISTS(maemo-version, [
-  VERSION=`pkg-config --modversion maemo-version`
-  AC_MSG_NOTICE([Configuring for Maemo $VERSION])
-  CFLAGS="$CFLAGS -DMAEMO_VERSION=\\\"$VERSION\\\""
-  MAJOR=`echo $VERSION | cut -b1 -`
-  CFLAGS="$CFLAGS -DMAEMO_VERSION_MAJOR=$MAJOR"
+PKG_CHECK_EXISTS([maemo-version], [
+  MAEMO_VERSION=`pkg-config --modversion maemo-version`
+  AC_MSG_NOTICE([Configuring for Maemo $MAEMO_VERSION])
+  EXTRA_CPPFLAGS="$CFLAGS -DMAEMO_VERSION=\\\"$MAEMO_VERSION\\\""
+  MAJOR=`echo $MAEMO_VERSION | cut -b1 -`
+  EXTRAS_CPPFLAGS="$CFLAGS -DMAEMO_VERSION_MAJOR=$MAJOR"
 ], [
   AC_MSG_WARN([maemo-version not found])
 ])
 
+# Warning flags and defines
+EXTRA_CPPFLAGS="-Wall -Wmissing-prototypes -Wmissing-declarations"
+
 # Fremantle uses different categories for backup then Diablo
-if [[ "$MAJOR" == "5" ]]; then
-  BACKUP_CATEGORY=other
-else
-  BACKUP_CATEGORY=documents
-fi
-
+AS_IF([test "$MAJOR" == "5"], [BACKUP_CATEGORY=other], [BACKUP_CATEGORY=documents])
 AC_MSG_NOTICE([Using backup category "$BACKUP_CATEGORY"])
-AC_SUBST(BACKUP_CATEGORY)
+AC_SUBST([BACKUP_CATEGORY])
 
-if [[ "$MAJOR" == "5" ]]; then
+# Midgard
+AS_IF([test "$MAJOR" = "5"],
+	[
+	AC_MSG_CHECKING([whether to build Midgard storage plugin])
+	AC_ARG_WITH([midgard],[AS_HELP_STRING([--with-midgard], [enable Midgard storage])],
+	[], [with_midgard=yes])
+	AS_IF([test "$with_midgard" = yes],
+		[
+		AC_MSG_RESULT([yes])
+		MIDGARD_DEPS="midgard2 >= 9.09"
+		AC_DEFINE([WITH_MIDGARD], [1], [Does have Midgard support])
+		],
+		[AC_MSG_RESULT([no])]
+	)
+	]
+)
 
-  AC_MSG_CHECKING([whether to build Midgard storage plugin])
-  AC_ARG_WITH([midgard],[AS_HELP_STRING([--with-midgard], [enable Midgard storage])],
-              [], [with_midgard=yes])
-  AS_IF(
-          [test "$with_midgard" = yes],
-          [
-          AC_MSG_RESULT([yes])
-          PKG_CHECK_MODULES(MIDGARD, midgard2 >= 9.09)
-          AC_DEFINE([WITH_MIDGARD], [1], [Does have Midgard support])
-          ],
-          AC_MSG_RESULT([no])
-  )
-fi
-
-AM_CONDITIONAL([MIDGARD], [test x$with_midgard = xyes])
+AM_CONDITIONAL([MIDGARD], [test "x$with_midgard" = xyes])
 
 # Support for maemo-launcher
+AC_MSG_CHECKING([whether to build with maemo-launcher support])
 AC_ARG_ENABLE([maemo-launcher],
 	[AS_HELP_STRING([--enable-maemo-launcher],
 		[build with maemo-launcher support])],
-		[case "${enableval}" in
-		yes) maemo_launcher=true ;;
-		no)  maemo_launcher=false ;;
-		*) AC_MSG_ERROR([bad value ${enableval} for --enable-maemo-launcher]) ;;
-		esac], [maemo_launcher=false])
+	[AS_CASE([${enableval}],
+		[yes], [COMMON_DEPS="$COMMON_DEPS maemo-launcher-app"
+			AC_MSG_RESULT([yes])],
+		[no], [AC_MSG_RESULT([no])],
+		[AC_MSG_ERROR([bad value ${enableval} for --enable-maemo-launcher])])])
 
-if test x$maemo_launcher = xtrue
-then
-	PKG_CHECK_MODULES(MAEMO_LAUNCHER, [maemo-launcher-app])
-	AC_SUBST(MAEMO_LAUNCHER_CFLAGS)
-	AC_SUBST(MAEMO_LAUNCHER_LIBS)
-fi
-
-
-
-
-# Application icon install directories
-icon_26x26dir=$datadir/icons/hicolor/26x26/hildon
-icon_40x40dir=$datadir/icons/hicolor/40x40/hildon
-icon_48x48dir=$datadir/icons/hicolor/48x48/hildon
-icon_64x64dir=$datadir/icons/hicolor/64x64/hildon
-icon_scalabledir=$datadir/icons/hicolor/scalable/hildon
-
-localedir=`$PKG_CONFIG osso-af-settings --variable=localedir`
-
-# Plugin dirs (TODO: should not be hardcoded to /usr/)
-pluginslibdir=$prefix/lib/conboy
-AC_MSG_NOTICE([Using "$pluginslibdir" for plugins])
-AC_SUBST(pluginslibdir)
+PLUGIN_DEPS="hildon-1 >= 0.8.4 libosso >= 0.8.4 gconf-2.0 >= 0.22"
+STORAGE_XML_DEPS="libxml-2.0 >= 2.6.0 json-glib-1.0 >= 0.6.2"
+COMMON_DEPS="$COMMON_DEPS $PLUGIN_DEPS $STORAGE_XML_DEPS gmodule-2.0 libhildonmime >= 1.0.0  libcurl >= 7.15.0 oauth >= 0.5.2"
+PKG_CHECK_MODULES([DEPS], [$COMMON_DEPS])
+PKG_CHECK_MODULES([STORAGE_EVERNOTE], [$PLUGIN_DEPS])
+PKG_CHECK_MODULES([STORAGE_MIDGARD], [$PLUGIN_DEPS $MIDGARD_DEPS])
+PKG_CHECK_MODULES([STORAGE_XML], [$PLUGIN_DEPS $STORAGE_XML_DEPS])
 
 # Localization-related
 AC_PROG_INTLTOOL([0.23])
-GETTEXT_PACKAGE=conboy
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED( GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Name of gettext package ])
-ALL_LINGUAS="de fr it pt_BR pl fi da nl sk sv ro tr hu ru nb"
+AC_SUBST([GETTEXT_PACKAGE], [$PACKAGE_NAME])
+AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"], [Name of gettext package])
+AC_SUBST([ALL_LINGUAS], ["de fr it pt_BR pl fi da nl sk sv ro tr hu ru nb"])
 AM_GLIB_GNU_GETTEXT
-AC_SUBST(ALL_LINGUAS)
-AC_SUBST(localedir)
-AC_DEFINE_UNQUOTED(LOCALEDIR,"$localedir",[localedir])
+AC_SUBST([localedir], [`$PKG_CONFIG osso-af-settings --variable=localedir`])
+AC_DEFINE_UNQUOTED([LOCALEDIR], ["$localedir"], [localedir])
 
-AC_SUBST(desktopentrydir)
-AC_SUBST(icon_26x26dir)
-AC_SUBST(icon_40x40dir)
-AC_SUBST(icon_48x48dir)
-AC_SUBST(icon_64x64dir)
-AC_SUBST(icon_scalabledir)
-
-AC_CONFIG_FILES([src/conboy_config.h])
-
-AC_OUTPUT([
+AC_CONFIG_FILES([
     Makefile 
-    src/Makefile
-    data/Makefile
     po/Makefile.in 
     po/Makefile
     data/de.zwong.conboy.service
     data/conboy2.desktop
     data/conboy.conf
-    src/plugins/Makefile
-    src/plugins/storage_xml/Makefile
-    src/plugins/storage_midgard/Makefile
-    src/plugins/storage_evernote/Makefile
+    src/conboy_config.h
 ])
+AC_OUTPUT

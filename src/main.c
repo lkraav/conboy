@@ -32,7 +32,7 @@
 #include "orientation.h"
 
 
-#define APP_NAME "conboy"
+#define APP_NAME PACKAGE_NAME
 #define APP_SERVICE "de.zwong.conboy"
 #define APP_METHOD "/de/zwong/conboy"
 
@@ -124,7 +124,7 @@ main (int argc, char *argv[])
   AppData *app_data;
 
   /* Startup message */
-  g_printerr("Starting %s, Version %s \n", APP_NAME, VERSION);
+  g_printerr("Starting %s, Version %s \n", APP_NAME, PACKAGE_VERSION);
 
   /* Init i18n */
   locale_init();
@@ -146,7 +146,7 @@ main (int argc, char *argv[])
   app_data = app_data_get();
 
   /* Initialize maemo application */
-  app_data->osso_ctx = osso_initialize(APP_SERVICE, VERSION, TRUE, NULL);
+  app_data->osso_ctx = osso_initialize(APP_SERVICE, PACKAGE_VERSION, TRUE, NULL);
 
   /* Check that initialization was ok */
   if (app_data->osso_ctx == NULL) {

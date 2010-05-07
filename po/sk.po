@@ -240,11 +240,11 @@ msgstr "O plugine"
 msgid "Configure plugin"
 msgstr "Nastaviť plugin"
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:1
 msgid "Loads and saves notes from the local filesystem."
 msgstr "Nahráva a ukladá poznámky z lokálne súborového systému."
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:2
 msgid "XML Storage Backend"
 msgstr "Backend pre XML úložisko"
 
