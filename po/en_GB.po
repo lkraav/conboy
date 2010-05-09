@@ -1,0 +1,265 @@
+# English (British) translation for Conboy.
+# This file is distributed under the same license as the Conboy package.
+# David King <amigadave@amigadave.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: conboy 0.6.3.8\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-12-29 16:54+0100\n"
+"PO-Revision-Date: 2010-05-08 10:52+0000\n"
+"Last-Translator: David King <amigadave@amigadave.com>\n"
+"Language-Team: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/interface.c:644 ../src/callbacks.c:287 ../src/note.c:169
+#, c-format
+msgid "New Note %i"
+msgstr "New Note %i"
+
+#. ACTIONS
+#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#: ../src/interface.c:936 ../src/interface.c:1045 ../src/interface.c:1083
+msgid "Bold"
+msgstr "Bold"
+
+#: ../src/interface.c:937
+msgid "Bullets"
+msgstr "Bullets"
+
+#: ../src/interface.c:938
+msgid "Decrease indent"
+msgstr "Decrease indent"
+
+#: ../src/interface.c:939
+msgid "Delete note"
+msgstr "Delete note"
+
+#: ../src/interface.c:940 ../src/interface.c:1049 ../src/interface.c:1087
+msgid "Fixed width"
+msgstr "Fixed width"
+
+#: ../src/interface.c:941 ../src/interface.c:1048 ../src/interface.c:1086
+msgid "Highlight"
+msgstr "Highlight"
+
+#: ../src/interface.c:942
+msgid "Increase indent"
+msgstr "Increase indent"
+
+#: ../src/interface.c:943
+msgid "Link"
+msgstr "Link"
+
+#: ../src/interface.c:944
+msgid "New note"
+msgstr "New note"
+
+#: ../src/interface.c:945
+msgid "Open note"
+msgstr "Open note"
+
+#: ../src/interface.c:946 ../src/settings_window.c:588
+#: ../src/settings_window.c:596
+msgid "Settings"
+msgstr "Settings"
+
+#: ../src/interface.c:947
+msgid "Quit"
+msgstr "Quit"
+
+#: ../src/interface.c:948 ../src/interface.c:1046 ../src/interface.c:1084
+msgid "Italic"
+msgstr "Italic"
+
+#: ../src/interface.c:949 ../src/interface.c:1047 ../src/interface.c:1085
+msgid "Strikeout"
+msgstr "Strikthrough"
+
+#: ../src/interface.c:950
+msgid "Style"
+msgstr "Style"
+
+#: ../src/interface.c:951
+msgid "Zoom in"
+msgstr "Zoom in"
+
+#: ../src/interface.c:952
+msgid "Zoom out"
+msgstr "Zoom out"
+
+#: ../src/interface.c:953
+msgid "Find in note"
+msgstr "Find in note"
+
+#: ../src/interface.c:954
+msgid "Synchronize"
+msgstr "Synchronise"
+
+#: ../src/interface.c:956
+msgid "Back"
+msgstr "Back"
+
+#: ../src/interface.c:957
+msgid "Forward"
+msgstr "Forward"
+
+#: ../src/interface.c:958 ../src/search_window.c:357
+msgid "Fullscreen"
+msgstr "Fullscreen"
+
+#. TODO: Use an enum instead of 0 to 3
+#: ../src/interface.c:960 ../src/interface.c:1050 ../src/interface.c:1088
+msgid "Small"
+msgstr "Small"
+
+#: ../src/interface.c:961
+msgid "Normal"
+msgstr "Normal"
+
+#: ../src/interface.c:962 ../src/interface.c:1051 ../src/interface.c:1089
+msgid "Large"
+msgstr "Large"
+
+#: ../src/interface.c:963 ../src/interface.c:1052 ../src/interface.c:1090
+msgid "Huge"
+msgstr "Huge"
+
+#. FIND TOOL BAR
+#: ../src/interface.c:1225 ../src/search_window.c:411
+msgid "Search:"
+msgstr "Search:"
+
+#: ../src/search_window.c:348
+msgid "Search all notes"
+msgstr "Search all notes"
+
+#. Add New Note item
+#.
+#. menu_new_note = gtk_button_new();
+#. gtk_action_connect_proxy(new_note_action, menu_new_note);
+#. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
+#.
+#. Add sort filters
+#: ../src/search_window.c:376
+msgid "Sort by title"
+msgstr "Sort by title"
+
+#: ../src/search_window.c:377
+msgid "Sort by date"
+msgstr "Sort by date"
+
+#: ../src/search_window.c:484
+msgid "Note"
+msgstr "Note"
+
+#: ../src/search_window.c:501
+msgid "Last changed"
+msgstr "Last changed"
+
+#: ../src/callbacks.c:80
+#, c-format
+msgid ""
+"<b>Note title taken</b>\n"
+"\n"
+"A note with the title <b>%s</b> already exists. Please choose another name "
+"for this note before continuing."
+msgstr ""
+"<b>Note title taken</b>\n"
+"\n"
+"A note with the title <b>%s</b> already exists. Please choose another name "
+"for this note before continuing."
+
+#: ../src/callbacks.c:804
+msgid "Really delete this note?"
+msgstr "Really delete this note?"
+
+#: ../src/callbacks.c:806
+msgid "If you delete a note it is permanently lost."
+msgstr "If you delete a note it is permanently lost."
+
+#: ../src/settings_window.c:371
+msgid "Scrollbar size"
+msgstr "Scrollbar size"
+
+#: ../src/settings_window.c:376
+msgid "Thin"
+msgstr "Thin"
+
+#: ../src/settings_window.c:380
+msgid "Thick"
+msgstr "Thick"
+
+#: ../src/settings_window.c:392 ../src/settings_window.c:394
+msgid "Use automatic portrait mode"
+msgstr "Use automatic portrait mode"
+
+#: ../src/settings_window.c:406 ../src/settings_window.c:408
+msgid "Use custom colors"
+msgstr "Use custom colours"
+
+#: ../src/settings_window.c:422
+msgid "Text"
+msgstr "Text"
+
+#: ../src/settings_window.c:436
+msgid "Background"
+msgstr "Background"
+
+#: ../src/settings_window.c:450
+msgid "Links"
+msgstr "Links"
+
+#: ../src/conboy_note.c:344
+msgid "Describe your new note here."
+msgstr "Describe your new note here."
+
+#: ../src/conboy_plugin_manager.c:46
+msgid "Plugin"
+msgstr "Plugin"
+
+#: ../src/conboy_plugin_manager.c:47
+msgid "Enabled"
+msgstr "Enabled"
+
+#: ../src/conboy_plugin_manager.c:129 ../src/conboy_plugin_manager_row.c:132
+msgid "Plugin settings"
+msgstr "Plugin settings"
+
+#: ../src/conboy_plugin_manager.c:602
+msgid "Active plugins"
+msgstr "Active plugins"
+
+#: ../src/conboy_plugin_manager.c:631
+msgid "About plugin"
+msgstr "About plugin"
+
+#: ../src/conboy_plugin_manager.c:635
+msgid "Configure plugin"
+msgstr "Configure plugin"
+
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
+msgid "Loads and saves notes from the local filesystem."
+msgstr "Loads and saves notes from the local filesystem."
+
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
+msgid "XML Storage Backend"
+msgstr "XML Storage Backend"
+
+#. Description
+#: ../debian/control.in:21
+msgid "Conboy is a note taking application."
+msgstr "Conboy is a note taking application."
+
+#. Description
+#: ../debian/control.in:21
+msgid ""
+"It is designed to be easy to use - yet powerful. Conboy can read and write "
+"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
+"Windows."
+msgstr ""
+"It is designed to be easy to use - yet powerful. Conboy can read and write "
+"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
+"Windows."
