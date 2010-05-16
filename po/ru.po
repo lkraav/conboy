@@ -1,7 +1,7 @@
 # Russian translation of Conboy.
 # Copyright © 2010 by the Conboy authors.
 # This file is distributed under the same license as the Conboy package.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: conboy\n"
@@ -19,7 +19,8 @@ msgid "New Note %i"
 msgstr "Новая заметка %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
 #: ../src/interface.c:936 ../src/interface.c:1045 ../src/interface.c:1083
 msgid "Bold"
 msgstr "Жирный"
@@ -75,7 +76,7 @@ msgstr "Курсив"
 
 #: ../src/interface.c:949 ../src/interface.c:1047 ../src/interface.c:1085
 msgid "Strikeout"
-msgstr "Перечеркнутый"
+msgstr "Зачеркнутый"
 
 #: ../src/interface.c:950
 msgid "Style"
@@ -136,11 +137,11 @@ msgid "Search all notes"
 msgstr "Искать по всем заметкам"
 
 #. Add New Note item
-#.
+#. 
 #. menu_new_note = gtk_button_new();
 #. gtk_action_connect_proxy(new_note_action, menu_new_note);
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#.
+#. 
 #. Add sort filters
 #: ../src/search_window.c:376
 msgid "Sort by title"
@@ -156,20 +157,18 @@ msgstr "Заметка"
 
 #: ../src/search_window.c:501
 msgid "Last changed"
-msgstr "Изменен"
+msgstr "Последнее изменение"
 
 #: ../src/callbacks.c:80
 #, c-format
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name "
-"for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
 msgstr ""
-"<b>Заголовок заметки уже используется</b>\n"
+"<b>Заголовок заметки уже использован</b>\n"
 "\n"
-"Заметка с заголовком <b>%s</b> уже существует. Пожалуйста, выберите другой заголовок "
-"для данной заметки."
+"Заметка с заголовком <b>%s</b> уже существует. Пожалуйста, выберите другой заголовок для данной заметки."
 
 #: ../src/callbacks.c:804
 msgid "Really delete this note?"
@@ -217,7 +216,7 @@ msgstr "Начните свою заметку здесь."
 
 #: ../src/conboy_plugin_manager.c:46
 msgid "Plugin"
-msgstr "Расширение"
+msgstr "Плагин"
 
 #: ../src/conboy_plugin_manager.c:47
 msgid "Enabled"
@@ -225,19 +224,19 @@ msgstr "Используется"
 
 #: ../src/conboy_plugin_manager.c:129 ../src/conboy_plugin_manager_row.c:132
 msgid "Plugin settings"
-msgstr "Настройка расширения"
+msgstr "Настройка плагина"
 
 #: ../src/conboy_plugin_manager.c:602
 msgid "Active plugins"
-msgstr "Используемые расширения"
+msgstr "Используемые плагин"
 
 #: ../src/conboy_plugin_manager.c:631
 msgid "About plugin"
-msgstr "О расширении"
+msgstr "О плагине"
 
 #: ../src/conboy_plugin_manager.c:635
 msgid "Configure plugin"
-msgstr "Настроить расширение"
+msgstr "Настроить плагин"
 
 #: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:1
 msgid "Loads and saves notes from the local filesystem."
@@ -245,18 +244,14 @@ msgstr "Загружает и сохраняет заметки с локаль�
 
 #: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:2
 msgid "XML Storage Backend"
-msgstr ""
+msgstr "Использовать XML бэк-энд"
 
 #. Description
 #: ../debian/control.in:21
 msgid "Conboy is a note taking application."
-msgstr "Conboy это приложение для создания заметок"
+msgstr "Conboy это приложение для создания заметок."
 
 #. Description
 #: ../debian/control.in:21
-msgid ""
-"It is designed to be easy to use - yet powerful. Conboy can read and write "
-"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
-"Windows."
-msgstr "Conboy прост в использовании, однако многофункционален. Conboy может читать и редактировать "
-"заметки в формате Tomboy, поэтому совместим с Tomboy на Linux, Mac и Windows."
+msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
+msgstr "Созданное приложение многофункционально и при этом простое в использовании. Conboy может читать и редактировать заметки в формате Tomboy, поэтому совместим с Tomboy на Linux, Mac и Windows."
