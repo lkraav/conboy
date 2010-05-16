@@ -74,6 +74,7 @@ check_title(UserInterface *ui)
 	if (existing_note && (existing_note != note)) {
 		/* Display message */
 		gchar msg[1024];
+		/* Translators: The note title already exists. */
 		g_sprintf(msg, _("<b>Note title taken</b>\n\nA note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."), title);
 		ui_helper_show_confirmation_dialog(GTK_WINDOW(ui->window), msg, FALSE);
 
@@ -570,6 +571,8 @@ on_delete_button_clicked			   (GtkAction		*action,
 	AppData *app_data = app_data_get();
 
 	gchar *message = g_strconcat("<b>",
+			/* Translators: Does the user really want to delete the
+			   current note? Answer is "yes" or "no".*/
 			_("Really delete this note?"),
 			"</b>\n\n",
 			_("If you delete a note it is permanently lost."),
@@ -1032,6 +1035,7 @@ on_about_button_clicked				   (GtkAction		*action,
 	he_about_dialog_set_app_name(dia, "Conboy");
 	he_about_dialog_set_bugtracker(dia, PACKAGE_BUGREPORT);
 	he_about_dialog_set_copyright(dia, "(c) Cornelius Hald 2010");
+	/* Translators: Description of the program. */
 	he_about_dialog_set_description(dia, _("Conboy is a note taking application."));
 	he_about_dialog_set_icon_name(dia, PACKAGE_NAME);
 	he_about_dialog_set_version(dia, PACKAGE_VERSION);

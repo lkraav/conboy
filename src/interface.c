@@ -388,6 +388,7 @@ on_window_visible(GtkWindow *window, GdkEvent *event, gpointer user_data)
 	/* If that does not work, create new note */
 	if (note == NULL) {
 		gchar title[50];
+		/* Translators: The title of a newly-created note. */
 		g_sprintf(title, _("New Note %i"), 1);
 		note = conboy_note_new_with_title(title);
 		note_show(note, TRUE, TRUE, TRUE);
@@ -655,34 +656,56 @@ UserInterface* create_mainwin() {
 	gtk_container_add(GTK_CONTAINER(mainwin), vbox1);
 
 	/* ACTIONS */
+	/* Translators: Bold font. */
 	action_bold = GTK_ACTION(gtk_toggle_action_new("bold", _("Bold"), NULL, NULL));
+	/* Translators: Bullet point for a list. */
 	action_bullets = GTK_ACTION(gtk_toggle_action_new("bullets", _("Bullets"), NULL, NULL));
 	action_dec_indent = GTK_ACTION(gtk_action_new("dec_indent", _("Decrease indent"), NULL, GTK_STOCK_UNINDENT));
 	action_delete = GTK_ACTION(gtk_action_new("delete", _("Delete note"), NULL, GTK_STOCK_DELETE));
+	/* Translators: Monospaced (non-proportional) font. */
 	action_fixed = GTK_ACTION(gtk_toggle_action_new("monospace", _("Fixed width"), NULL, NULL));
+	/* Translators: Emphasise text with a background colour. */
 	action_highlight = GTK_ACTION(gtk_toggle_action_new("highlight", _("Highlight"), NULL, NULL));
 	action_inc_indent = GTK_ACTION(gtk_action_new("inc_indent", _("Increase indent"), NULL, GTK_STOCK_INDENT));
+	/* Translators: Add a [hyper]link to another note. */
 	action_link = GTK_ACTION(gtk_action_new("link", _("Link"), NULL, GTK_STOCK_REDO));
+	/* Translators: Create a new note. */
 	action_new = GTK_ACTION(gtk_action_new("new", _("New note"), NULL, NULL));
+	/* Translators: Open an existing note. */
 	action_notes = GTK_ACTION(gtk_action_new("open", _("Open note"), NULL, GTK_STOCK_OPEN));
+	/* Translators: Show the settings dialog. */
 	action_settings = GTK_ACTION(gtk_action_new("settings", _("Settings"), NULL, NULL));
+	/* Translators: Quit the program. */
 	action_quit = GTK_ACTION(gtk_action_new("quit", _("Quit"), NULL, NULL));
+	/* Translators: Italic (cursive) font. */
 	action_italic = GTK_ACTION(gtk_toggle_action_new("italic", _("Italic"), NULL, GTK_STOCK_ITALIC));
+	/* Translators: Crossed out text. */
 	action_strike = GTK_ACTION(gtk_toggle_action_new("strikethrough", _("Strikeout"), NULL, NULL));
+	/* Translators: Select font. */
 	action_text_style = GTK_ACTION(gtk_action_new("style", _("Style"), NULL, GTK_STOCK_SELECT_FONT));
 	action_zoom_in = GTK_ACTION(gtk_action_new("zoom_in", _("Zoom in"), NULL, GTK_STOCK_ZOOM_IN));
 	action_zoom_out = GTK_ACTION(gtk_action_new("zoom_out", _("Zoom out"), NULL, GTK_STOCK_ZOOM_OUT));
+	/* Translators: Find text in the current note. */
 	action_find = GTK_ACTION(gtk_action_new("find", _("Find in note"), NULL, GTK_STOCK_FIND));
+	/* Translators: Synchronize the current note. */
 	gchar *sync_label = g_strconcat(_("Synchronize"), " (Alpha)", NULL);
 	action_sync = GTK_ACTION(gtk_action_new("sync", sync_label, NULL, NULL));
+	/* Translators: Navigate backwards (like a web browser). */
 	action_back = GTK_ACTION(gtk_action_new("back", _("Back"), NULL, GTK_STOCK_GO_BACK));
+	/* Translators: Navigate forwards (like a web browser). */
 	action_forward = GTK_ACTION(gtk_action_new("forward", _("Forward"), NULL, GTK_STOCK_GO_FORWARD));
+	/* Translators: View the note fullscreen. */
 	action_fullscreen = GTK_ACTION(gtk_action_new("fullscreen", _("Fullscreen"), NULL, NULL));
+	/* Translators: About the program. */
 	action_about = GTK_ACTION(gtk_action_new("about", _("About"), NULL, NULL));
 	/* TODO: Use an enum instead of 0 to 3 */
+	/* Translators: Small font. */
 	action_font_small = GTK_ACTION(gtk_radio_action_new("size:small", _("Small"), NULL, NULL, 0));
+	/* Translators: Normal size font. */
 	action_font_normal = GTK_ACTION(gtk_radio_action_new("size:normal", _("Normal"), NULL, NULL, 1));
+	/* Translators: Large font. */
 	action_font_large = GTK_ACTION(gtk_radio_action_new("size:large", _("Large"), NULL, NULL, 2));
+	/* Translators: Very large font. */
 	action_font_huge = GTK_ACTION(gtk_radio_action_new("size:huge", _("Huge"), NULL, NULL, 3));
 
 	gtk_action_set_sensitive(action_link, FALSE);
@@ -944,6 +967,7 @@ UserInterface* create_mainwin() {
 	hildon_window_add_toolbar(HILDON_WINDOW(mainwin), GTK_TOOLBAR(toolbar));
 
 	/* FIND TOOL BAR */
+	/* Translators: Search for this term in the current note. */
 	find_bar = hildon_find_toolbar_new(_("Search:"));
 	hildon_window_add_toolbar(HILDON_WINDOW(mainwin), GTK_TOOLBAR(find_bar));
 

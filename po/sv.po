@@ -2,8 +2,8 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR fpp, 2009.
-# 
-# 
+#
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Conboy\n"
@@ -22,8 +22,7 @@ msgid "New Note %i"
 msgstr "Ny anteckning %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and
-#. that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
 #: ../src/interface.c:936 ../src/interface.c:1045 ../src/interface.c:1083
 msgid "Bold"
 msgstr "Fet"
@@ -140,11 +139,11 @@ msgid "Search all notes"
 msgstr "Sök alla anteckningar"
 
 #. Add New Note item
-#. 
+#.
 #. menu_new_note = gtk_button_new();
 #. gtk_action_connect_proxy(new_note_action, menu_new_note);
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#. 
+#.
 #. Add sort filters
 #: ../src/search_window.c:376
 msgid "Sort by title"
@@ -167,11 +166,13 @@ msgstr "Senast ändrad"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name "
+"for this note before continuing."
 msgstr ""
 "<b>Anteckningstiteln upptagen</b>\n"
 "\n"
-"En anteckning med titeln <b>%s</b> finns redan. Välj ett annat namn för den här anteckningen innan du fortsätter."
+"En anteckning med titeln <b>%s</b> finns redan. Välj ett annat namn för den "
+"här anteckningen innan du fortsätter."
 
 #: ../src/callbacks.c:804
 msgid "Really delete this note?"
@@ -241,11 +242,11 @@ msgstr "Om plugin"
 msgid "Configure plugin"
 msgstr "Anpassa plugin"
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:1
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
 msgid "Loads and saves notes from the local filesystem."
 msgstr "Laddar och sparar anteckningar från det lokala filsystemet"
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:2
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
 msgid "XML Storage Backend"
 msgstr "XML Storage Backend"
 
@@ -256,8 +257,14 @@ msgstr "Conboy är en applikation för att ta anteckningar med"
 
 #. Description
 #: ../debian/control.in:21
-msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
-msgstr "Den är utformad för att vara lätt att använda - men ändå kraftfull. Conboy kan läsa och skriva Tomboys filformat för att vara kompatibel med Tomboy på Linux, Mac och Windows."
+msgid ""
+"It is designed to be easy to use - yet powerful. Conboy can read and write "
+"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
+"Windows."
+msgstr ""
+"Den är utformad för att vara lätt att använda - men ändå kraftfull. Conboy "
+"kan läsa och skriva Tomboys filformat för att vara kompatibel med Tomboy på "
+"Linux, Mac och Windows."
 
 #~ msgid "Open"
 #~ msgstr "Ouvrir"

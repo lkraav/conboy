@@ -1,7 +1,7 @@
 # translation of pl.po to Polish
 # Anna Karwowska <anna@zwong.de>, 2009.
 # Piotr Drąg <piotrdrag@gmail.com>, 2009.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: conboy\n"
@@ -22,8 +22,7 @@ msgid "New Note %i"
 msgstr "Nowa notatka %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and
-#. that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
 #: ../src/interface.c:936 ../src/interface.c:1045 ../src/interface.c:1083
 msgid "Bold"
 msgstr "Pogrubienie"
@@ -140,11 +139,11 @@ msgid "Search all notes"
 msgstr "Wyszukaj we wszystkich notatkach"
 
 #. Add New Note item
-#. 
+#.
 #. menu_new_note = gtk_button_new();
 #. gtk_action_connect_proxy(new_note_action, menu_new_note);
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#. 
+#.
 #. Add sort filters
 #: ../src/search_window.c:376
 msgid "Sort by title"
@@ -167,11 +166,13 @@ msgstr "Ostatnio zmienione"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name "
+"for this note before continuing."
 msgstr ""
 "<b>Przyjęto tytuł notatki</b>\n"
 "\n"
-"Notatka o tytule <b>%s</b> już istnieje. Proszę wybrać inną nazwę dla tej notatki przed kontynuowaniem."
+"Notatka o tytule <b>%s</b> już istnieje. Proszę wybrać inną nazwę dla tej "
+"notatki przed kontynuowaniem."
 
 #: ../src/callbacks.c:804
 msgid "Really delete this note?"
@@ -241,11 +242,11 @@ msgstr "O wtyczce"
 msgid "Configure plugin"
 msgstr "Skonfiguruj wtyczkę"
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:1
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
 msgid "Loads and saves notes from the local filesystem."
 msgstr "Wczytuje i zapisuje notatki z lokalnego systemu plików."
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:2
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
 msgid "XML Storage Backend"
 msgstr "Moduł przechowywania XML"
 
@@ -256,5 +257,11 @@ msgstr "Conboy to program do robienia notatek."
 
 #. Description
 #: ../debian/control.in:21
-msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
-msgstr "Jest zaprojektowany tak, aby był łatwy w użytkowaniu, a jednocześnie funkcjonalny. Program Conboy może odczytywać i zapisywać format pliku programu Tomboy z systemów Linux, Mac i Windows."
+msgid ""
+"It is designed to be easy to use - yet powerful. Conboy can read and write "
+"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
+"Windows."
+msgstr ""
+"Jest zaprojektowany tak, aby był łatwy w użytkowaniu, a jednocześnie "
+"funkcjonalny. Program Conboy może odczytywać i zapisywać format pliku "
+"programu Tomboy z systemów Linux, Mac i Windows."

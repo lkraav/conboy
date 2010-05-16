@@ -169,8 +169,8 @@ msgid ""
 msgstr ""
 "<b>Notattittel i bruk</b>\n"
 "\n"
-"Et notat med tittelen <b>%s</b> finnes allerede. Vennligst velg et annet navn "
-"for dette notatet før du fortsetter."
+"Et notat med tittelen <b>%s</b> finnes allerede. Vennligst velg et annet "
+"navn for dette notatet før du fortsetter."
 
 #: ../src/callbacks.c:804
 msgid "Really delete this note?"
@@ -240,11 +240,11 @@ msgstr "Om tilleggsmodul"
 msgid "Configure plugin"
 msgstr "Konfigurer tilleggsmodul"
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:1
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
 msgid "Loads and saves notes from the local filesystem."
 msgstr "Laster og lagrer notater på det lokale filsystemet."
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:2
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
 msgid "XML Storage Backend"
 msgstr "XML-lagringsmodul"
 
@@ -260,6 +260,6 @@ msgid ""
 "the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
 "Windows."
 msgstr ""
-"Den er laget for å være lett å bruke - men kraftig. Conboy kan lese og skrive "
-"Tomboy filformatet og er kompatibelt med Tomboy på Linux, Mac og "
+"Den er laget for å være lett å bruke - men kraftig. Conboy kan lese og "
+"skrive Tomboy filformatet og er kompatibelt med Tomboy på Linux, Mac og "
 "Windows."

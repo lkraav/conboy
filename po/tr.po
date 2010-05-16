@@ -239,11 +239,11 @@ msgstr "Eklenti hakkında"
 msgid "Configure plugin"
 msgstr "Eklentiyi yapılandır"
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:1
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
 msgid "Loads and saves notes from the local filesystem."
 msgstr ""
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:2
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
 msgid "XML Storage Backend"
 msgstr ""
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-29 16:54+0100\n"
+"POT-Creation-Date: 2010-05-16 18:36+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,125 +16,154 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../src/interface.c:644 ../src/callbacks.c:287 ../src/note.c:169
+#. Translators: The title of a newly-created note.
+#: ../src/interface.c:392 ../src/callbacks.c:284 ../src/note.c:170
 #, c-format
 msgid "New Note %i"
 msgstr ""
 
 #. ACTIONS
+#. Translators: Bold font.
 #. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
-#: ../src/interface.c:936 ../src/interface.c:1045 ../src/interface.c:1083
+#: ../src/interface.c:660 ../src/interface.c:789 ../src/interface.c:827
 msgid "Bold"
 msgstr ""
 
-#: ../src/interface.c:937
+#. Translators: Bullet point for a list.
+#: ../src/interface.c:662
 msgid "Bullets"
 msgstr ""
 
-#: ../src/interface.c:938
+#: ../src/interface.c:663
 msgid "Decrease indent"
 msgstr ""
 
-#: ../src/interface.c:939
+#: ../src/interface.c:664
 msgid "Delete note"
 msgstr ""
 
-#: ../src/interface.c:940 ../src/interface.c:1049 ../src/interface.c:1087
+#. Translators: Monospaced (non-proportional) font.
+#: ../src/interface.c:666 ../src/interface.c:793 ../src/interface.c:831
 msgid "Fixed width"
 msgstr ""
 
-#: ../src/interface.c:941 ../src/interface.c:1048 ../src/interface.c:1086
+#. Translators: Emphasise text with a background colour.
+#: ../src/interface.c:668 ../src/interface.c:792 ../src/interface.c:830
 msgid "Highlight"
 msgstr ""
 
-#: ../src/interface.c:942
+#: ../src/interface.c:669
 msgid "Increase indent"
 msgstr ""
 
-#: ../src/interface.c:943
+#. Translators: Add a [hyper]link to another note.
+#: ../src/interface.c:671
 msgid "Link"
 msgstr ""
 
-#: ../src/interface.c:944
+#. Translators: Create a new note.
+#: ../src/interface.c:673
 msgid "New note"
 msgstr ""
 
-#: ../src/interface.c:945
+#. Translators: Open an existing note.
+#: ../src/interface.c:675
 msgid "Open note"
 msgstr ""
 
-#: ../src/interface.c:946 ../src/settings_window.c:588
-#: ../src/settings_window.c:596
+#. Translators: Show the settings dialog.
+#: ../src/interface.c:677 ../src/settings_window.c:505
+#: ../src/settings_window.c:513
 msgid "Settings"
 msgstr ""
 
-#: ../src/interface.c:947
+#. Translators: Quit the program.
+#: ../src/interface.c:679
 msgid "Quit"
 msgstr ""
 
-#: ../src/interface.c:948 ../src/interface.c:1046 ../src/interface.c:1084
+#. Translators: Italic (cursive) font.
+#: ../src/interface.c:681 ../src/interface.c:790 ../src/interface.c:828
 msgid "Italic"
 msgstr ""
 
-#: ../src/interface.c:949 ../src/interface.c:1047 ../src/interface.c:1085
+#. Translators: Crossed out text.
+#: ../src/interface.c:683 ../src/interface.c:791 ../src/interface.c:829
 msgid "Strikeout"
 msgstr ""
 
-#: ../src/interface.c:950
+#. Translators: Select font.
+#: ../src/interface.c:685
 msgid "Style"
 msgstr ""
 
-#: ../src/interface.c:951
+#: ../src/interface.c:686
 msgid "Zoom in"
 msgstr ""
 
-#: ../src/interface.c:952
+#: ../src/interface.c:687
 msgid "Zoom out"
 msgstr ""
 
-#: ../src/interface.c:953
+#. Translators: Find text in the current note.
+#: ../src/interface.c:689
 msgid "Find in note"
 msgstr ""
 
-#: ../src/interface.c:954
+#. Translators: Synchronize the current note.
+#: ../src/interface.c:691
 msgid "Synchronize"
 msgstr ""
 
-#: ../src/interface.c:956
+#. Translators: Navigate backwards (like a web browser).
+#: ../src/interface.c:694
 msgid "Back"
 msgstr ""
 
-#: ../src/interface.c:957
+#. Translators: Navigate forwards (like a web browser).
+#: ../src/interface.c:696
 msgid "Forward"
 msgstr ""
 
-#: ../src/interface.c:958 ../src/search_window.c:357
+#. Translators: View the note fullscreen.
+#: ../src/interface.c:698 ../src/search_window.c:358
 msgid "Fullscreen"
 msgstr ""
 
+#. Translators: About the program.
+#: ../src/interface.c:700
+msgid "About"
+msgstr ""
+
 #. TODO: Use an enum instead of 0 to 3
-#: ../src/interface.c:960 ../src/interface.c:1050 ../src/interface.c:1088
+#. Translators: Small font.
+#: ../src/interface.c:703 ../src/interface.c:794 ../src/interface.c:832
 msgid "Small"
 msgstr ""
 
-#: ../src/interface.c:961
+#. Translators: Normal size font.
+#: ../src/interface.c:705
 msgid "Normal"
 msgstr ""
 
-#: ../src/interface.c:962 ../src/interface.c:1051 ../src/interface.c:1089
+#. Translators: Large font.
+#: ../src/interface.c:707 ../src/interface.c:795 ../src/interface.c:833
 msgid "Large"
 msgstr ""
 
-#: ../src/interface.c:963 ../src/interface.c:1052 ../src/interface.c:1090
+#. Translators: Very large font.
+#: ../src/interface.c:709 ../src/interface.c:796 ../src/interface.c:834
 msgid "Huge"
 msgstr ""
 
 #. FIND TOOL BAR
-#: ../src/interface.c:1225 ../src/search_window.c:411
+#. Translators: Search for this term in the current note.
+#: ../src/interface.c:971 ../src/search_window.c:414
 msgid "Search:"
 msgstr ""
 
-#: ../src/search_window.c:348
+#. Translators: Search in all notes.
+#: ../src/search_window.c:349
 msgid "Search all notes"
 msgstr ""
 
@@ -145,23 +174,29 @@ msgstr ""
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
 #.
 #. Add sort filters
-#: ../src/search_window.c:376
+#. Translators: Sort notes by title.
+#: ../src/search_window.c:378
 msgid "Sort by title"
 msgstr ""
 
-#: ../src/search_window.c:377
+#. Translators: Sort notes by last modified date.
+#: ../src/search_window.c:380
 msgid "Sort by date"
 msgstr ""
 
-#: ../src/search_window.c:484
+#. Translators: Title of a column in a table that contains note titles.
+#: ../src/search_window.c:488
 msgid "Note"
 msgstr ""
 
-#: ../src/search_window.c:501
+#. Translators: Title of a column in a table that contains dates when
+#. notes were most recently modified.
+#: ../src/search_window.c:507
 msgid "Last changed"
 msgstr ""
 
-#: ../src/callbacks.c:80
+#. Translators: The note title already exists.
+#: ../src/callbacks.c:78
 #, c-format
 msgid ""
 "<b>Note title taken</b>\n"
@@ -170,43 +205,61 @@ msgid ""
 "for this note before continuing."
 msgstr ""
 
-#: ../src/callbacks.c:804
+#. Translators: Does the user really want to delete the
+#. current note? Answer is "yes" or "no".
+#: ../src/callbacks.c:576
 msgid "Really delete this note?"
 msgstr ""
 
-#: ../src/callbacks.c:806
+#: ../src/callbacks.c:578
 msgid "If you delete a note it is permanently lost."
 msgstr ""
 
-#: ../src/settings_window.c:371
+#. Translators: Description of the program.
+#: ../src/callbacks.c:1039
+msgid "Conboy is a note taking application."
+msgstr ""
+
+#. Translators: Width of the scrollbar.
+#: ../src/settings_window.c:285
 msgid "Scrollbar size"
 msgstr ""
 
-#: ../src/settings_window.c:376
+#. Translators: Thin scrollbar width.
+#: ../src/settings_window.c:291
 msgid "Thin"
 msgstr ""
 
-#: ../src/settings_window.c:380
+#. Translators: Thick scrollbar width.
+#: ../src/settings_window.c:296
 msgid "Thick"
 msgstr ""
 
-#: ../src/settings_window.c:392 ../src/settings_window.c:394
+#. Translators: Whether to enable automatic portrait mode.
+#: ../src/settings_window.c:309 ../src/settings_window.c:311
 msgid "Use automatic portrait mode"
 msgstr ""
 
-#: ../src/settings_window.c:406 ../src/settings_window.c:408
+#. Translators: Whether to use custom colors.
+#: ../src/settings_window.c:324 ../src/settings_window.c:326
 msgid "Use custom colors"
 msgstr ""
 
-#: ../src/settings_window.c:422
+#. Translators: Text color. The color is shown in the dialog, next to
+#. the text.
+#: ../src/settings_window.c:342
 msgid "Text"
 msgstr ""
 
-#: ../src/settings_window.c:436
+#. Translators: Background color. The color is shown in the dialog,
+#. next to the text.
+#: ../src/settings_window.c:358
 msgid "Background"
 msgstr ""
 
-#: ../src/settings_window.c:450
+#. Translators: Color of links. The color is shown in the dialog, next
+#. to the text.
+#: ../src/settings_window.c:374
 msgid "Links"
 msgstr ""
 
@@ -214,47 +267,34 @@ msgstr ""
 msgid "Describe your new note here."
 msgstr ""
 
-#: ../src/conboy_plugin_manager.c:46
+#. Translators: A plugin. A dynamic library that extends the program's
+#. functionality.
+#: ../src/conboy_plugin_manager.c:48
 msgid "Plugin"
 msgstr ""
 
-#: ../src/conboy_plugin_manager.c:47
+#. Translators: Whether the plugin is enabled.
+#: ../src/conboy_plugin_manager.c:50
 msgid "Enabled"
 msgstr ""
 
-#: ../src/conboy_plugin_manager.c:129 ../src/conboy_plugin_manager_row.c:132
+#. Translators: Title for the plugin settings dialog.
+#: ../src/conboy_plugin_manager.c:133 ../src/conboy_plugin_manager_row.c:132
 msgid "Plugin settings"
 msgstr ""
 
-#: ../src/conboy_plugin_manager.c:602
+#. Translators: Plugins that are
+#. currently active.
+#: ../src/conboy_plugin_manager.c:608
 msgid "Active plugins"
 msgstr ""
 
-#: ../src/conboy_plugin_manager.c:631
+#. Translators: Show information about the plugin.
+#: ../src/conboy_plugin_manager.c:638
 msgid "About plugin"
 msgstr ""
 
-#: ../src/conboy_plugin_manager.c:635
+#. Translators: Configure the plugin.
+#: ../src/conboy_plugin_manager.c:643
 msgid "Configure plugin"
-msgstr ""
-
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
-msgid "Loads and saves notes from the local filesystem."
-msgstr ""
-
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
-msgid "XML Storage Backend"
-msgstr ""
-
-#. Description
-#: ../debian/control.in:21
-msgid "Conboy is a note taking application."
-msgstr ""
-
-#. Description
-#: ../debian/control.in:21
-msgid ""
-"It is designed to be easy to use - yet powerful. Conboy can read and write "
-"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
-"Windows."
 msgstr ""

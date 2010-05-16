@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -21,8 +21,7 @@ msgid "New Note %i"
 msgstr "Nuova nota %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and
-#. that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
 #: ../src/interface.c:936 ../src/interface.c:1045 ../src/interface.c:1083
 msgid "Bold"
 msgstr "Grassetto"
@@ -139,11 +138,11 @@ msgid "Search all notes"
 msgstr "Cerca in tutte le note"
 
 #. Add New Note item
-#. 
+#.
 #. menu_new_note = gtk_button_new();
 #. gtk_action_connect_proxy(new_note_action, menu_new_note);
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#. 
+#.
 #. Add sort filters
 #: ../src/search_window.c:376
 msgid "Sort by title"
@@ -166,11 +165,13 @@ msgstr "Ulltima modifica"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name "
+"for this note before continuing."
 msgstr ""
 "<b>Titolo nota occupato</b>\n"
 "\n"
-"Una nota intitolata <b>%s</b> esiste già. Selezionare un altro titolo prima di proseguire."
+"Una nota intitolata <b>%s</b> esiste già. Selezionare un altro titolo prima "
+"di proseguire."
 
 #: ../src/callbacks.c:804
 msgid "Really delete this note?"
@@ -240,11 +241,11 @@ msgstr "Info estensione"
 msgid "Configure plugin"
 msgstr "Configura estensione"
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:1
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
 msgid "Loads and saves notes from the local filesystem."
 msgstr "Carica e salva note dal disco locale"
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:2
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
 msgid "XML Storage Backend"
 msgstr "Servizio memorizzazione XML"
 
@@ -255,8 +256,14 @@ msgstr "Conboy è un'applicazione per prendere appunti."
 
 #. Description
 #: ../debian/control.in:21
-msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
-msgstr "E' pensato per essere semplice da usare, ma potente. Conboy può leggere e scrivere il formato di memorizzazione di Tomboy per essere compatibile con Tomboy su Linux, Mac e Windows."
+msgid ""
+"It is designed to be easy to use - yet powerful. Conboy can read and write "
+"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
+"Windows."
+msgstr ""
+"E' pensato per essere semplice da usare, ma potente. Conboy può leggere e "
+"scrivere il formato di memorizzazione di Tomboy per essere compatibile con "
+"Tomboy su Linux, Mac e Windows."
 
 #~ msgid "On startup"
 #~ msgstr "Alla partenza"

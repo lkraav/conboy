@@ -1,7 +1,7 @@
 # Russian translation of Conboy.
 # Copyright © 2010 by the Conboy authors.
 # This file is distributed under the same license as the Conboy package.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: conboy\n"
@@ -19,8 +19,7 @@ msgid "New Note %i"
 msgstr "Новая заметка %i"
 
 #. ACTIONS
-#. TODO: Write a function, which takes GtkActions that contain markup code and
-#. that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
 #: ../src/interface.c:936 ../src/interface.c:1045 ../src/interface.c:1083
 msgid "Bold"
 msgstr "Жирный"
@@ -137,11 +136,11 @@ msgid "Search all notes"
 msgstr "Искать по всем заметкам"
 
 #. Add New Note item
-#. 
+#.
 #. menu_new_note = gtk_button_new();
 #. gtk_action_connect_proxy(new_note_action, menu_new_note);
 #. hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-#. 
+#.
 #. Add sort filters
 #: ../src/search_window.c:376
 msgid "Sort by title"
@@ -164,11 +163,13 @@ msgstr "Последнее изменение"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name "
+"for this note before continuing."
 msgstr ""
 "<b>Заголовок заметки уже использован</b>\n"
 "\n"
-"Заметка с заголовком <b>%s</b> уже существует. Пожалуйста, выберите другой заголовок для данной заметки."
+"Заметка с заголовком <b>%s</b> уже существует. Пожалуйста, выберите другой "
+"заголовок для данной заметки."
 
 #: ../src/callbacks.c:804
 msgid "Really delete this note?"
@@ -238,11 +239,11 @@ msgstr "О плагине"
 msgid "Configure plugin"
 msgstr "Настроить плагин"
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:1
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:1
 msgid "Loads and saves notes from the local filesystem."
 msgstr "Загружает и сохраняет заметки с локального диска"
 
-#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.in.h:2
+#: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
 msgid "XML Storage Backend"
 msgstr "Использовать XML бэк-энд"
 
@@ -253,5 +254,11 @@ msgstr "Conboy это приложение для создания замето�
 
 #. Description
 #: ../debian/control.in:21
-msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
-msgstr "Созданное приложение многофункционально и при этом простое в использовании. Conboy может читать и редактировать заметки в формате Tomboy, поэтому совместим с Tomboy на Linux, Mac и Windows."
+msgid ""
+"It is designed to be easy to use - yet powerful. Conboy can read and write "
+"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
+"Windows."
+msgstr ""
+"Созданное приложение многофункционально и при этом простое в использовании. "
+"Conboy может читать и редактировать заметки в формате Tomboy, поэтому "
+"совместим с Tomboy на Linux, Mac и Windows."

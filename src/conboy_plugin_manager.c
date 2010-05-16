@@ -43,7 +43,10 @@ enum
 	NUM_COLUMNS
 };
 
+/* Translators: A plugin. A dynamic library that extends the program's
+   functionality. */
 #define PLUGIN_MANAGER_NAME_TITLE _("Plugin")
+/* Translators: Whether the plugin is enabled. */
 #define PLUGIN_MANAGER_ACTIVE_TITLE _("Enabled")
 
 #define CONBOY_PLUGIN_MANAGER_GET_PRIVATE(object)(G_TYPE_INSTANCE_GET_PRIVATE ((object), CONBOY_TYPE_PLUGIN_MANAGER, ConboyPluginManagerPrivate))
@@ -126,6 +129,7 @@ configure_button_cb (GtkWidget *button, ConboyPluginManager *pm)
 		return;
 	}
 
+	/* Translators: Title for the plugin settings dialog. */
 	GtkWidget *dialog = gtk_dialog_new_with_buttons(_("Plugin settings"),
 			NULL,
 			GTK_DIALOG_MODAL,
@@ -599,6 +603,8 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 
 	label = gtk_label_new (NULL);
 	markup = g_markup_printf_escaped ("<span weight=\"bold\">%s</span>",
+					  /* Translators: Plugins that are
+					     currently active. */
 					  _("Active plugins"));
 	gtk_label_set_markup (GTK_LABEL (label), markup);
 	g_free (markup);
@@ -628,10 +634,12 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 	gtk_box_set_spacing (GTK_BOX (hbuttonbox), 8);
 
 	pm->priv->about_button = gtk_button_new_from_stock (GTK_STOCK_ABOUT);
+	/* Translators: Show information about the plugin. */
 	gtk_button_set_label (GTK_BUTTON(pm->priv->about_button), _("About plugin"));
 	gtk_container_add (GTK_CONTAINER (hbuttonbox), pm->priv->about_button);
 
 	pm->priv->configure_button = gtk_button_new_from_stock (GTK_STOCK_PREFERENCES);
+	/* Translators: Configure the plugin. */
 	gtk_button_set_label (GTK_BUTTON(pm->priv->configure_button), _("Configure plugin"));
 	gtk_container_add (GTK_CONTAINER (hbuttonbox), pm->priv->configure_button);
 

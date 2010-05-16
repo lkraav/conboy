@@ -345,6 +345,7 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 #else
 	win = hildon_window_new();
 #endif
+	/* Translators: Search in all notes. */
 	gtk_window_set_title(GTK_WINDOW(win), _("Search all notes"));
 	screen = gdk_screen_get_default();
 	search_result = g_hash_table_new(NULL, NULL);
@@ -373,7 +374,9 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	*/
 
 	/* Add sort filters */
+	/* Translators: Sort notes by title. */
 	button_sort_by_title = gtk_radio_button_new_with_label(NULL, _("Sort by title"));
+	/* Translators: Sort notes by last modified date. */
 	button_sort_by_date = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(button_sort_by_title), _("Sort by date"));
 
 	/* Draw them as toggle buttons, not as radio buttons */
@@ -481,6 +484,7 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 
 	/* TITLE COLUMN WITH ICON */
 	title_column = gtk_tree_view_column_new();
+	/* Translators: Title of a column in a table that contains note titles. */
 	gtk_tree_view_column_set_title(title_column, _("Note"));
 	gtk_tree_view_column_set_sort_column_id(title_column, TITLE_COLUMN);
 	gtk_tree_view_column_set_reorderable(title_column, FALSE);
@@ -498,6 +502,8 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 
 	/* CHANGE_DATE COLUMN */
 	renderer = gtk_cell_renderer_text_new();
+	/* Translators: Title of a column in a table that contains dates when
+	   notes were most recently modified. */
 	change_date_column = gtk_tree_view_column_new_with_attributes(_("Last changed"), renderer, "text", CHANGE_DATE_COLUMN, NULL);
 	gtk_tree_view_column_set_sort_column_id(change_date_column, CHANGE_DATE_COLUMN);
 	gtk_tree_view_column_set_sort_indicator(change_date_column, TRUE);

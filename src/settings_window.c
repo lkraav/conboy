@@ -281,15 +281,18 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_box_pack_start(GTK_BOX(hbox), scroll_vbox, TRUE, TRUE, 0);
 
 	scroll_label = gtk_label_new("");
+	/* Translators: Width of the scrollbar. */
 	gtk_label_set_markup(GTK_LABEL(scroll_label), _("Scrollbar size"));
 	gtk_misc_set_alignment(GTK_MISC(scroll_label), 0, 0.5);
 	gtk_widget_show(scroll_label);
 	gtk_container_add(GTK_CONTAINER(scroll_vbox), scroll_label);
 
+	/* Translators: Thin scrollbar width. */
 	scroll_but1 = gtk_radio_button_new_with_label(NULL, _("Thin"));
 	gtk_widget_show(scroll_but1);
 	gtk_container_add(GTK_CONTAINER(scroll_vbox), scroll_but1);
 
+	/* Translators: Thick scrollbar width. */
 	scroll_but2 = gtk_radio_button_new_with_label_from_widget(GTK_RADIO_BUTTON(scroll_but1), _("Thick"));
 	gtk_widget_show(scroll_but2);
 	gtk_container_add(GTK_CONTAINER(scroll_vbox), scroll_but2);
@@ -302,6 +305,7 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 
 #ifdef HILDON_HAS_APP_MENU
 	portrait_but = hildon_check_button_new(HILDON_SIZE_FINGER_HEIGHT);
+	/* Translators: Whether to enable automatic portrait mode. */
 	gtk_button_set_label(GTK_BUTTON(portrait_but), _("Use automatic portrait mode"));
 #else
 	portrait_but = gtk_check_button_new_with_label(_("Use automatic portrait mode"));
@@ -316,6 +320,7 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 
 #ifdef HILDON_HAS_APP_MENU
 	color_but = hildon_check_button_new(HILDON_SIZE_FINGER_HEIGHT);
+	/* Translators: Whether to use custom colors. */
 	gtk_button_set_label(GTK_BUTTON(color_but), _("Use custom colors"));
 #else
 	color_but = gtk_check_button_new_with_label(_("Use custom colors"));
@@ -332,6 +337,8 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_widget_show(text_color_but);
 	gtk_box_pack_start(GTK_BOX(text_color_hbox), text_color_but, FALSE, FALSE, 0);
 
+	/* Translators: Text color. The color is shown in the dialog, next to
+	   the text. */
 	text_color_label = gtk_label_new(_("Text"));
 	gtk_misc_set_alignment(GTK_MISC(text_color_label), 0, 0.5);
 	gtk_widget_show(text_color_label);
@@ -346,6 +353,8 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_widget_show(back_color_but);
 	gtk_box_pack_start(GTK_BOX(text_color_hbox), back_color_but, FALSE, FALSE, 0);
 
+	/* Translators: Background color. The color is shown in the dialog,
+	   next to the text. */
 	back_color_label = gtk_label_new(_("Background"));
 	gtk_misc_set_alignment(GTK_MISC(back_color_label), 0, 0.5);
 	gtk_widget_show(back_color_label);
@@ -360,6 +369,8 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_widget_show(link_color_but);
 	gtk_box_pack_start(GTK_BOX(text_color_hbox), link_color_but, FALSE, FALSE, 0);
 
+	/* Translators: Color of links. The color is shown in the dialog, next
+	   to the text. */
 	link_color_label = gtk_label_new(_("Links"));
 	gtk_misc_set_alignment(GTK_MISC(link_color_label), 0, 0.5);
 	gtk_widget_show(link_color_label);
