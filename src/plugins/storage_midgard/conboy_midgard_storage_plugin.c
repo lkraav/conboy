@@ -73,7 +73,8 @@ __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 			NULL);
 
 	/* Get metadata datetimes */
-	MidgardMetadata *metadata = mgdobject->metadata;
+	MidgardMetadata *metadata;
+	g_object_get (mgdobject, "metadata", &metadata, NULL);
 
 	GValue created_val = {0, };
 	g_value_init (&created_val, MIDGARD_TYPE_TIMESTAMP);
@@ -215,7 +216,7 @@ _conboy_midgard_storage_plugin_note_delete (ConboyStoragePlugin *self, ConboyNot
 	/* Use this one if you want to have possibility to undelete */
 	/* return midgard_object_delete (mgdobject); */
 
-	return midgard_object_purge (mgdobject);
+	return midgard_object_purge (mgdobject, FALSE);
 }
 
 static GSList*
@@ -421,7 +422,7 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 	/* Create base storage and one required for note */
 	midgard_storage_create_base_storage (mgd_global);
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME (CONBOY_MIDGARD_NOTE_NAME);
-	midgard_storage_create_class_storage (mgd_global, MIDGARD_DBOBJECT_CLASS (klass));
+	midgard_storage_create (mgd_global, CONBOY_MIDGARD_NOTE_NAME);
 
 	/* HACK */
 	g_file_set_contents (db_file_exists, "", 1, NULL);
