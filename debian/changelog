@@ -1,3 +1,10 @@
+conboy (1:0.6.3.9) stable; urgency=low
+
+  * Includes new build system provided by David King
+  * Translation updates
+  
+ -- Cornelius Hald <hald@icandy.de>  Sun, 16 May 2010 19:23:12 +0200
+
 conboy (1:0.6.3.8) stable; urgency=low
 
   * Removed debug code for displaying lists
