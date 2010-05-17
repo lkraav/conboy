@@ -26,12 +26,6 @@
 #include <gtk/gtk.h>
 #include <hildon/hildon-window.h>
 
-/* without this, time.h will not include strptime() */
-#ifndef __USE_XOPEN
-#define __USE_XOPEN
-#endif
-#include <time.h>
-
 #include "metadata.h"
 #include "note.h"
 #include "conboy_note_store.h"

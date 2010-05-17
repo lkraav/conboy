@@ -21,6 +21,11 @@
 
 #include <gconf/gconf-client.h>
 #include <hildon/hildon-program.h>
+/* without this, time.h will not include strptime() */
+#ifndef __USE_XOPEN
+#define __USE_XOPEN
+#endif
+#include <time.h>
 
 #include "conboy_note_store.h"
 
