@@ -114,7 +114,8 @@ libstorageevernote_la_LDFLAGS = -module -avoid-version
 libstoragexml_la_SOURCES = \
 	src/plugins/storage_xml/conboy_xml_storage_plugin.h \
 	src/plugins/storage_xml/conboy_xml_storage_plugin.c
-libstoragexml_la_CPPFLAGS = $(STORAGE_XML_CFLAGS) $(EXTRA_CPPFLAGS)
+libstoragexml_la_CPPFLAGS = $(STORAGE_XML_CFLAGS) $(EXTRA_CPPFLAGS) \
+	-I$(top_builddir)
 libstoragexml_la_LIBADD = $(STORAGE_XML_LIBS)
 libstoragexml_la_LDFLAGS = -module -avoid-version
 
