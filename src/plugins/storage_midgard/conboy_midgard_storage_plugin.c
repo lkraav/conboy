@@ -22,6 +22,11 @@
 #include "../../metadata.h"
 #include "conboy_midgard_storage_plugin.h"
 
+#ifndef __USE_XOPEN
+#define __USE_XOPEN
+#endif
+#include <time.h>
+
 #define CONBOY_MIDGARD_NOTE_NAME "org_gnome_tomboy_note"
 
 static MidgardConnection *mgd_global = NULL;
