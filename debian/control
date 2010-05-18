@@ -7,7 +7,7 @@ Standards-Version: 3.6.0
 
 Package: conboy
 Architecture: any
-Depends: libjson-glib-1.0-0 (>=0.8.0-1maemo4), liboauth0 (>= 0.5.2-3), libcurl3 (>= 7.15.0), libglib2.0-0 (>= 2.14) | libpcre3 (>= 6.7), ${launcher:Depends}
+Depends: libjson-glib-1.0-0 (>=0.8.0-1maemo4) | maemo-release (<< 5.0.0), libjson-glib-1.0-0 (>=0.6.2-7) | maemo-release (>=5.0.0), liboauth0 (>= 0.5.2-3), libcurl3 (>= 7.15.0), libglib2.0-0 (>= 2.14) | libpcre3 (>= 6.7), ${launcher:Depends}
 Conflicts: conboy-unstable
 Replaces: conboy-unstable
 XB-Maemo-Upgrade-Description: Changes since 0.5.8

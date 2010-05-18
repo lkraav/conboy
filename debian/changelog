@@ -1,3 +1,21 @@
+conboy (1:0.6.3.9-3) stable; urgency=low
+
+  * Turning optification off again because it still does not work :(
+  
+ -- Cornelius Hald <hald@icandy.de>  Tue, 18 May 2010 19:15:45 +0200
+
+conboy (1:0.6.3.9-2) stable; urgency=low
+
+  * Testing optification again
+  
+ -- Cornelius Hald <hald@icandy.de>  Mon, 17 May 2010 22:04:13 +0200
+
+conboy (1:0.6.3.9-1) stable; urgency=low
+
+  * Fixing dependencies for Diablo and Chinook
+  
+ -- Cornelius Hald <hald@icandy.de>  Mon, 17 May 2010 19:01:12 +0200
+
 conboy (1:0.6.3.9) stable; urgency=low
 
   * Includes new build system provided by David King
