@@ -104,7 +104,7 @@ __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 			"guid", guid,
 			"title", title,
 			"content", content,
-			"openonstartup", open_on_startup,
+			"open-on-startup", open_on_startup,
 			"cursorposition", cursor_position,
 			"width", width,
 			"height", height,
