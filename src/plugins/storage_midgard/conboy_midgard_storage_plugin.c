@@ -91,7 +91,7 @@ __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 	g_value_init (&updated_str, G_TYPE_STRING);
 
 	g_object_get_property (G_OBJECT (metadata), "created", &created_val);
-	g_object_get_property (G_OBJECT (metadata), "updated", &updated_val);
+	g_object_get_property (G_OBJECT (metadata), "revised", &updated_val);
 
 	g_value_transform ((const GValue *) &created_val, &created_str);
 	g_value_transform ((const GValue *) &updated_val, &updated_str);
