@@ -107,69 +107,6 @@ on_color_but_changed(HildonColorButton *button, SettingsColorType *type)
 	settings_save_color(&color, GPOINTER_TO_INT(type));
 }
 
-struct AuthDialogData {
-	GtkDialog *dialog;
-	gchar *verifier;
-};
-
-static gint
-url_callback_handler(const gchar *interface, const gchar *method, GArray *arguments, gpointer user_data, osso_rpc_t *retval)
-{
-	g_printerr("Method: %s\n", method);
-	struct AuthDialogData *data = (struct AuthDialogData*) user_data;
-
-	GtkWidget *dialog = GTK_WIDGET(data->dialog);
-	gtk_window_present(GTK_WINDOW(dialog));
-
-	if (g_strcasecmp(method, "authenticated") == 0) {
-
-		/*
-		 * The parameter looks like this:
-		 * conboy://authenticate?oauth_token=kBFjXzLsKqzmxx9PGBX0&oauth_verifier=1ccaf32e-ec6e-4598-a77f-020af60f24b5&return=https://one.ubuntu.com
-		 */
-
-		g_printerr("___ CORRECTLY AUTHENTICATED ____\n");
-
-		if (arguments != NULL && arguments->len >= 1) {
-
-			osso_rpc_t value = g_array_index(arguments, osso_rpc_t, 0);
-
-			if (value.type == DBUS_TYPE_STRING) {
-				gchar *url = value.value.s;
-				g_printerr("URL: %s\n", url);
-
-				/* Find out verifier */
-				gchar **parts = g_strsplit_set(url, "?&", 4);
-
-				gchar *verifier = NULL;
-				int i = 0;
-				while (parts[i] != NULL) {
-
-					if (strncmp(parts[i], "oauth_verifier=", 15) == 0) {
-						verifier = g_strdup(&(parts[i][15])); /* Copy starting from character 15 */
-						break;
-					}
-					i++;
-				}
-
-				g_strfreev(parts);
-
-				if (verifier != NULL) {
-					g_printerr("OAuth Verifier: %s\n", verifier);
-					data->verifier = verifier;
-					/* Close the modal dialog and signal success */
-					g_signal_emit_by_name(data->dialog, "response", GTK_RESPONSE_OK);
-					return OSSO_OK;
-				}
-			}
-		}
-	}
-
-	/* Close the modal dialog and signal failure */
-	g_signal_emit_by_name(data->dialog, "response", GTK_RESPONSE_REJECT);
-	return OSSO_OK;
-}
-
 static void
 clear_sync_settings()
 {

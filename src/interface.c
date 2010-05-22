@@ -312,7 +312,7 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	gtk_widget_show(GTK_WIDGET(dialog_data->dialog));
 
 	/* Create thread and start sync */
-	GThread *thread = g_thread_create(web_sync_do_sync, dialog_data, TRUE, NULL);
+	GThread *thread = g_thread_create((GThreadFunc)web_sync_do_sync, dialog_data, TRUE, NULL);
 	if (!thread) {
 		g_printerr("ERROR: Cannot create sync thread\n");
 		return;

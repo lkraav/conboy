@@ -1,3 +1,9 @@
+conboy (1:0.6.3.10) stable; urgency=low
+
+  * We no longer depend on maemo's broken URL handling. OAuth now uses a network connection to localhost.
+  
+ -- Cornelius Hald <hald@icandy.de>  Tue, 22 May 2010 13:45:45 +0200
+
 conboy (1:0.6.3.9-3) stable; urgency=low
 
   * Turning optification off again because it still does not work :(

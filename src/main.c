@@ -51,60 +51,6 @@ static void cleanup()
 	conboy_xml_reader_free();
 }
 
-static gint
-dbus_handler(const gchar *interface, const gchar *method, GArray *arguments, gpointer user_data, osso_rpc_t *retval)
-{
-	g_printerr("Method: %s\n", method);
-	GtkWindow *win = GTK_WINDOW(user_data);
-	gtk_window_present(win);
-
-	if (g_strcasecmp(method, "authenticated") == 0) {
-
-		/*
-		 * TODO: Implement something that checks
-		 * whether the config/auth window is open
-		 * and if yes, that it is authorized.
-		 * Change the UI and so on...
-		 *
-		 * The parameter looks like this:
-		 * conboy://authenticate?oauth_token=kBFjXzLsKqzmxx9PGBX0&oauth_verifier=1ccaf32e-ec6e-4598-a77f-020af60f24b5&return=https://one.ubuntu.com
-		 */
-
-		g_printerr("___ CORRECTLY AUTHENTICATED ____\n");
-
-		if (arguments != NULL && arguments->len >= 1) {
-
-			osso_rpc_t value = g_array_index(arguments, osso_rpc_t, 0);
-
-			if (value.type == DBUS_TYPE_STRING) {
-				gchar *url = value.value.s;
-				g_printerr("URL: %s\n", url);
-
-				/* Find out verifier */
-				gchar **parts = g_strsplit_set(url, "?&", 4);
-
-				gchar *verifier = NULL;
-				int i = 0;
-				while (parts[i] != NULL) {
-
-					if (strncmp(parts[i], "oauth_verifier=", 15) == 0) {
-						verifier = g_strdup(&(parts[i][15])); /* Copy starting from character 15 */
-						break;
-					}
-
-					i++;
-				}
-
-				g_strfreev(parts);
-
-				g_printerr("OAuth Verifier: %s\n", verifier);
-			}
-		}
-
-	}
-	return OSSO_OK;
-}
-
 #ifdef HILDON_HAS_APP_MENU
 static void
 on_window_is_topmost_changed (HildonProgram *prog, GParamSpec *prop, gpointer data)
@@ -166,26 +112,6 @@ main (int argc, char *argv[])
   orientation_init(app_data);
 
 #endif
-
-  /* Register URL listener */
-  /*
-  if (osso_rpc_set_cb_f(app_data->osso_ctx, APP_SERVICE, APP_METHOD, APP_SERVICE, dbus_handler, app_data->note_window->window) != OSSO_OK) {
-      g_printerr("Failed to set callback\n");
-  }
-  */
-
-  /* EXPERIEMNT */
-
-
-
-  /*
-  gtk_widget_hide(GTK_WIDGET(app_data->note_window->toolbar));
-
-  FullscreenManager *mgr = fullscreen_create_manager(GTK_WINDOW(app_data->note_window->window));
-  fullscreen_enable(mgr);
-  */
-
-  /****/
 
   gdk_threads_enter();
   gtk_main();

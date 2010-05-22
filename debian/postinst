@@ -13,28 +13,9 @@ if [ -f /home/user/.cache/launch/de.zwong.conboy.pvr ]
 	then rm /home/user/.cache/launch/de.zwong.conboy.pvr
 fi
 
-#
-# Work around for bug #6263 
-#
-
-if [ ! -e /etc/operator_settings ]
-then
-        echo "Not running on Maemo5, not modifying file"
-        exit
-fi
-
-echo "Running on Maemo5, checking uri-action-defaults.list"
-
-grep -q "conboy=hildon-conboy" /usr/share/applications/uri-action-defaults.list
-if [ $? -eq 1 ]
-then
-        echo "Modifying file"
-        # Create backup and add line after line 2 to uri-action-defaults.list
-        cp /usr/share/applications/uri-action-defaults.list /usr/share/applications/uri-action-defaults.list.bak
-        sed -i '2a\conboy=hildon-conboy2.desktop' /usr/share/applications/uri-action-defaults.list
-else
-        echo "File already modified"
-fi
+# Cleaning up the mess versions below 1:0.6.3.10 made. Can be removed after a couple of updates. 
+sed -i '/conboy=hildon-conboy.desktop/ d'  /usr/share/applications/uri-action-defaults.list
+sed -i '/conboy=hildon-conboy2.desktop/ d' /usr/share/applications/uri-action-defaults.list
 
 update-desktop-database
 

@@ -34,7 +34,7 @@ typedef struct
 gboolean
 web_sync_authenticate (gchar *url, GtkWindow *parent);
 
-void
+gpointer
 web_sync_do_sync (gpointer *user_data);
 
 

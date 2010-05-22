@@ -15,7 +15,7 @@ fi
 # Work around for bug #6263 
 #
 
-# Remove the line from file if exits
+# Remove the line from file if exits (Not needed for versions >= 1:0.6.3.10 - Can be removed after a couple of updates)
 sed -i '/conboy=hildon-conboy.desktop/ d'  /usr/share/applications/uri-action-defaults.list
 sed -i '/conboy=hildon-conboy2.desktop/ d' /usr/share/applications/uri-action-defaults.list
 

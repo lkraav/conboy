@@ -18,6 +18,8 @@
 
 #include <gtk/gtk.h>
 #include <tablet-browser-interface.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 #include "settings.h"
 #include "json.h"
@@ -167,7 +169,7 @@ web_sync_remove_by_guid(GList *list, ConboyNote *note_to_remove)
 
 
 /* TODO: This function is way too long */
-void
+gpointer
 web_sync_do_sync (gpointer *user_data)
 {
 	WebSyncDialogData *data = (WebSyncDialogData*)user_data;
@@ -364,74 +366,168 @@ web_sync_do_sync (gpointer *user_data)
 	gdk_threads_leave();
 }
 
-
 struct AuthDialogData {
 	GtkDialog *dialog;
 	gchar *verifier;
 };
 
-
 /**
- * This function is called, whenever Maemo tries to open a conboy:// URL.
- * If the URL is of the form conboy://authenticated, we try to extract the oauth
- * verifier and save it.
+ * Extracts the oauth verifier from a http GET string. E.g.
+ * GET /bla/blub?key=val&key2=val2&oauth_verifier=abcdefg&key3=val3 HTTP/1.0
  */
-static gint
-url_callback_handler(const gchar *interface, const gchar *method, GArray *arguments, gpointer user_data, osso_rpc_t *retval)
+static gchar*
+extract_verifier (gchar* http_get_string)
 {
-	g_printerr("Method: %s\n", method);
-	struct AuthDialogData *data = (struct AuthDialogData*) user_data;
+	gchar **parts = g_strsplit(http_get_string, " ", 3); /* Cut away the GET and HTTP/1.0 parts */
+	gchar **parameters = g_strsplit_set(parts[1], "?&", 5);
+	gchar *verifier = NULL;
+	int i = 0;
 
-	GtkWidget *dialog = GTK_WIDGET(data->dialog);
-	gtk_window_present(GTK_WINDOW(dialog));
-
-	if (g_strcasecmp(method, "authenticated") == 0) {
-
-		/*
-		 * The parameter looks like this:
-		 * conboy://authenticate?oauth_token=kBFjXzLsKqzmxx9PGBX0&oauth_verifier=1ccaf32e-ec6e-4598-a77f-020af60f24b5&return=https://one.ubuntu.com
-		 */
-		g_printerr("___ CORRECTLY AUTHENTICATED ____\n");
-
-		if (arguments != NULL && arguments->len >= 1) {
-
-			osso_rpc_t value = g_array_index(arguments, osso_rpc_t, 0);
-
-			if (value.type == DBUS_TYPE_STRING) {
-				gchar *url = value.value.s;
-				g_printerr("URL: %s\n", url);
-
-				/* Find out verifier */
-				gchar **parts = g_strsplit_set(url, "?&", 4);
-
-				gchar *verifier = NULL;
-				int i = 0;
-				while (parts[i] != NULL) {
-
-					if (strncmp(parts[i], "oauth_verifier=", 15) == 0) {
-						verifier = g_strdup(&(parts[i][15])); /* Copy starting from character 15 */
-						break;
-					}
-					i++;
-				}
-
-				g_strfreev(parts);
-
-				if (verifier != NULL) {
-					g_printerr("OAuth Verifier: %s\n", verifier);
-					data->verifier = verifier;
-					/* Close the modal dialog and signal success */
-					g_signal_emit_by_name(data->dialog, "response", GTK_RESPONSE_OK);
-					return OSSO_OK;
-				}
-			}
+	while (parameters[i] != NULL) {
+		if (strncmp(parameters[i], "oauth_verifier=", 15) == 0) {
+			verifier = g_strdup(&(parameters[i][15])); /* Copy starting from character 15 */
+			break;
 		}
+		i++;
 	}
 
-	/* Close the modal dialog and signal failure */
-	g_signal_emit_by_name(data->dialog, "response", GTK_RESPONSE_REJECT);
-	return OSSO_OK;
+	g_strfreev(parameters);
+	g_strfreev(parts);
+	return verifier;
 }
+
+/**
+ * Extracts the oauth verifier and the redirect url from a http GET string. E.g.
+ * GET /bla/blub?return=http://one.ubuntu.com&key2=val2&oauth_verifier=abcdefg&key3=val3 HTTP/1.0
+ */
+static void
+extract_verifier_and_redirect_url (gchar* http_get_string, gchar** verifier, gchar** url)
+{
+	gchar **parts = g_strsplit(http_get_string, " ", 3); /* Cut away the GET and HTTP/1.0 parts */
+	gchar **parameters = g_strsplit_set(parts[1], "?&", 5);
+	if (verifier) *verifier = NULL;
+	if (url) *url = NULL;
+	int i = 0;
+
+	while (parameters[i] != NULL) {
+		if (verifier && strncmp(parameters[i], "oauth_verifier=", 15) == 0) {
+			*verifier = g_strdup(&(parameters[i][15])); /* Copy starting from character 15 */
+		}
+		if (url && strncmp(parameters[i], "return=", 7) == 0) {
+			*url = g_strdup(&(parameters[i][7])); /* Copy starting from character 7 */
+		}
+		i++;
+	}
+
+	g_strfreev(parameters);
+	g_strfreev(parts);
+}
+
+/**
+ * Opens a socket on localhost:14680 and blocks until a client connects.
+ * Returns FALSE if an error occured, TRUE otherwise.
+ */
+static gboolean
+open_socket(int *l_sock, int *sock)
+{
+	*l_sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (*l_sock < 0) {
+		g_printerr("ERROR: Cannot open listening socket\n");
+		return FALSE;
+	}
+
+	struct sockaddr_in address;
+	address.sin_family = AF_INET;
+	address.sin_addr.s_addr = htonl(INADDR_ANY);
+	address.sin_port = htons(14680);
+
+	if (bind(*l_sock, (struct sockaddr *) &address, sizeof(address)) < 0) {
+		g_printerr("ERROR: Cannot bind socket\n");
+		return FALSE;
+	}
+
+	listen(*l_sock, 1);
+
+	int sin_size = sizeof(struct sockaddr_in);
+
+	/* The following accept() call blocks until a client connects */
+	*sock = accept(*l_sock, (struct sockaddr *) &address, &sin_size);
+	if (sock < 0) {
+		g_printerr("ERROR: Cannot open SOCKET\n");
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+static gpointer
+oauth_callback_handler(gpointer user_data)
+{
+	struct AuthDialogData *data = (struct AuthDialogData*) user_data;
+	GtkWidget *dialog = GTK_WIDGET(data->dialog);
+	gchar *oauth_verifier;
+	gchar *redirect_url;
+
+	/* Open socket */
+	int l_sock, sock;
+	if (!open_socket(&l_sock, &sock)) {
+		g_printerr("Cannot open socket\n");
+	}
+
+	/* Read from socket */
+	GIOChannel *channel = g_io_channel_unix_new(sock);
+	gchar *buf;
+
+	g_io_channel_read_line(channel, &buf, NULL, NULL, NULL);
+	g_printerr("Read: %s\n", buf);
+	if (g_str_has_prefix(buf, "GET")) {
+		extract_verifier_and_redirect_url(buf, &oauth_verifier, &redirect_url);
+	} else {
+		g_printerr("First line did not start with 'GET', maybe we need to read more lines?\n");
+	}
+	g_free(buf);
+
+	/* Send reply to redirect browser */
+	if (redirect_url) {
+		g_printerr("Redirecting to: %s\n", redirect_url);
+		gchar *msg = g_strconcat("HTTP/1.1 302 Found\nStatus: 301 Found\nLocation: ", redirect_url, "\n\n", NULL);
+		g_io_channel_write_chars(channel, msg, -1, NULL, NULL);
+		g_free(msg);
+	}
+
+	/* Close socket */
+	g_io_channel_shutdown(channel, TRUE, NULL);
+	close(sock);
+	close(l_sock);
+
+	/* Present the UI */
+	gdk_threads_enter();
+	gtk_window_present(GTK_WINDOW(dialog));
+	gdk_threads_leave();
+
+	if (oauth_verifier != NULL) {
+		/* Close the modal dialog and signal success */
+		g_printerr("OAuth Verifier: %s\n", oauth_verifier);
+		data->verifier = oauth_verifier;
+		gdk_threads_enter();
+		g_signal_emit_by_name(data->dialog, "response", GTK_RESPONSE_OK);
+		gdk_threads_leave();
+
+	} else {
+		/* Close the modal dialog and signal failure */
+		gdk_threads_enter();
+		g_signal_emit_by_name(data->dialog, "response", GTK_RESPONSE_REJECT);
+		gdk_threads_leave();
+	}
+}
+
+typedef struct {
+	int sock;
+	int socket_fd;
+	struct sockaddr_in socket_addr;
+	int sin_size;
+} SocketData;
+
 
 gboolean
 web_sync_authenticate(gchar *url, GtkWindow *parent)
@@ -475,12 +571,14 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 
 	GtkWidget *dialog = ui_helper_create_cancel_dialog(parent, "Please grant access on the website of your service provider that just opened.\nAfter that you will be automatically redirected back to Conboy.");
 
-	struct AuthDialogData data;
-	data.dialog = GTK_DIALOG(dialog);
+	struct AuthDialogData auth_data;
+	auth_data.dialog = GTK_DIALOG(dialog);
 
-	/* Register DBus listener */
-	if (osso_rpc_set_cb_f(app_data->osso_ctx, "de.zwong.conboy", "de/zwong/conboy", "de.zwong.conboy", url_callback_handler, &data) != OSSO_OK) {
-		g_printerr("ERROR: Failed connect DBus url callback\n");
+	/* Create thread that listens to oauth callbacks */
+	GThread *thread = g_thread_create((GThreadFunc)oauth_callback_handler, &auth_data, FALSE, NULL);
+	if (!thread) {
+		g_printerr("ERROR: Cannot create socket thread\n");
+		return;
 	}
 
 	/* Open dialog and wait for result */
@@ -490,11 +588,6 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 	gtk_widget_hide(dialog);
 	gtk_widget_destroy(dialog);
 	g_printerr("After widget destroy\n");
-
-	/* Unregister DBus listener */
-	if (osso_rpc_unset_cb_f(app_data->osso_ctx, "de.zwong.conboy", "de/zwong/conboy", "de.zwong.conboy", url_callback_handler, &data) != OSSO_OK) {
-			g_printerr("ERROR: Failed disconnect DBus url callback\n");
-	}
 
 	/* Handle return values of the dialog */
 	if (result == GTK_RESPONSE_OK) {
@@ -510,7 +603,7 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 			gtk_main_iteration_do(FALSE);
 		}
 
-		if (conboy_get_access_token(api->access_token_url, data.verifier)) {
+		if (conboy_get_access_token(api->access_token_url, auth_data.verifier)) {
 			gtk_widget_destroy(wait_dialog);
 			ui_helper_show_confirmation_dialog(parent, "<b>You are successfully authenticated</b>\nYou can now use the synchronization from the main menu.", FALSE);
 			settings_save_sync_base_url(url);

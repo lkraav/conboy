@@ -77,10 +77,8 @@ get_request_token_and_auth_link(const gchar *request_url, const gchar *link_url,
 	gchar *reply   = NULL;
 	gchar *link = NULL;
 
-	/*
-	 * No need for a webserver. It works with the the url handling of Maemo
-	 */
-	gchar *request = g_strconcat(request_url, "?oauth_callback=conboy://authenticate", NULL);
+	/* We are listening on a port on localhost because Maemo URL handling is crap */
+	gchar *request = g_strconcat(request_url, "?oauth_callback=http://127.0.0.1:14680/authenticate", NULL);
 
 	/* Request the token, therefore use NULL, NULL */
 	gchar *req_url = oauth_sign_url2(request, &postarg, OA_HMAC, "POST", c_key, c_secret, NULL, NULL);
