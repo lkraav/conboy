@@ -1,9 +1,15 @@
-Big thanks to the following people:
+Big thanks to everyone who helped with the developement of Conboy! Especially: 
 
-TODO: Add translators
+All translators from http://www.transifex.net/projects/p/conboy
+
+All testers from http://maemo.org
+
+Everyone who helped on the maemo-devel mailing list
 
 Piotr Pokora for helping with the initial GObject / Plugin code.
 
 Faheem Pervez for initial support of 'send via bluetooth'.
 
 Tim Samoff for the nice black & white icons.
+
+David King for a new and improved build system.
