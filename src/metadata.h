@@ -41,8 +41,6 @@ time_t get_iso8601_time_in_seconds(const gchar *time_string);
 
 const gchar* note_get_new_filename(const gchar *uuid);
 
-gchar* get_uuid(void);
-
 gboolean is_portrait_mode(void);
 
 #endif /* METADATA_H */

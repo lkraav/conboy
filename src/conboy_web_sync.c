@@ -160,13 +160,11 @@ web_sync_remove_by_guid(GList *list, ConboyNote *note_to_remove)
 	g_free(guid);
 
 	if (found_note) {
-		g_printerr("Remove note\n");
 		return g_list_remove(list, found_note);
 	} else {
 		return list;
 	}
 }
-
 
 /* TODO: This function is way too long */
 gpointer
@@ -178,6 +176,7 @@ web_sync_do_sync (gpointer *user_data)
 	GtkProgressBar *bar = data->bar;
 
 	/* Save and make uneditable */
+	/* FIXME: Function is returned often, witout making it editable again */
 	gdk_threads_enter();
 	gtk_text_view_set_editable(ui->view, FALSE);
 	note_save(ui);
@@ -219,7 +218,7 @@ web_sync_do_sync (gpointer *user_data)
 
 	gchar *api_ref = json_get_api_ref(reply);
 
-	g_printerr("Now asking::: %s\n", api_ref);
+	g_printerr("Now asking: %s\n", api_ref);
 
 	reply = conboy_http_get(api_ref, TRUE);
 
@@ -235,6 +234,11 @@ web_sync_do_sync (gpointer *user_data)
 
 	/* Revision checks */
 	JsonUser *user = json_get_user(reply);
+	if (user == NULL) {
+		web_sync_show_message(data, "Could not parse server answer. Probably server error.");
+		return;
+	}
+
 	if (user->latest_sync_revision < last_sync_rev) {
 		g_printerr("Server revision older than our revision\nU1 rev: %i   Local rev: %i\n", user->latest_sync_revision, last_sync_rev);
 		/* Looks like checking this does not help anything */
@@ -265,41 +269,69 @@ web_sync_do_sync (gpointer *user_data)
 
 
 	/* Get all notes since last syncRev*/
-	JsonNoteList *note_list = web_sync_get_notes(user, last_sync_rev);
-	last_sync_rev = note_list->latest_sync_revision;
+	JsonNoteList *server_note_list = web_sync_get_notes(user, last_sync_rev);
+	last_sync_rev = server_note_list->latest_sync_revision;
 	web_sync_pulse_bar(bar);
 
 	int added_notes = 0;
 	int changed_notes = 0;
 
 	/* Save notes */
-	GSList *notes = note_list->notes;
-	while (notes != NULL) {
-		ConboyNote *note = CONBOY_NOTE(notes->data);
-		g_printerr("Saving: %s\n", note->title);
+	GSList *server_notes = server_note_list->notes;
+	while (server_notes != NULL) {
+		ConboyNote *server_note = CONBOY_NOTE(server_notes->data);
+		g_printerr("Saving: %s\n", server_note->title);
 		/* TODO: Check for title conflicts */
 
-		conboy_storage_note_save(app_data->storage, note);
+		conboy_storage_note_save(app_data->storage, server_note);
 
 		/* If not yet in the note store, add this note */
-		if (!conboy_note_store_find_by_guid(app_data->note_store, note->guid)) {
-			g_printerr("INFO: Adding note '%s' to note store\n", note->title);
-			conboy_note_store_add(app_data->note_store, note, NULL);
+		if (!conboy_note_store_find_by_guid(app_data->note_store, server_note->guid)) {
+			g_printerr("INFO: Adding note '%s' to note store\n", server_note->title);
+			conboy_note_store_add(app_data->note_store, server_note, NULL);
 			added_notes++;
 		} else {
-			g_printerr("INFO: Updating note '%s' in note store\n", note->title);
-			ConboyNote *old_note = conboy_note_store_find_by_guid(app_data->note_store, note->guid);
-			conboy_note_store_remove(app_data->note_store, old_note);
-			conboy_note_store_add(app_data->note_store, note, NULL);
+			g_printerr("INFO: Updating note '%s' in note store\n", server_note->title);
+			ConboyNote *local_note = conboy_note_store_find_by_guid(app_data->note_store, server_note->guid);
+
+			/* Replace local note with the updated version from server */
+			conboy_note_store_remove(app_data->note_store, local_note);
+			conboy_note_store_add(app_data->note_store, server_note, NULL);
 			changed_notes++;
+
+			/* Compare note timestamp with last_sync_time. If it's bigger, the note has been also modified locally. */
+			if (local_note->last_metadata_change_date > last_sync_time) {
+				g_printerr("INFO: We have a conflict\n");
+				/* TODO: Prompt user, ask for overwrite or not. If not overwrite, ask for new name */
+				gboolean overwrite = TRUE;
+
+				if (!overwrite) { /* If we do not overwrite, we need to create a copy that note */
+					ConboyNote *rescue_note = conboy_note_copy(local_note);
+					conboy_note_renew_guid(rescue_note);
+					gchar *rescue_note_title = g_strconcat(local_note->title, " (old)", NULL);
+					/* TODO: Test if title exists, if yes, add number like "Bla (old) 1". Put in function. */
+					conboy_note_rename(rescue_note, rescue_note_title);
+
+					g_free(rescue_note_title);
+
+					/* Save rescue_note */
+					conboy_storage_note_save(app_data->storage, rescue_note);
+					/* Add to note store */
+					conboy_note_store_add(app_data->note_store, rescue_note, NULL);
+					/* Add to temp list of local notes */
+					local_notes = g_list_append(local_notes, rescue_note);
+
+					added_notes++;
+				}
+			}
 		}
 
 		/* Remove from list of local notes */
 		/* Find local note and remove from list */
-		local_notes = web_sync_remove_by_guid(local_notes, note);
+		local_notes = web_sync_remove_by_guid(local_notes, server_note);
 
 		web_sync_pulse_bar(bar);
-		notes = notes->next;
+		server_notes = server_notes->next;
 	}
 
 	/*

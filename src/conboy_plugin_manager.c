@@ -325,11 +325,7 @@ plugin_manager_populate_lists (ConboyPluginManager *pm)
 }
 
 /**
- * TODO: Add here to code to load a plugin if we decided to
- * load them during runtime - which we should if we want that
- * a plugin can offer a Settings-Dialog.
  *
- * Or add code here to save to GConf which plugins are active
  */
 static void
 plugin_manager_set_active (ConboyPluginManager *pm,

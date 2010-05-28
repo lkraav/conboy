@@ -32,18 +32,6 @@
 #include "app_data.h"
 
 
-gchar*
-get_uuid()
-{
-	gchar *content;
-	gchar *result;
-	g_file_get_contents("/proc/sys/kernel/random/uuid", &content, NULL, NULL);
-	g_strchomp(content);
-	result = g_strconcat(content, "\0", NULL);
-	g_free(content);
-	return result;
-}
-
 /**
  * Returns the given time as iso8601 formatted string.
  * Example: 2009-03-24T13:16:42.0000000+01:00
