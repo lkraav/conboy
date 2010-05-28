@@ -36,9 +36,6 @@ typedef struct _ConboyMidgardStoragePluginClass ConboyMidgardStoragePluginClass;
 
 struct _ConboyMidgardStoragePlugin {
 	ConboyStoragePlugin parent;
-
-	gchar *user;
-	gchar *pass;
 	MidgardObject *object;
 };
 

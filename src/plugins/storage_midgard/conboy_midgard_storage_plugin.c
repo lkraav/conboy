@@ -33,7 +33,7 @@ static MidgardConnection *mgd_global = NULL;
 
 G_DEFINE_TYPE(ConboyMidgardStoragePlugin, conboy_midgard_storage_plugin, CONBOY_TYPE_STORAGE_PLUGIN);
 
-static time_t _time_t_from_iso8601 (const gchar *time_string) 
+static time_t _time_t_from_iso8601 (const gchar *time_string)
 {
 	struct tm _time;
   	strptime(time_string, "%Y-%m-%d %H:%M:%S", &_time);
@@ -284,50 +284,6 @@ _conboy_midgard_storage_plugin_note_list_ids (ConboyStoragePlugin *self)
 	return g_slist_reverse (slist);
 }
 
-static GtkWidget*
-_conboy_midgard_storage_plugin_get_widget (ConboyPlugin *self)
-{
-	g_return_val_if_fail(self != NULL, NULL);
-	g_return_val_if_fail(CONBOY_IS_PLUGIN(self), NULL);
-
-	/* First row */
-	GtkWidget *hbox1 = gtk_hbox_new(FALSE, 0);
-	GtkWidget *label1 = gtk_label_new("Host:");
-	GtkWidget *entry1 = gtk_entry_new();
-	gtk_container_add(GTK_CONTAINER(hbox1), label1);
-	gtk_container_add(GTK_CONTAINER(hbox1), entry1);
-	gtk_widget_show(label1);
-	gtk_widget_show(entry1);
-	gtk_widget_show(hbox1);
-
-	/* First row */
-	GtkWidget *hbox2 = gtk_hbox_new(FALSE, 0);
-	GtkWidget *label2 = gtk_label_new("Username:");
-	GtkWidget *entry2 = gtk_entry_new();
-	gtk_container_add(GTK_CONTAINER(hbox2), label2);
-	gtk_container_add(GTK_CONTAINER(hbox2), entry2);
-	gtk_widget_show(label2);
-	gtk_widget_show(entry2);
-	gtk_widget_show(hbox2);
-
-	/* First row */
-	GtkWidget *hbox3 = gtk_hbox_new(FALSE, 0);
-	GtkWidget *label3 = gtk_label_new("Password:");
-	GtkWidget *entry3 = gtk_entry_new();
-	gtk_container_add(GTK_CONTAINER(hbox3), label3);
-	gtk_container_add(GTK_CONTAINER(hbox3), entry3);
-	gtk_widget_show(label3);
-	gtk_widget_show(entry3);
-	gtk_widget_show(hbox3);
-
-	/* Result widget */
-	GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(vbox), hbox1);
-	gtk_container_add(GTK_CONTAINER(vbox), hbox2);
-	gtk_container_add(GTK_CONTAINER(vbox), hbox3);
-
-	return vbox;
-}
 
 /* GOBJECT ROUTINES */
 
@@ -341,9 +297,6 @@ _conboy_midgard_storage_plugin_constructor (GType type,
 				n_construct_properties,
 				construct_properties);
 
-	CONBOY_MIDGARD_STORAGE_PLUGIN(object)->user = NULL;
-	CONBOY_MIDGARD_STORAGE_PLUGIN(object)->pass = NULL;
-
 	return G_OBJECT(object);
 }
 
@@ -352,12 +305,6 @@ _conboy_midgard_storage_plugin_dispose(GObject *object)
 {
 	g_printerr("INFO: Dispose() called on Midgard plugin\n");
 	ConboyMidgardStoragePlugin *self = CONBOY_MIDGARD_STORAGE_PLUGIN(object);
-
-	g_free((gchar *)self->user);
-	self->user = NULL;
-
-	g_free((gchar *)self->pass);
-	self->pass = NULL;
 
 	G_OBJECT_CLASS(conboy_midgard_storage_plugin_parent_class)->dispose(object);
 }
@@ -379,14 +326,13 @@ conboy_midgard_storage_plugin_class_init (ConboyMidgardStoragePluginClass *klass
 	storage_plugin_class->delete   = _conboy_midgard_storage_plugin_note_delete;
 	storage_plugin_class->list     = _conboy_midgard_storage_plugin_note_list;
 	storage_plugin_class->list_ids = _conboy_midgard_storage_plugin_note_list_ids;
-
-	plugin_class->get_widget 		= _conboy_midgard_storage_plugin_get_widget;
 }
 
 static void
 conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 {
 	g_printerr("Hello from Midgard plugin\n");
+	CONBOY_PLUGIN(self)->has_settings = FALSE;
 
 	/* Initialize midgard */
 	midgard_init();
@@ -417,8 +363,6 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 		MidgardObject *mgdobject = midgard_object_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME, NULL);
 		CONBOY_MIDGARD_STORAGE_PLUGIN (self)->object = mgdobject;
 
-		CONBOY_PLUGIN(self)->has_settings = TRUE;
-
 		g_free (db_file_exists);
 
 		return;
@@ -435,12 +379,10 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 
 	MidgardObject *mgdobject = midgard_object_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME, NULL);
 	CONBOY_MIDGARD_STORAGE_PLUGIN (self)->object = mgdobject;
-
-	CONBOY_PLUGIN(self)->has_settings = TRUE;
 }
 
 ConboyMidgardStoragePlugin*
-conboy_plugin_new () 
+conboy_plugin_new ()
 {
 	return g_object_new(CONBOY_TYPE_MIDGARD_STORAGE_PLUGIN, NULL);
 }
