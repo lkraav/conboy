@@ -2,6 +2,7 @@ conboy (1:0.6.3.12) stable; urgency=low
 
   * Not yet released
   * Midgard plugin now shows a banner while initializing the DB
+  * Hide template notes
   
  -- Cornelius Hald <hald@icandy.de>  Fri, 29 May 2010 12:37:43 +0200
 

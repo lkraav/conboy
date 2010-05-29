@@ -388,6 +388,23 @@ conboy_note_get_tags(ConboyNote* note)
 	return note->tags;
 }
 
+gboolean
+conboy_note_is_template(ConboyNote* note)
+{
+	g_return_val_if_fail(note != NULL, FALSE);
+	g_return_val_if_fail(CONBOY_IS_NOTE(note), FALSE);
+
+	GList *iter = note->tags;
+	while (iter != NULL) {
+		if (g_strcmp0("system:template", (gchar*)iter->data) == 0) {
+			return TRUE;
+		}
+		iter = iter->next;
+	}
+
+	return FALSE;
+}
+
 /**
  * Creates an almost exact deep copy of a note.
  */

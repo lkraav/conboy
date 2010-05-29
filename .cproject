@@ -354,7 +354,7 @@
 <storageModule environmentOp_0="CFLAGS=-O0 -g" environmentOp_1="CXXFLAGS=-O0 -g" moduleId="buildConfig.environment"/>
 <storageModule id="Scratchbox 1~FREMANTLE_X86.1257449132065" moduleId="defaultConfigurationDataProvider" name="FREMANTLE_X86 (Debug)">
 <sourceEntries>
-<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="/conboy/src"/>
+<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 </sourceEntries>
 <folderData id="Scratchbox 1~FREMANTLE_X86.1257449132065.1152405978" name="" path="">
 <languageData contentTypeIds="org.eclipse.cdt.core.cxxSource;org.eclipse.cdt.core.cxxHeader" id="Scratchbox 1~FREMANTLE_X86.1257449132065.1152405978.472442944" languageId="org.eclipse.cdt.core.g++" name="GNU C++" supportedEntryKinds="includePath;includeFile;macro;macroFile">
@@ -454,7 +454,11 @@
 </settingEntries>
 </languageData>
 </folderData>
-<buildData errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.VCErrorParser;org.maemo.mica.cpp.project.builder.autotools.MicaAutotoolsErrorParser" id="Scratchbox 1~FREMANTLE_X86.1257449132065.125735592"/>
+<buildData errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GASErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.VCErrorParser;org.maemo.mica.cpp.project.builder.autotools.MicaAutotoolsErrorParser" id="Scratchbox 1~FREMANTLE_X86.1257449132065.125735592">
+<outputEntries>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name=""/>
+</outputEntries>
+</buildData>
 <targetPlatformData binaryParsers="org.eclipse.cdt.core.ELF" id="Scratchbox 1~FREMANTLE_X86.1257449132065.125413504"/>
 </storageModule>
 <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>

@@ -85,6 +85,8 @@ void         conboy_note_remove_tag     (ConboyNote* note, const gchar*);
 void         conboy_note_clear_tags     (ConboyNote* note);
 GList*       conboy_note_get_tags       (ConboyNote* note);
 
+gboolean     conboy_note_is_template    (ConboyNote* note);
+
 ConboyNote*  conboy_note_copy           (ConboyNote* note);
 void         conboy_note_rename         (ConboyNote *note, const gchar *new_title);
 void         conboy_note_renew_guid     (ConboyNote *note);

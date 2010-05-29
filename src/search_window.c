@@ -57,6 +57,17 @@ is_row_visible(GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data)
 	GHashTable *search_result = data->search_result;
 	ConboyNote *note;
 
+	gtk_tree_model_get(model, iter, NOTE_COLUMN, &note, -1);
+
+	if (note == NULL) {
+		return FALSE;
+	}
+
+	/* In case that the note is a template, don't show it */
+	if (conboy_note_is_template(note)) {
+		return FALSE;
+	}
+
 	/* In case the search field does not exist yet, or containts no text, show all */
 	if (data->search_field == NULL) {
 		return TRUE;
@@ -66,21 +77,11 @@ is_row_visible(GtkTreeModel *model, GtkTreeIter *iter, gpointer user_data)
 		return TRUE;
 	}
 
-	gtk_tree_model_get(model, iter, NOTE_COLUMN, &note, -1);
-
-	if (note == NULL) {
-		return FALSE;
-	}
-
 	if (search_result == NULL) {
 		return TRUE;
 	}
 
-	if (g_hash_table_lookup(search_result, note)) {
-		return TRUE;
-	} else {
-		return FALSE;
-	}
+	return (gboolean) g_hash_table_lookup(search_result, note);
 }
 
 static
@@ -248,25 +249,14 @@ on_scrollbar_settings_changed(GConfClient *client, guint cnxn_id, GConfEntry *en
 	}
 }
 
-/*
-static void
-on_new_note_action_activated(GtkAction *action, gpointer user_data)
-{
-	GtkWidget *window = GTK_WIDGET(user_data);
-	gtk_widget_hide(window);
-	ConboyNote *note = conboy_note_new();
-	note_show(note, TRUE, TRUE, FALSE);
-}
-*/
-
 static void
 on_fullscreen_button_clicked (GtkAction *action, gpointer user_data)
 {
 	ui_helper_toggle_fullscreen(GTK_WINDOW(user_data));
 }
 
-static
-gint compare_titles(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
+static gint
+compare_titles(GtkTreeModel *model, GtkTreeIter *a, GtkTreeIter *b, gpointer user_data)
 {
 	gint result = 0;
 	gchar *title_a, *title_b;
@@ -366,13 +356,6 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 #ifdef HILDON_HAS_APP_MENU
 	menu = hildon_app_menu_new();
 
-	/* Add New Note item */
-	/*
-	menu_new_note = gtk_button_new();
-	gtk_action_connect_proxy(new_note_action, menu_new_note);
-	hildon_app_menu_append(HILDON_APP_MENU(menu), GTK_BUTTON(menu_new_note));
-	*/
-
 	/* Add sort filters */
 	/* Translators: Sort notes by title. */
 	button_sort_by_title = gtk_radio_button_new_with_label(NULL, _("Sort by title"));
@@ -392,13 +375,6 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 	hildon_app_menu_add_filter(HILDON_APP_MENU(menu), GTK_BUTTON(button_sort_by_date));
 
 	hildon_window_set_app_menu(HILDON_WINDOW(win), HILDON_APP_MENU(menu));
-#else
-	/*
-	menu = gtk_menu_new();
-	menu_new_note = gtk_action_create_menu_item(new_note_action);
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_new_note);
-	hildon_window_set_menu(HILDON_WINDOW(win), GTK_MENU(menu));
-	*/
 #endif
 
 	vbox = gtk_vbox_new(FALSE, 0);
