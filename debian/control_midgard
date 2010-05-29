@@ -1,6 +1,6 @@
 Package: conboy-midgard
 Architecture: any
-Depends: conboy (>= 0.6.3.3), libmidgard2-2010, midgard2-common (>=10.05.0), libgda4-sqlite
+Depends: conboy (>= 0.6.3.11), libmidgard2-2010, midgard2-common (>=10.05.0), libgda4-sqlite
 XB-Maemo-Display-Name: Conboy Midgard Plugin
 Description: Conboy plugin to store notes in Midgard content repository.
 XSBC-Bugtracker: http://trac.midgard-project.org/report

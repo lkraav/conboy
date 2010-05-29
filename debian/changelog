@@ -1,3 +1,11 @@
+conboy (1:0.6.3.11) stable; urgency=low
+
+  * Removed settings UI from Midgard plugin
+  * Initial code for conflict detection
+  * Test-Build with PR 1.2
+  
+ -- Cornelius Hald <hald@icandy.de>  Fri, 28 May 2010 20:08:43 +0200
+
 conboy (1:0.6.3.10) stable; urgency=low
 
   * We no longer depend on maemo's broken URL handling. OAuth now uses a network connection to localhost.
