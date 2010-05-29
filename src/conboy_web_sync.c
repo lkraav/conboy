@@ -166,6 +166,25 @@ web_sync_remove_by_guid(GList *list, ConboyNote *note_to_remove)
 	}
 }
 
+static gchar*
+create_title_for_conflict_note(const gchar* orig_title)
+{
+	AppData *app_data = app_data_get();
+	gchar *base_title = g_strconcat(orig_title, " (old)", NULL);
+	gchar *result = g_strdup(base_title);
+
+	int index = 1;
+	while (conboy_note_store_find_by_title(app_data->note_store, result)) {
+		g_free(result);
+		result = g_strdup_printf("%s %i", base_title, index);
+		index++;
+	}
+
+	g_free(base_title);
+	return result;
+}
+
+
 /* TODO: This function is way too long */
 gpointer
 web_sync_do_sync (gpointer *user_data)
@@ -302,16 +321,17 @@ web_sync_do_sync (gpointer *user_data)
 			/* Compare note timestamp with last_sync_time. If it's bigger, the note has been also modified locally. */
 			if (local_note->last_metadata_change_date > last_sync_time) {
 				g_printerr("INFO: We have a conflict\n");
+
 				/* TODO: Prompt user, ask for overwrite or not. If not overwrite, ask for new name */
-				gboolean overwrite = TRUE;
+				gboolean overwrite = FALSE;
 
 				if (!overwrite) { /* If we do not overwrite, we need to create a copy that note */
 					ConboyNote *rescue_note = conboy_note_copy(local_note);
 					conboy_note_renew_guid(rescue_note);
-					gchar *rescue_note_title = g_strconcat(local_note->title, " (old)", NULL);
-					/* TODO: Test if title exists, if yes, add number like "Bla (old) 1". Put in function. */
-					conboy_note_rename(rescue_note, rescue_note_title);
 
+					/* Set new title */
+					gchar *rescue_note_title = create_title_for_conflict_note(local_note->title);
+					conboy_note_rename(rescue_note, rescue_note_title);
 					g_free(rescue_note_title);
 
 					/* Save rescue_note */
