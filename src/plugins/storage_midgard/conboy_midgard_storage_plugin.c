@@ -17,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <hildon/hildon-banner.h>
 #include "../../conboy_note.h"
 #include "../../conboy_storage_plugin.h"
 #include "../../metadata.h"
@@ -105,14 +106,14 @@ __conboy_note_from_midgard_object (MidgardObject *mgdobject)
 			"title", title,
 			"content", content,
 			"open-on-startup", open_on_startup,
-			"cursorposition", cursor_position,
+			"cursor-position", cursor_position,
 			"width", width,
 			"height", height,
 			"x", x,
 			"y", y,
-			"last_change_date", _time_t_from_iso8601 (g_value_get_string (&updated_str)),
-        		"last_metadata_change_date", _time_t_from_iso8601 (g_value_get_string (&updated_str)),
-        		"create_date", _time_t_from_iso8601 (g_value_get_string (&created_str)),
+			"change-date", _time_t_from_iso8601 (g_value_get_string (&updated_str)),
+        	"metadata-change-date", _time_t_from_iso8601 (g_value_get_string (&updated_str)),
+        	"create-date", _time_t_from_iso8601 (g_value_get_string (&created_str)),
 			NULL);
 
 	g_free (guid);
@@ -368,6 +369,15 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 		return;
 	}
 
+	/* Pop up a banner informing the user that this will take some time */
+	GtkWidget *banner = hildon_banner_show_information(NULL, NULL, "Creating Midgard database. This will take a while.");
+	hildon_banner_set_timeout(HILDON_BANNER(banner), 120000); /* 2 minutes */
+
+	/* Process the events that will show the banner */
+	while (gtk_events_pending()) {
+		gtk_main_iteration_do(FALSE);
+	}
+
 	/* Create base storage and one required for note */
 	midgard_storage_create_base_storage (mgd_global);
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME (CONBOY_MIDGARD_NOTE_NAME);
@@ -379,6 +389,9 @@ conboy_midgard_storage_plugin_init (ConboyMidgardStoragePlugin *self)
 
 	MidgardObject *mgdobject = midgard_object_new (mgd_global, CONBOY_MIDGARD_NOTE_NAME, NULL);
 	CONBOY_MIDGARD_STORAGE_PLUGIN (self)->object = mgdobject;
+
+	/* Hide the banner again */
+	gtk_widget_destroy(banner);
 }
 
 ConboyMidgardStoragePlugin*
