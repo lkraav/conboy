@@ -35,7 +35,9 @@
 #define JSON_PINNED "pinned"
 #define JSON_TAGS "tags"
 
-
+/**
+ * Return value must be freed
+ */
 static gchar*
 remove_xml_tag_and_title(const gchar* content)
 {
@@ -77,6 +79,9 @@ remove_xml_tag_and_title(const gchar* content)
 
 	g_strfreev(parts);
 
+	if (result == NULL || strcmp(result, "") == 0) {
+		return "";
+	}
 	return result;
 }
 
@@ -85,79 +90,135 @@ remove_xml_tag_and_title(const gchar* content)
  * as they are. g_strescape is doing "H��llo" -> "H\303\266llo" which
  * is not JSON conform.
  */
-static gchar*
-escape_string (gchar *orig)
+//static gchar*
+//escape_string (gchar *orig)
+//{
+//	const guchar *p;
+//	gchar *result;
+//	gchar *q;
+//
+// 	if (orig == NULL) {
+// 		return g_strdup ("\"\"");
+// 	}
+//
+//	p = (guchar *) orig;
+//	/* Each source byte needs maximally two destination chars (\n) */
+//	q = result = g_malloc (strlen (orig) * 2 + 1);
+//
+//	while (*p)
+//	{
+//		switch (*p)
+//		{
+//		case '\n':
+//			*q++ = '\\';
+//			*q++ = 'n';
+//			break;
+//		case '\r':
+//			*q++ = '\\';
+//			*q++ = 'r';
+//			break;
+//		case '\t':
+//			*q++ = '\\';
+//			*q++ = 't';
+//			break;
+//		case '\b':
+//			*q++ = '\\';
+//			*q++ = 'b';
+//			break;
+//		case '\f':
+//			*q++ = '\\';
+//			*q++ = 'f';
+//			break;
+//		case '\\':
+//			*q++ = '\\';
+//			*q++ = '\\';
+//			break;
+//		case '\"':
+//			*q++ = '\\';
+//			*q++ = '"';
+//			break;
+//		default:
+//			*q++ = *p;
+//		}
+//		p++;
+//	}
+//
+//	*q = 0;
+//
+//	return result;
+//}
+
+
+static gboolean
+eval_cb(const GMatchInfo *info, GString *result, gpointer data)
 {
-	const guchar *p;
+	gchar *match;
+	gchar *replacement;
+
+	match = g_match_info_fetch(info, 0);
+	replacement = g_hash_table_lookup((GHashTable *)data, match);
+	g_string_append(result, replacement);
+	g_free (match);
+
+	return FALSE;
+}
+
+/**
+ * Replaces all occurences of &, <, >, " and ' with their
+ * xml entities (e.g. &amp;).
+ *
+ * Returned string needs to be freed.
+ */
+static gchar*
+escape_entities(const gchar *input)
+{
+	GRegex *regex;
+	GHashTable *table;
 	gchar *result;
-	gchar *q;
 
- 	if (orig == NULL) {
- 		return g_strdup ("\"\"");
- 	}
+	table = g_hash_table_new(g_str_hash, g_str_equal);
 
-	p = (guchar *) orig;
-	/* Each source byte needs maximally two destination chars (\n) */
-	q = result = g_malloc (strlen (orig) * 2 + 1);
+	g_hash_table_insert(table, "&",  "&amp;");
+	g_hash_table_insert(table, "<",  "&lt;");
+	g_hash_table_insert(table, ">",  "&gt;");
+	g_hash_table_insert(table, "\"", "&quot;");
+	g_hash_table_insert(table, "'",  "&apos;");
 
-	while (*p)
-	{
-		switch (*p)
-		{
-		case '\n':
-			*q++ = '\\';
-			*q++ = 'n';
-			break;
-		case '\r':
-			*q++ = '\\';
-			*q++ = 'r';
-			break;
-		case '\t':
-			*q++ = '\\';
-			*q++ = 't';
-			break;
-		case '\b':
-			*q++ = '\\';
-			*q++ = 'b';
-			break;
-		case '\f':
-			*q++ = '\\';
-			*q++ = 'f';
-			break;
-		case '\\':
-			*q++ = '\\';
-			*q++ = '\\';
-			break;
-		case '\"':
-			*q++ = '\\';
-			*q++ = '"';
-			break;
-		default:
-			*q++ = *p;
-		}
-		p++;
-	}
+	regex = g_regex_new("&|<|>|\"|';", G_REGEX_CASELESS, 0, NULL);
+	result = g_regex_replace_eval(regex, input, -1, 0, 0, eval_cb, table, NULL);
 
-	*q = 0;
-
+	g_regex_unref(regex);
+	g_hash_table_destroy(table);
 	return result;
 }
 
-
+/**
+ * Replaces all occurences of xml entities like &amp; &gt; etc. with their normal
+ * character value (e.g. &, <, >, etc.).
+ *
+ * Returned string needs to be freed.
+ */
 static gchar*
-convert_content(const gchar *content)
+unescape_entities(const gchar *input)
 {
-	gchar *result = NULL;
-	gchar *tmp = remove_xml_tag_and_title(content);
+	GRegex *regex;
+	GHashTable *table;
+	gchar *result;
 
-	if (tmp == NULL || strcmp(tmp, "") == 0) {
-		return "";
-	} else {
-		/*result = escape_string(tmp);*/ /* TODO: It looks like newer version of glib-json escape those already */
-		result = g_strdup(tmp);
-		g_free(tmp);
-		return result;
-	}
+	table = g_hash_table_new(g_str_hash, g_str_equal);
+
+	g_hash_table_insert(table, "&amp;", "&");
+	g_hash_table_insert(table, "&lt;", "<");
+	g_hash_table_insert(table, "&gt;", ">");
+	g_hash_table_insert(table, "&quot;", "\"");
+	g_hash_table_insert(table, "&apos;", "'");
+
+	regex = g_regex_new("&amp;|&lt;|&gt;|&quot;|&apos;", G_REGEX_CASELESS, 0, NULL);
+	result = g_regex_replace_eval(regex, input, -1, 0, 0, eval_cb, table, NULL);
+
+	g_regex_unref(regex);
+	g_hash_table_destroy(table);
+	return result;
 }
 
 JsonNode*
@@ -180,13 +241,17 @@ json_get_node_from_note(ConboyNote *note)
 	json_node_set_string(node, note->guid);
 	json_object_add_member(obj, JSON_GUID, node);
 
+	gchar *esc_title = escape_entities(note->title);
 	node = json_node_new(JSON_NODE_VALUE);
-	json_node_set_string(node, note->title);
+	json_node_set_string(node, esc_title);
 	json_object_add_member(obj, JSON_TITLE, node);
+	g_free(esc_title);
 
+	gchar *content =  remove_xml_tag_and_title(note->content);
 	node = json_node_new(JSON_NODE_VALUE);
-	json_node_set_string(node, convert_content(note->content));
+	json_node_set_string(node, content);
 	json_object_add_member(obj, JSON_NOTE_CONTENT, node);
+	g_free(content);
 
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_double(node, note->content_version);
@@ -234,12 +299,12 @@ json_get_node_from_note(ConboyNote *note)
 	return root;
 }
 
-
 gchar*
 json_node_to_string(JsonNode *node, gboolean pretty)
 {
 	JsonGenerator *gen;
 	gchar *string;
+	gchar *result;
 
 	gen = json_generator_new();
 	g_object_set(gen, "pretty", pretty, NULL);
@@ -247,34 +312,10 @@ json_node_to_string(JsonNode *node, gboolean pretty)
 	string = json_generator_to_data(gen, NULL);
 
 	g_object_unref(gen);
-
 	return string;
 }
 
-void
-json_print_note(ConboyNote *note)
-{
-	/*
-	 * TODO: Use json_node_to_string()
-	 */
 
-	JsonNode *obj;
-	JsonGenerator *gen;
-	gchar *string;
-
-	obj = json_get_node_from_note(note);
-
-	gen = json_generator_new();
-	g_object_set(gen, "pretty", TRUE, NULL);
-	json_generator_set_root(gen, obj);
-	string = json_generator_to_data(gen, NULL);
-
-	g_printerr("%s", string);
-
-	g_free(string);
-	json_node_free(obj);
-	g_object_unref(gen);
-}
 
 
 /*
@@ -307,7 +348,12 @@ json_get_note_from_node(JsonNode *node)
 	if (member)	note->guid = (gchar*)json_node_dup_string(member);
 
 	member = json_object_get_member(obj, JSON_TITLE);
-	if (member) note->title = (gchar*)json_node_dup_string(member);
+	if (member) {
+		gchar *title = (gchar*)json_node_dup_string(member);
+		g_printerr("Received title: %s\n", title);
+		note->title =  unescape_entities(title);
+		g_printerr("Converted title: %s\n", note->title);
+	}
 
 	member = json_object_get_member(obj, JSON_NOTE_CONTENT);
 	if (member) note->content = (gchar*)json_node_dup_string(member);
