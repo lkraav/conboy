@@ -74,9 +74,9 @@ conboy_CPPFLAGS = $(DEPS_CFLAGS) $(EXTRAS_CPPFLAGS) \
 conboy_LDADD = $(DEPS_LIBS)
 
 plugindir = $(pkglibdir)
-plugin_LTLIBRARIES = libstorageevernote.la \
-	libstoragemidgard.la \
-	libstoragexml.la
+plugin_LTLIBRARIES = src/plugins/storage_evernote/libstorageevernote.la \
+	src/plugins/storage_midgard/libstoragemidgard.la \
+	src/plugins/storage_xml/libstoragexml.la
 nodist_plugin_DATA = \
 	src/plugins/storage_evernote/conboy_storage_evernote.plugin \
 	src/plugins/storage_xml/conboy_storage_xml.plugin
@@ -92,32 +92,38 @@ nodist_plugin_DATA += \
 midgardschemadir = $(datadir)/midgard2/schema
 dist_midgardschema_DATA = data/org_gnome_tomboy.xml
 
-libstoragemidgard_la_SOURCES = \
+src_plugins_storage_midgard_libstoragemidgard_la_SOURCES = \
 	src/plugins/storage_midgard/conboy_midgard_storage_plugin.h \
 	src/plugins/storage_midgard/conboy_midgard_storage_plugin.c
-libstoragemidgard_la_CPPFLAGS = $(STORAGE_MIDGARD_CFLAGS) $(EXTRA_CPPFLAGS)
-libstoragemidgard_la_LIBADD = $(STORAGE_MIDGARD_LIBS)
-libstoragemidgard_la_LDFLAGS = -module -avoid-version
+src_plugins_storage_midgard_libstoragemidgard_la_CPPFLAGS = \
+	$(STORAGE_MIDGARD_CFLAGS) $(EXTRA_CPPFLAGS)
+src_plugins_storage_midgard_libstoragemidgard_la_LIBADD = \
+	$(STORAGE_MIDGARD_LIBS)
+src_plugins_storage_midgard_libstoragemidgard_la_LDFLAGS = \
+	-module -avoid-version
 endif
 
 CLEANFILES = $(nodist_plugin_DATA)
 
 %.plugin: %.plugin.in $(INTLTOOL_MERGE) $(wildcard $(top_srcdir)/po/*po) ; $(INTLTOOL_MERGE) $(top_srcdir)/po $< $@ -d -u -c $(top_builddir)/po/.intltool-merge-cache
 
-libstorageevernote_la_SOURCES = \
+src_plugins_storage_evernote_libstorageevernote_la_SOURCES = \
 	src/plugins/storage_evernote/conboy_evernote_storage_plugin.h \
 	src/plugins/storage_evernote/conboy_evernote_storage_plugin.c
-libstorageevernote_la_CPPFLAGS = $(STORAGE_EVERNOTE_CFLAGS) $(EXTRA_CPPFLAGS)
-libstorageevernote_la_LIBADD = $(STORAGE_EVERNOTE_LIBS)
-libstorageevernote_la_LDFLAGS = -module -avoid-version
+src_plugins_storage_evernote_libstorageevernote_la_CPPFLAGS = \
+	$(STORAGE_EVERNOTE_CFLAGS) $(EXTRA_CPPFLAGS)
+src_plugins_storage_evernote_libstorageevernote_la_LIBADD = \
+	$(STORAGE_EVERNOTE_LIBS)
+src_plugins_storage_evernote_libstorageevernote_la_LDFLAGS = \
+	-module -avoid-version
 
-libstoragexml_la_SOURCES = \
+src_plugins_storage_xml_libstoragexml_la_SOURCES = \
 	src/plugins/storage_xml/conboy_xml_storage_plugin.h \
 	src/plugins/storage_xml/conboy_xml_storage_plugin.c
-libstoragexml_la_CPPFLAGS = $(STORAGE_XML_CFLAGS) $(EXTRA_CPPFLAGS) \
-	-I$(top_builddir)
-libstoragexml_la_LIBADD = $(STORAGE_XML_LIBS)
-libstoragexml_la_LDFLAGS = -module -avoid-version
+src_plugins_storage_xml_libstoragexml_la_CPPFLAGS = \
+	$(STORAGE_XML_CFLAGS) $(EXTRA_CPPFLAGS) -I$(top_builddir)
+src_plugins_storage_xml_libstoragexml_la_LIBADD = $(STORAGE_XML_LIBS)
+src_plugins_storage_xml_libstoragexml_la_LDFLAGS = -module -avoid-version
 
 dbusdir = $(datadir)/dbus-1/services
 nodist_dbus_DATA = data/de.zwong.conboy.service
