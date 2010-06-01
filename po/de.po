@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -23,7 +23,8 @@ msgstr "Neue Notiz %i"
 
 #. ACTIONS
 #. Translators: Bold font.
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
 #: ../src/interface.c:662 ../src/interface.c:799 ../src/interface.c:840
 msgid "Bold"
 msgstr "Fett"
@@ -54,7 +55,7 @@ msgstr "Hervorhebung"
 #. Translators: Underlined text.
 #: ../src/interface.c:672 ../src/interface.c:803 ../src/interface.c:844
 msgid "Underline"
-msgstr ""
+msgstr "Unterstichen"
 
 #: ../src/interface.c:673
 msgid "Increase indent"
@@ -137,7 +138,7 @@ msgstr "Vollbild"
 #. Translators: About the program.
 #: ../src/interface.c:704
 msgid "About"
-msgstr ""
+msgstr "Über"
 
 #. TODO: Use an enum instead of 0 to 3
 #. Translators: Small font.
@@ -199,13 +200,11 @@ msgstr "Zuletzt geändert"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name "
-"for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
 msgstr ""
 "<b>Titel schon verwendet</b>\n"
 "\n"
-"Eine Notiz mit dem Titel <b>%s</b> existiert schon. Bitte wählen Sie einen "
-"anderen Name für diese Notiz, bevor sie weiter machen."
+"Eine Notiz mit dem Titel <b>%s</b> existiert schon. Bitte wählen Sie einen anderen Name für diese Notiz, bevor sie weiter machen."
 
 #. Translators: Does the user really want to delete the
 #. current note? Answer is "yes" or "no".
@@ -314,14 +313,8 @@ msgstr "XML Speicher Plug-in"
 
 #. Translators: Following lines of description used by the package manager
 #: ../src/extra_strings.h:5
-msgid ""
-"It is designed to be easy to use - yet powerful. Conboy can read and write "
-"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
-"Windows."
-msgstr ""
-"Es ist einfach zu bedienen - aber trotzdem mächtig. Conboy kann das Tomboy "
-"Dateiformat lesen und schreiben und ist deswegen kompatibel mit Tomboy auf "
-"Linux, Mac und Windows."
+msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
+msgstr "Es ist einfach zu bedienen - aber trotzdem mächtig. Conboy kann das Tomboy Dateiformat lesen und schreiben und ist deswegen kompatibel mit Tomboy auf Linux, Mac und Windows."
 
 #~ msgid "On startup"
 #~ msgstr "Beim Starten"
