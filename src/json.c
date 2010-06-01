@@ -605,10 +605,12 @@ json_get_note_list(const gchar* json_string)
 		return NULL;
 	}
 
+	/* This part is not Snowy compatible, because Snowys answer looks slightly different
 	if (strncmp(json_string, "{\"notes\":", 9) != 0) {
 		g_printerr("ERROR: Cannot parse string. Does not start with '{\"notes\":'\n");
 		return NULL;
 	}
+	*/
 
 	JsonParser *parser = json_parser_new();
 	JsonNoteList *result = NULL;

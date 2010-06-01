@@ -587,7 +587,7 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 	/* Get URLs */
 	gchar *request = g_strconcat(url, "/api/1.0", NULL);
 
-	gchar *reply = conboy_http_get(request, FALSE);
+	gchar *reply = conboy_http_get(request, TRUE);
 
 	if (reply == NULL) {
 		gchar *msg = g_strconcat("Got no reply from: ", request, "\n", NULL);
