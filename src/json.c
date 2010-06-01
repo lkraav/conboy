@@ -19,6 +19,9 @@
 #include <string.h>
 #include <libxml/xmlreader.h>
 
+#ifndef GLIB_HAS_PCRE
+#include "gregex.h"
+#endif
 #include "json.h"
 #include "metadata.h"
 #include "app_data.h"
@@ -304,7 +307,6 @@ json_node_to_string(JsonNode *node, gboolean pretty)
 {
 	JsonGenerator *gen;
 	gchar *string;
-	gchar *result;
 
 	gen = json_generator_new();
 	g_object_set(gen, "pretty", pretty, NULL);
