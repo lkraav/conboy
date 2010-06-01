@@ -564,6 +564,7 @@ UserInterface* create_mainwin() {
 	GtkWidget *menu_italic;
 	GtkWidget *menu_strike;
 	GtkWidget *menu_highlight;
+	GtkWidget *menu_underline;
 	GtkWidget *menu_fixed;
 	GtkWidget *menu_bullets;
 	GtkWidget *menu_settings;
@@ -605,6 +606,7 @@ UserInterface* create_mainwin() {
 	GtkAction *action_bold;
 	GtkAction *action_fixed;
 	GtkAction *action_highlight;
+	GtkAction *action_underline;
 	GtkAction *action_italic;
 	GtkAction *action_strike;
 	GtkAction *action_bullets;
@@ -666,6 +668,8 @@ UserInterface* create_mainwin() {
 	action_fixed = GTK_ACTION(gtk_toggle_action_new("monospace", _("Fixed width"), NULL, NULL));
 	/* Translators: Emphasise text with a background colour. */
 	action_highlight = GTK_ACTION(gtk_toggle_action_new("highlight", _("Highlight"), NULL, NULL));
+	/* Translators: Underlined text. */
+	action_underline = GTK_ACTION(gtk_toggle_action_new("underline", _("Underline"), NULL, NULL));
 	action_inc_indent = GTK_ACTION(gtk_action_new("inc_indent", _("Increase indent"), NULL, GTK_STOCK_INDENT));
 	/* Translators: Add a [hyper]link to another note. */
 	action_link = GTK_ACTION(gtk_action_new("link", _("Link"), NULL, GTK_STOCK_REDO));
@@ -731,33 +735,36 @@ UserInterface* create_mainwin() {
 	gtk_action_group_add_action_with_accel(action_group, action_italic,    "<Ctrl>i");
 	gtk_action_group_add_action_with_accel(action_group, action_fixed,     "<Ctrl>m");
 	gtk_action_group_add_action_with_accel(action_group, action_highlight, "<Ctrl>h");
+	gtk_action_group_add_action_with_accel(action_group, action_underline, "<Ctrl>u");
 	gtk_action_group_add_action_with_accel(action_group, action_strike,    "<Ctrl>s");
 	gtk_action_group_add_action_with_accel(action_group, action_quit,      "<Ctrl>q");
 	gtk_action_group_add_action_with_accel(action_group, action_new,       "<Ctrl>n");
 	gtk_action_group_add_action_with_accel(action_group, action_find,      "<Ctrl>f");
-	gtk_action_group_add_action_with_accel(action_group, action_fullscreen,"<Ctrl>u");
+	//gtk_action_group_add_action_with_accel(action_group, action_fullscreen,"<Ctrl>u");
 	gtk_action_group_add_action_with_accel(action_group, action_link,      "<Ctrl>l");
 
 	gtk_action_set_accel_group(action_bold,      accel_group);
 	gtk_action_set_accel_group(action_italic,    accel_group);
 	gtk_action_set_accel_group(action_fixed,     accel_group);
 	gtk_action_set_accel_group(action_highlight, accel_group);
+	gtk_action_set_accel_group(action_underline, accel_group);
 	gtk_action_set_accel_group(action_strike,    accel_group);
 	gtk_action_set_accel_group(action_quit,      accel_group);
 	gtk_action_set_accel_group(action_new,       accel_group);
 	gtk_action_set_accel_group(action_find,      accel_group);
-	gtk_action_set_accel_group(action_fullscreen,accel_group);
+	//gtk_action_set_accel_group(action_fullscreen,accel_group);
 	gtk_action_set_accel_group(action_link,      accel_group);
 
 	gtk_action_connect_accelerator(action_bold);
 	gtk_action_connect_accelerator(action_italic);
 	gtk_action_connect_accelerator(action_fixed);
 	gtk_action_connect_accelerator(action_highlight);
+	gtk_action_connect_accelerator(action_underline);
 	gtk_action_connect_accelerator(action_strike);
 	gtk_action_connect_accelerator(action_find);
 	gtk_action_connect_accelerator(action_new);
 	gtk_action_connect_accelerator(action_quit);
-	gtk_action_connect_accelerator(action_fullscreen);
+	//gtk_action_connect_accelerator(action_fullscreen);
 	gtk_action_connect_accelerator(action_link);
 
 
@@ -769,6 +776,7 @@ UserInterface* create_mainwin() {
 	menu_italic = gtk_toggle_button_new();
 	menu_strike = gtk_toggle_button_new();
 	menu_highlight = gtk_toggle_button_new();
+	menu_underline = gtk_toggle_button_new();
 	menu_fixed = gtk_toggle_button_new();
 	menu_bullets = gtk_toggle_button_new();
 	menu_font_small = gtk_toggle_button_new();
@@ -780,6 +788,7 @@ UserInterface* create_mainwin() {
 	gtk_action_connect_proxy(action_italic, menu_italic);
 	gtk_action_connect_proxy(action_strike, menu_strike);
 	gtk_action_connect_proxy(action_highlight, menu_highlight);
+	gtk_action_connect_proxy(action_underline, menu_underline);
 	gtk_action_connect_proxy(action_fixed, menu_fixed);
 	gtk_action_connect_proxy(action_bullets, menu_bullets);
 	gtk_action_connect_proxy(action_font_small, menu_font_small);
@@ -791,6 +800,7 @@ UserInterface* create_mainwin() {
 	set_item_label(GTK_CONTAINER(menu_italic),     "<i>", _("Italic"), "</i>");
 	set_item_label(GTK_CONTAINER(menu_strike),     "<s>", _("Strikeout"), "</s>");
 	set_item_label(GTK_CONTAINER(menu_highlight),  "<span background=\"yellow\" foreground=\"black\">", _("Highlight"), "</span>");
+	set_item_label(GTK_CONTAINER(menu_underline),  "<u>", _("Underline"), "</u>");
 	set_item_label(GTK_CONTAINER(menu_fixed),      "<tt>", _("Fixed width"), "</tt>");
 	set_item_label(GTK_CONTAINER(menu_font_small), "<span size=\"small\">", _("Small"), "</span>");
 	set_item_label(GTK_CONTAINER(menu_font_large), "<span size=\"large\">", _("Large"), "</span>");
@@ -800,6 +810,7 @@ UserInterface* create_mainwin() {
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_italic));
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_strike));
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_highlight));
+	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_underline));
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_fixed));
 	hildon_app_menu_append(HILDON_APP_MENU(text_style_menu), GTK_BUTTON(menu_bullets));
 
@@ -816,6 +827,7 @@ UserInterface* create_mainwin() {
 	menu_italic = gtk_action_create_menu_item(action_italic);
 	menu_strike = gtk_action_create_menu_item(action_strike);
 	menu_highlight = gtk_action_create_menu_item(action_highlight);
+	menu_underline = gtk_action_create_menu_item(action_underline);
 	menu_fixed = gtk_action_create_menu_item(action_fixed);
 	menu_bullets = gtk_action_create_menu_item(action_bullets);
 	menu_inc_indent = gtk_action_create_menu_item(action_inc_indent);
@@ -829,6 +841,7 @@ UserInterface* create_mainwin() {
 	set_item_label(GTK_CONTAINER(menu_italic),     "<i>", _("Italic"), "</i>");
 	set_item_label(GTK_CONTAINER(menu_strike),     "<s>", _("Strikeout"), "</s>");
 	set_item_label(GTK_CONTAINER(menu_highlight),  "<span background=\"yellow\">", _("Highlight"), "</span>");
+	set_item_label(GTK_CONTAINER(menu_underline),  "<u>", _("Underline"), "</u>");
 	set_item_label(GTK_CONTAINER(menu_fixed),      "<tt>", _("Fixed width"), "</tt>");
 	set_item_label(GTK_CONTAINER(menu_font_small), "<span size=\"small\">", _("Small"), "</span>");
 	set_item_label(GTK_CONTAINER(menu_font_large), "<span size=\"large\">", _("Large"), "</span>");
@@ -838,6 +851,7 @@ UserInterface* create_mainwin() {
 	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_italic);
 	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_strike);
 	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_highlight);
+	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_underline);
 	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_fixed);
 	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_font_small);
@@ -1048,6 +1062,7 @@ UserInterface* create_mainwin() {
 	ui->action_bold = GTK_TOGGLE_ACTION(action_bold);
 	ui->action_bullets = GTK_TOGGLE_ACTION(action_bullets);
 	ui->action_highlight = GTK_TOGGLE_ACTION(action_highlight);
+	ui->action_underline = GTK_TOGGLE_ACTION(action_underline);
 	ui->action_italic = GTK_TOGGLE_ACTION(action_italic);
 	ui->action_strike = GTK_TOGGLE_ACTION(action_strike);
 	ui->action_fixed = GTK_TOGGLE_ACTION(action_fixed);
@@ -1091,6 +1106,10 @@ UserInterface* create_mainwin() {
 			ui);
 
 	g_signal_connect(action_highlight, "activate",
+			G_CALLBACK(on_format_button_clicked),
+			ui);
+
+	g_signal_connect(action_underline, "activate",
 			G_CALLBACK(on_format_button_clicked),
 			ui);
 
@@ -1289,6 +1308,7 @@ conboy_note_window_update_button_states(UserInterface *ui)
 	g_signal_handlers_block_by_func(ui->action_italic, on_format_button_clicked, ui);
 	g_signal_handlers_block_by_func(ui->action_strike, on_format_button_clicked, ui);
 	g_signal_handlers_block_by_func(ui->action_highlight, on_format_button_clicked, ui);
+	g_signal_handlers_block_by_func(ui->action_underline, on_format_button_clicked, ui);
 	g_signal_handlers_block_by_func(ui->action_fixed, on_format_button_clicked, ui);
 	g_signal_handlers_block_by_func(ui->action_bullets, on_bullets_button_clicked, ui);
 	g_signal_handlers_block_by_func(ui->action_font_small, on_font_size_radio_group_changed, ui);
@@ -1302,6 +1322,7 @@ conboy_note_window_update_button_states(UserInterface *ui)
 	gtk_toggle_action_set_active(ui->action_italic, FALSE);
 	gtk_toggle_action_set_active(ui->action_strike, FALSE);
 	gtk_toggle_action_set_active(ui->action_highlight, FALSE);
+	gtk_toggle_action_set_active(ui->action_underline, FALSE);
 	gtk_toggle_action_set_active(ui->action_fixed, FALSE);
 	gtk_toggle_action_set_active(ui->action_bullets, FALSE);
 	gtk_radio_action_set_current_value(ui->action_font_small, 1); /* Enable normal font size */
@@ -1322,6 +1343,8 @@ conboy_note_window_update_button_states(UserInterface *ui)
 			gtk_toggle_action_set_active(ui->action_strike, TRUE);
 		} else if (strcmp(tag->name, "highlight") == 0) {
 			gtk_toggle_action_set_active(ui->action_highlight, TRUE);
+		} else if (strcmp(tag->name, "underline") == 0) {
+			gtk_toggle_action_set_active(ui->action_underline, TRUE);
 		} else if (strcmp(tag->name, "monospace") == 0) {
 			gtk_toggle_action_set_active(ui->action_fixed, TRUE);
 		} else if (strncmp(tag->name, "list-item", 9) == 0) {
@@ -1345,6 +1368,7 @@ conboy_note_window_update_button_states(UserInterface *ui)
 	g_signal_handlers_unblock_by_func(ui->action_italic, on_format_button_clicked, ui);
 	g_signal_handlers_unblock_by_func(ui->action_strike, on_format_button_clicked, ui);
 	g_signal_handlers_unblock_by_func(ui->action_highlight, on_format_button_clicked, ui);
+	g_signal_handlers_unblock_by_func(ui->action_underline, on_format_button_clicked, ui);
 	g_signal_handlers_unblock_by_func(ui->action_fixed, on_format_button_clicked, ui);
 	g_signal_handlers_unblock_by_func(ui->action_bullets, on_bullets_button_clicked, ui);
 	g_signal_handlers_unblock_by_func(ui->action_font_small, on_font_size_radio_group_changed, ui);

@@ -39,6 +39,7 @@ typedef struct
 	GtkToggleToolButton *button_italic;
 	GtkToggleToolButton *button_strike;
 	GtkToggleToolButton *button_highlight;
+	GtkToggleToolButton *button_underline;
 	GtkToggleToolButton *button_bullets;
 
 	GtkToggleAction     *action_bold;
@@ -46,6 +47,7 @@ typedef struct
 	GtkToggleAction	    *action_fixed;
 	GtkToggleAction     *action_strike;
 	GtkToggleAction     *action_highlight;
+	GtkToggleAction     *action_underline;
 	GtkToggleAction     *action_bullets;
 	GtkAction           *action_link;
 	GtkRadioAction		*action_font_small;
