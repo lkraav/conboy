@@ -1,7 +1,7 @@
 # English (British) translation for Conboy.
 # This file is distributed under the same license as the Conboy package.
 # David King <amigadave@amigadave.com>, 2010.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: conboy 0.6.3.8\n"
@@ -22,7 +22,8 @@ msgstr "New Note %i"
 
 #. ACTIONS
 #. Translators: Bold font.
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
 #: ../src/interface.c:662 ../src/interface.c:799 ../src/interface.c:840
 msgid "Bold"
 msgstr "Bold"
@@ -53,7 +54,7 @@ msgstr "Highlight"
 #. Translators: Underlined text.
 #: ../src/interface.c:672 ../src/interface.c:803 ../src/interface.c:844
 msgid "Underline"
-msgstr ""
+msgstr "Underline"
 
 #: ../src/interface.c:673
 msgid "Increase indent"
@@ -136,7 +137,7 @@ msgstr "Fullscreen"
 #. Translators: About the program.
 #: ../src/interface.c:704
 msgid "About"
-msgstr ""
+msgstr "About"
 
 #. TODO: Use an enum instead of 0 to 3
 #. Translators: Small font.
@@ -198,13 +199,11 @@ msgstr "Last changed"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name "
-"for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
 msgstr ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name "
-"for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
 
 #. Translators: Does the user really want to delete the
 #. current note? Answer is "yes" or "no".
@@ -313,11 +312,5 @@ msgstr "XML Storage Backend"
 
 #. Translators: Following lines of description used by the package manager
 #: ../src/extra_strings.h:5
-msgid ""
-"It is designed to be easy to use - yet powerful. Conboy can read and write "
-"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
-"Windows."
-msgstr ""
-"It is designed to be easy to use - yet powerful. Conboy can read and write "
-"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
-"Windows."
+msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
+msgstr "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
