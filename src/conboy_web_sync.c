@@ -634,12 +634,9 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 	}
 
 	/* Open dialog and wait for result */
-	g_printerr("Before dialog run\n");
 	int result = gtk_dialog_run(GTK_DIALOG(dialog));
-	g_printerr("Before widget destroy\n");
 	gtk_widget_hide(dialog);
 	gtk_widget_destroy(dialog);
-	g_printerr("After widget destroy\n");
 
 	/* Handle return values of the dialog */
 	if (result == GTK_RESPONSE_OK) {
