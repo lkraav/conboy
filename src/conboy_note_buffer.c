@@ -1306,24 +1306,28 @@ GtkTextTag* get_depth_tag(ParseContext *ctx, GtkTextBuffer *buffer, gchar* name)
 	return tag;
 }
 
-static
-void apply_tags(GSList *tags, GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_iter)
+static void
+apply_tags(GSList *tags, GtkTextBuffer *buffer, GtkTextIter *start_iter, GtkTextIter *end_iter)
 {
 	GtkTextTag *tag;
 	GSList *tag_list = tags;
 	while (tag_list) {
 		tag = gtk_text_tag_table_lookup(buffer->tag_table, tag_list->data);
 		if (tag == NULL) {
-			g_printerr("ERROR: TAG DOES NOT EXIST: %s", (gchar*)tag_list->data);
-			/* TODO: Auto create unknown tags */
+			gchar *tag_name = (gchar*)tag_list->data;
+			if (tag_name != NULL && strcmp(tag_name, "") != 0) {
+				g_printerr("INFO: XML tag <%s> does not exist yet. Creating it.\n", tag_name);
+				gtk_text_buffer_create_tag(buffer, tag_name, NULL);
+				tag = gtk_text_tag_table_lookup(buffer->tag_table, tag_name);
+			}
 		}
 		gtk_text_buffer_apply_tag(buffer, tag, start_iter, end_iter);
 		tag_list = tag_list->next;
 	}
 }
 
-static
-void handle_text_element(ParseContext *ctx, xmlTextReader *reader, GtkTextBuffer *buffer)
+static void
+handle_text_element(ParseContext *ctx, xmlTextReader *reader, GtkTextBuffer *buffer)
 {
 	const gchar *text = (const gchar *) xmlTextReaderConstValue(reader);
 	GtkTextIter *iter = ctx->iter;

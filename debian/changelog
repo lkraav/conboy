@@ -4,6 +4,8 @@ conboy (1:0.6.3.12) stable; urgency=low
   * Midgard plugin now shows a banner while initializing the DB
   * Hide template notes
   * Added keyboard shortcut for note linking Ctrl+l
+  * Syncs again with Snowy
+  * Unknown text tags are preserved when reading/writing them
   
  -- Cornelius Hald <hald@icandy.de>  Fri, 29 May 2010 12:37:43 +0200
 
