@@ -6,5 +6,5 @@ src/settings_window.c
 src/conboy_note.c
 src/conboy_plugin_manager.c
 src/conboy_plugin_manager_row.c
-src/plugins/storage_xml/conboy_storage_xml.plugin.in
-#[type: gettext/rfc822deb]debian/control.rfc822.in
+src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in
+src/extra_strings.h

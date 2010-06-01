@@ -74,16 +74,17 @@ conboy_CPPFLAGS = $(DEPS_CFLAGS) $(EXTRAS_CPPFLAGS) \
 conboy_LDADD = $(DEPS_LIBS)
 
 plugindir = $(pkglibdir)
-plugin_LTLIBRARIES = src/plugins/storage_evernote/libstorageevernote.la \
+plugin_LTLIBRARIES = \
+	src/plugins/storage_evernote/libstorageevernote.la \
 	src/plugins/storage_midgard/libstoragemidgard.la \
 	src/plugins/storage_xml/libstoragexml.la
 nodist_plugin_DATA = \
 	src/plugins/storage_evernote/conboy_storage_evernote.plugin \
 	src/plugins/storage_xml/conboy_storage_xml.plugin
 dist_plugin_DATA = \
-	src/plugins/storage_evernote/conboy_storage_evernote.plugin.in \
-	src/plugins/storage_midgard/conboy_storage_midgard.plugin.in \
-	src/plugins/storage_xml/conboy_storage_xml.plugin.in
+	src/plugins/storage_evernote/conboy_storage_evernote.plugin.desktop.in \
+	src/plugins/storage_midgard/conboy_storage_midgard.plugin.desktop.in \
+	src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in
 
 if MIDGARD
 nodist_plugin_DATA += \
@@ -105,7 +106,7 @@ endif
 
 CLEANFILES = $(nodist_plugin_DATA)
 
-%.plugin: %.plugin.in $(INTLTOOL_MERGE) $(wildcard $(top_srcdir)/po/*po) ; $(INTLTOOL_MERGE) $(top_srcdir)/po $< $@ -d -u -c $(top_builddir)/po/.intltool-merge-cache
+%.plugin: %.plugin.desktop.in $(INTLTOOL_MERGE) $(wildcard $(top_srcdir)/po/*po) ; $(INTLTOOL_MERGE) $(top_srcdir)/po $< $@ -d -u -c $(top_builddir)/po/.intltool-merge-cache
 
 src_plugins_storage_evernote_libstorageevernote_la_SOURCES = \
 	src/plugins/storage_evernote/conboy_evernote_storage_plugin.h \

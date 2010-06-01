@@ -1,8 +1,10 @@
 [Conboy Plugin]
 Module=storagexml
 Kind=storage
+#Translators: Name of the plug-in
 _Name=XML Storage Backend
+#Translators: Description of the plug-in
 _Description=Loads and saves notes from the local filesystem.
 Version=0.1
 Authors=Cornelius Hald <hald@icandy.de>
-Copyright=Copyright (C) 2009 Cornelius Hald
+Copyright=Copyright (C) 2010 Cornelius Hald

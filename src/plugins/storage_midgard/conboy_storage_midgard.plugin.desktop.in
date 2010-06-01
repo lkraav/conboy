@@ -1,8 +1,10 @@
 [Conboy Plugin]
 Module=storagemidgard
 Kind=storage
+#Translators: Name of the plug-in
 _Name=Midgard Storage Backend
+#Translators: Description of the plug-in
 _Description=Loads and saves notes from a Midgard repository.
 Version=0.1
 Authors=Piotr Pokora <piotrek.pokora@gmail.com>
-Copyright=Copyright (C) 2009 Piotr Pokora
+Copyright=Copyright (C) 2010 Piotr Pokora
