@@ -54,35 +54,34 @@
 <languageData contentTypeIds="org.eclipse.cdt.core.cSource;org.eclipse.cdt.core.cHeader" id="Scratchbox 1~DIABLO_ARMEL.1257449132051.1052124255.751968816" languageId="org.eclipse.cdt.core.gcc" name="GNU C" supportedEntryKinds="includePath;includeFile;macro;macroFile">
 <settingEntries>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy/src"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/home/maemo/workspace/conboy"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/home/maemo/workspace/conboy/src"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/hildon-1"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/cairo"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/pixman-1"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/freetype2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libpng12"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gconf/2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libmodest-dbus-client-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-module-2.0"/>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/home/${USERNAME}/workspace/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/home/${USERNAME}/workspace/conboy/src"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/pixman-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/libmodest-dbus-client-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/gnome-vfs-module-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/hildon-1"/>
 </settingEntries>
 </languageData>
 <languageData contentTypeIds="org.eclipse.cdt.core.asmSource" id="Scratchbox 1~DIABLO_ARMEL.1257449132051.1052124255.1756996253" languageId="org.eclipse.cdt.core.assembly" name="Assembly" supportedEntryKinds="includePath;includeFile;macro;macroFile">
 <settingEntries>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy/src"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/home/maemo/workspace/conboy"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/home/maemo/workspace/conboy/src"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/hildon-1"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
@@ -103,6 +102,8 @@
 <entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libmodest-dbus-client-1.0"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-module-2.0"/>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/home/${USERNAME}/workspace/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/home/${USERNAME}/workspace/conboy/src"/>
 </settingEntries>
 </languageData>
 </folderData>
@@ -159,33 +160,33 @@
 <entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libmodest-dbus-client-1.0"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-module-2.0"/>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include"/>
 </settingEntries>
 </languageData>
 <languageData contentTypeIds="org.eclipse.cdt.core.cSource;org.eclipse.cdt.core.cHeader" id="Scratchbox 1~DIABLO_X86.1257449132058.692046645.216134063" languageId="org.eclipse.cdt.core.gcc" name="GNU C" supportedEntryKinds="includePath;includeFile;macro;macroFile">
 <settingEntries>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy/src"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/home/maemo/workspace/conboy"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/home/maemo/workspace/conboy/src"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/hildon-1"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gtk-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/gtk-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/atk-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/cairo"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/pango-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/glib-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/glib-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/pixman-1"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/freetype2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libpng12"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/hildon-fm-2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gconf/2"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-2.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/gnome-vfs-2.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/dbus-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/lib/dbus-1.0/include"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libmodest-dbus-client-1.0"/>
-<entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-module-2.0"/>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/hildon-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/gtk-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/lib/gtk-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/atk-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/cairo"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/pango-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/glib-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/lib/glib-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/pixman-1"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/freetype2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/libpng12"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/hildon-fm-2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/gconf/2"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/gnome-vfs-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/lib/gnome-vfs-2.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/dbus-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/lib/dbus-1.0/include"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/libmodest-dbus-client-1.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include/gnome-vfs-module-2.0"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include"/>
 </settingEntries>
 </languageData>
 <languageData contentTypeIds="org.eclipse.cdt.core.asmSource" id="Scratchbox 1~DIABLO_X86.1257449132058.692046645.1492807873" languageId="org.eclipse.cdt.core.assembly" name="Assembly" supportedEntryKinds="includePath;includeFile;macro;macroFile">
@@ -213,6 +214,7 @@
 <entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/libmodest-dbus-client-1.0"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/maemo/targets/FREMANTLE_X86/usr/include/gnome-vfs-module-2.0"/>
 <entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/conboy"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/DIABLO_X86/usr/include"/>
 </settingEntries>
 </languageData>
 </folderData>
