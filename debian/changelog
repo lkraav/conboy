@@ -1,3 +1,9 @@
+conboy (1:0.6.3.12-1) stable; urgency=low
+
+  * Test build only for Diablo
+  
+ -- Cornelius Hald <hald@icandy.de>  Fri, 02 Jun 2010 16:00:43 +0200
+
 conboy (1:0.6.3.12) stable; urgency=low
 
   * Midgard plugin now shows a banner while initializing the DB

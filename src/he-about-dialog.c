@@ -26,6 +26,10 @@
  * #HeAboutDialog works as a nice default about dialog for Maemo apps
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
 #ifdef HILDON_HAS_APP_MENU
 
 #define _GNU_SOURCE     /* needed for GNU nl_langinfo_l */

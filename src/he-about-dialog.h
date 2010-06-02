@@ -19,6 +19,12 @@
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
+#ifdef HILDON_HAS_APP_MENU
+
 #ifndef					__HE_ABOUT_DIALOG_H__
 #define					__HE_ABOUT_DIALOG_H__
 
@@ -115,3 +121,5 @@ he_about_dialog_set_donate_url(HeAboutDialog* ad, const gchar* url);
 G_END_DECLS
 
 #endif						/* __HE_ABOUT_DIALOG_H__ */
+
+#endif /* HILDON_HAS_APP_MENU */
