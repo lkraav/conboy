@@ -54,6 +54,7 @@ enum
 struct _ConboyPluginManagerPrivate
 {
 	GList		*rows;
+	gint          plugin_count;
 
 	/* Diablo stuff */
 	GtkWidget	*tree;
@@ -567,6 +568,7 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 
 	pm->priv = CONBOY_PLUGIN_MANAGER_GET_PRIVATE (pm);
 	pm->priv->rows = NULL;
+	pm->priv->plugin_count = 0;
 
 	AppData *app_data = app_data_get();
 	ConboyPluginStore *plugin_store = app_data->plugin_store;
@@ -580,6 +582,7 @@ conboy_plugin_manager_init (ConboyPluginManager *pm)
 		gtk_widget_show(row);
 		gtk_box_pack_start(GTK_BOX(pm), row, TRUE, TRUE, 0);
 		pm->priv->rows = g_list_prepend(pm->priv->rows, row);
+		pm->priv->plugin_count++;
 
 		infos = infos->next;
 	}
@@ -683,4 +686,12 @@ GtkWidget *conboy_plugin_manager_new (void)
 {
 	return g_object_new (CONBOY_TYPE_PLUGIN_MANAGER, NULL);
 }
+
+gint
+conboy_plugin_manager_get_count (ConboyPluginManager *self)
+{
+	return CONBOY_PLUGIN_MANAGER_GET_PRIVATE(self)->plugin_count;
+}
+
+
 

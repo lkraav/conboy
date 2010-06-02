@@ -331,44 +331,45 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_widget_show(sync_hbox);
 	gtk_box_pack_start(GTK_BOX(config_vbox), sync_hbox, TRUE, TRUE, 0);
 
-#ifdef HILDON_HAS_APP_MENU
+	#ifdef HILDON_HAS_APP_MENU
 	GtkWidget *sync_entry = hildon_entry_new(HILDON_SIZE_FINGER_HEIGHT);
 	hildon_entry_set_placeholder(HILDON_ENTRY(sync_entry), "http://example.com:8080");
-#else
+	#else
 	GtkWidget *sync_entry = gtk_entry_new();
-#endif
+	#endif
 	widget->url_entry = sync_entry;
 	gtk_widget_show(sync_entry);
 	gtk_box_pack_start(GTK_BOX(sync_hbox), sync_entry, TRUE, TRUE, 0);
 
-#ifdef HILDON_HAS_APP_MENU
+	#ifdef HILDON_HAS_APP_MENU
 	GtkWidget *sync_auth_but = hildon_gtk_button_new(HILDON_SIZE_FINGER_HEIGHT);
-#else
+	#else
 	GtkWidget *sync_auth_but = gtk_button_new();
-#endif
+	#endif
 	widget->auth_button = sync_auth_but;
 	gtk_button_set_label(GTK_BUTTON(sync_auth_but), "Authenticate");
 	gtk_widget_show(sync_auth_but);
 	gtk_box_pack_start(GTK_BOX(sync_hbox), sync_auth_but, FALSE, FALSE, 0);
 
-	/* Add the plugin manager widget */
+	/* Add the plugin manager widget if it contains more than one plugin */
 	GtkWidget *plugin_manager = conboy_plugin_manager_new();
-	gtk_widget_show(plugin_manager);
-	gtk_box_pack_start(GTK_BOX(config_vbox), plugin_manager, FALSE, FALSE, 0);
+	if (conboy_plugin_manager_get_count(CONBOY_PLUGIN_MANAGER(plugin_manager)) > 0) {
+		gtk_widget_show(plugin_manager);
+		gtk_box_pack_start(GTK_BOX(config_vbox), plugin_manager, FALSE, FALSE, 0);
+	}
 
 
 	/*
 	 * Set initial values from gconf
 	 */
-
-#ifndef HILDON_HAS_APP_MENU
+	#ifndef HILDON_HAS_APP_MENU
 	/* Scrollbars */
 	if (settings_load_scrollbar_size() == SETTINGS_SCROLLBAR_SIZE_SMALL) {
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(scroll_but1), TRUE);
 	} else {
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(scroll_but2), TRUE);
 	}
-#endif
+	#endif
 
 	/* On Startup */
 #ifdef XXX

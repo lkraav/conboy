@@ -1,3 +1,10 @@
+conboy (1:0.6.3.13) stable; urgency=low
+
+  * Not released yet
+  * Only show plugin selector if there is more than one plugin
+  
+ -- Cornelius Hald <hald@icandy.de>  Fri, 02 Jun 2010 16:00:43 +0200
+
 conboy (1:0.6.3.12-1) stable; urgency=low
 
   * Test build only for Diablo

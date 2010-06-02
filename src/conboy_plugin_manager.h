@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ typedef struct _ConboyPluginManagerPrivate ConboyPluginManagerPrivate;
  */
 typedef struct _ConboyPluginManager ConboyPluginManager;
 
-struct _ConboyPluginManager 
+struct _ConboyPluginManager
 {
 	GtkVBox vbox;
 
@@ -54,7 +54,7 @@ struct _ConboyPluginManager
  */
 typedef struct _ConboyPluginManagerClass ConboyPluginManagerClass;
 
-struct _ConboyPluginManagerClass 
+struct _ConboyPluginManagerClass
 {
 	GtkVBoxClass parent_class;
 };
@@ -64,8 +64,10 @@ struct _ConboyPluginManagerClass
  */
 GType		 conboy_plugin_manager_get_type		(void) G_GNUC_CONST;
 
-GtkWidget	*conboy_plugin_manager_new		(void);
-   
+GtkWidget*   conboy_plugin_manager_new          (void);
+
+gint         conboy_plugin_manager_get_count    (ConboyPluginManager *self);
+
 G_END_DECLS
 
 
