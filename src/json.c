@@ -18,10 +18,12 @@
 
 #include <string.h>
 #include <libxml/xmlreader.h>
+#include <glib.h>
 
 #ifndef GLIB_HAS_PCRE
 #include "gregex.h"
 #endif
+
 #include "json.h"
 #include "metadata.h"
 #include "app_data.h"

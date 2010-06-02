@@ -205,19 +205,16 @@ void note_save(UserInterface *ui)
 
 	/** DEBUG **/
 	if (!g_str_has_suffix(content, "</note-content>\n")) {
-		/*hildon_banner_show_information(ui->window, NULL, "NOTE NOTE SAVED! NOTE CORRUPTED!");*/
-		g_printerr("\n**%s**\n", content);
+		g_printerr("WARN: Problem when saving:\n%s\n", content);
 		g_free(content);
 		content = NULL;
 
 		/* Get XML again. See wheter is's ok now */
 		content = conboy_note_buffer_get_xml(CONBOY_NOTE_BUFFER(buffer));
 		if (!g_str_has_suffix(content, "</note-content>\n")) {
-			g_printerr("Second save NOT successful\n");
-			hildon_banner_show_information(ui->window, NULL, "Second save NOT successful!");
+			g_printerr("ERROR: Second save NOT successful\n");
 		} else {
-			g_printerr("Second save successful\n");
-			hildon_banner_show_information(ui->window, NULL, "Second save successful!");
+			g_printerr("INFO: Second save successful\n");
 		}
 
 		gtk_text_buffer_set_modified(buffer, FALSE);
