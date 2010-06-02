@@ -53,7 +53,7 @@ msgstr "Fremhev"
 #. Translators: Underlined text.
 #: ../src/interface.c:672 ../src/interface.c:803 ../src/interface.c:844
 msgid "Underline"
-msgstr ""
+msgstr "Understrek"
 
 #: ../src/interface.c:673
 msgid "Increase indent"
@@ -136,7 +136,7 @@ msgstr "Fullskjerm"
 #. Translators: About the program.
 #: ../src/interface.c:704
 msgid "About"
-msgstr ""
+msgstr "Om Conboy"
 
 #. TODO: Use an enum instead of 0 to 3
 #. Translators: Small font.
