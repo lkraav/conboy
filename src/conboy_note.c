@@ -396,7 +396,7 @@ conboy_note_is_template(ConboyNote* note)
 
 	GList *iter = note->tags;
 	while (iter != NULL) {
-		if (g_strcmp0("system:template", (gchar*)iter->data) == 0) {
+		if (strcmp("system:template", (gchar*)iter->data) == 0) {
 			return TRUE;
 		}
 		iter = iter->next;

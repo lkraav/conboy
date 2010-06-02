@@ -588,6 +588,7 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 	gchar *request = g_strconcat(url, "/api/1.0", NULL);
 
 	gchar *reply = conboy_http_get(request, TRUE);
+	g_printerr("Reply:\n%s\n", reply);
 
 	if (reply == NULL) {
 		gchar *msg = g_strconcat("Got no reply from: ", request, "\n", NULL);
@@ -643,7 +644,9 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 
 		GtkWidget *wait_dialog = gtk_dialog_new();
 		gtk_window_set_title(GTK_WINDOW(wait_dialog), "Connecting to server");
+		#ifdef HILDON_HAS_APP_MENU
 		hildon_gtk_window_set_progress_indicator(GTK_WINDOW(wait_dialog), TRUE);
+		#endif
 		gtk_window_set_modal(GTK_WINDOW(wait_dialog), TRUE);
 		gtk_window_set_transient_for(GTK_WINDOW(wait_dialog), parent);
 		gtk_window_set_destroy_with_parent(GTK_WINDOW(wait_dialog), TRUE);

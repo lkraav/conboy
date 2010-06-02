@@ -26,6 +26,8 @@
  * #HeAboutDialog works as a nice default about dialog for Maemo apps
  */
 
+#ifdef HILDON_HAS_APP_MENU
+
 #define _GNU_SOURCE     /* needed for GNU nl_langinfo_l */
 #define __USE_GNU       /* needed for locale */
 
@@ -365,4 +367,4 @@ he_about_dialog_set_donate_url(HeAboutDialog* ad, const gchar* url)
     ad->priv->donate_url = g_strdup(url);
 }
 
-
+#endif /* HILDON_HAS_APP_MENU */

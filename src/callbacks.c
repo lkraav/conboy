@@ -1042,7 +1042,7 @@ on_about_button_clicked				   (GtkAction		*action,
 	he_about_dialog_set_website(dia, "http://conboy.garage.maemo.org");
 #else
 	GtkAboutDialog *dia = GTK_ABOUT_DIALOG(gtk_about_dialog_new());
-	gtk_about_dialog_set_program_name(dia, "Conboy");
+	gtk_about_dialog_set_name(dia, "Conboy");
 	gtk_about_dialog_set_copyright(dia, "(c) Cornelius Hald 2010");
 	gtk_about_dialog_set_logo_icon_name(dia, PACKAGE_NAME);
 	gtk_about_dialog_set_website(dia, "http://conboy.garage.maemo.org");

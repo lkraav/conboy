@@ -261,7 +261,7 @@ conboy_http_get(const gchar *url, gboolean auth)
 		gchar *tok = settings_load_oauth_access_token();
 		gchar *sec = settings_load_oauth_access_secret();
 		gchar *signed_url = oauth_sign_url2(url, NULL, OA_HMAC, "GET", c_token, c_secret, tok, sec);
-		g_printerr("Request: %s\n", signed_url);
+		g_printerr("GET Request: %s\n", signed_url);
 		response = http_get(signed_url);
 		g_free(tok);
 		g_free(sec);
