@@ -1,6 +1,5 @@
 conboy (1:0.6.3.13) stable; urgency=low
 
-  * Not released yet
   * Only show plugin selector if there is more than one plugin
   * Fixed sync on Diablo and Chinook
   
