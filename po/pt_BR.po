@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: conboy 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-01 20:28+0200\n"
+"POT-Creation-Date: 2010-06-03 19:16+0200\n"
 "PO-Revision-Date: 2009-06-27\n"
 "Last-Translator: Leonardo Ferreira Fontenelle <leonardof@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <ldp-br@bazar.conectiva.com.br>\n"
@@ -82,8 +82,8 @@ msgid "Open note"
 msgstr "Abrir nota"
 
 #. Translators: Show the settings dialog.
-#: ../src/interface.c:681 ../src/settings_window.c:442
-#: ../src/settings_window.c:450
+#: ../src/interface.c:681 ../src/settings_window.c:443
+#: ../src/settings_window.c:451
 msgid "Settings"
 msgstr "Configurações"
 
@@ -145,7 +145,7 @@ msgstr ""
 
 #. Translators: About the program.
 #: ../src/interface.c:704
-msgid "About"
+msgid "About Conboy"
 msgstr ""
 
 #. TODO: Use an enum instead of 0 to 3
@@ -293,24 +293,24 @@ msgid "Enabled"
 msgstr ""
 
 #. Translators: Title for the plugin settings dialog.
-#: ../src/conboy_plugin_manager.c:133 ../src/conboy_plugin_manager_row.c:132
+#: ../src/conboy_plugin_manager.c:134 ../src/conboy_plugin_manager_row.c:132
 #, fuzzy
 msgid "Plugin settings"
 msgstr "Configurações"
 
 #. Translators: Plugins that are
 #. currently active.
-#: ../src/conboy_plugin_manager.c:604
+#: ../src/conboy_plugin_manager.c:607
 msgid "Active plugins"
 msgstr ""
 
 #. Translators: Show information about the plugin.
-#: ../src/conboy_plugin_manager.c:634
+#: ../src/conboy_plugin_manager.c:637
 msgid "About plugin"
 msgstr ""
 
 #. Translators: Configure the plugin.
-#: ../src/conboy_plugin_manager.c:639
+#: ../src/conboy_plugin_manager.c:642
 msgid "Configure plugin"
 msgstr ""
 

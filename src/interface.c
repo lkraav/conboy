@@ -570,8 +570,8 @@ UserInterface* create_mainwin() {
 	GtkWidget *menu_settings;
 	GtkWidget *menu_quit;
 	GtkWidget *menu_text_style;
-	GtkWidget *menu_inc_indent;
-	GtkWidget *menu_dec_indent;
+	//GtkWidget *menu_inc_indent;
+	//GtkWidget *menu_dec_indent;
 	GtkWidget *menu_font_small;
 	GtkWidget *menu_font_normal;
 	GtkWidget *menu_font_large;
@@ -701,7 +701,7 @@ UserInterface* create_mainwin() {
 	/* Translators: View the note fullscreen. */
 	action_fullscreen = GTK_ACTION(gtk_action_new("fullscreen", _("Fullscreen"), NULL, NULL));
 	/* Translators: About the program. */
-	action_about = GTK_ACTION(gtk_action_new("about", _("About"), NULL, NULL));
+	action_about = GTK_ACTION(gtk_action_new("about", _("About Conboy"), NULL, NULL));
 	/* TODO: Use an enum instead of 0 to 3 */
 	/* Translators: Small font. */
 	action_font_small = GTK_ACTION(gtk_radio_action_new("size:small", _("Small"), NULL, NULL, 0));
@@ -830,8 +830,8 @@ UserInterface* create_mainwin() {
 	menu_underline = gtk_action_create_menu_item(action_underline);
 	menu_fixed = gtk_action_create_menu_item(action_fixed);
 	menu_bullets = gtk_action_create_menu_item(action_bullets);
-	menu_inc_indent = gtk_action_create_menu_item(action_inc_indent);
-	menu_dec_indent = gtk_action_create_menu_item(action_dec_indent);
+	//menu_inc_indent = gtk_action_create_menu_item(action_inc_indent);
+	//menu_dec_indent = gtk_action_create_menu_item(action_dec_indent);
 	menu_font_small = gtk_action_create_menu_item(action_font_small);
 	menu_font_normal = gtk_action_create_menu_item(action_font_normal);
 	menu_font_large = gtk_action_create_menu_item(action_font_large);
@@ -860,8 +860,8 @@ UserInterface* create_mainwin() {
 	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_font_huge);
 	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_bullets);
-	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_inc_indent);
-	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_dec_indent);
+	//gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_inc_indent);
+	//gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_dec_indent);
 #endif
 
 
