@@ -95,63 +95,63 @@ remove_xml_tag_and_title(const gchar* content)
  * as they are. g_strescape is doing "H��llo" -> "H\303\266llo" which
  * is not JSON conform.
  */
-//static gchar*
-//escape_string (gchar *orig)
-//{
-//	const guchar *p;
-//	gchar *result;
-//	gchar *q;
-//
-// 	if (orig == NULL) {
-// 		return g_strdup ("\"\"");
-// 	}
-//
-//	p = (guchar *) orig;
-//	/* Each source byte needs maximally two destination chars (\n) */
-//	q = result = g_malloc (strlen (orig) * 2 + 1);
-//
-//	while (*p)
-//	{
-//		switch (*p)
-//		{
-//		case '\n':
-//			*q++ = '\\';
-//			*q++ = 'n';
-//			break;
-//		case '\r':
-//			*q++ = '\\';
-//			*q++ = 'r';
-//			break;
-//		case '\t':
-//			*q++ = '\\';
-//			*q++ = 't';
-//			break;
-//		case '\b':
-//			*q++ = '\\';
-//			*q++ = 'b';
-//			break;
-//		case '\f':
-//			*q++ = '\\';
-//			*q++ = 'f';
-//			break;
-//		case '\\':
-//			*q++ = '\\';
-//			*q++ = '\\';
-//			break;
-//		case '\"':
-//			*q++ = '\\';
-//			*q++ = '"';
-//			break;
-//		default:
-//			*q++ = *p;
-//		}
-//		p++;
-//	}
-//
-//	*q = 0;
-//
-//	return result;
-//}
+static gchar*
+escape_string (gchar *orig)
+{
+	const guchar *p;
+	gchar *result;
+	gchar *q;
+
+ 	if (orig == NULL) {
+ 		return g_strdup ("\"\"");
+ 	}
+
+	p = (guchar *) orig;
+	/* Each source byte needs maximally two destination chars (\n) */
+	q = result = g_malloc (strlen (orig) * 2 + 1);
+
+	while (*p)
+	{
+		switch (*p)
+		{
+		case '\n':
+			*q++ = '\\';
+			*q++ = 'n';
+			break;
+		case '\r':
+			*q++ = '\\';
+			*q++ = 'r';
+			break;
+		case '\t':
+			*q++ = '\\';
+			*q++ = 't';
+			break;
+		case '\b':
+			*q++ = '\\';
+			*q++ = 'b';
+			break;
+		case '\f':
+			*q++ = '\\';
+			*q++ = 'f';
+			break;
+		case '\\':
+			*q++ = '\\';
+			*q++ = '\\';
+			break;
+		case '\"':
+			*q++ = '\\';
+			*q++ = '"';
+			break;
+		default:
+			*q++ = *p;
+		}
+		p++;
+	}
+
+	*q = 0;
+
+	return result;
+}
 
 
 static gboolean
@@ -226,6 +226,29 @@ unescape_entities(const gchar *input)
 	return result;
 }
 
+/**
+ * Returns a newly alocated string, that is striped from xml tags and the title.
+ *
+ * If compiled for Chinook or Diablo, the string es manually escaped. The version
+ * of glib-json in Fremantle does this automatically.
+ */
+static gchar*
+convert_content(const gchar *content)
+{
+	gchar *result = NULL;
+	gchar *tmp = NULL;
+
+	#ifdef HILDON_HAS_APP_MENU
+	result = remove_xml_tag_and_title(content);
+	#else
+	tmp = remove_xml_tag_and_title(content);
+	result = escape_string(tmp);
+	g_free(tmp);
+	#endif
+
+	return result;
+}
+
 JsonNode*
 json_get_node_from_note(ConboyNote *note)
 {
@@ -252,7 +275,7 @@ json_get_node_from_note(ConboyNote *note)
 	json_object_add_member(obj, JSON_TITLE, node);
 	g_free(esc_title);
 
-	gchar *content =  remove_xml_tag_and_title(note->content);
+	gchar *content = convert_content(note->content);
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_string(node, content);
 	json_object_add_member(obj, JSON_NOTE_CONTENT, node);
@@ -429,6 +452,7 @@ json_get_note_from_node(JsonNode *node)
 	return note;
 }
 
+/*
 ConboyNote*
 json_get_note_from_string(const gchar *json_string)
 {
@@ -450,6 +474,8 @@ json_get_note_from_string(const gchar *json_string)
 
 	return note;
 }
+*/
+
 /*
 GSList*
 json_get_notes_from_string(const gchar *json_string)

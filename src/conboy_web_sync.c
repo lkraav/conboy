@@ -79,9 +79,10 @@ web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_syn
 
 	gchar *reply = conboy_http_put(url, json_string, TRUE);
 
-
+	/*
 	g_printerr("Reply from Snowy:\n");
 	g_printerr("%s\n", reply);
+	*/
 
 	/* Parse answer and see if expected_rev fits or not */
 	JsonNoteList *note_list = json_get_note_list(reply);
