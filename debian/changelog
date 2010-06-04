@@ -1,3 +1,9 @@
+conboy (1:0.6.3.14) stable; urgency=low
+
+  * Important fix for regression in Fremantle sync code.
+  
+ -- Cornelius Hald <hald@icandy.de>  Fri, 02 Jun 2010 16:00:43 +0200
+
 conboy (1:0.6.3.13) stable; urgency=low
 
   * Only show plugin selector if there is more than one plugin

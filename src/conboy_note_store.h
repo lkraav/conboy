@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -78,6 +78,7 @@ ConboyNote*			conboy_note_store_find_by_guid(ConboyNoteStore *self, const gchar 
 void 				conboy_note_store_note_changed(ConboyNoteStore *self, ConboyNote *note);
 /*void 				conboy_note_store_fill_from_storage(ConboyNoteStore *self, ConboyStorage *storage);*/
 void				conboy_note_store_set_storage(ConboyNoteStore *self, ConboyStorage *storage);
+GList*              conboy_note_store_get_all(ConboyNoteStore *self);
 
 G_END_DECLS
 

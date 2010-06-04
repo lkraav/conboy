@@ -20,6 +20,10 @@
 #include <libxml/xmlreader.h>
 #include <glib.h>
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif /* HAVE_CONFIG_H */
+
 #ifndef GLIB_HAS_PCRE
 #include "gregex.h"
 #endif
@@ -101,6 +105,8 @@ escape_string (gchar *orig)
 	const guchar *p;
 	gchar *result;
 	gchar *q;
+
+	g_printerr("*** escape_string() called \n");
 
  	if (orig == NULL) {
  		return g_strdup ("\"\"");

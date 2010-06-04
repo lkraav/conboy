@@ -185,6 +185,93 @@ create_title_for_conflict_note(const gchar* orig_title)
 	return result;
 }
 
+/**
+ * Receives all notes that have been changed on the server and merges them
+ * with the local notes.
+ *
+ * Returns a list of local notes that are newer than the server notes
+ *
+ * TODO: Its not nice to have so many ref parameters. Introduce a proper
+ * struct that contains all paramters and return values.
+ */
+static GList*
+web_sync_incoming_changes(JsonUser *user, gint *last_sync_rev, time_t last_sync_time, gint *added_note_count, gint *changed_note_count)
+{
+	AppData *app_data = app_data_get();
+	gint added_notes = 0;
+	gint changed_notes = 0;
+
+	/* Create list of all local notes */
+	ConboyNoteStore *note_store = app_data->note_store;
+	GList *local_notes = conboy_note_store_get_all(note_store);
+
+	/* Get all notes since last syncRev*/
+	JsonNoteList *server_note_list = web_sync_get_notes(user, *last_sync_rev);
+	*last_sync_rev = server_note_list->latest_sync_revision;
+
+	/* Save notes */
+	GSList *server_notes = server_note_list->notes;
+	while (server_notes != NULL) {
+		ConboyNote *server_note = CONBOY_NOTE(server_notes->data);
+		g_printerr("Saving: %s\n", server_note->title);
+		/* TODO: Check for title conflicts */
+
+		conboy_storage_note_save(app_data->storage, server_note);
+
+		/* If not yet in the note store, add this note */
+		if (!conboy_note_store_find_by_guid(app_data->note_store, server_note->guid)) {
+			g_printerr("INFO: Adding note '%s' to note store\n", server_note->title);
+			conboy_note_store_add(app_data->note_store, server_note, NULL);
+			added_notes++;
+		} else {
+			g_printerr("INFO: Updating note '%s' in note store\n", server_note->title);
+			ConboyNote *local_note = conboy_note_store_find_by_guid(app_data->note_store, server_note->guid);
+
+			/* Replace local note with the updated version from server */
+			conboy_note_store_remove(app_data->note_store, local_note);
+			conboy_note_store_add(app_data->note_store, server_note, NULL);
+			changed_notes++;
+
+			/* Compare note timestamp with last_sync_time. If it's bigger, the note has been also modified locally. */
+			if (local_note->last_metadata_change_date > last_sync_time) {
+				g_printerr("INFO: We have a conflict\n");
+
+				/* TODO: Prompt user, ask for overwrite or not. If not overwrite, ask for new name */
+				gboolean overwrite = FALSE;
+
+				if (!overwrite) { /* If we do not overwrite, we need to create a copy that note */
+					ConboyNote *rescue_note = conboy_note_copy(local_note);
+					conboy_note_renew_guid(rescue_note);
+
+					/* Set new title */
+					gchar *rescue_note_title = create_title_for_conflict_note(local_note->title);
+					conboy_note_rename(rescue_note, rescue_note_title);
+					g_free(rescue_note_title);
+
+					/* Save rescue_note */
+					conboy_storage_note_save(app_data->storage, rescue_note);
+					/* Add to note store */
+					conboy_note_store_add(app_data->note_store, rescue_note, NULL);
+					/* Add to temp list of local notes */
+					local_notes = g_list_append(local_notes, rescue_note);
+
+					added_notes++;
+				}
+			}
+		}
+
+		/* Remove from list of local notes */
+		/* Find local note and remove from list */
+		local_notes = web_sync_remove_by_guid(local_notes, server_note);
+
+		server_notes = server_notes->next;
+	}
+
+	*added_note_count = added_notes;
+	*changed_note_count = changed_notes;
+
+	return local_notes;
+}
 
 /* TODO: This function is way too long */
 gpointer
@@ -274,86 +361,10 @@ web_sync_do_sync (gpointer *user_data)
 	g_printerr("#   Api ref: %s\n", user->api_ref);
 	g_printerr("####################################\n");
 
-	/* Create list of all local notes */
-	/* Just copy NoteStore to normal list */
-	ConboyNoteStore *note_store = app_data->note_store;
-	GList *local_notes = NULL;
-	GtkTreeIter iter;
-	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(note_store), &iter)) do
-	{
-		ConboyNote *note;
-		gtk_tree_model_get(GTK_TREE_MODEL(note_store), &iter, NOTE_COLUMN, &note, -1);
-		local_notes = g_list_append(local_notes, note);
-		web_sync_pulse_bar(bar);
-	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(note_store), &iter));
-
-
-	/* Get all notes since last syncRev*/
-	JsonNoteList *server_note_list = web_sync_get_notes(user, last_sync_rev);
-	last_sync_rev = server_note_list->latest_sync_revision;
-	web_sync_pulse_bar(bar);
-
-	int added_notes = 0;
-	int changed_notes = 0;
-
-	/* Save notes */
-	GSList *server_notes = server_note_list->notes;
-	while (server_notes != NULL) {
-		ConboyNote *server_note = CONBOY_NOTE(server_notes->data);
-		g_printerr("Saving: %s\n", server_note->title);
-		/* TODO: Check for title conflicts */
-
-		conboy_storage_note_save(app_data->storage, server_note);
-
-		/* If not yet in the note store, add this note */
-		if (!conboy_note_store_find_by_guid(app_data->note_store, server_note->guid)) {
-			g_printerr("INFO: Adding note '%s' to note store\n", server_note->title);
-			conboy_note_store_add(app_data->note_store, server_note, NULL);
-			added_notes++;
-		} else {
-			g_printerr("INFO: Updating note '%s' in note store\n", server_note->title);
-			ConboyNote *local_note = conboy_note_store_find_by_guid(app_data->note_store, server_note->guid);
-
-			/* Replace local note with the updated version from server */
-			conboy_note_store_remove(app_data->note_store, local_note);
-			conboy_note_store_add(app_data->note_store, server_note, NULL);
-			changed_notes++;
-
-			/* Compare note timestamp with last_sync_time. If it's bigger, the note has been also modified locally. */
-			if (local_note->last_metadata_change_date > last_sync_time) {
-				g_printerr("INFO: We have a conflict\n");
-
-				/* TODO: Prompt user, ask for overwrite or not. If not overwrite, ask for new name */
-				gboolean overwrite = FALSE;
-
-				if (!overwrite) { /* If we do not overwrite, we need to create a copy that note */
-					ConboyNote *rescue_note = conboy_note_copy(local_note);
-					conboy_note_renew_guid(rescue_note);
-
-					/* Set new title */
-					gchar *rescue_note_title = create_title_for_conflict_note(local_note->title);
-					conboy_note_rename(rescue_note, rescue_note_title);
-					g_free(rescue_note_title);
-
-					/* Save rescue_note */
-					conboy_storage_note_save(app_data->storage, rescue_note);
-					/* Add to note store */
-					conboy_note_store_add(app_data->note_store, rescue_note, NULL);
-					/* Add to temp list of local notes */
-					local_notes = g_list_append(local_notes, rescue_note);
-
-					added_notes++;
-				}
-			}
-		}
-
-		/* Remove from list of local notes */
-		/* Find local note and remove from list */
-		local_notes = web_sync_remove_by_guid(local_notes, server_note);
-
-		web_sync_pulse_bar(bar);
-		server_notes = server_notes->next;
-	}
+	gint added_note_count = 0;
+	gint changed_note_count = 0;
+	GList *local_changes = web_sync_incoming_changes(user, &last_sync_rev, last_sync_time, &added_note_count, &changed_note_count);
+	g_printerr("DEBUG: After web_sync_incoming_changes\n");
 
 	/*
 	 * Remaining local notes are newer on the client.
@@ -361,10 +372,11 @@ web_sync_do_sync (gpointer *user_data)
 	 */
 	gint uploaded_notes = 0;
 
-	web_sync_pulse_bar(bar);
 	GError *error = NULL;
-	int sync_rev = web_sync_send_notes(local_notes, user->api_ref, last_sync_rev + 1, last_sync_time, &uploaded_notes, &error);
+	int sync_rev = web_sync_send_notes(local_changes, user->api_ref, last_sync_rev + 1, last_sync_time, &uploaded_notes, &error);
 	web_sync_pulse_bar(bar);
+
+
 
 	gchar msg[1000];
 
@@ -374,8 +386,8 @@ web_sync_do_sync (gpointer *user_data)
 
 		g_sprintf(msg, "<b>%s</b>\n\n%s: %i\n%s: %i\n%s: %i\n%s: %i",
 				"Synchonization completed",
-				"Added notes", added_notes,
-				"Changed notes", changed_notes,
+				"Added notes", added_note_count,
+				"Changed notes", changed_note_count,
 				"Deleted notes", 0,
 				"Uploaded notes", uploaded_notes);
 
@@ -389,7 +401,7 @@ web_sync_do_sync (gpointer *user_data)
 	 * Sync finished
 	 */
 	g_free(api_ref);
-	g_list_free(local_notes);
+	g_list_free(local_changes);
 	/* TODO: Free json stuff */
 
 	/* Show message to user */
@@ -481,7 +493,7 @@ extract_verifier_and_redirect_url (gchar* http_get_string, gchar** verifier, gch
  * Returns FALSE if an error occured, TRUE otherwise.
  */
 static gboolean
-open_socket(int *l_sock, int *sock)
+open_server_socket(int *l_sock, int *sock)
 {
 	*l_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (*l_sock < 0) {
@@ -518,35 +530,53 @@ oauth_callback_handler(gpointer user_data)
 {
 	struct AuthDialogData *data = (struct AuthDialogData*) user_data;
 	GtkWidget *dialog = GTK_WIDGET(data->dialog);
-	gchar *oauth_verifier;
-	gchar *redirect_url;
+	gchar *oauth_verifier = NULL;
+	gchar *redirect_url = NULL;
 
 	/* Open socket */
 	int l_sock, sock;
-	if (!open_socket(&l_sock, &sock)) {
-		g_printerr("Cannot open socket\n");
+	if (!open_server_socket(&l_sock, &sock)) {
+		g_printerr("ERROR Cannot open socket\n");
+		return;
 	}
 
 	/* Read from socket */
 	GIOChannel *channel = g_io_channel_unix_new(sock);
 	gchar *buf;
 
+	/* TODO: If/Else chaos. Clean up */
 	g_io_channel_read_line(channel, &buf, NULL, NULL, NULL);
 	g_printerr("Read: %s\n", buf);
 	if (g_str_has_prefix(buf, "GET")) {
 		extract_verifier_and_redirect_url(buf, &oauth_verifier, &redirect_url);
+		/* Send reply to the browser to redirect it */
+		if (redirect_url) {
+			g_printerr("Redirecting to: %s\n", redirect_url);
+			gchar *msg = g_strconcat("HTTP/1.1 302 Found\nStatus: 301 Found\nLocation: ", redirect_url, "\n\n", NULL);
+			g_io_channel_write_chars(channel, msg, -1, NULL, NULL);
+			g_free(msg);
+		} else {
+			g_printerr("Did not get redirect_url\n");
+		}
+	}
+
+	/* This happens if the user manually canceled, then we don't need to manipulate
+	 * the dialog, because the dialog does not exist anymore.*/
+	if (g_str_has_prefix(buf, "KILL")) {
+		g_printerr("INFO: Received KILL, shuting down this thread\n");
+		/* Close socket */
+		g_io_channel_shutdown(channel, TRUE, NULL);
+		close(sock);
+		close(l_sock);
+		g_free(buf);
+		return;
+
 	} else {
 		g_printerr("First line did not start with 'GET', maybe we need to read more lines?\n");
 	}
+
 	g_free(buf);
 
-	/* Send reply to redirect browser */
-	if (redirect_url) {
-		g_printerr("Redirecting to: %s\n", redirect_url);
-		gchar *msg = g_strconcat("HTTP/1.1 302 Found\nStatus: 301 Found\nLocation: ", redirect_url, "\n\n", NULL);
-		g_io_channel_write_chars(channel, msg, -1, NULL, NULL);
-		g_free(msg);
-	}
 
 	/* Close socket */
 	g_io_channel_shutdown(channel, TRUE, NULL);
@@ -581,6 +611,45 @@ typedef struct {
 	int sin_size;
 } SocketData;
 
+static gboolean
+open_client_socket(int *sock)
+{
+	*sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (*sock < 0) {
+		g_printerr("ERROR: Cannot open listening socket\n");
+		return FALSE;
+	}
+
+	struct sockaddr_in address;
+	address.sin_family = AF_INET;
+	address.sin_addr.s_addr = inet_addr("127.0.0.1");
+	address.sin_port = htons(14680);
+
+	if (connect(*sock, (struct sockaddr *) &address, sizeof(address)) < 0) {
+		g_printerr("ERROR: Cannot connect to socket\n");
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+static void
+kill_callback_thread()
+{
+	/* Open socket */
+	int sock;
+	if (!open_client_socket(&sock)) {
+		g_printerr("ERROR: Cannot open client socket\n");
+	}
+
+	/* Write to socket */
+	GIOChannel *channel = g_io_channel_unix_new(sock);
+	g_io_channel_write_chars(channel, "KILL", -1, NULL, NULL);
+
+	/* Close socket */
+	g_io_channel_shutdown(channel, TRUE, NULL);
+	close(sock);
+}
 
 gboolean
 web_sync_authenticate(gchar *url, GtkWindow *parent)
@@ -673,6 +742,7 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 
 
 	if (result == 666) {
+		kill_callback_thread();
 		ui_helper_show_confirmation_dialog(parent, "You have manually canceled the authentication process.", FALSE);
 		return FALSE;
 	}

@@ -478,4 +478,25 @@ conboy_note_store_find_by_guid(ConboyNoteStore *self, const gchar *guid)
 	return result;
 }
 
+/**
+ * Returns all notes as GList. The returned list needs to be freed by the caller.
+ */
+GList*
+conboy_note_store_get_all (ConboyNoteStore *self)
+{
+	g_return_val_if_fail(self != NULL, NULL);
+	g_return_val_if_fail(CONBOY_IS_NOTE_STORE(self), NULL);
+
+	GtkTreeIter iter;
+	GList *result = NULL;
+	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(self), &iter)) do
+	{
+		ConboyNote *note;
+		gtk_tree_model_get(GTK_TREE_MODEL(self), &iter, NOTE_COLUMN, &note, -1);
+		result = g_list_append(result, note);
+	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(self), &iter));
+
+	return result;
+}
+
 
