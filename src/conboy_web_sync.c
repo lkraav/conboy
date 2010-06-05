@@ -35,8 +35,8 @@
 static gint
 web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_sync_time, gint *uploaded_notes, GError **error)
 {
-	gchar *t_key = settings_load_oauth_access_token();
-	gchar *t_secret = settings_load_oauth_access_secret();
+	//gchar *t_key = settings_load_oauth_access_token();
+	//gchar *t_secret = settings_load_oauth_access_secret();
 
 	/*
 	 * Create correct json structure to send the note
@@ -246,7 +246,7 @@ web_sync_incoming_changes(JsonUser *user, gint *last_sync_rev, time_t last_sync_
 				g_printerr("INFO: We have a conflict\n");
 
 				/* TODO: Prompt user, ask for overwrite or not. If not overwrite, ask for new name */
-				gboolean overwrite = FALSE;
+				gboolean overwrite = TRUE;
 
 				if (!overwrite) { /* If we do not overwrite, we need to create a copy that note */
 					ConboyNote *rescue_note = conboy_note_copy(local_note);
@@ -409,6 +409,119 @@ web_sync_delete_local_notes(JsonUser *user, GList *notes_to_upload, gint *delete
 	//json_server_notes_free(json_server_notes); //TODO
 }
 
+static gint
+web_sync_send_local_deletions(gchar *url, gint expected_rev, gint *local_deletions, GError **error)
+{
+	/* Get list of notes to delete */
+	// FIXME: TODO: Filter out those, that have never been synced, because they don't exist on the server
+
+	/*
+	 *
+	 *
+	 * Really important. Sending a delete request to the server with a non-existing UUID
+	 * will result in an error.
+	 *
+	 *
+	 */
+
+	gchar *content = NULL;
+	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/deleted_notes.txt", NULL);
+	g_file_get_contents(filename, &content, NULL, NULL);
+	if (content == NULL) {
+		g_printerr("INFO: File empty or does not exist. Nothing to delete\n", filename);
+		g_free(filename);
+		return expected_rev - 1;
+	}
+
+	/*
+	 * Create correct json structure to send the note
+	 * TODO: Put into json.c
+	 */
+	JsonNode *result = json_node_new(JSON_NODE_OBJECT);
+	JsonObject *obj = json_object_new();
+	JsonArray *array = json_array_new();
+
+	gchar **parts = g_strsplit(content, "\n", -1);
+	int i = 0;
+	while (parts[i] != NULL) {
+		gchar *guid = parts[i];
+		if (strcmp(guid, "") != 0) {
+
+			JsonNode *note_node = json_node_new(JSON_NODE_OBJECT);
+			JsonObject *note_obj = json_object_new();
+
+			JsonNode *guid_node = json_node_new(JSON_NODE_VALUE);
+			json_node_set_string(guid_node, guid);
+			json_object_add_member(note_obj, "guid", guid_node);
+
+			JsonNode *command_node = json_node_new(JSON_NODE_VALUE);
+			json_node_set_string(command_node, "delete");
+			json_object_add_member(note_obj, "command", command_node);
+
+			json_node_take_object(note_node, note_obj);
+
+			json_array_add_element(array, note_node);
+		}
+		i++;
+	}
+
+	g_strfreev(parts);
+
+
+	*local_deletions = json_array_get_length(array);
+	if (*local_deletions == 0) {
+		g_printerr("INFO: No notes deleted on client. Sending nothing.\n");
+		return expected_rev - 1;
+	}
+
+	JsonNode *node = json_node_new(JSON_NODE_ARRAY);
+	json_node_set_array(node, array);
+	json_object_add_member(obj, "note-changes", node);
+
+	node = json_node_new(JSON_NODE_VALUE);
+	json_node_set_int(node, expected_rev);
+	json_object_add_member(obj, "latest-sync-revision", node);
+
+	json_node_take_object(result, obj);
+
+	/* Convert to string */
+	gchar *json_string = json_node_to_string(result, FALSE);
+
+	g_printerr("&&&&&&&&&&&&&&&&&&\n");
+	g_printerr("%s\n", json_string);
+	g_printerr("&&&&&&&&&&&&&&&&&&\n");
+
+
+	gchar *reply = conboy_http_put(url, json_string, TRUE);
+
+	g_printerr("Reply from Snowy:\n");
+	g_printerr("%s\n", reply);
+
+	/* Parse answer and see if expected_rev fits or not */
+	JsonNoteList *note_list = json_get_note_list(reply);
+
+	if (note_list == NULL) {
+		g_set_error(error, 0, 0, "json_get_note_list() returned NULL");
+		return expected_rev - 1;
+	}
+
+	if (note_list->latest_sync_revision != expected_rev) {
+		g_printerr("WARN: Expected sync rev (%i) and actual sync rev (%i) are not the same\n", expected_rev, note_list->latest_sync_revision);
+		//g_set_error(error, 0, 0, "Expected sync rev (%i) and actual sync rev (%i) are not the same\n", expected_rev, note_list->latest_sync_revision);
+		return note_list->latest_sync_revision;
+	}
+
+	return expected_rev;
+}
+
+static void
+remove_deleted_notes_file()
+{
+	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/deleted_notes.txt", NULL);
+	g_unlink(filename);
+	g_free(filename);
+}
+
 /* TODO: This function is way too long */
 /**
  * 1.) Receive new/updated notes from server
@@ -484,7 +597,11 @@ web_sync_do_sync (gpointer *user_data)
 	/* Revision checks */
 	JsonUser *user = json_get_user(reply);
 	if (user == NULL) {
-		web_sync_show_message(data, "Could not parse server answer. Probably server error.");
+		if (g_strstr_len(reply, 30, "Subscription required")) {
+			web_sync_show_message(data, "Server said: 'Subscription required'. Please check that your local time is set correctly.\n");
+		} else {
+			web_sync_show_message(data, "Could not parse server answer. Probably server error.");
+		}
 		return;
 	}
 
@@ -531,32 +648,33 @@ web_sync_do_sync (gpointer *user_data)
 	web_sync_pulse_bar(bar);
 
 
-
-	/*
-	 * Now that we updated notes on both sides, we can send local deletions
-	 * to the server.
-	 */
-	//gint deleted_on_server_count = 0;
-	//web_sync_send_local_deletion(&deleted_on_server_count);
-
-	/* TODO: Change the "synced_notes" file */
-	/* Put all local notes into the synced_notes file */
-	update_synced_notes_file();
-
-
+	gint deleted_on_server_count = 0;
+	if (!error) {
+		/*
+		 * Now that we updated notes on both sides, we can send local deletions
+		 * to the server.
+		 */
+		sync_rev = web_sync_send_local_deletions(user->api_ref, sync_rev + 1, &deleted_on_server_count, &error);
+	}
 
 	gchar msg[1000];
 
 	if (!error) {
+		/* Store new sync_rev and sync_time */
 		settings_save_last_sync_revision(sync_rev);
 		settings_save_last_sync_time(time(NULL));
 
-		g_sprintf(msg, "<b>%s</b>\n\n%s: %i\n%s: %i\n%s: %i\n%s: %i",
+		/* Update synced_notes and deleted_notes file */
+		update_synced_notes_file();
+		remove_deleted_notes_file();
+
+		g_sprintf(msg, "<b>%s</b>\n\n%s: %i\n%s: %i\n%s: %i\n%s: %i\n%s: %i",
 				"Synchonization completed",
 				"Added notes", added_note_count,
 				"Changed notes", changed_note_count,
 				"Deleted notes", deleted_note_count,
-				"Uploaded notes", uploaded_notes);
+				"Uploaded notes", uploaded_notes,
+				"Deleted on server", deleted_on_server_count);
 
 	} else {
 		g_printerr("ERROR: %s\n", error->message);

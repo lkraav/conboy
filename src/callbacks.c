@@ -563,6 +563,24 @@ on_link_url_tag_event				(GtkTextTag  *tag,
 	return FALSE;
 }
 
+static void
+add_to_deleted_notes_file(ConboyNote *note)
+{
+	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/deleted_notes.txt", NULL);
+	gchar *content = g_strconcat(note->guid, "\n", NULL);
+
+	GIOChannel *channel = g_io_channel_new_file(filename, "w", NULL);
+	g_io_channel_set_flags(channel, G_IO_FLAG_APPEND, NULL);
+	if (g_io_channel_write_chars(channel, content, -1, NULL, NULL) != G_IO_STATUS_NORMAL) {
+		g_printerr("ERROR: Cannot write to file '%s'\n", filename);
+	}
+
+	g_io_channel_shutdown(channel, TRUE, NULL);
+	g_io_channel_unref(channel);
+	g_free(filename);
+	g_free(content);
+}
+
 void
 on_delete_button_clicked			   (GtkAction		*action,
 										gpointer		 user_data)
@@ -585,6 +603,7 @@ on_delete_button_clicked			   (GtkAction		*action,
 
 	if (response == GTK_RESPONSE_YES) {
 		/* Delete note */
+		add_to_deleted_notes_file(ui->note);
 		note_delete(ui->note);
 		ui->note = NULL;
 
@@ -875,12 +894,12 @@ on_inc_indent_button_clicked			   (GtkAction		*action,
 	if (gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter)) {
 		start_line = gtk_text_iter_get_line(&start_iter);
 		end_line = gtk_text_iter_get_line(&end_iter);
-		conboy_note_buffer_increase_indent(buffer, start_line, end_line);
+		conboy_note_buffer_increase_indent(CONBOY_NOTE_BUFFER(buffer), start_line, end_line);
 
 	} else {
 		gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer));
 		start_line = gtk_text_iter_get_line(&start_iter);
-		conboy_note_buffer_increase_indent(buffer, start_line, start_line);
+		conboy_note_buffer_increase_indent(CONBOY_NOTE_BUFFER(buffer), start_line, start_line);
 	}
 
 	conboy_note_window_update_button_states(ui);
@@ -901,12 +920,12 @@ on_dec_indent_button_clicked			   (GtkAction		*action,
 	if (gtk_text_buffer_get_selection_bounds(buffer, &start_iter, &end_iter)) {
 		start_line = gtk_text_iter_get_line(&start_iter);
 		end_line = gtk_text_iter_get_line(&end_iter);
-		conboy_note_buffer_decrease_indent(buffer, start_line, end_line);
+		conboy_note_buffer_decrease_indent(CONBOY_NOTE_BUFFER(buffer), start_line, end_line);
 
 	} else {
 		gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer));
 		start_line = gtk_text_iter_get_line(&start_iter);
-		conboy_note_buffer_decrease_indent(buffer, start_line, start_line);
+		conboy_note_buffer_decrease_indent(CONBOY_NOTE_BUFFER(buffer), start_line, start_line);
 	}
 
 	conboy_note_window_update_button_states(ui);

@@ -110,13 +110,19 @@ on_color_but_changed(HildonColorButton *button, SettingsColorType *type)
 static void
 clear_sync_settings()
 {
+	gchar *filename;
+
 	settings_save_last_sync_revision(-1);
 	settings_save_last_sync_time(0);
 	settings_save_sync_base_url("");
 	settings_save_oauth_access_token("");
 	settings_save_oauth_access_secret("");
 
-	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/synced_notes.txt", NULL);
+	filename = g_strconcat(g_get_home_dir(), "/.conboy/synced_notes.txt", NULL);
+	g_unlink(filename);
+	g_free(filename);
+
+	filename = g_strconcat(g_get_home_dir(), "/.conboy/deleted_notes.txt", NULL);
 	g_unlink(filename);
 	g_free(filename);
 }
