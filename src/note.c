@@ -244,20 +244,32 @@ void note_delete(ConboyNote *note)
 	AppData *app_data = app_data_get();
 
 	/* Delete file */
-	if (!conboy_storage_note_delete(app_data->storage, note)) {
+	if (!conboy_storage_note_delete(CONBOY_STORAGE(app_data->storage), note)) {
 		g_printerr("ERROR: The note with the guid %s could not be deleted \n", note->guid);
 	}
 
 	/* Remove from list store */
-	conboy_note_store_remove(app_data->note_store, note);
+	conboy_note_store_remove(CONBOY_NOTE_STORE(app_data->note_store), note);
 
-	/* Remove from history */
-	if (app_data->current_element->prev) {
-		app_data->current_element = app_data->current_element->prev;
-	} else {
-		app_data->current_element = app_data->current_element->next;
+	/* If it was the current note, that has been deleted, change current note */
+	if (app_data->current_element && note == app_data->current_element->data) {
+
+		g_printerr("INFO: Current active note has been deleted. Changing history\n");
+
+		if (app_data->current_element->prev) {
+			app_data->current_element = app_data->current_element->prev;
+		} else if (app_data->current_element->next) {
+			app_data->current_element = app_data->current_element->next;
+		} else {
+			app_data->current_element = NULL;
+		}
 	}
+
+	/* Remove note from history */
 	app_data->note_history = g_list_remove_all(app_data->note_history, note);
+
+	/* Destroy note object */
+	g_object_unref(note);
 }
 
 /*
@@ -358,7 +370,7 @@ void note_show(ConboyNote *note, gboolean modify_history, gboolean scroll, gbool
 	}
 
 	/* Add to history */
-	if (modify_history) {
+	if (modify_history || app_data->current_element == NULL) {
 		add_to_history(note);
 	}
 

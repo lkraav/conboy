@@ -16,9 +16,7 @@
  * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#  include <config.h>
-#endif
+#include "localisation.h"
 
 #include <string.h>
 #include <gtk/gtk.h>
@@ -382,6 +380,21 @@ conboy_note_store_get_latest(ConboyNoteStore *self)
 	} while (gtk_tree_model_iter_next(GTK_TREE_MODEL(self), &iter));
 
 	return latest_note;
+}
+
+ConboyNote*
+conboy_note_store_get_latest_or_new(ConboyNoteStore *self)
+{
+	ConboyNote *note = conboy_note_store_get_latest(self);
+
+	if (note == NULL) {
+		gchar title[100];
+		int num = conboy_note_store_get_length(self) + 1;
+		g_sprintf(title, _("New Note %i"), num);
+		note = conboy_note_new_with_title(title);
+	}
+
+	return note;
 }
 
 void

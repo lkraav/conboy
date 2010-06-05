@@ -74,6 +74,7 @@ ConboyNote*			conboy_note_store_find(ConboyNoteStore *self, ConboyNote *note);
 ConboyNote*			conboy_note_store_find_by_title(ConboyNoteStore *self, const gchar *title);
 gint				conboy_note_store_get_length(ConboyNoteStore *self);
 ConboyNote*			conboy_note_store_get_latest(ConboyNoteStore *self);
+ConboyNote*         conboy_note_store_get_latest_or_new(ConboyNoteStore *self);
 ConboyNote*			conboy_note_store_find_by_guid(ConboyNoteStore *self, const gchar *guid);
 void 				conboy_note_store_note_changed(ConboyNoteStore *self, ConboyNote *note);
 /*void 				conboy_note_store_fill_from_storage(ConboyNoteStore *self, ConboyStorage *storage);*/

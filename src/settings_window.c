@@ -115,6 +115,10 @@ clear_sync_settings()
 	settings_save_sync_base_url("");
 	settings_save_oauth_access_token("");
 	settings_save_oauth_access_secret("");
+
+	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/synced_notes.txt", NULL);
+	g_unlink(filename);
+	g_free(filename);
 }
 
 static void

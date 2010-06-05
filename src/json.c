@@ -383,9 +383,7 @@ json_get_note_from_node(JsonNode *node)
 	member = json_object_get_member(obj, JSON_TITLE);
 	if (member) {
 		gchar *title = (gchar*)json_node_dup_string(member);
-		g_printerr("Received title: %s\n", title);
 		note->title =  unescape_entities(title);
-		g_printerr("Converted title: %s\n", note->title);
 	}
 
 	member = json_object_get_member(obj, JSON_NOTE_CONTENT);

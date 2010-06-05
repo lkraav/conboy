@@ -16,6 +16,8 @@
  * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "localisation.h"
+
 #include <gtk/gtk.h>
 #include <tablet-browser-interface.h>
 #include <sys/socket.h>
@@ -43,14 +45,15 @@ web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_syn
 	JsonObject *obj = json_object_new();
 	JsonArray *array = json_array_new();
 
-	while (notes) {
-		ConboyNote *note = CONBOY_NOTE(notes->data);
+	GList *iter = notes;
+	while (iter) {
+		ConboyNote *note = CONBOY_NOTE(iter->data);
 		if (note->last_metadata_change_date > last_sync_time) {
 			g_printerr("Will send: %s\n", note->title);
 			JsonNode *note_node = json_get_node_from_note(note);
 			json_array_add_element(array, note_node);
 		}
-		notes = notes->next;
+		iter = iter->next;
 	}
 
 	*uploaded_notes = json_array_get_length(array);
@@ -102,13 +105,13 @@ web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_syn
 }
 
 static JsonNoteList*
-web_sync_get_notes(JsonUser *user, int since_rev)
+web_sync_get_notes(JsonUser *user, int since_rev, gboolean with_content)
 {
 	JsonNoteList *result;
 	gchar *json_string;
 	gchar get_all_notes_url[1024];
 
-	g_sprintf(get_all_notes_url, "%s?include_notes=true&since=%i", user->api_ref, since_rev);
+	g_sprintf(get_all_notes_url, "%s?include_notes=%s&since=%i", user->api_ref, with_content ? "true" : "false", since_rev);
 
 	json_string = conboy_http_get(get_all_notes_url, TRUE);
 	result = json_get_note_list(json_string);
@@ -138,6 +141,9 @@ web_sync_pulse_bar (GtkProgressBar *bar)
 }
 
 
+/**
+ * Removes a note from a list of notes
+ */
 static GList*
 web_sync_remove_by_guid(GList *list, ConboyNote *note_to_remove)
 {
@@ -202,11 +208,10 @@ web_sync_incoming_changes(JsonUser *user, gint *last_sync_rev, time_t last_sync_
 	gint changed_notes = 0;
 
 	/* Create list of all local notes */
-	ConboyNoteStore *note_store = app_data->note_store;
-	GList *local_notes = conboy_note_store_get_all(note_store);
+	GList *local_notes = conboy_note_store_get_all(CONBOY_NOTE_STORE(app_data->note_store));
 
 	/* Get all notes since last syncRev*/
-	JsonNoteList *server_note_list = web_sync_get_notes(user, *last_sync_rev);
+	JsonNoteList *server_note_list = web_sync_get_notes(user, *last_sync_rev, TRUE);
 	*last_sync_rev = server_note_list->latest_sync_revision;
 
 	/* Save notes */
@@ -221,15 +226,19 @@ web_sync_incoming_changes(JsonUser *user, gint *last_sync_rev, time_t last_sync_
 		/* If not yet in the note store, add this note */
 		if (!conboy_note_store_find_by_guid(app_data->note_store, server_note->guid)) {
 			g_printerr("INFO: Adding note '%s' to note store\n", server_note->title);
+			gdk_threads_enter();
 			conboy_note_store_add(app_data->note_store, server_note, NULL);
+			gdk_threads_leave();
 			added_notes++;
 		} else {
 			g_printerr("INFO: Updating note '%s' in note store\n", server_note->title);
 			ConboyNote *local_note = conboy_note_store_find_by_guid(app_data->note_store, server_note->guid);
 
 			/* Replace local note with the updated version from server */
+			gdk_threads_enter();
 			conboy_note_store_remove(app_data->note_store, local_note);
 			conboy_note_store_add(app_data->note_store, server_note, NULL);
+			gdk_threads_leave();
 			changed_notes++;
 
 			/* Compare note timestamp with last_sync_time. If it's bigger, the note has been also modified locally. */
@@ -251,7 +260,9 @@ web_sync_incoming_changes(JsonUser *user, gint *last_sync_rev, time_t last_sync_
 					/* Save rescue_note */
 					conboy_storage_note_save(app_data->storage, rescue_note);
 					/* Add to note store */
+					gdk_threads_enter();
 					conboy_note_store_add(app_data->note_store, rescue_note, NULL);
+					gdk_threads_leave();
 					/* Add to temp list of local notes */
 					local_notes = g_list_append(local_notes, rescue_note);
 
@@ -273,7 +284,138 @@ web_sync_incoming_changes(JsonUser *user, gint *last_sync_rev, time_t last_sync_
 	return local_notes;
 }
 
+/**
+ * TODO: This implementation is very naiv. It opens and reads through the file each time it is
+ * called. This should probably be cached somewhere...
+ */
+static gboolean
+note_has_been_synced_at_least_once(ConboyNote *note)
+{
+	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/synced_notes.txt", NULL);
+	if (!g_file_test(filename, G_FILE_TEST_EXISTS)) {
+		g_free(filename);
+		return FALSE;
+	}
+
+	gboolean result = FALSE;
+	GIOChannel *channel = g_io_channel_new_file(filename, "r", NULL);
+	gchar *line = NULL;
+	while (g_io_channel_read_line(channel, &line, NULL, NULL, NULL) != G_IO_STATUS_EOF) {
+		if (line != NULL) {
+			if (strncmp(note->guid, line, 36) == 0) {
+				result = TRUE;
+			}
+			g_free(line);
+		}
+		if (result) break;
+	}
+
+	g_io_channel_shutdown(channel, TRUE, NULL);
+	g_io_channel_unref(channel);
+	g_free(filename);
+
+	return result;
+}
+
+static void
+update_synced_notes_file()
+{
+	AppData *app_data = app_data_get();
+	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/synced_notes.txt", NULL);
+
+	/* Create the content of the file */
+	GString *content = g_string_new("");
+	GList *all_local_notes = conboy_note_store_get_all(app_data->note_store);
+	GList *iter = all_local_notes;
+	while (iter) {
+		ConboyNote *note = CONBOY_NOTE(iter->data);
+		g_string_append(content, note->guid);
+		g_string_append(content, "\n");
+		iter = iter->next;
+	}
+
+	/* Write the file */
+	if (!g_file_set_contents(filename, content->str, -1, NULL)) {
+		g_printerr("ERROR: Could not write to file: %s\n", filename);
+	}
+
+	/* Free stuff */
+	g_list_free(all_local_notes);
+	g_string_free(content, TRUE);
+	g_free(filename);
+}
+
+static void
+web_sync_delete_local_notes(JsonUser *user, GList *notes_to_upload, gint *deleted_notes_count)
+{
+	/*
+	 * 1. Get since rev=0 without content
+	 * 2. Compare to local notes
+	 * 3. Delete local difference
+	 */
+	AppData *app_data = app_data_get();
+
+	JsonNoteList *json_server_notes = web_sync_get_notes(user, 0, FALSE);
+	GSList *server_notes = json_server_notes->notes;
+	GList *local_notes = conboy_note_store_get_all(CONBOY_NOTE_STORE(app_data->note_store));
+
+	/* All that is not on the server has to be deleted locally */
+	/* Go though list of local notes and everything that cannot be found in the
+	 * list of server notes, must be deleted locally.
+	 */
+
+	GList *local_notes_iter = local_notes;
+	while (local_notes_iter != NULL) {
+
+		ConboyNote *local_note = CONBOY_NOTE(local_notes_iter->data);
+
+		gboolean found_note = FALSE;
+		GSList *server_notes_iter = server_notes;
+		while (server_notes_iter != NULL) {
+
+			ConboyNote *server_note = CONBOY_NOTE(server_notes_iter->data);
+
+			if (strcmp(local_note->guid, server_note->guid) == 0) {
+				g_printerr("MATCH\n");
+				found_note = TRUE;
+				break;
+			}
+
+			server_notes_iter = server_notes_iter->next;
+		}
+
+		/* If we couldn't find the local note on the server - delete it but only if it has been synced before */
+		if (!found_note) {
+			if (note_has_been_synced_at_least_once(local_note)) {
+				g_printerr("Deleting note: %s\n", local_note->title);
+				/* Delete from filesystem etc. */
+				gdk_threads_enter();
+				note_delete(local_note);
+				gdk_threads_leave();
+				/* Remove from notes_to_update if on it */
+				notes_to_upload = web_sync_remove_by_guid(notes_to_upload, local_note);
+				(*deleted_notes_count)++;
+			} else {
+				g_printerr("INFO: Not deleting '%s', because it was never synced before\n", local_note->title);
+			}
+		}
+
+		local_notes_iter = local_notes_iter->next;
+	}
+
+	g_slist_free(server_notes);
+	g_list_free(local_notes);
+	// FIXME:
+	//json_server_notes_free(json_server_notes); //TODO
+}
+
 /* TODO: This function is way too long */
+/**
+ * 1.) Receive new/updated notes from server
+ * 2.) Process incoming deletion
+ * 3.) Send new/updated notes to server
+ * 4.) Send local deletion to server (Diff zwischen gesamter Server-Version und lokaler Version. Alles was lokal fehlt, kann auf dem Server geloescht werden)
+ */
 gpointer
 web_sync_do_sync (gpointer *user_data)
 {
@@ -361,10 +503,22 @@ web_sync_do_sync (gpointer *user_data)
 	g_printerr("#   Api ref: %s\n", user->api_ref);
 	g_printerr("####################################\n");
 
+
+	/* Get notes from server */
 	gint added_note_count = 0;
 	gint changed_note_count = 0;
 	GList *local_changes = web_sync_incoming_changes(user, &last_sync_rev, last_sync_time, &added_note_count, &changed_note_count);
 	g_printerr("DEBUG: After web_sync_incoming_changes\n");
+
+
+	/*
+	 * Process deletions made on server
+	 * Notes that get deleted get also delted from local_changes, to
+	 * make sure we don't upload them again.
+	 */
+	gint deleted_note_count = 0;
+	web_sync_delete_local_notes(user, local_changes, &deleted_note_count);
+
 
 	/*
 	 * Remaining local notes are newer on the client.
@@ -378,6 +532,19 @@ web_sync_do_sync (gpointer *user_data)
 
 
 
+	/*
+	 * Now that we updated notes on both sides, we can send local deletions
+	 * to the server.
+	 */
+	//gint deleted_on_server_count = 0;
+	//web_sync_send_local_deletion(&deleted_on_server_count);
+
+	/* TODO: Change the "synced_notes" file */
+	/* Put all local notes into the synced_notes file */
+	update_synced_notes_file();
+
+
+
 	gchar msg[1000];
 
 	if (!error) {
@@ -388,7 +555,7 @@ web_sync_do_sync (gpointer *user_data)
 				"Synchonization completed",
 				"Added notes", added_note_count,
 				"Changed notes", changed_note_count,
-				"Deleted notes", 0,
+				"Deleted notes", deleted_note_count,
 				"Uploaded notes", uploaded_notes);
 
 	} else {
@@ -415,13 +582,7 @@ web_sync_do_sync (gpointer *user_data)
 
 	/* If not possible, because it was deleted or there was no previous note, get latest */
 	if (note == NULL) {
-		note = conboy_note_store_get_latest(app_data->note_store);
-	}
-
-	if (note == NULL) {
-		/* TODO: Show demo note */
-		note = conboy_note_new();
-		g_printerr("ERROR: No notes to display\n");
+		note = conboy_note_store_get_latest_or_new(app_data->note_store);
 	}
 
 	/* Load again and make editable */

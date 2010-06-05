@@ -584,24 +584,19 @@ on_delete_button_clicked			   (GtkAction		*action,
 	g_free(message);
 
 	if (response == GTK_RESPONSE_YES) {
-
 		/* Delete note */
 		note_delete(ui->note);
-		g_object_unref(ui->note);
 		ui->note = NULL;
 
 		/* Show previous note */
 		ConboyNote *note;
 		if (app_data->current_element == NULL) {
-			note = conboy_note_store_get_latest(app_data->note_store);
-			app_data->note_history = g_list_append(app_data->note_history, note);
-			app_data->current_element = app_data->note_history;
-			note_show(note, FALSE, TRUE, FALSE);
+			note = conboy_note_store_get_latest_or_new(app_data->note_store);
+			note_show(note, TRUE, TRUE, FALSE);
 		} else {
 			note = CONBOY_NOTE(app_data->current_element->data);
 			note_show(note, FALSE, TRUE, FALSE);
 		}
-
 	}
 }
 
