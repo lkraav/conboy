@@ -511,7 +511,7 @@ json_get_notes_from_string(const gchar *json_string)
 }
 */
 
-
+/*
 void
 json_test()
 {
@@ -532,7 +532,7 @@ json_test()
 	g_slist_free(note_list->notes);
 	g_free(note_list);
 }
-
+*/
 
 gchar*
 json_get_api_ref(const gchar* json_string)
@@ -628,6 +628,26 @@ json_get_user(const gchar* json_string)
 
 	g_object_unref(parser);
 	return result;
+}
+
+void
+json_user_free(JsonUser *user)
+{
+	g_free(user->api_ref);
+	g_free(user->current_sync_guid);
+	g_free(user->first_name);
+	g_free(user->last_name);
+	g_free(user->user_name);
+	g_free(user);
+}
+
+void
+json_api_free(JsonApi *api)
+{
+	g_free(api->access_token_url);
+	g_free(api->request_token_url);
+	g_free(api->authorize_url);
+	g_free(api);
 }
 
 JsonNoteList*

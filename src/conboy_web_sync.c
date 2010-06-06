@@ -35,14 +35,9 @@
 static gint
 web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_sync_time, gint *uploaded_notes, GError **error)
 {
-	//gchar *t_key = settings_load_oauth_access_token();
-	//gchar *t_secret = settings_load_oauth_access_secret();
-
 	/*
 	 * Create correct json structure to send the note
 	 */
-	JsonNode *result = json_node_new(JSON_NODE_OBJECT);
-	JsonObject *obj = json_object_new();
 	JsonArray *array = json_array_new();
 
 	GList *iter = notes;
@@ -59,9 +54,11 @@ web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_syn
 	*uploaded_notes = json_array_get_length(array);
 	if (*uploaded_notes == 0) {
 		g_printerr("INFO: No new notes on client. Sending nothing.\n");
+		json_array_unref(array);
 		return expected_rev - 1;
 	}
 
+	JsonObject *obj = json_object_new();
 	JsonNode *node = json_node_new(JSON_NODE_ARRAY);
 	json_node_set_array(node, array);
 	json_object_add_member(obj, "note-changes", node);
@@ -70,10 +67,14 @@ web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_syn
 	json_node_set_int(node, expected_rev);
 	json_object_add_member(obj, "latest-sync-revision", node);
 
+	JsonNode *result = json_node_new(JSON_NODE_OBJECT);
 	json_node_take_object(result, obj);
 
 	/* Convert to string */
 	gchar *json_string = json_node_to_string(result, FALSE);
+
+	/* Freeing the root node should also free the children */
+	json_node_free(result);
 
 	g_printerr("&&&&&&&&&&&&&&&&&&\n");
 	g_printerr("%s\n", json_string);
@@ -81,7 +82,7 @@ web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_syn
 
 
 	gchar *reply = conboy_http_put(url, json_string, TRUE);
-
+	g_free(json_string);
 	/*
 	g_printerr("Reply from Snowy:\n");
 	g_printerr("%s\n", reply);
@@ -89,6 +90,8 @@ web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_syn
 
 	/* Parse answer and see if expected_rev fits or not */
 	JsonNoteList *note_list = json_get_note_list(reply);
+	/* TODO: JsonNoteList plus containing Notes needs to be freed or unrefed */
+	g_free(reply);
 
 	if (note_list == NULL) {
 		g_set_error(error, 0, 0, "json_get_note_list() returned NULL");
@@ -270,9 +273,9 @@ web_sync_incoming_changes(JsonUser *user, gint *last_sync_rev, time_t last_sync_
 				}
 			}
 		}
+		/* TODO: JsonNoteList *server_note_list needs to be freed or unrefed */
 
 		/* Remove from list of local notes */
-		/* Find local note and remove from list */
 		local_notes = web_sync_remove_by_guid(local_notes, server_note);
 
 		server_notes = server_notes->next;
@@ -348,7 +351,7 @@ update_synced_notes_file()
 	g_free(filename);
 }
 
-static void
+static GList*
 web_sync_delete_local_notes(JsonUser *user, GList *notes_to_upload, gint *deleted_notes_count)
 {
 	/*
@@ -379,7 +382,6 @@ web_sync_delete_local_notes(JsonUser *user, GList *notes_to_upload, gint *delete
 			ConboyNote *server_note = CONBOY_NOTE(server_notes_iter->data);
 
 			if (strcmp(local_note->guid, server_note->guid) == 0) {
-				g_printerr("MATCH\n");
 				found_note = TRUE;
 				break;
 			}
@@ -406,10 +408,12 @@ web_sync_delete_local_notes(JsonUser *user, GList *notes_to_upload, gint *delete
 		local_notes_iter = local_notes_iter->next;
 	}
 
-	g_slist_free(server_notes);
 	g_list_free(local_notes);
-	// FIXME:
-	//json_server_notes_free(json_server_notes); //TODO
+	/* TODO: JsonNoteList *json_server_notes needs to be freed or unrefed */
+	/* We need to make sure that memory is given back, but ConboyNotes that are now local notes are not deleted */
+	//json_server_notes_free(json_server_notes);
+
+	return notes_to_upload;
 }
 
 
@@ -424,6 +428,7 @@ web_sync_send_local_deletions(gchar *url, gint expected_rev, gint *local_deletio
 		g_free(filename);
 		return expected_rev - 1;
 	}
+	g_free(filename);
 
 	JsonArray *array = json_array_new();
 	gchar **parts = g_strsplit(content, "\n", -1);
@@ -494,6 +499,7 @@ web_sync_send_local_deletions(gchar *url, gint expected_rev, gint *local_deletio
 static void
 remove_deleted_notes_file()
 {
+	/* TODO: This filename and "synced_notes_txt" is plastered all over this file. Again and again... */
 	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/deleted_notes.txt", NULL);
 	g_unlink(filename);
 	g_free(filename);
@@ -515,7 +521,7 @@ web_sync_do_sync (gpointer *user_data)
 	GtkProgressBar *bar = data->bar;
 
 	/* Save and make uneditable */
-	/* FIXME: Function is returned often, witout making it editable again */
+	/* TODO: Function is returned often, witout making it editable again */
 	gdk_threads_enter();
 	gtk_text_view_set_editable(ui->view, FALSE);
 	note_save(ui);
@@ -556,6 +562,7 @@ web_sync_do_sync (gpointer *user_data)
 	g_printerr("Reply from /api/1.0/:: %s\n", reply);
 
 	gchar *api_ref = json_get_api_ref(reply);
+	g_free(reply);
 
 	g_printerr("Now asking: %s\n", api_ref);
 
@@ -565,9 +572,11 @@ web_sync_do_sync (gpointer *user_data)
 		gchar *msg = g_strconcat("Got no reply from: \n", api_ref, NULL);
 		web_sync_show_message(data, msg);
 		g_free(msg);
+		g_free(api_ref);
 		return;
 	}
 	web_sync_pulse_bar(bar);
+	g_free(api_ref);
 
 	g_printerr("Reply from /user/:: %s\n", reply);
 
@@ -579,8 +588,10 @@ web_sync_do_sync (gpointer *user_data)
 		} else {
 			web_sync_show_message(data, "Could not parse server answer. Probably server error.");
 		}
+		g_free(reply);
 		return;
 	}
+	g_free(reply);
 
 	if (user->latest_sync_revision < last_sync_rev) {
 		g_printerr("Server revision older than our revision\nU1 rev: %i   Local rev: %i\n", user->latest_sync_revision, last_sync_rev);
@@ -611,7 +622,7 @@ web_sync_do_sync (gpointer *user_data)
 	 * make sure we don't upload them again.
 	 */
 	gint deleted_note_count = 0;
-	web_sync_delete_local_notes(user, local_changes, &deleted_note_count);
+	local_changes = web_sync_delete_local_notes(user, local_changes, &deleted_note_count);
 
 
 	/*
@@ -623,7 +634,7 @@ web_sync_do_sync (gpointer *user_data)
 	GError *error = NULL;
 	int sync_rev = web_sync_send_notes(local_changes, user->api_ref, last_sync_rev + 1, last_sync_time, &uploaded_notes, &error);
 	web_sync_pulse_bar(bar);
-
+	g_list_free(local_changes);
 
 	gint deleted_on_server_count = 0;
 	if (!error) {
@@ -633,6 +644,8 @@ web_sync_do_sync (gpointer *user_data)
 		 */
 		sync_rev = web_sync_send_local_deletions(user->api_ref, sync_rev + 1, &deleted_on_server_count, &error);
 	}
+
+	json_user_free(user);
 
 	gchar msg[1000];
 
@@ -662,9 +675,6 @@ web_sync_do_sync (gpointer *user_data)
 	/*
 	 * Sync finished
 	 */
-	g_free(api_ref);
-	g_list_free(local_changes);
-	/* TODO: Free json stuff */
 
 	/* Show message to user */
 	web_sync_show_message(data, msg);
@@ -926,6 +936,7 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 	g_free(request);
 
 	JsonApi *api = json_get_api(reply);
+	g_free(reply);
 
 	/*g_printerr("###################################\n");
 	g_printerr("Request token url: %s\n", api->request_token_url);
@@ -935,6 +946,7 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 
 	/* Get auth link url */
 	gchar *link = conboy_get_request_token_and_auth_link(api->request_token_url, api->authorize_url);
+	json_api_free(api);
 
 	if (link == NULL) {
 		ui_helper_show_confirmation_dialog(parent, "Could not connect to host.", FALSE);
@@ -947,6 +959,7 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 			OSSO_BROWSER_OPEN_NEW_WINDOW_REQ, NULL,
 			DBUS_TYPE_STRING, link, DBUS_TYPE_INVALID);
 	g_printerr("Opening browser with URL: >%s<\n", link);
+	g_free(link);
 
 	GtkWidget *dialog = ui_helper_create_cancel_dialog(parent, "Please grant access on the website of your service provider that just opened.\nAfter that you will be automatically redirected back to Conboy.");
 
@@ -995,7 +1008,6 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 		settings_save_sync_base_url("");
 		return FALSE;
 	}
-
 
 	if (result == 666) {
 		kill_callback_thread();
