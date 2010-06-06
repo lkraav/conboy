@@ -824,11 +824,9 @@ oauth_callback_handler(gpointer user_data)
 		} else {
 			g_printerr("Did not get redirect_url\n");
 		}
-	}
-
-	/* This happens if the user manually canceled, then we don't need to manipulate
-	 * the dialog, because the dialog does not exist anymore.*/
-	if (g_str_has_prefix(buf, "KILL")) {
+	} else if (g_str_has_prefix(buf, "KILL")) {
+		/* This happens if the user manually canceled, then we don't need to manipulate
+		 * the dialog, because the dialog does not exist anymore.*/
 		g_printerr("INFO: Received KILL, shuting down this thread\n");
 		/* Close socket */
 		g_io_channel_shutdown(channel, TRUE, NULL);
@@ -836,13 +834,13 @@ oauth_callback_handler(gpointer user_data)
 		close(l_sock);
 		g_free(buf);
 		return;
-
 	} else {
-		g_printerr("First line did not start with 'GET', maybe we need to read more lines?\n");
+		g_printerr("ERROR: First line did not start with 'GET', maybe we need to read more lines?\n");
+		g_free(buf);
+		return;
 	}
 
 	g_free(buf);
-
 
 	/* Close socket */
 	g_io_channel_shutdown(channel, TRUE, NULL);
@@ -946,10 +944,10 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 
 	/* Get auth link url */
 	gchar *link = conboy_get_request_token_and_auth_link(api->request_token_url, api->authorize_url);
-	json_api_free(api);
 
 	if (link == NULL) {
 		ui_helper_show_confirmation_dialog(parent, "Could not connect to host.", FALSE);
+		json_api_free(api);
 		return FALSE;
 	}
 
@@ -970,6 +968,7 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 	GThread *thread = g_thread_create((GThreadFunc)oauth_callback_handler, &auth_data, FALSE, NULL);
 	if (!thread) {
 		g_printerr("ERROR: Cannot create socket thread\n");
+		json_api_free(api);
 		return;
 	}
 
@@ -999,8 +998,11 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 			ui_helper_show_confirmation_dialog(parent, "<b>You are successfully authenticated</b>\nYou can now use the synchronization from the main menu.", FALSE);
 			settings_save_sync_base_url(url);
 			/* Everything is good */
+			json_api_free(api);
 			return TRUE;
 		}
+
+		json_api_free(api);
 
 		/* We did not get the access token */
 		gtk_widget_destroy(wait_dialog);
