@@ -1,6 +1,5 @@
 conboy (1:0.6.3.15) stable; urgency=low
 
-  * Not yet released
   * Notes deleted on the server are now also deleted locally
   * Notes deleted locally are also deleted on the server
   
