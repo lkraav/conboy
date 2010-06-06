@@ -569,8 +569,7 @@ add_to_deleted_notes_file(ConboyNote *note)
 	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/deleted_notes.txt", NULL);
 	gchar *content = g_strconcat(note->guid, "\n", NULL);
 
-	GIOChannel *channel = g_io_channel_new_file(filename, "w", NULL);
-	g_io_channel_set_flags(channel, G_IO_FLAG_APPEND, NULL);
+	GIOChannel *channel = g_io_channel_new_file(filename, "a", NULL);
 	if (g_io_channel_write_chars(channel, content, -1, NULL, NULL) != G_IO_STATUS_NORMAL) {
 		g_printerr("ERROR: Cannot write to file '%s'\n", filename);
 	}

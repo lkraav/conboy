@@ -679,3 +679,22 @@ json_get_note_list(const gchar* json_string)
 	g_object_unref(G_OBJECT(parser));
 	return result;
 }
+
+JsonNode*
+json_get_delete_node(const gchar *guid)
+{
+	JsonNode *delete_node = json_node_new(JSON_NODE_OBJECT);
+	JsonObject *note_obj = json_object_new();
+
+	JsonNode *guid_node = json_node_new(JSON_NODE_VALUE);
+	json_node_set_string(guid_node, guid);
+	json_object_add_member(note_obj, "guid", guid_node);
+
+	JsonNode *command_node = json_node_new(JSON_NODE_VALUE);
+	json_node_set_string(command_node, "delete");
+	json_object_add_member(note_obj, "command", command_node);
+
+	json_node_take_object(delete_node, note_obj);
+
+	return delete_node;
+}

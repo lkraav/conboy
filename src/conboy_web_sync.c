@@ -289,8 +289,11 @@ web_sync_incoming_changes(JsonUser *user, gint *last_sync_rev, time_t last_sync_
  * called. This should probably be cached somewhere...
  */
 static gboolean
-note_has_been_synced_at_least_once(ConboyNote *note)
+note_has_been_synced_at_least_once(const gchar *guid)
 {
+	g_return_val_if_fail(guid != NULL, FALSE);
+	g_return_val_if_fail(strcmp("", guid) != 0, FALSE);
+
 	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/synced_notes.txt", NULL);
 	if (!g_file_test(filename, G_FILE_TEST_EXISTS)) {
 		g_free(filename);
@@ -302,7 +305,7 @@ note_has_been_synced_at_least_once(ConboyNote *note)
 	gchar *line = NULL;
 	while (g_io_channel_read_line(channel, &line, NULL, NULL, NULL) != G_IO_STATUS_EOF) {
 		if (line != NULL) {
-			if (strncmp(note->guid, line, 36) == 0) {
+			if (strncmp(guid, line, 36) == 0) {
 				result = TRUE;
 			}
 			g_free(line);
@@ -386,7 +389,7 @@ web_sync_delete_local_notes(JsonUser *user, GList *notes_to_upload, gint *delete
 
 		/* If we couldn't find the local note on the server - delete it but only if it has been synced before */
 		if (!found_note) {
-			if (note_has_been_synced_at_least_once(local_note)) {
+			if (note_has_been_synced_at_least_once(local_note->guid)) {
 				g_printerr("Deleting note: %s\n", local_note->title);
 				/* Delete from filesystem etc. */
 				gdk_threads_enter();
@@ -409,21 +412,10 @@ web_sync_delete_local_notes(JsonUser *user, GList *notes_to_upload, gint *delete
 	//json_server_notes_free(json_server_notes); //TODO
 }
 
+
 static gint
 web_sync_send_local_deletions(gchar *url, gint expected_rev, gint *local_deletions, GError **error)
 {
-	/* Get list of notes to delete */
-	// FIXME: TODO: Filter out those, that have never been synced, because they don't exist on the server
-
-	/*
-	 *
-	 *
-	 * Really important. Sending a delete request to the server with a non-existing UUID
-	 * will result in an error.
-	 *
-	 *
-	 */
-
 	gchar *content = NULL;
 	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/deleted_notes.txt", NULL);
 	g_file_get_contents(filename, &content, NULL, NULL);
@@ -433,47 +425,29 @@ web_sync_send_local_deletions(gchar *url, gint expected_rev, gint *local_deletio
 		return expected_rev - 1;
 	}
 
-	/*
-	 * Create correct json structure to send the note
-	 * TODO: Put into json.c
-	 */
-	JsonNode *result = json_node_new(JSON_NODE_OBJECT);
-	JsonObject *obj = json_object_new();
 	JsonArray *array = json_array_new();
-
 	gchar **parts = g_strsplit(content, "\n", -1);
 	int i = 0;
 	while (parts[i] != NULL) {
 		gchar *guid = parts[i];
 		if (strcmp(guid, "") != 0) {
-
-			JsonNode *note_node = json_node_new(JSON_NODE_OBJECT);
-			JsonObject *note_obj = json_object_new();
-
-			JsonNode *guid_node = json_node_new(JSON_NODE_VALUE);
-			json_node_set_string(guid_node, guid);
-			json_object_add_member(note_obj, "guid", guid_node);
-
-			JsonNode *command_node = json_node_new(JSON_NODE_VALUE);
-			json_node_set_string(command_node, "delete");
-			json_object_add_member(note_obj, "command", command_node);
-
-			json_node_take_object(note_node, note_obj);
-
-			json_array_add_element(array, note_node);
+			if (note_has_been_synced_at_least_once(guid)) {
+				JsonNode *note_node = json_get_delete_node(guid);
+				json_array_add_element(array, note_node);
+			}
 		}
 		i++;
 	}
-
 	g_strfreev(parts);
-
 
 	*local_deletions = json_array_get_length(array);
 	if (*local_deletions == 0) {
 		g_printerr("INFO: No notes deleted on client. Sending nothing.\n");
+		json_array_unref(array);
 		return expected_rev - 1;
 	}
 
+	JsonObject *obj = json_object_new();
 	JsonNode *node = json_node_new(JSON_NODE_ARRAY);
 	json_node_set_array(node, array);
 	json_object_add_member(obj, "note-changes", node);
@@ -482,15 +456,18 @@ web_sync_send_local_deletions(gchar *url, gint expected_rev, gint *local_deletio
 	json_node_set_int(node, expected_rev);
 	json_object_add_member(obj, "latest-sync-revision", node);
 
+	JsonNode *result = json_node_new(JSON_NODE_OBJECT);
 	json_node_take_object(result, obj);
 
 	/* Convert to string */
 	gchar *json_string = json_node_to_string(result, FALSE);
 
+	/* Freeing this node should also destroy the child nodes */
+	json_node_free(result);
+
 	g_printerr("&&&&&&&&&&&&&&&&&&\n");
 	g_printerr("%s\n", json_string);
 	g_printerr("&&&&&&&&&&&&&&&&&&\n");
-
 
 	gchar *reply = conboy_http_put(url, json_string, TRUE);
 

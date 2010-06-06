@@ -52,6 +52,7 @@ void 			json_print_note(ConboyNote *note);
 gchar* 			json_node_to_string(JsonNode *node, gboolean pretty);
 GSList*			json_get_notes_from_string(const gchar *json_string);
 gchar*			json_get_api_ref(const gchar* json_string);
+JsonNode*       json_get_delete_node(const gchar *guid);
 
 void json_test(void);
 
