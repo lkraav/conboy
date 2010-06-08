@@ -614,7 +614,7 @@ web_sync_do_sync (gpointer *user_data)
 	gint changed_note_count = 0;
 	GList *local_changes = web_sync_incoming_changes(user, &last_sync_rev, last_sync_time, &added_note_count, &changed_note_count);
 	g_printerr("DEBUG: After web_sync_incoming_changes\n");
-
+	web_sync_pulse_bar(bar);
 
 	/*
 	 * Process deletions made on server
@@ -623,7 +623,7 @@ web_sync_do_sync (gpointer *user_data)
 	 */
 	gint deleted_note_count = 0;
 	local_changes = web_sync_delete_local_notes(user, local_changes, &deleted_note_count);
-
+	web_sync_pulse_bar(bar);
 
 	/*
 	 * Remaining local notes are newer on the client.
@@ -643,6 +643,7 @@ web_sync_do_sync (gpointer *user_data)
 		 * to the server.
 		 */
 		sync_rev = web_sync_send_local_deletions(user->api_ref, sync_rev + 1, &deleted_on_server_count, &error);
+		web_sync_pulse_bar(bar);
 	}
 
 	json_user_free(user);
