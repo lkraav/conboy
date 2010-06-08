@@ -1,3 +1,10 @@
+conboy (1:0.6.3.17) stable; urgency=low
+
+  * Ctrl+Enter for fullscreen
+  * UI changes to settings
+  
+ -- Cornelius Hald <hald@icandy.de>  Sat, 08 Jun 2010 10:12:11 +0200
+
 conboy (1:0.6.3.16) stable; urgency=low
 
   * Fixed regression with the sync authentication

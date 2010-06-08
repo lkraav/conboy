@@ -216,12 +216,21 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(pannable), config_vbox);
 #endif
 
+	/* Frame for general settings */
+	GtkWidget *general_frame = gtk_frame_new("General");
+	gtk_frame_set_label_align(GTK_FRAME(general_frame), 0, -1);
+	gtk_widget_show(general_frame);
+	gtk_box_pack_start(GTK_BOX(config_vbox), general_frame, TRUE, TRUE, 0);
 
+	/* VBox for general settings */
+	GtkWidget *general_vbox = gtk_vbox_new(FALSE, 0);
+	gtk_widget_show(general_vbox);
+	gtk_container_add(GTK_CONTAINER(general_frame), general_vbox);
 
 	/* Container for "scrollbar size" and for "on startup" */
 	hbox = gtk_hbox_new(FALSE, 0);
 	gtk_widget_show(hbox);
-	gtk_box_pack_start(GTK_BOX(config_vbox), hbox, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(general_vbox), hbox, FALSE, FALSE, 0);
 
 #ifndef HILDON_HAS_APP_MENU
 	/* Scrollbar vbox */
@@ -250,7 +259,7 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	/* Use auto portrait mode vbox */
 	portrait_vbox = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(portrait_vbox);
-	gtk_box_pack_start(GTK_BOX(config_vbox), portrait_vbox, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(general_vbox), portrait_vbox, FALSE, FALSE, 0);
 
 #ifdef HILDON_HAS_APP_MENU
 	portrait_but = hildon_check_button_new(HILDON_SIZE_FINGER_HEIGHT);
@@ -265,7 +274,7 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	/* Select Colors vbox */
 	color_vbox = gtk_vbox_new(FALSE, 0);
 	gtk_widget_show(color_vbox);
-	gtk_box_pack_start(GTK_BOX(config_vbox), color_vbox, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(general_vbox), color_vbox, FALSE, FALSE, 0);
 
 #ifdef HILDON_HAS_APP_MENU
 	color_but = hildon_check_button_new(HILDON_SIZE_FINGER_HEIGHT);
@@ -339,7 +348,8 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	#endif
 
 	/* Frame for sync */
-	GtkWidget *sync_frame = gtk_frame_new("Synchronization (Beta)");
+	GtkWidget *sync_frame = gtk_frame_new("Synchronization URL (e.g. https://one.ubuntu.com/notes)");
+	gtk_frame_set_label_align(GTK_FRAME(sync_frame), 0, -1);
 	gtk_widget_show(sync_frame);
 	gtk_box_pack_start(GTK_BOX(config_vbox), sync_frame, TRUE, TRUE, 0);
 
@@ -350,7 +360,7 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 
 	#ifdef HILDON_HAS_APP_MENU
 	GtkWidget *sync_entry = hildon_entry_new(HILDON_SIZE_FINGER_HEIGHT);
-	hildon_entry_set_placeholder(HILDON_ENTRY(sync_entry), "http://example.com:8080");
+	hildon_entry_set_placeholder(HILDON_ENTRY(sync_entry), "https://one.ubuntu.com/notes");
 	#else
 	GtkWidget *sync_entry = gtk_entry_new();
 	#endif
@@ -373,6 +383,7 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	if (conboy_plugin_manager_get_count(CONBOY_PLUGIN_MANAGER(plugin_manager)) > 0) {
 		/* Frame for plugins */
 		GtkWidget *plugin_frame = gtk_frame_new("Plug-ins");
+		gtk_frame_set_label_align(GTK_FRAME(plugin_frame), 0, -1);
 		gtk_widget_show(plugin_frame);
 		gtk_box_pack_start(GTK_BOX(config_vbox), plugin_frame, TRUE, TRUE, 0);
 		/* Plugin manager */
