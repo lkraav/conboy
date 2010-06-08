@@ -608,7 +608,7 @@ on_delete_button_clicked			   (GtkAction		*action,
 
 		/* Show previous note */
 		ConboyNote *note;
-		if (app_data->current_element == NULL) {
+		if (app_data->current_element == NULL || app_data->current_element->data == NULL) {
 			note = conboy_note_store_get_latest_or_new(app_data->note_store);
 			note_show(note, TRUE, TRUE, FALSE);
 		} else {

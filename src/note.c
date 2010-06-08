@@ -261,15 +261,20 @@ void note_delete(ConboyNote *note)
 		} else if (app_data->current_element->next) {
 			app_data->current_element = app_data->current_element->next;
 		} else {
+			/* It was the last note. Empty history. */
 			app_data->current_element = NULL;
+			app_data->note_history = NULL;
 		}
 	}
 
 	/* Remove note from history */
-	app_data->note_history = g_list_remove_all(app_data->note_history, note);
+	if (app_data->note_history != NULL) {
+		app_data->note_history = g_list_remove_all(app_data->note_history, note);
+	}
 
 	/* Destroy note object */
 	g_object_unref(note);
+	note = NULL;
 }
 
 /*
