@@ -944,10 +944,17 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 	g_printerr("###################################\n");*/
 
 	/* Get auth link url */
-	gchar *link = conboy_get_request_token_and_auth_link(api->request_token_url, api->authorize_url);
+	GError *error = NULL;
+	gchar *link = conboy_get_request_token_and_auth_link(api->request_token_url, api->authorize_url, &error);
 
 	if (link == NULL) {
-		ui_helper_show_confirmation_dialog(parent, "Could not connect to host.", FALSE);
+		if (error == NULL) {
+			ui_helper_show_confirmation_dialog(parent, "Could not connect to host.", FALSE);
+		} else {
+			gchar *msg = g_strconcat("Could not connect to host.\nReason: ", error->message, NULL);
+			ui_helper_show_confirmation_dialog(parent, msg, FALSE);
+			g_free(msg);
+		}
 		json_api_free(api);
 		return FALSE;
 	}

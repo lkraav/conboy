@@ -23,7 +23,7 @@
 
 
 gchar*
-conboy_get_request_token_and_auth_link (const gchar *call_url, const gchar *link_url);
+conboy_get_request_token_and_auth_link (const gchar *call_url, const gchar *link_url, GError **error);
 
 gboolean
 conboy_get_access_token (const gchar *url, const gchar *verifier);

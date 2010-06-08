@@ -380,7 +380,7 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 
 	/* Add the plugin manager widget if it contains more than one plugin */
 	GtkWidget *plugin_manager = conboy_plugin_manager_new();
-	if (conboy_plugin_manager_get_count(CONBOY_PLUGIN_MANAGER(plugin_manager)) > 0) {
+	if (conboy_plugin_manager_get_count(CONBOY_PLUGIN_MANAGER(plugin_manager)) > 1) {
 		/* Frame for plugins */
 		GtkWidget *plugin_frame = gtk_frame_new("Plug-ins");
 		gtk_frame_set_label_align(GTK_FRAME(plugin_frame), 0, -1);

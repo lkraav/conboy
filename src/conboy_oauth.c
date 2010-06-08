@@ -71,7 +71,7 @@ parse_reply (const char *reply, char **token, char **secret) {
 }
 
 static gchar*
-get_request_token_and_auth_link(const gchar *request_url, const gchar *link_url, gchar **t_key, gchar **t_secret)
+get_request_token_and_auth_link(const gchar *request_url, const gchar *link_url, gchar **t_key, gchar **t_secret, GError **error)
 {
 	gchar *postarg = NULL;
 	gchar *reply   = NULL;
@@ -95,12 +95,14 @@ get_request_token_and_auth_link(const gchar *request_url, const gchar *link_url,
 
 	if (reply == NULL) {
 		g_printerr("ERROR: Reply = NULL\n");
+		g_set_error(error, 0, 5, "Reply was no valid JSON string.");
 		g_free(req_url);
 		return NULL;
 	}
 
 	if (strstr(reply, "Expired timestamp")) {
-		g_printerr("ERROR: Timestamp is expired. Probably clock running wrong.\n");
+		g_printerr("ERROR: Timestamp is expired. Probably the local clock is wrong.\n");
+		g_set_error(error, 0, 5, "Timestamp is expired. Probably the local clock is wrong.");
 		g_free(req_url);
 		return NULL;
 	}
@@ -205,12 +207,12 @@ conboy_get_access_token(const gchar *url, const gchar *verifier) {
  * return different error object/code.
  */
 gchar*
-conboy_get_request_token_and_auth_link(const gchar *call_url, const gchar *link_url)
+conboy_get_request_token_and_auth_link(const gchar *call_url, const gchar *link_url, GError **error)
 {
 	gchar *tok = "";
 	gchar *sec = "";
 
-	gchar *link = get_request_token_and_auth_link(call_url, link_url ,&tok, &sec);
+	gchar *link = get_request_token_and_auth_link(call_url, link_url ,&tok, &sec, error);
 
 	settings_save_oauth_access_token(tok);
 	settings_save_oauth_access_secret(sec);
