@@ -692,8 +692,9 @@ UserInterface* create_mainwin() {
 	/* Translators: Find text in the current note. */
 	action_find = GTK_ACTION(gtk_action_new("find", _("Find in note"), NULL, GTK_STOCK_FIND));
 	/* Translators: Synchronize the current note. */
-	gchar *sync_label = g_strconcat(_("Synchronize"), " (Alpha)", NULL);
+	gchar *sync_label = g_strconcat(_("Synchronize"), " (Beta)", NULL);
 	action_sync = GTK_ACTION(gtk_action_new("sync", sync_label, NULL, NULL));
+	g_free(sync_label);
 	/* Translators: Navigate backwards (like a web browser). */
 	action_back = GTK_ACTION(gtk_action_new("back", _("Back"), NULL, GTK_STOCK_GO_BACK));
 	/* Translators: Navigate forwards (like a web browser). */
@@ -740,7 +741,8 @@ UserInterface* create_mainwin() {
 	gtk_action_group_add_action_with_accel(action_group, action_quit,      "<Ctrl>q");
 	gtk_action_group_add_action_with_accel(action_group, action_new,       "<Ctrl>n");
 	gtk_action_group_add_action_with_accel(action_group, action_find,      "<Ctrl>f");
-	//gtk_action_group_add_action_with_accel(action_group, action_fullscreen,"<Ctrl>u");
+	//gtk_action_group_add_action_with_accel(action_group, action_fullscreen,"<Ctrl>Return");
+	gtk_action_group_add_action_with_accel(action_group, action_fullscreen,"<Control>KP_Enter");
 	gtk_action_group_add_action_with_accel(action_group, action_link,      "<Ctrl>l");
 
 	gtk_action_set_accel_group(action_bold,      accel_group);
@@ -752,7 +754,7 @@ UserInterface* create_mainwin() {
 	gtk_action_set_accel_group(action_quit,      accel_group);
 	gtk_action_set_accel_group(action_new,       accel_group);
 	gtk_action_set_accel_group(action_find,      accel_group);
-	//gtk_action_set_accel_group(action_fullscreen,accel_group);
+	gtk_action_set_accel_group(action_fullscreen,accel_group);
 	gtk_action_set_accel_group(action_link,      accel_group);
 
 	gtk_action_connect_accelerator(action_bold);
@@ -764,7 +766,7 @@ UserInterface* create_mainwin() {
 	gtk_action_connect_accelerator(action_find);
 	gtk_action_connect_accelerator(action_new);
 	gtk_action_connect_accelerator(action_quit);
-	//gtk_action_connect_accelerator(action_fullscreen);
+	gtk_action_connect_accelerator(action_fullscreen);
 	gtk_action_connect_accelerator(action_link);
 
 
