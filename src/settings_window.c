@@ -216,6 +216,8 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(pannable), config_vbox);
 #endif
 
+
+
 	/* Container for "scrollbar size" and for "on startup" */
 	hbox = gtk_hbox_new(FALSE, 0);
 	gtk_widget_show(hbox);
@@ -336,10 +338,15 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	gtk_widget_set_size_request(GTK_WIDGET(link_color_but), 70, 70);
 	#endif
 
+	/* Frame for sync */
+	GtkWidget *sync_frame = gtk_frame_new("Synchronization (Beta)");
+	gtk_widget_show(sync_frame);
+	gtk_box_pack_start(GTK_BOX(config_vbox), sync_frame, TRUE, TRUE, 0);
+
 	/* Adding sync section */
 	GtkWidget *sync_hbox = gtk_hbox_new(FALSE, 0);
 	gtk_widget_show(sync_hbox);
-	gtk_box_pack_start(GTK_BOX(config_vbox), sync_hbox, TRUE, TRUE, 0);
+	gtk_container_add(GTK_CONTAINER(sync_frame), sync_hbox);
 
 	#ifdef HILDON_HAS_APP_MENU
 	GtkWidget *sync_entry = hildon_entry_new(HILDON_SIZE_FINGER_HEIGHT);
@@ -364,8 +371,13 @@ GtkWidget *settings_widget_create(GtkWindow *parent)
 	/* Add the plugin manager widget if it contains more than one plugin */
 	GtkWidget *plugin_manager = conboy_plugin_manager_new();
 	if (conboy_plugin_manager_get_count(CONBOY_PLUGIN_MANAGER(plugin_manager)) > 0) {
+		/* Frame for plugins */
+		GtkWidget *plugin_frame = gtk_frame_new("Plug-ins");
+		gtk_widget_show(plugin_frame);
+		gtk_box_pack_start(GTK_BOX(config_vbox), plugin_frame, TRUE, TRUE, 0);
+		/* Plugin manager */
 		gtk_widget_show(plugin_manager);
-		gtk_box_pack_start(GTK_BOX(config_vbox), plugin_manager, FALSE, FALSE, 0);
+		gtk_container_add(GTK_CONTAINER(plugin_frame), plugin_manager);
 	}
 
 
