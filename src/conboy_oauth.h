@@ -20,6 +20,7 @@
 #define CONBOY_OAUTH_H_
 
 #include <glib/gtypes.h>
+#include <glib/gerror.h>
 
 
 gchar*

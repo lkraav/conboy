@@ -920,7 +920,7 @@ kill_callback_thread()
 }
 
 gboolean
-web_sync_authenticate(gchar *url, GtkWindow *parent)
+web_sync_authenticate(const gchar *url, GtkWindow *parent)
 {
 	/* Get URLs */
 	gchar *request = g_strconcat(url, "/api/1.0", NULL);

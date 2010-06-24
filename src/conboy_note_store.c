@@ -20,6 +20,7 @@
 
 #include <string.h>
 #include <gtk/gtk.h>
+#include <glib/gprintf.h>
 
 #include "note.h"
 #include "metadata.h"
@@ -48,7 +49,7 @@ G_DEFINE_TYPE_EXTENDED(ConboyNoteStore, conboy_note_store, GTK_TYPE_LIST_STORE, 
 			conboy_note_store_tree_model_iface_init))
 
 /* our parent's model iface */
-static GtkTreeModelIface parent_iface = { 0, };
+static GtkTreeModelIface parent_iface = { {0,} };
 
 /* this method is called once to set up the class */
 static void
@@ -458,7 +459,7 @@ conboy_note_store_set_storage(ConboyNoteStore *self, ConboyStorage *storage) {
 	g_timer_elapsed(timer, &micro);
 	g_timer_destroy(timer);
 
-	g_printerr("INFO: Loading %i notes took %i micro seconds\n", conboy_note_store_get_length(self), micro);
+	g_printerr("INFO: Loading %i notes took %il micro seconds\n", conboy_note_store_get_length(self), micro);
 
 	g_signal_connect(storage, "activated",   G_CALLBACK(on_storage_activated),   self);
 	g_signal_connect(storage, "deactivated", G_CALLBACK(on_storage_deactivated), self);

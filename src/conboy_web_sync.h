@@ -32,7 +32,7 @@ typedef struct
 } WebSyncDialogData;
 
 gboolean
-web_sync_authenticate (gchar *url, GtkWindow *parent);
+web_sync_authenticate (const gchar *url, GtkWindow *parent);
 
 gpointer
 web_sync_do_sync (gpointer *user_data);

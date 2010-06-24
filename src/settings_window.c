@@ -19,6 +19,7 @@
 
 #include <gtk/gtk.h>
 #include <glib/gprintf.h>
+#include <glib/gstdio.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-color-button.h>
 #include <tablet-browser-interface.h>
@@ -40,6 +41,7 @@
 #include "conboy_plugin_manager.h"
 #include "ui_helper.h"
 #include "json.h"
+#include "conboy_web_sync.h"
 
 #include "settings_window.h"
 
