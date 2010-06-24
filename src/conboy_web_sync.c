@@ -43,7 +43,7 @@ web_sync_send_notes(GList *notes, gchar *url, gint expected_rev, time_t last_syn
 	GList *iter = notes;
 	while (iter) {
 		ConboyNote *note = CONBOY_NOTE(iter->data);
-		if (note->last_metadata_change_date > last_sync_time) {
+		if (note->last_metadata_change_date > last_sync_time || note->last_change_date > last_sync_time) {
 			g_printerr("Will send: %s\n", note->title);
 			JsonNode *note_node = json_get_node_from_note(note);
 			json_array_add_element(array, note_node);
@@ -224,6 +224,8 @@ web_sync_incoming_changes(JsonUser *user, gint *last_sync_rev, time_t last_sync_
 		g_printerr("Saving: %s\n", server_note->title);
 		/* TODO: Check for title conflicts */
 
+		/* Update metadata change date and save */
+		g_object_set(server_note, "metadata-change-date", time(NULL), NULL);
 		conboy_storage_note_save(app_data->storage, server_note);
 
 		/* If not yet in the note store, add this note */
@@ -548,7 +550,7 @@ web_sync_do_sync (gpointer *user_data)
 
 	gchar *request = g_strconcat(url, "/api/1.0/", NULL);
 
-	gchar *reply = conboy_http_get(request, FALSE);
+	gchar *reply = conboy_http_get(request, TRUE);
 
 	if (reply == NULL) {
 		gchar *msg = g_strconcat("Got no reply from: %s\n", request, NULL);
