@@ -905,6 +905,7 @@ kill_callback_thread()
 	int sock;
 	if (!open_client_socket(&sock)) {
 		g_printerr("ERROR: Cannot open client socket\n");
+		return;
 	}
 
 	/* Write to socket */
@@ -1019,19 +1020,20 @@ web_sync_authenticate(gchar *url, GtkWindow *parent)
 		return FALSE;
 	}
 
-	if (result == 666) {
-		kill_callback_thread();
-		ui_helper_show_confirmation_dialog(parent, "You have manually canceled the authentication process.", FALSE);
-		return FALSE;
-	}
-
 	if (result == GTK_RESPONSE_REJECT) {
 		ui_helper_show_confirmation_dialog(parent, "There were problems with the data received from your service provider. Please try again.", FALSE);
 		settings_save_sync_base_url("");
 		return FALSE;
 	}
 
+	if (result == 666 || result == -4) {
+		kill_callback_thread();
+		ui_helper_show_confirmation_dialog(parent, "You have manually canceled the authentication process.", FALSE);
+		return FALSE;
+	}
+
 	/* Some other error */
+	kill_callback_thread();
 	ui_helper_show_confirmation_dialog(parent, "An unknown error occured, please try again.", FALSE);
 	return FALSE;
 }
