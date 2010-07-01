@@ -144,7 +144,7 @@ conboy_share_note (ConboyNote *note)
 
 	/* Parse style sheet */
 	xmlChar *style_sheet = NULL;
-	xsltStylesheetPtr ptr = xsltParseStylesheetFile(PREFIX"/share/conboy_to_html.xsl");
+	xsltStylesheetPtr ptr = xsltParseStylesheetFile(PREFIX"/share/conboy/conboy_to_html.xsl");
 
 
 	/* Parse note */
