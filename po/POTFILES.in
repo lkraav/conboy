@@ -8,3 +8,4 @@ src/conboy_plugin_manager.c
 src/conboy_plugin_manager_row.c
 src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in
 src/extra_strings.h
+src/conboy_note_store.c

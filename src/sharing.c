@@ -1,10 +1,20 @@
-
-//#include <libxml/xmlmemory.h>
-//#include <libxml/debugXML.h>
-//#include <libxml/HTMLtree.h>
-//#include <libxml/xmlIO.h>
-//#include <libxml/xinclude.h>
-//#include <libxml/catalog.h>
+/* This file is part of Conboy.
+ *
+ * Copyright (C) 2010 Cornelius Hald
+ *
+ * Conboy is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Conboy is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include <libxml/HTMLparser.h>
 #include <libxml/xmlwriter.h>
@@ -16,17 +26,23 @@
 #include <libxslt/transform.h>
 #include <libxslt/extensions.h>
 
+#include <sharing-dialog.h>
 
-
+#include "app_data.h"
 #include "conboy_note.h"
+#include "config.h"
+#include "conboy_config.h"
 
 #include "sharing.h"
 
+#ifdef WITH_SHARING
 
+/* TODO: This is mostly copy & paste taken from the XML Storage Plug-In.
+ * Maybe the code can somehow be shared?
+ */
 static void
-create_xml_doc(ConboyNote *note, xmlDocPtr *doc)
+create_xml_doc (ConboyNote *note, xmlDocPtr *doc)
 {
-
 	gchar version[20];
 	gdouble note_version;
 	gchar *title;
@@ -36,11 +52,7 @@ create_xml_doc(ConboyNote *note, xmlDocPtr *doc)
 
 	g_object_get(note, "title", &title, "content", &content, "note-version", &note_version, NULL);
 
-	//writer = xmlNewTextWriterFilename("/tmp/note.xml", 0);
 	writer = xmlNewTextWriterDoc(doc, FALSE);
-
-
-
 
 	/* Enable indentation */
 	xmlTextWriterSetIndent(writer, TRUE);
@@ -65,11 +77,12 @@ create_xml_doc(ConboyNote *note, xmlDocPtr *doc)
 	xmlTextWriterStartElement(writer, BAD_CAST "text");
 	xmlTextWriterWriteAttributeNS(writer, BAD_CAST "xml", BAD_CAST "space", NULL, BAD_CAST "preserve");
 
-
+	/* Remove duplicated namespace declarations */
 	GRegex *regex = g_regex_new(" xmlns(?:.*?)?=\".*?\"", 0, 0, NULL);
 	gchar *content_clean = g_regex_replace(regex, content, -1, 0, "", 0, NULL);
 	g_regex_unref(regex);
 
+	/* Write note content */
 	xmlTextWriterWriteRaw(writer, (const xmlChar *)content_clean);
 	g_free(content);
 	xmlFree(content_clean);
@@ -82,10 +95,8 @@ create_xml_doc(ConboyNote *note, xmlDocPtr *doc)
 }
 
 void
-xslt_to_lower(xmlXPathParserContextPtr ctx, int nargs)
+xslt_to_lower (xmlXPathParserContextPtr ctx, int nargs)
 {
-	g_printerr("to-lower called with %i params\n", nargs);
-
 	xmlXPathObjectPtr obj = valuePop(ctx);
 
 	/* Convert to string if needed */
@@ -95,11 +106,8 @@ xslt_to_lower(xmlXPathParserContextPtr ctx, int nargs)
 	    obj = valuePop(ctx);
 	}
 
-	g_printerr("Original value: %s\n", obj->stringval);
-
-	gchar *lower = g_strdup("Hallo&nbsp;Welt"); //g_strconcat("\"", g_utf8_strdown(obj->stringval, -1), "\"", NULL);
-
-	g_printerr("Lower value: %s\n", lower);
+	/* Convert to lower case */
+	gchar *lower = g_utf8_strdown(obj->stringval, -1);
 
 	/* Push result */
 	//xmlXPathObjectPtr result = xmlXPathNewCString(lower);
@@ -124,42 +132,29 @@ initFunct (xsltTransformContextPtr ctx, const xmlChar *uri)
 }
 
 void
-conboy_share_note(ConboyNote *note)
+conboy_share_note (ConboyNote *note)
 {
 	xmlSubstituteEntitiesDefault(1);
-
 	xmlLoadExtDtdDefaultValue = 1;
 
 	/* Register extension */
 	xsltRegisterExtModule("http://beatniksoftware.com/tomboy", initFunct, NULL);
 
-	g_printerr("After registering module\n");
-
 	/* Parse style sheet */
 	xmlChar *style_sheet = NULL;
-	xsltStylesheetPtr ptr = xsltParseStylesheetFile("/home/conny/workspace/conboy/data/export_to_html.xsl");
+	xsltStylesheetPtr ptr = xsltParseStylesheetFile(PREFIX"/share/conboy_to_html.xsl");
 
-	g_printerr("After parsing style sheet\n");
 
 	/* Parse note */
 	xmlDocPtr doc;
 	create_xml_doc(note, &doc);
 
-	g_printerr("After creating note document\n");
-
-/*
-	xmlSaveCtxtPtr ctxt = xmlSaveToFilename( "/tmp/doc.xml", NULL, 0 );
-	long ret = xmlSaveDoc( ctxt, doc );
-	ret = xmlSaveClose( ctxt );
-*/
-
-
 	/* Set params */
 	const char *params[8+1];
 	params[0] = "export-linked";
-	params[1] = "false"; /* or 0? */
+	params[1] = "false";
 	params[2] = "export-linked-all";
-	params[3] = "false"; /* or 0? */
+	params[3] = "false";
 	params[4] = "root-note";
 	params[5] = g_strconcat("'", note->title, "'", NULL);
 	params[6] = "font";
@@ -169,15 +164,21 @@ conboy_share_note(ConboyNote *note)
 	/* Apply style sheet */
 	xmlDocPtr res = xsltApplyStylesheet(ptr, doc, params);
 
-	g_printerr("After applying stylesheet\n");
-
+	/* Save to temp file */
 	xsltSaveResultToFilename("/tmp/notes.html", res, ptr, 0);
-
-	g_printerr("After saving\n");
 
 	/* Cleanup */
 	xsltFreeStylesheet(ptr);
 	xmlFreeDoc(res);
 	xmlFreeDoc(doc);
 	xsltCleanupGlobals();
+
+	/* Open sharing dialog */
+	AppData *app_data = app_data_get();
+	sharing_dialog_with_file(app_data->osso_ctx, GTK_WINDOW(app_data->note_window->window), "/tmp/notes.html");
+
+	/* Remove temp file again */
+	g_unlink("/tmp/notes.html");
 }
+
+#endif /* WITH_SHARING */

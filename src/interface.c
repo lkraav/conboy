@@ -320,16 +320,16 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	}
 }
 
+#ifdef WITH_SHARING
 static void
 on_share_but_clicked(GtkButton *but, gpointer user_data)
 {
-	g_printerr("Share clicked\n");
-
 	UserInterface *ui = (UserInterface*) user_data;
 	ConboyNote *note = ui->note;
 
 	conboy_share_note(note);
 }
+#endif /* WITH_SHARING */
 
 /*
  * This is a hack: We load the first note here, because it has
@@ -905,7 +905,9 @@ UserInterface* create_mainwin() {
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_new));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_delete));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_sync));
+	#ifdef WITH_SHARING
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_share));
+	#endif /* WITH_SHARING */
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_settings));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_fullscreen));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_about));
@@ -1189,9 +1191,11 @@ UserInterface* create_mainwin() {
 			G_CALLBACK(on_sync_but_clicked),
 			ui);
 
+	#ifdef WITH_SHARING
 	g_signal_connect(action_share, "activate",
 			G_CALLBACK(on_share_but_clicked),
 			ui);
+	#endif /* WITH_SHARING */
 
 	g_signal_connect(action_back, "activate",
 			G_CALLBACK(on_back_button_clicked),

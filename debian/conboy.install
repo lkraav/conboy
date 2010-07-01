@@ -11,3 +11,4 @@ usr/share/dbus-1/services/de.zwong.conboy.service
 usr/share/locale/*
 usr/share/applications/hildon/conboy2.desktop
 etc/osso-backup/applications/conboy.conf
+usr/share/conboy/*

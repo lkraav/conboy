@@ -389,7 +389,9 @@
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/curl"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libxslt"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/sharingdialog"/>
 <entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+<entry flags="" kind="macro" name="WITH_SHARING" value="1"/>
 </settingEntries>
 </languageData>
 <languageData contentTypeIds="org.eclipse.cdt.core.cSource;org.eclipse.cdt.core.cHeader" id="Scratchbox 1~FREMANTLE_X86.1257449132065.1152405978.778505974" languageId="org.eclipse.cdt.core.gcc" name="GNU C" supportedEntryKinds="includePath;includeFile;macro;macroFile">
@@ -422,7 +424,9 @@
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/curl"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libxslt"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/sharingdialog"/>
 <entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+<entry flags="" kind="macro" name="WITH_SHARING" value="1"/>
 </settingEntries>
 </languageData>
 <languageData contentTypeIds="org.eclipse.cdt.core.asmSource" id="Scratchbox 1~FREMANTLE_X86.1257449132065.1152405978.499161089" languageId="org.eclipse.cdt.core.assembly" name="Assembly" supportedEntryKinds="includePath;includeFile;macro;macroFile">
@@ -455,7 +459,9 @@
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/curl"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libxslt"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/sharingdialog"/>
 <entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
+<entry flags="" kind="macro" name="WITH_SHARING" value="1"/>
 </settingEntries>
 </languageData>
 </folderData>

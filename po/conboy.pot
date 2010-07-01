@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-03 19:16+0200\n"
+"POT-Creation-Date: 2010-07-01 22:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Translators: The title of a newly-created note.
-#: ../src/interface.c:392 ../src/callbacks.c:284 ../src/note.c:170
+#: ../src/interface.c:404 ../src/callbacks.c:284 ../src/note.c:170
+#: ../src/conboy_note_store.c:394
 #, c-format
 msgid "New Note %i"
 msgstr ""
@@ -25,145 +26,150 @@ msgstr ""
 #. ACTIONS
 #. Translators: Bold font.
 #. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
-#: ../src/interface.c:662 ../src/interface.c:799 ../src/interface.c:840
+#: ../src/interface.c:674 ../src/interface.c:815 ../src/interface.c:854
 msgid "Bold"
 msgstr ""
 
 #. Translators: Bullet point for a list.
-#: ../src/interface.c:664
+#: ../src/interface.c:676
 msgid "Bullets"
 msgstr ""
 
-#: ../src/interface.c:665
+#: ../src/interface.c:677
 msgid "Decrease indent"
 msgstr ""
 
-#: ../src/interface.c:666
+#: ../src/interface.c:678
 msgid "Delete note"
 msgstr ""
 
 #. Translators: Monospaced (non-proportional) font.
-#: ../src/interface.c:668 ../src/interface.c:804 ../src/interface.c:845
+#: ../src/interface.c:680 ../src/interface.c:820 ../src/interface.c:859
 msgid "Fixed width"
 msgstr ""
 
 #. Translators: Emphasise text with a background colour.
-#: ../src/interface.c:670 ../src/interface.c:802 ../src/interface.c:843
+#: ../src/interface.c:682 ../src/interface.c:818 ../src/interface.c:857
 msgid "Highlight"
 msgstr ""
 
 #. Translators: Underlined text.
-#: ../src/interface.c:672 ../src/interface.c:803 ../src/interface.c:844
+#: ../src/interface.c:684 ../src/interface.c:819 ../src/interface.c:858
 msgid "Underline"
 msgstr ""
 
-#: ../src/interface.c:673
+#: ../src/interface.c:685
 msgid "Increase indent"
 msgstr ""
 
 #. Translators: Add a [hyper]link to another note.
-#: ../src/interface.c:675
+#: ../src/interface.c:687
 msgid "Link"
 msgstr ""
 
 #. Translators: Create a new note.
-#: ../src/interface.c:677
+#: ../src/interface.c:689
 msgid "New note"
 msgstr ""
 
 #. Translators: Open an existing note.
-#: ../src/interface.c:679
+#: ../src/interface.c:691
 msgid "Open note"
 msgstr ""
 
 #. Translators: Show the settings dialog.
-#: ../src/interface.c:681 ../src/settings_window.c:443
-#: ../src/settings_window.c:451
+#: ../src/interface.c:693 ../src/settings_window.c:478
+#: ../src/settings_window.c:486
 msgid "Settings"
 msgstr ""
 
 #. Translators: Quit the program.
-#: ../src/interface.c:683
+#: ../src/interface.c:695
 msgid "Quit"
 msgstr ""
 
 #. Translators: Italic (cursive) font.
-#: ../src/interface.c:685 ../src/interface.c:800 ../src/interface.c:841
+#: ../src/interface.c:697 ../src/interface.c:816 ../src/interface.c:855
 msgid "Italic"
 msgstr ""
 
 #. Translators: Crossed out text.
-#: ../src/interface.c:687 ../src/interface.c:801 ../src/interface.c:842
+#: ../src/interface.c:699 ../src/interface.c:817 ../src/interface.c:856
 msgid "Strikeout"
 msgstr ""
 
 #. Translators: Select font.
-#: ../src/interface.c:689
+#: ../src/interface.c:701
 msgid "Style"
 msgstr ""
 
-#: ../src/interface.c:690
+#: ../src/interface.c:702
 msgid "Zoom in"
 msgstr ""
 
-#: ../src/interface.c:691
+#: ../src/interface.c:703
 msgid "Zoom out"
 msgstr ""
 
 #. Translators: Find text in the current note.
-#: ../src/interface.c:693
+#: ../src/interface.c:705
 msgid "Find in note"
 msgstr ""
 
 #. Translators: Synchronize the current note.
-#: ../src/interface.c:695
+#: ../src/interface.c:707
 msgid "Synchronize"
 msgstr ""
 
 #. Translators: Navigate backwards (like a web browser).
-#: ../src/interface.c:698
+#: ../src/interface.c:711
 msgid "Back"
 msgstr ""
 
 #. Translators: Navigate forwards (like a web browser).
-#: ../src/interface.c:700
+#: ../src/interface.c:713
 msgid "Forward"
 msgstr ""
 
 #. Translators: View the note fullscreen.
-#: ../src/interface.c:702 ../src/search_window.c:348
+#: ../src/interface.c:715 ../src/search_window.c:348
 msgid "Fullscreen"
 msgstr ""
 
 #. Translators: About the program.
-#: ../src/interface.c:704
+#: ../src/interface.c:717
 msgid "About Conboy"
+msgstr ""
+
+#. Translators: Share a note via the sharing dialog.
+#: ../src/interface.c:719
+msgid "Share note"
 msgstr ""
 
 #. TODO: Use an enum instead of 0 to 3
 #. Translators: Small font.
-#: ../src/interface.c:707 ../src/interface.c:805 ../src/interface.c:846
+#: ../src/interface.c:722 ../src/interface.c:821 ../src/interface.c:860
 msgid "Small"
 msgstr ""
 
 #. Translators: Normal size font.
-#: ../src/interface.c:709
+#: ../src/interface.c:724
 msgid "Normal"
 msgstr ""
 
 #. Translators: Large font.
-#: ../src/interface.c:711 ../src/interface.c:806 ../src/interface.c:847
+#: ../src/interface.c:726 ../src/interface.c:822 ../src/interface.c:861
 msgid "Large"
 msgstr ""
 
 #. Translators: Very large font.
-#: ../src/interface.c:713 ../src/interface.c:807 ../src/interface.c:848
+#: ../src/interface.c:728 ../src/interface.c:823 ../src/interface.c:862
 msgid "Huge"
 msgstr ""
 
 #. FIND TOOL BAR
 #. Translators: Search for this term in the current note.
-#: ../src/interface.c:986 ../src/search_window.c:390
+#: ../src/interface.c:1003 ../src/search_window.c:390
 msgid "Search:"
 msgstr ""
 
@@ -206,60 +212,60 @@ msgstr ""
 
 #. Translators: Does the user really want to delete the
 #. current note? Answer is "yes" or "no".
-#: ../src/callbacks.c:576
+#: ../src/callbacks.c:593
 msgid "Really delete this note?"
 msgstr ""
 
-#: ../src/callbacks.c:578
+#: ../src/callbacks.c:595
 msgid "If you delete a note it is permanently lost."
 msgstr ""
 
 #. Translators: Description of the program.
 #. Translators: First line of description used by the package manager
-#: ../src/callbacks.c:1039 ../src/extra_strings.h:3
+#: ../src/callbacks.c:1052 ../src/extra_strings.h:3
 msgid "Conboy is a note taking application."
 msgstr ""
 
 #. Translators: Width of the scrollbar.
-#: ../src/settings_window.c:222
+#: ../src/settings_window.c:245
 msgid "Scrollbar size"
 msgstr ""
 
 #. Translators: Thin scrollbar width.
-#: ../src/settings_window.c:228
+#: ../src/settings_window.c:251
 msgid "Thin"
 msgstr ""
 
 #. Translators: Thick scrollbar width.
-#: ../src/settings_window.c:233
+#: ../src/settings_window.c:256
 msgid "Thick"
 msgstr ""
 
 #. Translators: Whether to enable automatic portrait mode.
-#: ../src/settings_window.c:246 ../src/settings_window.c:248
+#: ../src/settings_window.c:269 ../src/settings_window.c:271
 msgid "Use automatic portrait mode"
 msgstr ""
 
 #. Translators: Whether to use custom colors.
-#: ../src/settings_window.c:261 ../src/settings_window.c:263
+#: ../src/settings_window.c:284 ../src/settings_window.c:286
 msgid "Use custom colors"
 msgstr ""
 
 #. Translators: Text color. The color is shown in the dialog, next to
 #. the text.
-#: ../src/settings_window.c:279
+#: ../src/settings_window.c:302
 msgid "Text"
 msgstr ""
 
 #. Translators: Background color. The color is shown in the dialog,
 #. next to the text.
-#: ../src/settings_window.c:295
+#: ../src/settings_window.c:318
 msgid "Background"
 msgstr ""
 
 #. Translators: Color of links. The color is shown in the dialog, next
 #. to the text.
-#: ../src/settings_window.c:311
+#: ../src/settings_window.c:334
 msgid "Links"
 msgstr ""
 

@@ -69,6 +69,7 @@ conboy_SOURCES = \
 	src/conboy_http.c \
 	src/conboy_web_sync.h \
 	src/conboy_web_sync.c \
+	src/extra_strings.h \
 	src/sharing.h \
 	src/sharing.c
 conboy_CPPFLAGS = $(DEPS_CFLAGS) $(EXTRAS_CPPFLAGS) \
@@ -133,6 +134,11 @@ nodist_dbus_DATA = data/de.zwong.conboy.service
 
 desktopdir = $(datadir)/applications/hildon
 nodist_desktop_DATA = data/conboy2.desktop
+
+#miscdir = $(datadir)/conboy
+#dist_misc_DATA = data/conboy_to_html.xsl
+stuffdir = $(pkgdatadir)
+dist_stuff_DATA = data/conboy_to_html.xsl
 
 # Icons
 icon_26x26dir=$(datadir)/icons/hicolor/26x26/hildon

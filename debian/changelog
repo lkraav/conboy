@@ -1,3 +1,9 @@
+conboy (1:0.6.3.20) stable; urgency=low
+
+  * Initial support for sharing notes via the sharing dialog
+  
+ -- Cornelius Hald <hald@icandy.de>  Thu, 01 Jul 2010 22:07:54 +0200
+
 conboy (1:0.6.3.19) stable; urgency=low
 
   * Now syncs with Snowy

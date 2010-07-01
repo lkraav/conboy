@@ -76,7 +76,7 @@ main (int argc, char *argv[])
   locale_init();
 
   /* Init threads */
-  g_thread_init(NULL);
+  //g_thread_init(NULL);
   gdk_threads_init();
 
   /* Init GTK */
