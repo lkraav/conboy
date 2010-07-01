@@ -16,6 +16,11 @@
  * along with Conboy. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+#include "conboy_config.h"
+
+#ifdef WITH_SHARING
+
 #include <libxml/HTMLparser.h>
 #include <libxml/xmlwriter.h>
 #include <libxml/xmlsave.h>
@@ -30,12 +35,9 @@
 
 #include "app_data.h"
 #include "conboy_note.h"
-#include "config.h"
-#include "conboy_config.h"
 
 #include "sharing.h"
 
-#ifdef WITH_SHARING
 
 /* TODO: This is mostly copy & paste taken from the XML Storage Plug-In.
  * Maybe the code can somehow be shared?

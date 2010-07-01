@@ -426,7 +426,7 @@ web_sync_send_local_deletions(gchar *url, gint expected_rev, gint *local_deletio
 	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/deleted_notes.txt", NULL);
 	g_file_get_contents(filename, &content, NULL, NULL);
 	if (content == NULL) {
-		g_printerr("INFO: File empty or does not exist. Nothing to delete\n", filename);
+		g_printerr("INFO: File '%s' empty or does not exist. Nothing to delete\n", filename);
 		g_free(filename);
 		return expected_rev - 1;
 	}
@@ -540,7 +540,7 @@ web_sync_do_sync (gpointer *user_data)
 	gchar *url = settings_load_sync_base_url();
 	if (url == NULL || strcmp(url, "") == 0) {
 		web_sync_show_message(data, "Please first set a URL in the settings");
-		return;
+		return NULL;
 	}
 
 	web_sync_pulse_bar(bar);
@@ -556,7 +556,7 @@ web_sync_do_sync (gpointer *user_data)
 		gchar *msg = g_strconcat("Got no reply from: %s\n", request, NULL);
 		web_sync_show_message(data, msg);
 		g_free(msg);
-		return;
+		return NULL;
 	}
 	g_free(request);
 	web_sync_pulse_bar(bar);
@@ -568,7 +568,7 @@ web_sync_do_sync (gpointer *user_data)
 
 	if (api_ref == NULL) {
 		web_sync_show_message(data, "Authentication failed. Got no api_ref. Make sure your lokal clock is correct.");
-		return;
+		return NULL;
 	}
 
 	g_printerr("Now asking: %s\n", api_ref);
@@ -580,7 +580,7 @@ web_sync_do_sync (gpointer *user_data)
 		web_sync_show_message(data, msg);
 		g_free(msg);
 		g_free(api_ref);
-		return;
+		return NULL;
 	}
 	web_sync_pulse_bar(bar);
 	g_free(api_ref);
@@ -596,7 +596,7 @@ web_sync_do_sync (gpointer *user_data)
 			web_sync_show_message(data, "Could not parse server answer. Probably server error.");
 		}
 		g_free(reply);
-		return;
+		return NULL;
 	}
 	g_free(reply);
 
@@ -703,6 +703,8 @@ web_sync_do_sync (gpointer *user_data)
 	gtk_text_view_set_editable(ui->view, TRUE);
 	note_show(note, FALSE, TRUE, FALSE);
 	gdk_threads_leave();
+
+	return NULL;
 }
 
 struct AuthDialogData {
@@ -714,17 +716,18 @@ struct AuthDialogData {
  * Extracts the oauth verifier from a http GET string. E.g.
  * GET /bla/blub?key=val&key2=val2&oauth_verifier=abcdefg&key3=val3 HTTP/1.0
  */
+/*
 static gchar*
 extract_verifier (gchar* http_get_string)
 {
-	gchar **parts = g_strsplit(http_get_string, " ", 3); /* Cut away the GET and HTTP/1.0 parts */
+	gchar **parts = g_strsplit(http_get_string, " ", 3); // Cut away the GET and HTTP/1.0 parts
 	gchar **parameters = g_strsplit_set(parts[1], "?&", 5);
 	gchar *verifier = NULL;
 	int i = 0;
 
 	while (parameters[i] != NULL) {
 		if (strncmp(parameters[i], "oauth_verifier=", 15) == 0) {
-			verifier = g_strdup(&(parameters[i][15])); /* Copy starting from character 15 */
+			verifier = g_strdup(&(parameters[i][15])); // Copy starting from character 15
 			break;
 		}
 		i++;
@@ -734,6 +737,7 @@ extract_verifier (gchar* http_get_string)
 	g_strfreev(parts);
 	return verifier;
 }
+*/
 
 /**
  * Extracts the oauth verifier and the redirect url from a http GET string. E.g.
@@ -811,7 +815,7 @@ oauth_callback_handler(gpointer user_data)
 	int l_sock, sock;
 	if (!open_server_socket(&l_sock, &sock)) {
 		g_printerr("ERROR Cannot open socket\n");
-		return;
+		return NULL;
 	}
 
 	/* Read from socket */
@@ -841,11 +845,11 @@ oauth_callback_handler(gpointer user_data)
 		close(sock);
 		close(l_sock);
 		g_free(buf);
-		return;
+		return NULL;
 	} else {
 		g_printerr("ERROR: First line did not start with 'GET', maybe we need to read more lines?\n");
 		g_free(buf);
-		return;
+		return NULL;
 	}
 
 	g_free(buf);
@@ -874,6 +878,8 @@ oauth_callback_handler(gpointer user_data)
 		g_signal_emit_by_name(data->dialog, "response", GTK_RESPONSE_REJECT);
 		gdk_threads_leave();
 	}
+
+	return NULL;
 }
 
 typedef struct {
@@ -985,7 +991,7 @@ web_sync_authenticate(const gchar *url, GtkWindow *parent)
 	if (!thread) {
 		g_printerr("ERROR: Cannot create socket thread\n");
 		json_api_free(api);
-		return;
+		return FALSE;
 	}
 
 	/* Open dialog and wait for result */
