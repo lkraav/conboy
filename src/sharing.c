@@ -180,7 +180,7 @@ conboy_share_note (ConboyNote *note)
 	sharing_dialog_with_file(app_data->osso_ctx, GTK_WINDOW(app_data->note_window->window), "/tmp/notes.html");
 
 	/* Remove temp file again */
-	g_unlink("/tmp/notes.html");
+	/* g_unlink("/tmp/notes.html"); Dont remove file, otherwise the service cant access it */
 }
 
 #endif /* WITH_SHARING */
