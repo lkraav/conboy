@@ -550,7 +550,7 @@ web_sync_do_sync (gpointer *user_data)
 
 	gchar *request = g_strconcat(url, "/api/1.0/", NULL);
 
-	gchar *reply = conboy_http_get(request, TRUE);
+	gchar *reply = conboy_http_get(request, TRUE); /* <<<<<<<< PROBLEM TODO: For some reason this calls fails using Snowy, but only on the device */
 
 	if (reply == NULL) {
 		gchar *msg = g_strconcat("Got no reply from: %s\n", request, NULL);
@@ -565,6 +565,11 @@ web_sync_do_sync (gpointer *user_data)
 
 	gchar *api_ref = json_get_api_ref(reply);
 	g_free(reply);
+
+	if (api_ref == NULL) {
+		web_sync_show_message(data, "Authentication failed. Got no api_ref. Make sure your lokal clock is correct.");
+		return;
+	}
 
 	g_printerr("Now asking: %s\n", api_ref);
 
@@ -620,7 +625,7 @@ web_sync_do_sync (gpointer *user_data)
 
 	/*
 	 * Process deletions made on server
-	 * Notes that get deleted get also delted from local_changes, to
+	 * Notes that get deleted get also deleted from local_changes, to
 	 * make sure we don't upload them again.
 	 */
 	gint deleted_note_count = 0;

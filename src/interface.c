@@ -50,6 +50,7 @@
 #include "json.h"
 #include "ui_helper.h"
 #include "he-fullscreen-button.h"
+#include "sharing.h"
 #include "interface.h"
 
 static void initialize_tags(GtkTextBuffer *buffer) {
@@ -319,6 +320,17 @@ on_sync_but_clicked(GtkButton *but, gpointer user_data)
 	}
 }
 
+static void
+on_share_but_clicked(GtkButton *but, gpointer user_data)
+{
+	g_printerr("Share clicked\n");
+
+	UserInterface *ui = (UserInterface*) user_data;
+	ConboyNote *note = ui->note;
+
+	conboy_share_note(note);
+}
+
 /*
  * This is a hack: We load the first note here, because it has
  * to be run inside the main loop after opening the window.
@@ -570,14 +582,13 @@ UserInterface* create_mainwin() {
 	GtkWidget *menu_settings;
 	GtkWidget *menu_quit;
 	GtkWidget *menu_text_style;
-	//GtkWidget *menu_inc_indent;
-	//GtkWidget *menu_dec_indent;
 	GtkWidget *menu_font_small;
 	GtkWidget *menu_font_normal;
 	GtkWidget *menu_font_large;
 	GtkWidget *menu_font_huge;
 	GtkWidget *menu_open;
 	GtkWidget *menu_sync;
+	GtkWidget *menu_share;
 	GtkWidget *menu_delete;
 	GtkWidget *menu_fullscreen;
 	GtkWidget *menu_about;
@@ -626,6 +637,7 @@ UserInterface* create_mainwin() {
 	GtkAction *action_forward;
 	GtkAction *action_fullscreen;
 	GtkAction *action_about;
+	GtkAction *action_share;
 
 	GtkActionGroup *action_group;
 
@@ -703,6 +715,8 @@ UserInterface* create_mainwin() {
 	action_fullscreen = GTK_ACTION(gtk_action_new("fullscreen", _("Fullscreen"), NULL, NULL));
 	/* Translators: About the program. */
 	action_about = GTK_ACTION(gtk_action_new("about", _("About Conboy"), NULL, NULL));
+	/* Translators: Share a note via the sharing dialog. */
+	action_share = GTK_ACTION(gtk_action_new("share", _("Share note"), NULL, NULL));
 	/* TODO: Use an enum instead of 0 to 3 */
 	/* Translators: Small font. */
 	action_font_small = GTK_ACTION(gtk_radio_action_new("size:small", _("Small"), NULL, NULL, 0));
@@ -832,8 +846,6 @@ UserInterface* create_mainwin() {
 	menu_underline = gtk_action_create_menu_item(action_underline);
 	menu_fixed = gtk_action_create_menu_item(action_fixed);
 	menu_bullets = gtk_action_create_menu_item(action_bullets);
-	//menu_inc_indent = gtk_action_create_menu_item(action_inc_indent);
-	//menu_dec_indent = gtk_action_create_menu_item(action_dec_indent);
 	menu_font_small = gtk_action_create_menu_item(action_font_small);
 	menu_font_normal = gtk_action_create_menu_item(action_font_normal);
 	menu_font_large = gtk_action_create_menu_item(action_font_large);
@@ -862,8 +874,6 @@ UserInterface* create_mainwin() {
 	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_font_huge);
 	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_bullets);
-	//gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_inc_indent);
-	//gtk_menu_shell_append(GTK_MENU_SHELL(text_style_menu), menu_dec_indent);
 #endif
 
 
@@ -876,6 +886,7 @@ UserInterface* create_mainwin() {
 	menu_open = gtk_button_new();
 	menu_settings = gtk_button_new();
 	menu_sync = gtk_button_new();
+	menu_share = gtk_button_new();
 	menu_quit = gtk_button_new();
 	menu_delete = gtk_button_new();
 	menu_fullscreen = gtk_button_new();
@@ -885,6 +896,7 @@ UserInterface* create_mainwin() {
 	gtk_action_connect_proxy(action_notes, menu_open);
 	gtk_action_connect_proxy(action_settings, menu_settings);
 	gtk_action_connect_proxy(action_sync, menu_sync);
+	gtk_action_connect_proxy(action_share, menu_share);
 	gtk_action_connect_proxy(action_quit, menu_quit);
 	gtk_action_connect_proxy(action_delete, menu_delete);
 	gtk_action_connect_proxy(action_fullscreen, menu_fullscreen);
@@ -893,6 +905,7 @@ UserInterface* create_mainwin() {
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_new));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_delete));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_sync));
+	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_share));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_settings));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_fullscreen));
 	hildon_app_menu_append(HILDON_APP_MENU(main_menu), GTK_BUTTON(menu_about));
@@ -1174,6 +1187,10 @@ UserInterface* create_mainwin() {
 
 	g_signal_connect(action_sync, "activate",
 			G_CALLBACK(on_sync_but_clicked),
+			ui);
+
+	g_signal_connect(action_share, "activate",
+			G_CALLBACK(on_share_but_clicked),
 			ui);
 
 	g_signal_connect(action_back, "activate",

@@ -388,6 +388,7 @@
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libxml2"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/curl"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libxslt"/>
 <entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
 </settingEntries>
 </languageData>
@@ -420,6 +421,7 @@
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libxml2"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/curl"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libxslt"/>
 <entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
 </settingEntries>
 </languageData>
@@ -452,6 +454,7 @@
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libxml2"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/curl"/>
 <entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/"/>
+<entry flags="" kind="includePath" name="/scratchbox/users/${USERNAME}/targets/FREMANTLE_X86/usr/include/libxslt"/>
 <entry flags="" kind="macro" name="HILDON_HAS_APP_MENU" value="1"/>
 </settingEntries>
 </languageData>

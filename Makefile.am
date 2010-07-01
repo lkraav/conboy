@@ -68,7 +68,9 @@ conboy_SOURCES = \
 	src/conboy_http.h \
 	src/conboy_http.c \
 	src/conboy_web_sync.h \
-	src/conboy_web_sync.c
+	src/conboy_web_sync.c \
+	src/sharing.h \
+	src/sharing.c
 conboy_CPPFLAGS = $(DEPS_CFLAGS) $(EXTRAS_CPPFLAGS) \
 	-I$(top_srcdir)/src -I$(top_builddir) -I$(top_builddir)/src
 conboy_LDADD = $(DEPS_LIBS)
