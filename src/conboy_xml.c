@@ -88,8 +88,10 @@ void conboy_xml_reader_free()
 
 void conboy_reinit_xml_reader()
 {
-	xmlFreeTextReader(__xml_text_reader);
-	__xml_text_reader = NULL;
+	if (__xml_text_reader != NULL) {
+		//xmlFreeTextReader(__xml_text_reader);
+		__xml_text_reader = NULL;
+	}
 }
 
 
