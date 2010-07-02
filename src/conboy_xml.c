@@ -80,7 +80,16 @@ void conboy_xml_reader_free()
 {
 	if (__xml_text_reader) {
 		xmlFreeTextReader(__xml_text_reader);
+		__xml_text_reader = NULL;
 		xmlCleanupParser();
 	}
 }
+
+
+void conboy_reinit_xml_reader()
+{
+	xmlFreeTextReader(__xml_text_reader);
+	__xml_text_reader = NULL;
+}
+
 

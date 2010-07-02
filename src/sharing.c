@@ -18,7 +18,7 @@
 
 #include "config.h"
 #include "conboy_config.h"
-
+#define WITH_SHARING
 #ifdef WITH_SHARING
 
 #include <libxml/HTMLparser.h>
@@ -178,6 +178,10 @@ conboy_share_note (ConboyNote *note)
 	/* Open sharing dialog */
 	AppData *app_data = app_data_get();
 	sharing_dialog_with_file(app_data->osso_ctx, GTK_WINDOW(app_data->note_window->window), "/tmp/notes.html");
+
+	/* Work around. The sharing dialog calls xmlCleanupParser(), so we have to reinit the xml parser.
+	 * https://bugs.maemo.org/show_bug.cgi?id=10849 */
+	conboy_reinit_xml_reader();
 
 	/* Remove temp file again */
 	/* g_unlink("/tmp/notes.html"); Dont remove file, otherwise the service cant access it */

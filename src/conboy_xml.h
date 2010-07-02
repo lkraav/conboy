@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -30,6 +30,7 @@ xmlTextReader* conboy_xml_get_reader_for_file(const gchar *file_name);
 xmlTextReader* conboy_xml_get_reader_for_memory(const gchar *xml_string);
 
 void conboy_xml_reader_free(void);
+void conboy_reinit_xml_reader(void);
 
 
 
