@@ -18,7 +18,7 @@
 
 #include "config.h"
 #include "conboy_config.h"
-#define WITH_SHARING
+
 #ifdef WITH_SHARING
 
 #include <libxml/HTMLparser.h>

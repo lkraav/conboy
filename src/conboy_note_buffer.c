@@ -78,7 +78,7 @@ conboy_note_buffer_add_active_tag (ConboyNoteBuffer *self, GtkTextTag *tag)
 	g_return_if_fail(GTK_IS_TEXT_TAG(tag));
 
 	if (strncmp(tag->name, "depth", 5) == 0) {
-		g_printerr("WARNING: Trying to add depth tag. Not added\n", tag->name);
+		g_printerr("WARNING: Trying to add depth tag. Not added\n");
 		return;
 	}
 
@@ -774,7 +774,7 @@ conboy_note_buffer_backspace_handler(ConboyNoteBuffer *buffer)
 			/* Check if cursor is on the right side of a soft line break. If yes, remove it */
 			prev = start;
 			gtk_text_iter_backward_chars(&prev, 2);
-			if (gtk_text_iter_get_char(&prev) == "\u2028") {
+			if (gtk_text_iter_get_char(&prev) == '\u2028') {
 				GtkTextIter end_break = prev;
 				gtk_text_iter_forward_char(&end_break);
 				gtk_text_buffer_delete(buf, &prev, &end_break);

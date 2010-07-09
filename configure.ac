@@ -1,4 +1,4 @@
-AC_INIT([conboy], [0.6.3.24], [https://bugs.maemo.org/enter_bug.cgi?product=conboy], [conboy])
+AC_INIT([conboy], [0.6.3.25], [https://bugs.maemo.org/enter_bug.cgi?product=conboy], [conboy])
 #AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([macros])
@@ -82,7 +82,7 @@ AC_ARG_ENABLE([maemo-launcher],
 
 PLUGIN_DEPS="hildon-1 >= 0.8.4 libosso >= 0.8.4 gconf-2.0 >= 0.22"
 STORAGE_XML_DEPS="libxml-2.0 >= 2.6.0 json-glib-1.0 >= 0.6.2"
-COMMON_DEPS="$COMMON_DEPS $PLUGIN_DEPS $STORAGE_XML_DEPS gmodule-2.0 libhildonmime >= 1.0.0  libcurl >= 7.15.0 oauth >= 0.5.2 libxslt >= 1.1"
+COMMON_DEPS="$COMMON_DEPS $PLUGIN_DEPS $STORAGE_XML_DEPS gmodule-2.0 libhildonmime >= 1.0.0 libcurl >= 7.15.0 oauth >= 0.5.2 libxslt >= 1.1"
 PKG_CHECK_MODULES([DEPS], [$COMMON_DEPS])
 PKG_CHECK_MODULES([STORAGE_EVERNOTE], [$PLUGIN_DEPS])
 PKG_CHECK_MODULES([STORAGE_MIDGARD], [$PLUGIN_DEPS $MIDGARD_DEPS])

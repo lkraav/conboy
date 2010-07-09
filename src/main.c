@@ -76,7 +76,9 @@ main (int argc, char *argv[])
   locale_init();
 
   /* Init threads */
-  //g_thread_init(NULL);
+  #ifndef WITH_SHARING /* Sharing dialog somehow included a call to g_thread_init */
+  g_thread_init(NULL);
+  #endif
   gdk_threads_init();
 
   /* Init GTK */

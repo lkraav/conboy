@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -52,13 +52,13 @@ struct _ConboyPluginInfo {
 struct _ConboyPluginInfoClass
 {
 	GObjectClass parent;
-	
+
 	void (*plugin_activate)			(ConboyPluginInfo *info);
 	void (*plugin_deactivate)		(ConboyPluginInfo *info);
-	
+
 	void (*plugin_activated)		(ConboyPluginInfo *info);
 	void (*plugin_deactivated)		(ConboyPluginInfo *info);
-	
+
 };
 
 ConboyPluginInfo  *conboy_plugin_info_new       (const gchar *file);
@@ -76,8 +76,8 @@ gboolean      conboy_plugin_info_is_available      (ConboyPluginInfo *info);
 gboolean      conboy_plugin_info_is_configurable   (ConboyPluginInfo *info);
 gboolean      conboy_plugin_info_is_active         (ConboyPluginInfo *info);
 
-gboolean	conboy_plugin_info_activate_plugin		(ConboyPluginInfo *info);
-gboolean	conboy_plugin_info_deactivate_plugin	(ConboyPluginInfo *info);
+void    	conboy_plugin_info_activate_plugin		(ConboyPluginInfo *info);
+void        conboy_plugin_info_deactivate_plugin	(ConboyPluginInfo *info);
 
 
 G_END_DECLS

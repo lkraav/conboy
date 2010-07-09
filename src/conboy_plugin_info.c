@@ -1,5 +1,5 @@
 /* This file is part of Conboy.
- * 
+ *
  * Copyright (C) 2009 Cornelius Hald
  *
  * Conboy is free software: you can redistribute it and/or modify
@@ -332,16 +332,16 @@ conboy_plugin_info_is_configurable (ConboyPluginInfo *info)
 	return FALSE;
 }
 
-gboolean
+void
 conboy_plugin_info_activate_plugin (ConboyPluginInfo *info)
 {
-	g_return_val_if_fail(info != NULL, FALSE);
-	g_return_val_if_fail(info->file != NULL, FALSE);
-	g_return_val_if_fail(info->module_name != NULL, FALSE);
+	g_return_if_fail(info != NULL);
+	g_return_if_fail(info->file != NULL);
+	g_return_if_fail(info->module_name != NULL);
 
 	if (info->plugin != NULL) {
 		g_printerr("ERROR: Plugin is already active\n");
-		return FALSE;
+		return;
 	}
 
 	ConboyPlugin *result = NULL;
@@ -368,18 +368,17 @@ conboy_plugin_info_activate_plugin (ConboyPluginInfo *info)
 	g_free(filename);
 	g_free(path);
 
-	return (CONBOY_PLUGIN(result)); /* FIXME, return TRUE or FALSE */
 }
 
-gboolean
+void
 conboy_plugin_info_deactivate_plugin (ConboyPluginInfo *info)
 {
-	g_return_val_if_fail(info != NULL, FALSE);
-	g_return_val_if_fail(CONBOY_IS_PLUGIN_INFO(info), FALSE);
+	g_return_if_fail(info != NULL);
+	g_return_if_fail(CONBOY_IS_PLUGIN_INFO(info));
 
 	if (info->plugin == NULL || !CONBOY_IS_PLUGIN(info->plugin)) {
 		g_printerr("ERROR: Plugin not active. Cannot be deactivated\n");
-		return FALSE;
+		return;
 	}
 
 	/* We emit the signal before destroying the plugin, so that
@@ -390,6 +389,4 @@ conboy_plugin_info_deactivate_plugin (ConboyPluginInfo *info)
 	info->plugin = NULL;
 
 	g_signal_emit_by_name(info, "plugin-deactivated");
-
-	return TRUE;
 }

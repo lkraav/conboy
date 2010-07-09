@@ -18,10 +18,15 @@
 
 #include "localisation.h"
 
+#include <glib.h>
+#include <glib/gprintf.h>
+#include <glib/gstdio.h>
 #include <gtk/gtk.h>
 #include <tablet-browser-interface.h>
 #include <sys/socket.h>
+#include <stdio.h>
 #include <netinet/in.h>
+#include <string.h>
 
 #include "settings.h"
 #include "json.h"
