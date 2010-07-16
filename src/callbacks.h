@@ -20,6 +20,7 @@
 #ifndef CALLBACKS_H
 #define CALLBACKS_H
 
+#include "config.h"
 #include "note.h"
 #include "interface.h"
 
@@ -187,6 +188,12 @@ void on_find_button_clicked(GtkAction *action, gpointer user_data);
 void on_find_bar_search(GtkWidget *widget, UserInterface *ui);
 void on_find_bar_close(GtkWidget *widget, UserInterface *ui);
 
+#ifdef WITH_BT
+void on_send_bt_button_clicked(GtkAction *action, gpointer user_data);
+#endif
+#ifdef WITH_MODEST
+void on_send_mail_button_clicked(GtkAction *action, gpointer user_data);
+#endif
 
 
 

@@ -1,3 +1,9 @@
+conboy (1:0.6.3.26) stable; urgency=low
+
+  * Implemented Send via bluetooth/email for Diablo and (maybe) Chinook
+  
+ -- Cornelius Hald <hald@icandy.de>  Thu, 09 Jul 2010 19:51:41 +0200
+
 conboy (1:0.6.3.25) stable; urgency=low
 
   * Fixed execution on Diablo and Chinook

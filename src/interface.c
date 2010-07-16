@@ -327,7 +327,7 @@ on_share_but_clicked(GtkButton *but, gpointer user_data)
 	UserInterface *ui = (UserInterface*) user_data;
 	ConboyNote *note = ui->note;
 
-	conboy_share_note(note);
+	conboy_share_note_via_sharing(note);
 }
 #endif /* WITH_SHARING */
 
@@ -581,7 +581,6 @@ UserInterface* create_mainwin() {
 	GtkWidget *menu_bullets;
 	GtkWidget *menu_settings;
 	GtkWidget *menu_quit;
-	GtkWidget *menu_text_style;
 	GtkWidget *menu_font_small;
 	GtkWidget *menu_font_normal;
 	GtkWidget *menu_font_large;
@@ -592,6 +591,9 @@ UserInterface* create_mainwin() {
 	GtkWidget *menu_delete;
 	GtkWidget *menu_fullscreen;
 	GtkWidget *menu_about;
+	GtkWidget *menu_send;
+	GtkWidget *menu_send_bt;
+	GtkWidget *menu_send_mail;
 
 	GtkWidget *toolbar;
 	GtkWidget *find_bar;
@@ -638,6 +640,8 @@ UserInterface* create_mainwin() {
 	GtkAction *action_fullscreen;
 	GtkAction *action_about;
 	GtkAction *action_share;
+	GtkAction *action_send_bt;
+	GtkAction *action_send_mail;
 
 	GtkActionGroup *action_group;
 
@@ -717,7 +721,11 @@ UserInterface* create_mainwin() {
 	action_about = GTK_ACTION(gtk_action_new("about", _("About Conboy"), NULL, NULL));
 	/* Translators: Share a note via the sharing dialog. */
 	action_share = GTK_ACTION(gtk_action_new("share", _("Share note"), NULL, NULL));
-	/* TODO: Use an enum instead of 0 to 3 */
+	/* Translators: Send a note via bluetooth */
+	action_send_bt = GTK_ACTION(gtk_action_new("send_bt", _("Via Bluetooth..."), NULL, NULL));
+	/* Translators: Send a note via email */
+	action_send_mail = GTK_ACTION(gtk_action_new("send_mail", _("Via E-mail..."), NULL, NULL));
+
 	/* Translators: Small font. */
 	action_font_small = GTK_ACTION(gtk_radio_action_new("size:small", _("Small"), NULL, NULL, 0));
 	/* Translators: Normal size font. */
@@ -728,7 +736,6 @@ UserInterface* create_mainwin() {
 	action_font_huge = GTK_ACTION(gtk_radio_action_new("size:huge", _("Huge"), NULL, NULL, 3));
 
 	gtk_action_set_sensitive(action_link, FALSE);
-	/*gtk_action_set_sensitive(action_inc_indent, FALSE);*/
 	gtk_action_set_sensitive(action_dec_indent, FALSE);
 	gtk_action_set_sensitive(action_back, FALSE);
 	gtk_action_set_sensitive(action_forward, FALSE);
@@ -755,8 +762,7 @@ UserInterface* create_mainwin() {
 	gtk_action_group_add_action_with_accel(action_group, action_quit,      "<Ctrl>q");
 	gtk_action_group_add_action_with_accel(action_group, action_new,       "<Ctrl>n");
 	gtk_action_group_add_action_with_accel(action_group, action_find,      "<Ctrl>f");
-	//gtk_action_group_add_action_with_accel(action_group, action_fullscreen,"<Ctrl>Return");
-	gtk_action_group_add_action_with_accel(action_group, action_fullscreen,"<Control>KP_Enter");
+	gtk_action_group_add_action_with_accel(action_group, action_fullscreen,"<Ctrl>KP_Enter");
 	gtk_action_group_add_action_with_accel(action_group, action_link,      "<Ctrl>l");
 
 	gtk_action_set_accel_group(action_bold,      accel_group);
@@ -926,8 +932,6 @@ UserInterface* create_mainwin() {
 	menu_new = gtk_action_create_menu_item(action_new);
 	menu_delete = gtk_action_create_menu_item(action_delete);
 	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menu_delete), NULL);
-	/*menu_text_style = gtk_menu_item_new_with_label(_("Text Style"));
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_text_style), text_style_menu);*/
 	menu_settings = gtk_action_create_menu_item(action_settings);
 	menu_sync = gtk_action_create_menu_item(action_sync);
 	menu_about = gtk_action_create_menu_item(action_about);
@@ -935,12 +939,26 @@ UserInterface* create_mainwin() {
 
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_new);
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_delete);
-	/*gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
-	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_text_style);*/
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_settings);
-	/*gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());*/
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_sync);
+
+	/* If Modest or Bluetooth is there, add Send menu with Mail and/or Bluetooth */
+	#if defined(WITH_MODEST) || defined(WITH_BT)
+		menu_send = gtk_menu_item_new_with_label(_("Share Note"));
+		GtkWidget *send_menu = gtk_menu_new();
+		gtk_menu_item_set_submenu(GTK_MENU_ITEM(menu_send), send_menu);
+		gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_send);
+		#ifdef WITH_MODEST
+			menu_send_mail = gtk_action_create_menu_item(action_send_mail);
+			gtk_menu_shell_append(GTK_MENU_SHELL(send_menu), menu_send_mail);
+		#endif
+		#ifdef WITH_BT
+			menu_send_bt = gtk_action_create_menu_item(action_send_bt);
+			gtk_menu_shell_append(GTK_MENU_SHELL(send_menu), menu_send_bt);
+		#endif
+	#endif
+
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), gtk_separator_menu_item_new());
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_about);
 	gtk_menu_shell_append(GTK_MENU_SHELL(main_menu), menu_quit);
@@ -1212,6 +1230,18 @@ UserInterface* create_mainwin() {
 	g_signal_connect(action_about, "activate",
 			G_CALLBACK(on_about_button_clicked),
 			ui);
+
+	#ifdef WITH_MODEST
+		g_signal_connect(action_send_mail, "activate",
+			G_CALLBACK(on_send_mail_button_clicked),
+			ui);
+	#endif
+
+	#ifdef WITH_BT
+		g_signal_connect(action_send_bt, "activate",
+			G_CALLBACK(on_send_bt_button_clicked),
+			ui);
+	#endif
 
 	/* OTHER SIGNALS */
 	g_signal_connect ((gpointer) buffer, "mark-set",

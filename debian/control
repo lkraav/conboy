@@ -2,7 +2,7 @@ Source: conboy
 Section: user/utilities
 Priority: optional
 Maintainer: Cornelius Hald <hald@icandy.de>
-Build-Depends: debhelper (>= 4.0.0), intltool, maemo-version-dev, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings, libcurl3-dev, liboauth-dev, libssl-dev, tablet-browser-interface-dev, mce-dev, libpcre3-dev, libhildonmime-dev, libmodest-dbus-client-dev | maemo-version-dev (<< 4.1), libmidgard2-dev | maemo-version-dev (<< 5.0), libgda3-dev, maemo-optify | maemo-version-dev (<< 5.0), maemo-launcher-dev (>= 0.23-1), sharing-dialog-dev (>= 1.1.48) | maemo-version-dev (<< 5.0), libxslt1-dev (>= 1.1)
+Build-Depends: debhelper (>= 4.0.0), intltool, maemo-version-dev, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings, libcurl3-dev, liboauth-dev, libssl-dev, tablet-browser-interface-dev, mce-dev, libpcre3-dev, libhildonmime-dev, libmodest-dbus-client-dev | maemo-version-dev (<< 4.1), libmidgard2-dev | maemo-version-dev (<< 5.0), libgda3-dev, maemo-optify | maemo-version-dev (<< 5.0), maemo-launcher-dev (>= 0.23-1), sharing-dialog-dev (>= 1.1.48) | maemo-version-dev (<< 5.0), libxslt1-dev (>= 1.1), conbtdialogs-dev | maemo-version-dev (<< 4.1)
 Standards-Version: 3.6.0
 
 Package: conboy
@@ -124,4 +124,3 @@ XB-Maemo-Icon-26:
  JIAuIGXtgFDow3ax3wdEevfAehASueDzd7v5JHKBp4JrHzD2AoH9Xz5wBCQL
  yoUCu+B7Dbcv9Rcr/wNmArLWkmPEkQAAAABJRU5ErkJggg==
 
- 

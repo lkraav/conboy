@@ -1,4 +1,4 @@
-AC_INIT([conboy], [0.6.3.25], [https://bugs.maemo.org/enter_bug.cgi?product=conboy], [conboy])
+AC_INIT([conboy], [0.6.3.26], [https://bugs.maemo.org/enter_bug.cgi?product=conboy], [conboy])
 #AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([macros])
@@ -26,6 +26,10 @@ PKG_CHECK_EXISTS([glib-2.0 < 2.14.0], [COMMON_DEPS="$COMMON_DEPS libpcre >= 6.7"
 PKG_CHECK_EXISTS([libmodest-dbus-client-1.0 >= 1.0], [
 	AC_DEFINE([WITH_MODEST], [1], [Does have Modest support])
 	COMMON_DEPS="$COMMON_DEPS libmodest-dbus-client-1.0 >= 1.0"])
+
+PKG_CHECK_EXISTS([conbtdialogs >= 1.4], [
+	AC_DEFINE([WITH_BT], [1], [Does have bluetooth dialogs])
+	COMMON_DEPS="$COMMON_DEPS conbtdialogs >= 1.4"])
 	
 PKG_CHECK_EXISTS([sharingdialog >= 1.1], [
 	AC_DEFINE([WITH_SHARING], [1], [Does have sharing dialog])

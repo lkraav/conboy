@@ -52,6 +52,7 @@
 #include "conboy_note_buffer.h"
 #include "ui_helper.h"
 #include "gregex.h"
+#include "sharing.h"
 
 #include "callbacks.h"
 
@@ -1065,3 +1066,20 @@ on_about_button_clicked				   (GtkAction		*action,
 	gtk_widget_destroy(GTK_WIDGET(dia));
 }
 
+#ifdef WITH_BT
+void
+on_send_bt_button_clicked(GtkAction *action, gpointer user_data)
+{
+	UserInterface *ui = (UserInterface*) user_data;
+	conboy_share_note_via_bluetooth(ui->note);
+}
+#endif
+
+#ifdef WITH_MODEST
+void
+on_send_mail_button_clicked(GtkAction *action, gpointer user_data)
+{
+	UserInterface *ui = (UserInterface*) user_data;
+	conboy_share_note_via_email(ui->note);
+}
+#endif

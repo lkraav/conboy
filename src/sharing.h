@@ -19,8 +19,19 @@
 #ifndef __SHARING_H__
 #define __SHARING_H__
 
+#include "config.h"
 #include "conboy_note.h"
 
-void conboy_share_note(ConboyNote *note);
+#ifdef WITH_SHARING
+void conboy_share_note_via_sharing (ConboyNote *note);
+#endif
+
+#ifdef WITH_BT
+void conboy_share_note_via_bluetooth (ConboyNote *note);
+#endif
+
+#ifdef WITH_MODEST
+void conboy_share_note_via_email (ConboyNote *note);
+#endif
 
 #endif /* __SHARING_H__ */
