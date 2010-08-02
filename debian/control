@@ -61,6 +61,10 @@ Description-nb_NB: Conboy er et program for notatskriving.
  Den er laget for å være lett å bruke - men kraftig. Conboy kan lese og skrive
  Tomboy filformatet og er kompatibelt med Tomboy på Linux, Mac og
  Windows.
+Description-cs_CS: Conboy je program na psaní poznámek.
+ Je navržen tak, aby byl jednoduše použitelný, ale zároveň i výkonný.
+ Conboy dokáže číst a zapisovat poznámky v souborovém formátu Tomboy, který
+ je slučitelný s Tomboyem pro Linux, Mac a Windows.
 XB-Maemo-Display-Name: Conboy
 XSBC-Bugtracker: https://bugs.maemo.org/enter_bug.cgi?product=conboy
 XB-Maemo-Icon-26:

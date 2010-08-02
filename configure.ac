@@ -96,7 +96,7 @@ PKG_CHECK_MODULES([STORAGE_XML], [$PLUGIN_DEPS $STORAGE_XML_DEPS])
 AC_PROG_INTLTOOL([0.23])
 AC_SUBST([GETTEXT_PACKAGE], [$PACKAGE_NAME])
 AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"], [Name of gettext package])
-AC_SUBST([ALL_LINGUAS], ["de en_GB fr it pt_BR pl fi da nl sk sv ro tr hu ru nb"])
+AC_SUBST([ALL_LINGUAS], ["de en_GB fr it pt_BR pl fi da nl sk sv ro tr hu ru nb cs"])
 AM_GLIB_GNU_GETTEXT
 AC_SUBST([localedir], [`$PKG_CONFIG osso-af-settings --variable=localedir`])
 AC_DEFINE_UNQUOTED([LOCALEDIR], ["$localedir"], [localedir])
