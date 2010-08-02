@@ -666,6 +666,11 @@ json_get_note_list(const gchar* json_string)
 	}
 	*/
 
+	/* Currently known U1 server bug. Remove this, when fixed. */
+	if (strncmp(json_string, "Could not save note record: ResourceConflict", 44) != 0) {
+		g_printf("ERROR: The sever rejected a note, because the UUID was already used in the past. This is a server bug.\n");
+	}
+
 	JsonParser *parser = json_parser_new();
 	JsonNoteList *result = NULL;
 	GError *error = NULL;
