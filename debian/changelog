@@ -1,3 +1,9 @@
+conboy (1:0.6.3.27) stable; urgency=low
+
+  * Now using hildon-extras library instead of copy&paste code.
+  
+ -- Cornelius Hald <hald@icandy.de>  Thu, 03 Aug 2010 09:37:17 +0200
+
 conboy (1:0.6.3.26) stable; urgency=low
 
   * Implemented Send via bluetooth/email for Diablo and (maybe) Chinook

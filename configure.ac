@@ -1,4 +1,4 @@
-AC_INIT([conboy], [0.6.3.26], [https://bugs.maemo.org/enter_bug.cgi?product=conboy], [conboy])
+AC_INIT([conboy], [0.6.3.27], [https://bugs.maemo.org/enter_bug.cgi?product=conboy], [conboy])
 #AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([macros])
@@ -34,6 +34,10 @@ PKG_CHECK_EXISTS([conbtdialogs >= 1.4], [
 PKG_CHECK_EXISTS([sharingdialog >= 1.1], [
 	AC_DEFINE([WITH_SHARING], [1], [Does have sharing dialog])
 	COMMON_DEPS="$COMMON_DEPS sharingdialog >= 1.1"])
+	
+PKG_CHECK_EXISTS([hildon-extras-1 >= 0.9], [
+	AC_DEFINE([WITH_HE], [1], [Does have hildon-extras])
+	COMMON_DEPS="$COMMON_DEPS hildon-extras-1 >= 0.9"])
 
 # Find out maemo version
 PKG_CHECK_EXISTS([maemo-version], [

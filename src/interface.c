@@ -37,6 +37,9 @@
 #include <hildon/hildon-text-view.h>
 #include <hildon/hildon-pannable-area.h>
 #endif
+#if WITH_HE
+#include <hildon-extras/he-fullscreen-button.h>
+#endif
 
 #include "conboy_config.h"
 #include "callbacks.h"
@@ -49,7 +52,6 @@
 #include "note.h"
 #include "json.h"
 #include "ui_helper.h"
-#include "he-fullscreen-button.h"
 #include "sharing.h"
 #include "interface.h"
 
@@ -1333,7 +1335,7 @@ UserInterface* create_mainwin() {
 	ungrab_volume_keys(mainwin);
 
 	/* Adding the transparent fullscreen button */
-#ifdef HILDON_HAS_APP_MENU
+#ifdef WITH_HE
 	HeFullscreenButton *but = he_fullscreen_button_new(GTK_WINDOW(mainwin));
 	g_signal_connect_swapped(but, "clicked", G_CALLBACK(ui_helper_toggle_fullscreen), he_fullscreen_button_get_window(but));
 #endif

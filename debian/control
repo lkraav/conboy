@@ -2,12 +2,12 @@ Source: conboy
 Section: user/utilities
 Priority: optional
 Maintainer: Cornelius Hald <hald@icandy.de>
-Build-Depends: debhelper (>= 4.0.0), intltool, maemo-version-dev, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings, libcurl3-dev, liboauth-dev, libssl-dev, tablet-browser-interface-dev, mce-dev, libpcre3-dev, libhildonmime-dev, libmodest-dbus-client-dev | maemo-version-dev (<< 4.1), libmidgard2-dev | maemo-version-dev (<< 5.0), libgda3-dev, maemo-optify | maemo-version-dev (<< 5.0), maemo-launcher-dev (>= 0.23-1), sharing-dialog-dev (>= 1.1.48) | maemo-version-dev (<< 5.0), libxslt1-dev (>= 1.1), conbtdialogs-dev | maemo-version-dev (<< 4.1)
+Build-Depends: debhelper (>= 4.0.0), intltool, maemo-version-dev, libhildon1-dev, libosso-dev, libgconf2-dev, libxml2-dev, libjson-glib-dev, osso-af-settings, libcurl3-dev, liboauth-dev, libssl-dev, tablet-browser-interface-dev, mce-dev, libpcre3-dev, libhildonmime-dev, libmodest-dbus-client-dev | maemo-version-dev (<< 4.1), libmidgard2-dev | maemo-version-dev (<< 5.0), libgda3-dev, maemo-optify | maemo-version-dev (<< 5.0), maemo-launcher-dev (>= 0.23-1), sharing-dialog-dev (>= 1.1.48) | maemo-version-dev (<< 5.0), libxslt1-dev (>= 1.1), conbtdialogs-dev | maemo-version-dev (<< 4.1), hildon-extras1-dev (>= 0.9) | maemo-version-dev (<< 5.0) 
 Standards-Version: 3.6.0
 
 Package: conboy
 Architecture: any
-Depends: libjson-glib-1.0-0 (>=0.8.0-1maemo4) | maemo-release (<< 5.0.0), libjson-glib-1.0-0 (>=0.6.2-7) | maemo-release (>=5.0.0), liboauth0 (>= 0.6.1-2), libcurl3 (>= 7.15.0), libglib2.0-0 (>= 2.14) | libpcre3 (>= 6.7), ${launcher:Depends}, sharing-dialog (>= 1.1.48) | maemo-release (<< 5.0.0), libxslt1.1 (>= 1.1) 
+Depends: libjson-glib-1.0-0 (>=0.8.0-1maemo4) | maemo-release (<< 5.0.0), libjson-glib-1.0-0 (>=0.6.2-7) | maemo-release (>=5.0.0), liboauth0 (>= 0.6.1-2), libcurl3 (>= 7.15.0), libglib2.0-0 (>= 2.14) | libpcre3 (>= 6.7), ${launcher:Depends}, sharing-dialog (>= 1.1.48) | maemo-release (<< 5.0.0), libxslt1.1 (>= 1.1), hildon-extras1 (>= 0.9) | maemo-release (<< 5.0.0)  
 Conflicts: conboy-unstable
 Replaces: conboy-unstable
 #XB-Maemo-Upgrade-Description: Changes since 0.5.8

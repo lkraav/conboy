@@ -49,12 +49,8 @@ conboy_SOURCES = \
 	src/conboy_note_buffer.c \
 	src/conboy_plugin_store.h \
 	src/conboy_plugin_store.c \
-	src/he-check-button.h \
-	src/he-check-button.c \
 	src/orientation.h \
 	src/orientation.c \
-	src/he-fullscreen-button.h \
-	src/he-fullscreen-button.c \
 	src/ui_helper.h \
 	src/ui_helper.c \
 	src/conboy_plugin_manager_row.h \
@@ -63,8 +59,6 @@ conboy_SOURCES = \
 	src/gregex.c \
 	src/conboy_xml.h \
 	src/conboy_xml.c \
-	src/he-about-dialog.h \
-	src/he-about-dialog.c \
 	src/conboy_http.h \
 	src/conboy_http.c \
 	src/conboy_web_sync.h \

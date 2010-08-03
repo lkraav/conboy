@@ -25,7 +25,6 @@
 #include <hildon/hildon-program.h>
 #ifdef HILDON_HAS_APP_MENU
 #include <hildon/hildon-pannable-area.h>
-#include <he-about-dialog.h>
 #endif
 #include <hildon/hildon-banner.h>
 #include <hildon/hildon-defines.h>
@@ -39,6 +38,9 @@
 #include <tablet-browser-interface.h>
 #ifdef WITH_MODEST
 #include <libmodest-dbus-client/libmodest-dbus-client.h>
+#endif
+#ifdef WITH_HE
+#include <hildon-extras/he-about-dialog.h>
 #endif
 
 #include "metadata.h"
@@ -1042,7 +1044,7 @@ on_about_button_clicked				   (GtkAction		*action,
 {
 	UserInterface *ui = (UserInterface*)user_data;
 
-#ifdef HILDON_HAS_APP_MENU
+#ifdef WITH_HE
 	HeAboutDialog *dia = HE_ABOUT_DIALOG(he_about_dialog_new());
 	gtk_window_set_transient_for(GTK_WINDOW(dia), GTK_WINDOW(ui->window));
 

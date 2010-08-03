@@ -18,11 +18,11 @@
 
 #include "localisation.h"
 
-#ifdef HILDON_HAS_APP_MENU
+#ifdef WITH_HE
 
 #include <hildon/hildon-gtk.h>
+#include <hildon-extras/he-check-button.h>
 
-#include "he-check-button.h"
 #include "conboy_plugin_manager_row.h"
 
 

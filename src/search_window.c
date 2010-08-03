@@ -17,6 +17,7 @@
  */
 #include "localisation.h"
 
+#include <string.h>
 #include <gtk/gtk.h>
 #include <hildon/hildon-window.h>
 #include <hildon/hildon-defines.h>
@@ -27,7 +28,9 @@
 #include <hildon/hildon-gtk.h>
 #include <gtk/gtkenums.h>
 #endif
-#include <string.h>
+#ifdef WITH_HE
+#include <hildon-extras/he-fullscreen-button.h>
+#endif
 
 #include "app_data.h"
 #include "metadata.h"
@@ -36,7 +39,6 @@
 #include "settings.h"
 #include "search.h"
 #include "ui_helper.h"
-#include "he-fullscreen-button.h"
 #include "search_window.h"
 
 typedef struct {
@@ -516,9 +518,11 @@ HildonWindow* search_window_create(SearchWindowData *window_data)
 #ifdef HILDON_HAS_APP_MENU
 	g_signal_connect(button_sort_by_title, "toggled", G_CALLBACK(on_sort_by_title_changed), sorted_store);
 	g_signal_connect(button_sort_by_date, "toggled", G_CALLBACK(on_sort_by_date_changed), sorted_store);
+	#ifdef WITH_HE
 	/* Add transparent fullscreen button */
 	HeFullscreenButton *but = he_fullscreen_button_new(GTK_WINDOW(win));
 	g_signal_connect_swapped(but, "clicked", G_CALLBACK(ui_helper_toggle_fullscreen), he_fullscreen_button_get_window(but));
+	#endif
 #endif
 
 	return HILDON_WINDOW(win);
