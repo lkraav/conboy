@@ -285,7 +285,9 @@ json_get_node_from_note(ConboyNote *note)
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_string(node, content);
 	json_object_add_member(obj, JSON_NOTE_CONTENT, node);
-	g_free(content);
+	if (content != NULL && strcmp(content, "") != 0) { /* Only free if something is there, otherwise crash */
+		g_free(content);
+	}
 
 	node = json_node_new(JSON_NODE_VALUE);
 	json_node_set_double(node, note->content_version);
