@@ -434,16 +434,19 @@ json_get_note_from_node(JsonNode *node)
 	gchar tmp_version[10];
 	gchar *tmp_content;
 	gchar *tmp_title;
+	gchar *tmp_title_esc;
 
 	g_object_get(note, "title", &tmp_title, "content", &tmp_content, "content-version", &version, NULL);
 	g_ascii_formatd(tmp_version, 10, "%.1f", version);
+
+	tmp_title_esc = escape_entities(tmp_title);
 
 	gchar *full_content = g_strconcat(
 			"<note-content xmlns:link=\"http://beatniksoftware.com/tomboy/link\" xmlns:size=\"http://beatniksoftware.com/tomboy/size\" xmlns=\"http://beatniksoftware.com/tomboy\" ",
 			"version=\"",
 			tmp_version,
 			"\">",
-			tmp_title,
+			tmp_title_esc,
 			"\n\n",
 			tmp_content,
 			"</note-content>",
@@ -454,6 +457,7 @@ json_get_note_from_node(JsonNode *node)
 	g_free(full_content);
 	g_free(tmp_content);
 	g_free(tmp_title);
+	g_free(tmp_title_esc);
 
 	return note;
 }
@@ -669,8 +673,8 @@ json_get_note_list(const gchar* json_string)
 	*/
 
 	/* Currently known U1 server bug. Remove this, when fixed. */
-	if (strncmp(json_string, "Could not save note record: ResourceConflict", 44) != 0) {
-		g_printf("ERROR: The sever rejected a note, because the UUID was already used in the past. This is a server bug.\n");
+	if (strncmp(json_string, "Could not save note record: ResourceConflict", 44) == 0) {
+		g_printerr("ERROR: The sever rejected a note, because the UUID was already used in the past. This is a server bug.\n");
 	}
 
 	JsonParser *parser = json_parser_new();
