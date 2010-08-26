@@ -1,3 +1,9 @@
+conboy (1:0.6.3.31) stable; urgency=low
+
+  * Fixed build against new liboauth
+  
+ -- Cornelius Hald <hald@icandy.de>  Thu, 26 Aug 2010 20:40:35 +0200
+
 conboy (1:0.6.3.30) stable; urgency=low
 
   * Fixed stupid crasher introduced in last version

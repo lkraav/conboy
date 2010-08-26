@@ -1,4 +1,4 @@
-AC_INIT([conboy], [0.6.3.30], [https://bugs.maemo.org/enter_bug.cgi?product=conboy], [conboy])
+AC_INIT([conboy], [0.6.3.31], [https://bugs.maemo.org/enter_bug.cgi?product=conboy], [conboy])
 #AC_CONFIG_AUX_DIR([build])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([macros])

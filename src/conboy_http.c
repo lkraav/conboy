@@ -39,7 +39,7 @@ WriteMemoryCallback(void *ptr, size_t size, size_t nmemb, void *data) {
   size_t realsize = size * nmemb;
   struct MemoryStruct *mem = (struct MemoryStruct *)data;
 
-  mem->data = (char *)xrealloc(mem->data, mem->size + realsize + 1);
+  mem->data = (char *)g_realloc(mem->data, mem->size + realsize + 1);
   if (mem->data) {
     memcpy(&(mem->data[mem->size]), ptr, realsize);
     mem->size += realsize;
