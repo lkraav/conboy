@@ -57,7 +57,7 @@ msgstr "Evidențiat"
 #. Translators: Underlined text.
 #: ../src/interface.c:684 ../src/interface.c:819 ../src/interface.c:858
 msgid "Underline"
-msgstr "Subliniază"
+msgstr "Subliniat"
 
 #: ../src/interface.c:685
 msgid "Increase indent"
