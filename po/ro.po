@@ -115,7 +115,7 @@ msgstr "Micșorează"
 #. Translators: Find text in the current note.
 #: ../src/interface.c:705
 msgid "Find in note"
-msgstr "Găsește în notiță"
+msgstr "Caută în notiță"
 
 #. Translators: Synchronize the current note.
 #: ../src/interface.c:707
