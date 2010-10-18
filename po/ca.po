@@ -84,7 +84,7 @@ msgstr "Nota nova"
 #. Translators: Open an existing note.
 #: ../src/interface.c:691
 msgid "Open note"
-msgstr ""
+msgstr "Obre nota"
 
 #. Translators: Show the settings dialog.
 #: ../src/interface.c:693
@@ -128,7 +128,7 @@ msgstr "Allunya"
 #. Translators: Find text in the current note.
 #: ../src/interface.c:705
 msgid "Find in note"
-msgstr ""
+msgstr "Cerca a la nota"
 
 #. Translators: Synchronize the current note.
 #: ../src/interface.c:707
@@ -154,12 +154,12 @@ msgstr "Pantalla completa"
 #. Translators: About the program.
 #: ../src/interface.c:717
 msgid "About Conboy"
-msgstr ""
+msgstr "Sobre Conboi"
 
 #. Translators: Share a note via the sharing dialog.
 #: ../src/interface.c:719
 msgid "Share note"
-msgstr ""
+msgstr "Comparteix nota"
 
 #. TODO: Use an enum instead of 0 to 3
 #. Translators: Small font.
@@ -204,12 +204,12 @@ msgstr "Cerca totes les notes"
 #. Translators: Sort notes by title.
 #: ../src/search_window.c:361
 msgid "Sort by title"
-msgstr ""
+msgstr "Ordena per títol"
 
 #. Translators: Sort notes by last modified date.
 #: ../src/search_window.c:363
 msgid "Sort by date"
-msgstr ""
+msgstr "Ordena per data"
 
 #. Translators: Title of a column in a table that contains note titles.
 #: ../src/search_window.c:464
@@ -230,6 +230,10 @@ msgid ""
 "\n"
 "A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
 msgstr ""
+"<b>Títol de Nota agafat</b>\n"
+"\n"
+"Una nota amb el títol <b>%s</b> ja existeix. Si us plau tria un altre nom abans de continuar."
+
 
 #. Translators: Does the user really want to delete the
 #. current note? Answer is "yes" or "no".
@@ -246,12 +250,12 @@ msgstr "Si suprimeixes una nota la perdràs definitivament."
 #: ../src/callbacks.c:1052
 #: ../src/extra_strings.h:3
 msgid "Conboy is a note taking application."
-msgstr ""
+msgstr "Conboy és una aplicació per a prendre notes."
 
 #. Translators: Width of the scrollbar.
 #: ../src/settings_window.c:245
 msgid "Scrollbar size"
-msgstr ""
+msgstr "Mida de la barra de desplaçament"
 
 #. Translators: Thin scrollbar width.
 #: ../src/settings_window.c:251
@@ -261,13 +265,13 @@ msgstr "Fina"
 #. Translators: Thick scrollbar width.
 #: ../src/settings_window.c:256
 msgid "Thick"
-msgstr ""
+msgstr "Gruixuda"
 
 #. Translators: Whether to enable automatic portrait mode.
 #: ../src/settings_window.c:269
 #: ../src/settings_window.c:271
 msgid "Use automatic portrait mode"
-msgstr ""
+msgstr "Usa el mode de retrat automàtic"
 
 #. Translators: Whether to use custom colors.
 #: ../src/settings_window.c:284
@@ -312,7 +316,7 @@ msgstr "Habilitat"
 #: ../src/conboy_plugin_manager.c:134
 #: ../src/conboy_plugin_manager_row.c:132
 msgid "Plugin settings"
-msgstr ""
+msgstr "Configuració del Connector"
 
 #. Translators: Plugins that are
 #. currently active.
@@ -328,22 +332,22 @@ msgstr "Quant al connector"
 #. Translators: Configure the plugin.
 #: ../src/conboy_plugin_manager.c:642
 msgid "Configure plugin"
-msgstr ""
+msgstr "Configura el connector"
 
 #. Translators: Description of the plug-in
 #: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
 msgid "Loads and saves notes from the local filesystem."
-msgstr ""
+msgstr "Càrrega i guarda les notes del sistema de fitxers local."
 
 #. Translators: Name of the plug-in
 #: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:4
 msgid "XML Storage Backend"
-msgstr ""
+msgstr "XML administració d'emmagatzematge"
 
 #. Translators: Following lines of description used by the package manager
 #: ../src/extra_strings.h:5
 msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
-msgstr ""
+msgstr "Conboy pot llegir i escriure el format de fitxer Tomboy per ser compatible amb Tomboy a Linux, Mac i Windows."
 
 #~ msgid "About"
-#~ msgstr ""
+#~ msgstr "Sobre"
