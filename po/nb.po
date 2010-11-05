@@ -50,7 +50,7 @@ msgstr "Fast bredde"
 #. Translators: Emphasise text with a background colour.
 #: ../src/interface.c:682 ../src/interface.c:818 ../src/interface.c:857
 msgid "Highlight"
-msgstr "Fremhev"
+msgstr "Uthev"
 
 #. Translators: Underlined text.
 #: ../src/interface.c:684 ../src/interface.c:819 ../src/interface.c:858
@@ -175,7 +175,7 @@ msgstr "Søk:"
 #. Translators: Search in all notes.
 #: ../src/search_window.c:339
 msgid "Search all notes"
-msgstr "Søk i alle notat"
+msgstr "Søk i alle notater"
 
 #. Add sort filters
 #. Translators: Sort notes by title.
@@ -215,17 +215,17 @@ msgstr ""
 #. current note? Answer is "yes" or "no".
 #: ../src/callbacks.c:593
 msgid "Really delete this note?"
-msgstr "Vil du virkelig slette notatet?"
+msgstr "Vil du virkelig slette dette notatet?"
 
 #: ../src/callbacks.c:595
 msgid "If you delete a note it is permanently lost."
-msgstr "Hvis du sletter et notat blir den permanent borte."
+msgstr "Hvis du sletter et notat kan det ikke gjenopprettes."
 
 #. Translators: Description of the program.
 #. Translators: First line of description used by the package manager
 #: ../src/callbacks.c:1052 ../src/extra_strings.h:3
 msgid "Conboy is a note taking application."
-msgstr "Conboy er et program for notatskriving."
+msgstr "Conboy er et program til å ta notater med."
 
 #. Translators: Width of the scrollbar.
 #: ../src/settings_window.c:245
@@ -244,8 +244,9 @@ msgstr "Tykk"
 
 #. Translators: Whether to enable automatic portrait mode.
 #: ../src/settings_window.c:269 ../src/settings_window.c:271
+#, fuzzy
 msgid "Use automatic portrait mode"
-msgstr "Bruk automatisk stående format"
+msgstr "Bruk portrett-modus automatisk "
 
 #. Translators: Whether to use custom colors.
 #: ../src/settings_window.c:284 ../src/settings_window.c:286
@@ -309,7 +310,7 @@ msgstr "Konfigurer tilleggsmodul"
 #. Translators: Description of the plug-in
 #: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:2
 msgid "Loads and saves notes from the local filesystem."
-msgstr "Laster og lagrer notater på det lokale filsystemet."
+msgstr "Laster inn og lagrer notater på det lokale filsystemet."
 
 #. Translators: Name of the plug-in
 #: ../src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in.h:4
@@ -319,7 +320,7 @@ msgstr "XML-lagringsmodul"
 #. Translators: Following lines of description used by the package manager
 #: ../src/extra_strings.h:5
 msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
-msgstr "Den er laget for å være lett å bruke - men kraftig. Conboy kan lese og skrive Tomboy filformatet og er kompatibelt med Tomboy på Linux, Mac og Windows."
+msgstr "Den er laget for å være lett å bruke - men likevel kraftig. Conboy kan lese og skrive Tomboy-filformatet og er kompatibel med Tomboy på Linux, Mac og Windows."
 
 #~ msgid "About"
 #~ msgstr "Om Conboy"
