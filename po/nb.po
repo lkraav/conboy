@@ -1,7 +1,7 @@
 # Norwegian Bokmål translation of Conboy
 # This file is distributed under the same license as the conboy package.
 # Robert Nordan <rpvn@robpvn.net>, 2010.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: conboy main\n"
@@ -9,7 +9,7 @@ msgstr ""
 "POT-Creation-Date: 2010-07-01 22:11+0200\n"
 "PO-Revision-Date: 2010-03-22 22:45+0100\n"
 "Last-Translator: Robert Nordan <rpvn@robpvn.net>\n"
-"Language-Team: conboy-nb \n"
+"Language-Team: conboy-nb\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,7 +23,8 @@ msgstr "Nytt notat %i"
 
 #. ACTIONS
 #. Translators: Bold font.
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
 #: ../src/interface.c:674 ../src/interface.c:815 ../src/interface.c:854
 msgid "Bold"
 msgstr "Fet"
@@ -137,7 +138,7 @@ msgstr "Fullskjerm"
 #. Translators: About the program.
 #: ../src/interface.c:717
 msgid "About Conboy"
-msgstr ""
+msgstr "Om Conboy"
 
 #. Translators: Share a note via the sharing dialog.
 #: ../src/interface.c:719
@@ -205,13 +206,11 @@ msgstr "Sist endret"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name "
-"for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
 msgstr ""
 "<b>Notattittel i bruk</b>\n"
 "\n"
-"Et notat med tittelen <b>%s</b> finnes allerede. Vennligst velg et annet "
-"navn for dette notatet før du fortsetter."
+"Et notat med tittelen <b>%s</b> finnes allerede. Vennligst velg et annet navn for dette notatet før du fortsetter."
 
 #. Translators: Does the user really want to delete the
 #. current note? Answer is "yes" or "no".
@@ -320,14 +319,8 @@ msgstr "XML-lagringsmodul"
 
 #. Translators: Following lines of description used by the package manager
 #: ../src/extra_strings.h:5
-msgid ""
-"It is designed to be easy to use - yet powerful. Conboy can read and write "
-"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
-"Windows."
-msgstr ""
-"Den er laget for å være lett å bruke - men kraftig. Conboy kan lese og "
-"skrive Tomboy filformatet og er kompatibelt med Tomboy på Linux, Mac og "
-"Windows."
+msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
+msgstr "Den er laget for å være lett å bruke - men kraftig. Conboy kan lese og skrive Tomboy filformatet og er kompatibelt med Tomboy på Linux, Mac og Windows."
 
 #~ msgid "About"
 #~ msgstr "Om Conboy"
