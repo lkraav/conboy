@@ -142,9 +142,8 @@ msgstr "Om Conboy"
 
 #. Translators: Share a note via the sharing dialog.
 #: ../src/interface.c:719
-#, fuzzy
 msgid "Share note"
-msgstr "Nytt notat"
+msgstr "Del notat"
 
 #. TODO: Use an enum instead of 0 to 3
 #. Translators: Small font.
