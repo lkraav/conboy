@@ -1,3 +1,2 @@
-src/he-about-dialog.c
 src/plugins/storage_evernote/conboy_storage_evernote.plugin.desktop.in
 src/plugins/storage_midgard/conboy_storage_midgard.plugin.desktop.in

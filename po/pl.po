@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: conboy\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-01 22:11+0200\n"
+"POT-Creation-Date: 2010-11-06 12:34+0100\n"
 "PO-Revision-Date: 2009-12-29 18:46+0100\n"
 "Last-Translator: Tomasz Dominikowski <dominikowski@gmail.com>\n"
 "Language-Team: Polish <dominikowski@gmail.com>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "X-Poedit-Country: Poland\n"
 
 #. Translators: The title of a newly-created note.
-#: ../src/interface.c:404 ../src/callbacks.c:284 ../src/note.c:170
+#: ../src/interface.c:406 ../src/callbacks.c:287 ../src/note.c:170
 #: ../src/conboy_note_store.c:394
 #, c-format
 msgid "New Note %i"
@@ -26,183 +26,197 @@ msgstr "Nowa notatka %i"
 #. ACTIONS
 #. Translators: Bold font.
 #. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
-#: ../src/interface.c:674 ../src/interface.c:815 ../src/interface.c:854
+#: ../src/interface.c:680 ../src/interface.c:823 ../src/interface.c:862
 msgid "Bold"
 msgstr "Pogrubienie"
 
 #. Translators: Bullet point for a list.
-#: ../src/interface.c:676
+#: ../src/interface.c:682
 msgid "Bullets"
 msgstr "Wypunktowanie"
 
-#: ../src/interface.c:677
+#: ../src/interface.c:683
 msgid "Decrease indent"
 msgstr "Zmniejsz wcięcie"
 
-#: ../src/interface.c:678
+#: ../src/interface.c:684
 msgid "Delete note"
 msgstr "Usuń notatkę"
 
 #. Translators: Monospaced (non-proportional) font.
-#: ../src/interface.c:680 ../src/interface.c:820 ../src/interface.c:859
+#: ../src/interface.c:686 ../src/interface.c:828 ../src/interface.c:867
 msgid "Fixed width"
 msgstr "Stała szerokość"
 
 #. Translators: Emphasise text with a background colour.
-#: ../src/interface.c:682 ../src/interface.c:818 ../src/interface.c:857
+#: ../src/interface.c:688 ../src/interface.c:826 ../src/interface.c:865
 msgid "Highlight"
 msgstr "Wyróżnienie"
 
 #. Translators: Underlined text.
-#: ../src/interface.c:684 ../src/interface.c:819 ../src/interface.c:858
+#: ../src/interface.c:690 ../src/interface.c:827 ../src/interface.c:866
 msgid "Underline"
 msgstr ""
 
-#: ../src/interface.c:685
+#: ../src/interface.c:691
 msgid "Increase indent"
 msgstr "Zwiększ wcięcie"
 
 #. Translators: Add a [hyper]link to another note.
-#: ../src/interface.c:687
+#: ../src/interface.c:693
 msgid "Link"
 msgstr "Odnośnik"
 
 #. Translators: Create a new note.
-#: ../src/interface.c:689
+#: ../src/interface.c:695
 msgid "New note"
 msgstr "Nowa notatka"
 
 #. Translators: Open an existing note.
-#: ../src/interface.c:691
+#: ../src/interface.c:697
 msgid "Open note"
 msgstr "Otwórz notatkę"
 
 #. Translators: Show the settings dialog.
-#: ../src/interface.c:693 ../src/settings_window.c:478
+#: ../src/interface.c:699 ../src/settings_window.c:478
 #: ../src/settings_window.c:486
 msgid "Settings"
 msgstr "Ustawienia"
 
 #. Translators: Quit the program.
-#: ../src/interface.c:695
+#: ../src/interface.c:701
 msgid "Quit"
 msgstr "Zakończ"
 
 #. Translators: Italic (cursive) font.
-#: ../src/interface.c:697 ../src/interface.c:816 ../src/interface.c:855
+#: ../src/interface.c:703 ../src/interface.c:824 ../src/interface.c:863
 msgid "Italic"
 msgstr "Pochylenie"
 
 #. Translators: Crossed out text.
-#: ../src/interface.c:699 ../src/interface.c:817 ../src/interface.c:856
+#: ../src/interface.c:705 ../src/interface.c:825 ../src/interface.c:864
 msgid "Strikeout"
 msgstr "Przekreślenie"
 
 #. Translators: Select font.
-#: ../src/interface.c:701
+#: ../src/interface.c:707
 msgid "Style"
 msgstr "Styl"
 
-#: ../src/interface.c:702
+#: ../src/interface.c:708
 msgid "Zoom in"
 msgstr "Powiększ"
 
-#: ../src/interface.c:703
+#: ../src/interface.c:709
 msgid "Zoom out"
 msgstr "Pomniejsz"
 
 #. Translators: Find text in the current note.
-#: ../src/interface.c:705
+#: ../src/interface.c:711
 msgid "Find in note"
 msgstr "Znajdź w notatce"
 
 #. Translators: Synchronize the current note.
-#: ../src/interface.c:707
+#: ../src/interface.c:713
 msgid "Synchronize"
 msgstr "Zsynchronizuj"
 
 #. Translators: Navigate backwards (like a web browser).
-#: ../src/interface.c:711
+#: ../src/interface.c:717
 msgid "Back"
 msgstr "Wstecz"
 
 #. Translators: Navigate forwards (like a web browser).
-#: ../src/interface.c:713
+#: ../src/interface.c:719
 msgid "Forward"
 msgstr "Dalej"
 
 #. Translators: View the note fullscreen.
-#: ../src/interface.c:715 ../src/search_window.c:348
+#: ../src/interface.c:721 ../src/search_window.c:350
 msgid "Fullscreen"
 msgstr "Pełny ekran"
 
 #. Translators: About the program.
-#: ../src/interface.c:717
+#: ../src/interface.c:723
 msgid "About Conboy"
 msgstr ""
 
 #. Translators: Share a note via the sharing dialog.
-#: ../src/interface.c:719
+#: ../src/interface.c:725
 #, fuzzy
 msgid "Share note"
 msgstr "Nowa notatka"
 
-#. TODO: Use an enum instead of 0 to 3
+#. Translators: Send a note via bluetooth
+#: ../src/interface.c:727
+msgid "Via Bluetooth..."
+msgstr ""
+
+#. Translators: Send a note via email
+#: ../src/interface.c:729
+msgid "Via E-mail..."
+msgstr ""
+
 #. Translators: Small font.
-#: ../src/interface.c:722 ../src/interface.c:821 ../src/interface.c:860
+#: ../src/interface.c:732 ../src/interface.c:829 ../src/interface.c:868
 msgid "Small"
 msgstr "Mały"
 
 #. Translators: Normal size font.
-#: ../src/interface.c:724
+#: ../src/interface.c:734
 msgid "Normal"
 msgstr "Normalny"
 
 #. Translators: Large font.
-#: ../src/interface.c:726 ../src/interface.c:822 ../src/interface.c:861
+#: ../src/interface.c:736 ../src/interface.c:830 ../src/interface.c:869
 msgid "Large"
 msgstr "Duży"
 
 #. Translators: Very large font.
-#: ../src/interface.c:728 ../src/interface.c:823 ../src/interface.c:862
+#: ../src/interface.c:738 ../src/interface.c:831 ../src/interface.c:870
 msgid "Huge"
 msgstr "Wielki"
 
+#: ../src/interface.c:950
+#, fuzzy
+msgid "Share Note"
+msgstr "Nowa notatka"
+
 #. FIND TOOL BAR
 #. Translators: Search for this term in the current note.
-#: ../src/interface.c:1003 ../src/search_window.c:390
+#: ../src/interface.c:1023 ../src/search_window.c:392
 msgid "Search:"
 msgstr "Wyszukaj:"
 
 #. Translators: Search in all notes.
-#: ../src/search_window.c:339
+#: ../src/search_window.c:341
 msgid "Search all notes"
 msgstr "Wyszukaj we wszystkich notatkach"
 
 #. Add sort filters
 #. Translators: Sort notes by title.
-#: ../src/search_window.c:361
+#: ../src/search_window.c:363
 msgid "Sort by title"
 msgstr "Sortuj wg tytułu"
 
 #. Translators: Sort notes by last modified date.
-#: ../src/search_window.c:363
+#: ../src/search_window.c:365
 msgid "Sort by date"
 msgstr "Sortuj wg daty"
 
 #. Translators: Title of a column in a table that contains note titles.
-#: ../src/search_window.c:464
+#: ../src/search_window.c:466
 msgid "Note"
 msgstr "Notatka"
 
 #. Translators: Title of a column in a table that contains dates when
 #. notes were most recently modified.
-#: ../src/search_window.c:483
+#: ../src/search_window.c:485
 msgid "Last changed"
 msgstr "Ostatnio zmienione"
 
 #. Translators: The note title already exists.
-#: ../src/callbacks.c:78
+#: ../src/callbacks.c:81
 #, c-format
 msgid ""
 "<b>Note title taken</b>\n"
@@ -217,17 +231,17 @@ msgstr ""
 
 #. Translators: Does the user really want to delete the
 #. current note? Answer is "yes" or "no".
-#: ../src/callbacks.c:593
+#: ../src/callbacks.c:596
 msgid "Really delete this note?"
 msgstr "Na pewno usunąć tę notatkę?"
 
-#: ../src/callbacks.c:595
+#: ../src/callbacks.c:598
 msgid "If you delete a note it is permanently lost."
 msgstr "Usunięcie spowoduje bezpowrotną utratę notatki."
 
 #. Translators: Description of the program.
 #. Translators: First line of description used by the package manager
-#: ../src/callbacks.c:1052 ../src/extra_strings.h:3
+#: ../src/callbacks.c:1055 ../src/extra_strings.h:3
 msgid "Conboy is a note taking application."
 msgstr "Conboy to program do robienia notatek."
 
@@ -330,3 +344,74 @@ msgstr ""
 "Jest zaprojektowany tak, aby był łatwy w użytkowaniu, a jednocześnie "
 "funkcjonalny. Program Conboy może odczytywać i zapisywać format pliku "
 "programu Tomboy z systemów Linux, Mac i Windows."
+
+#: ../src/conboy_web_sync.c:538
+#, fuzzy
+msgid "Synchonization failed"
+msgstr "Zsynchronizuj"
+
+#: ../src/conboy_web_sync.c:538 ../src/conboy_web_sync.c:978
+#: ../src/conboy_web_sync.c:1001 ../src/conboy_web_sync.c:1068
+#: ../src/conboy_web_sync.c:1076 ../src/conboy_web_sync.c:1090
+msgid "Error Message:"
+msgstr ""
+
+#: ../src/conboy_web_sync.c:574
+msgid ""
+"Before you can synchronize your notes, please enter a URL in the settings."
+msgstr ""
+
+#: ../src/conboy_web_sync.c:706
+#, fuzzy
+msgid "Synchronization completed"
+msgstr "Zsynchronizuj"
+
+#: ../src/conboy_web_sync.c:707
+#, fuzzy
+msgid "Added notes"
+msgstr "Nowa notatka"
+
+#: ../src/conboy_web_sync.c:708
+#, fuzzy
+msgid "Changed notes"
+msgstr "Nowa notatka"
+
+#: ../src/conboy_web_sync.c:709
+#, fuzzy
+msgid "Deleted notes"
+msgstr "Usuń notatkę"
+
+#: ../src/conboy_web_sync.c:710
+#, fuzzy
+msgid "Uploaded notes"
+msgstr "Otwórz notatkę"
+
+#: ../src/conboy_web_sync.c:711
+#, fuzzy
+msgid "Deleted on server"
+msgstr "Usuń notatkę"
+
+#: ../src/conboy_web_sync.c:978 ../src/conboy_web_sync.c:1001
+msgid "Could not connect to host."
+msgstr ""
+
+#: ../src/conboy_web_sync.c:1020
+msgid ""
+"Please grant access on the website of your service provider that just "
+"opened. After that you will be automatically redirected back to Conboy."
+msgstr ""
+
+#: ../src/conboy_web_sync.c:1042
+msgid "Connecting to server"
+msgstr ""
+
+#: ../src/conboy_web_sync.c:1057
+msgid ""
+"<b>You are successfully authenticated</b>\n"
+"You can now use the synchronization from the main menu."
+msgstr ""
+
+#: ../src/conboy_web_sync.c:1068 ../src/conboy_web_sync.c:1076
+#: ../src/conboy_web_sync.c:1090
+msgid "Could not login to your service provider"
+msgstr ""

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-01 20:28+0200\n"
+"POT-Creation-Date: 2010-11-06 12:34+0100\n"
 "PO-Revision-Date: 2010-07-13 12:25+0200\n"
 "Last-Translator: Pavel Fric\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
@@ -18,7 +18,8 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #. Translators: The title of a newly-created note.
-#: ../src/interface.c:392 ../src/callbacks.c:284 ../src/note.c:170
+#: ../src/interface.c:406 ../src/callbacks.c:287 ../src/note.c:170
+#: ../src/conboy_note_store.c:394
 #, c-format
 msgid "New Note %i"
 msgstr "Nová poznámka %i"
@@ -26,177 +27,197 @@ msgstr "Nová poznámka %i"
 #. ACTIONS
 #. Translators: Bold font.
 #. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
-#: ../src/interface.c:662 ../src/interface.c:799 ../src/interface.c:840
+#: ../src/interface.c:680 ../src/interface.c:823 ../src/interface.c:862
 msgid "Bold"
 msgstr "Tučné"
 
 #. Translators: Bullet point for a list.
-#: ../src/interface.c:664
+#: ../src/interface.c:682
 msgid "Bullets"
 msgstr "Odrážky"
 
-#: ../src/interface.c:665
+#: ../src/interface.c:683
 msgid "Decrease indent"
 msgstr "Zmenšit odsazení"
 
-#: ../src/interface.c:666
+#: ../src/interface.c:684
 msgid "Delete note"
 msgstr "Smazat poznámku"
 
 #. Translators: Monospaced (non-proportional) font.
-#: ../src/interface.c:668 ../src/interface.c:804 ../src/interface.c:845
+#: ../src/interface.c:686 ../src/interface.c:828 ../src/interface.c:867
 msgid "Fixed width"
 msgstr "Pevná šířka"
 
 #. Translators: Emphasise text with a background colour.
-#: ../src/interface.c:670 ../src/interface.c:802 ../src/interface.c:843
+#: ../src/interface.c:688 ../src/interface.c:826 ../src/interface.c:865
 msgid "Highlight"
 msgstr "Zvýraznit"
 
 #. Translators: Underlined text.
-#: ../src/interface.c:672 ../src/interface.c:803 ../src/interface.c:844
+#: ../src/interface.c:690 ../src/interface.c:827 ../src/interface.c:866
 msgid "Underline"
 msgstr "Podtržení"
 
-#: ../src/interface.c:673
+#: ../src/interface.c:691
 msgid "Increase indent"
 msgstr "Zvětšit odsazení"
 
 #. Translators: Add a [hyper]link to another note.
-#: ../src/interface.c:675
+#: ../src/interface.c:693
 msgid "Link"
 msgstr "Odkaz"
 
 #. Translators: Create a new note.
-#: ../src/interface.c:677
+#: ../src/interface.c:695
 msgid "New note"
 msgstr "Nová poznámka"
 
 #. Translators: Open an existing note.
-#: ../src/interface.c:679
+#: ../src/interface.c:697
 msgid "Open note"
 msgstr "Otevřít poznámku"
 
 #. Translators: Show the settings dialog.
-#: ../src/interface.c:681 ../src/settings_window.c:442
-#: ../src/settings_window.c:450
+#: ../src/interface.c:699 ../src/settings_window.c:478
+#: ../src/settings_window.c:486
 msgid "Settings"
 msgstr "Nastavení"
 
 #. Translators: Quit the program.
-#: ../src/interface.c:683
+#: ../src/interface.c:701
 msgid "Quit"
 msgstr "Ukončit"
 
 #. Translators: Italic (cursive) font.
-#: ../src/interface.c:685 ../src/interface.c:800 ../src/interface.c:841
+#: ../src/interface.c:703 ../src/interface.c:824 ../src/interface.c:863
 msgid "Italic"
 msgstr "Kurzíva"
 
 #. Translators: Crossed out text.
-#: ../src/interface.c:687 ../src/interface.c:801 ../src/interface.c:842
+#: ../src/interface.c:705 ../src/interface.c:825 ../src/interface.c:864
 msgid "Strikeout"
 msgstr "Přeškrtnuté"
 
 #. Translators: Select font.
-#: ../src/interface.c:689
+#: ../src/interface.c:707
 msgid "Style"
 msgstr "Styl"
 
-#: ../src/interface.c:690
+#: ../src/interface.c:708
 msgid "Zoom in"
 msgstr "Přiblížit"
 
-#: ../src/interface.c:691
+#: ../src/interface.c:709
 msgid "Zoom out"
 msgstr "Oddálit"
 
 #. Translators: Find text in the current note.
-#: ../src/interface.c:693
+#: ../src/interface.c:711
 msgid "Find in note"
 msgstr "Najít v poznámce"
 
 #. Translators: Synchronize the current note.
-#: ../src/interface.c:695
+#: ../src/interface.c:713
 msgid "Synchronize"
 msgstr "Seřídit"
 
 #. Translators: Navigate backwards (like a web browser).
-#: ../src/interface.c:698
+#: ../src/interface.c:717
 msgid "Back"
 msgstr "Zpět"
 
 #. Translators: Navigate forwards (like a web browser).
-#: ../src/interface.c:700
+#: ../src/interface.c:719
 msgid "Forward"
 msgstr "Vpřed"
 
 #. Translators: View the note fullscreen.
-#: ../src/interface.c:702 ../src/search_window.c:348
+#: ../src/interface.c:721 ../src/search_window.c:350
 msgid "Fullscreen"
 msgstr "Celá obrazovka"
 
 #. Translators: About the program.
-#: ../src/interface.c:704
-msgid "About"
-msgstr "O programu"
+#: ../src/interface.c:723
+msgid "About Conboy"
+msgstr ""
 
-#. TODO: Use an enum instead of 0 to 3
+#. Translators: Share a note via the sharing dialog.
+#: ../src/interface.c:725
+#, fuzzy
+msgid "Share note"
+msgstr "Zobraziť poznámku"
+
+#. Translators: Send a note via bluetooth
+#: ../src/interface.c:727
+msgid "Via Bluetooth..."
+msgstr ""
+
+#. Translators: Send a note via email
+#: ../src/interface.c:729
+msgid "Via E-mail..."
+msgstr ""
+
 #. Translators: Small font.
-#: ../src/interface.c:707 ../src/interface.c:805 ../src/interface.c:846
+#: ../src/interface.c:732 ../src/interface.c:829 ../src/interface.c:868
 msgid "Small"
 msgstr "Malé"
 
 #. Translators: Normal size font.
-#: ../src/interface.c:709
+#: ../src/interface.c:734
 msgid "Normal"
 msgstr "Normální"
 
 #. Translators: Large font.
-#: ../src/interface.c:711 ../src/interface.c:806 ../src/interface.c:847
+#: ../src/interface.c:736 ../src/interface.c:830 ../src/interface.c:869
 msgid "Large"
 msgstr "Velké"
 
 #. Translators: Very large font.
-#: ../src/interface.c:713 ../src/interface.c:807 ../src/interface.c:848
+#: ../src/interface.c:738 ../src/interface.c:831 ../src/interface.c:870
 msgid "Huge"
 msgstr "Obrovské"
 
+#: ../src/interface.c:950
+#, fuzzy
+msgid "Share Note"
+msgstr "Zobraziť poznámku"
+
 #. FIND TOOL BAR
 #. Translators: Search for this term in the current note.
-#: ../src/interface.c:986 ../src/search_window.c:390
+#: ../src/interface.c:1023 ../src/search_window.c:392
 msgid "Search:"
 msgstr "Hledat:"
 
 #. Translators: Search in all notes.
-#: ../src/search_window.c:339
+#: ../src/search_window.c:341
 msgid "Search all notes"
 msgstr "Hledat ve všech poznámkách"
 
 #. Add sort filters
 #. Translators: Sort notes by title.
-#: ../src/search_window.c:361
+#: ../src/search_window.c:363
 msgid "Sort by title"
 msgstr "Třídit podle názvu"
 
 #. Translators: Sort notes by last modified date.
-#: ../src/search_window.c:363
+#: ../src/search_window.c:365
 msgid "Sort by date"
 msgstr "Třídit podle data"
 
 #. Translators: Title of a column in a table that contains note titles.
-#: ../src/search_window.c:464
+#: ../src/search_window.c:466
 msgid "Note"
 msgstr "Poznámka"
 
 #. Translators: Title of a column in a table that contains dates when
 #. notes were most recently modified.
-#: ../src/search_window.c:483
+#: ../src/search_window.c:485
 msgid "Last changed"
 msgstr "Naposledy změněno"
 
 #. Translators: The note title already exists.
-#: ../src/callbacks.c:78
+#: ../src/callbacks.c:81
 #, c-format
 msgid ""
 "<b>Note title taken</b>\n"
@@ -211,60 +232,60 @@ msgstr ""
 
 #. Translators: Does the user really want to delete the
 #. current note? Answer is "yes" or "no".
-#: ../src/callbacks.c:576
+#: ../src/callbacks.c:596
 msgid "Really delete this note?"
 msgstr "Opravdu smazat tuto poznámku?"
 
-#: ../src/callbacks.c:578
+#: ../src/callbacks.c:598
 msgid "If you delete a note it is permanently lost."
 msgstr "Pokud poznámku smažete, bude navždy ztracena."
 
 #. Translators: Description of the program.
 #. Translators: First line of description used by the package manager
-#: ../src/callbacks.c:1039 ../src/extra_strings.h:3
+#: ../src/callbacks.c:1055 ../src/extra_strings.h:3
 msgid "Conboy is a note taking application."
 msgstr "Conboy je program na psaní poznámek."
 
 #. Translators: Width of the scrollbar.
-#: ../src/settings_window.c:222
+#: ../src/settings_window.c:245
 msgid "Scrollbar size"
 msgstr "Velikost posuvníku"
 
 #. Translators: Thin scrollbar width.
-#: ../src/settings_window.c:228
+#: ../src/settings_window.c:251
 msgid "Thin"
 msgstr "Úzký"
 
 #. Translators: Thick scrollbar width.
-#: ../src/settings_window.c:233
+#: ../src/settings_window.c:256
 msgid "Thick"
 msgstr "Široký"
 
 #. Translators: Whether to enable automatic portrait mode.
-#: ../src/settings_window.c:246 ../src/settings_window.c:248
+#: ../src/settings_window.c:269 ../src/settings_window.c:271
 msgid "Use automatic portrait mode"
 msgstr "Použít automatické zobrazení na výšku"
 
 #. Translators: Whether to use custom colors.
-#: ../src/settings_window.c:261 ../src/settings_window.c:263
+#: ../src/settings_window.c:284 ../src/settings_window.c:286
 msgid "Use custom colors"
 msgstr "Použít vlastní barvy"
 
 #. Translators: Text color. The color is shown in the dialog, next to
 #. the text.
-#: ../src/settings_window.c:279
+#: ../src/settings_window.c:302
 msgid "Text"
 msgstr "Text"
 
 #. Translators: Background color. The color is shown in the dialog,
 #. next to the text.
-#: ../src/settings_window.c:295
+#: ../src/settings_window.c:318
 msgid "Background"
 msgstr "Pozadí"
 
 #. Translators: Color of links. The color is shown in the dialog, next
 #. to the text.
-#: ../src/settings_window.c:311
+#: ../src/settings_window.c:334
 msgid "Links"
 msgstr "Odkazy"
 
@@ -284,23 +305,23 @@ msgid "Enabled"
 msgstr "Povolen"
 
 #. Translators: Title for the plugin settings dialog.
-#: ../src/conboy_plugin_manager.c:133 ../src/conboy_plugin_manager_row.c:132
+#: ../src/conboy_plugin_manager.c:134 ../src/conboy_plugin_manager_row.c:132
 msgid "Plugin settings"
 msgstr "Nastavení přídavného modulu"
 
 #. Translators: Plugins that are
 #. currently active.
-#: ../src/conboy_plugin_manager.c:604
+#: ../src/conboy_plugin_manager.c:607
 msgid "Active plugins"
 msgstr "Přídavné moduly v činnosti"
 
 #. Translators: Show information about the plugin.
-#: ../src/conboy_plugin_manager.c:634
+#: ../src/conboy_plugin_manager.c:637
 msgid "About plugin"
 msgstr "O přídavném modulu"
 
 #. Translators: Configure the plugin.
-#: ../src/conboy_plugin_manager.c:639
+#: ../src/conboy_plugin_manager.c:642
 msgid "Configure plugin"
 msgstr "Nastavit přídavný modul"
 
@@ -321,12 +342,83 @@ msgid ""
 "the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
 "Windows."
 msgstr ""
-"Je navržen tak, aby byl jednoduše použitelný, ale zároveň i výkonný."
-"Conboy dokáže číst a zapisovat poznámky v souborovém formátu Tomboy, který "
-"je slučitelný s Tomboyem pro Linux, Mac a Windows."
+"Je navržen tak, aby byl jednoduše použitelný, ale zároveň i výkonný.Conboy "
+"dokáže číst a zapisovat poznámky v souborovém formátu Tomboy, který je "
+"slučitelný s Tomboyem pro Linux, Mac a Windows."
 
-#~ msgid "Show note"
-#~ msgstr "Zobraziť poznámku"
+#: ../src/conboy_web_sync.c:538
+#, fuzzy
+msgid "Synchonization failed"
+msgstr "Seřídit"
+
+#: ../src/conboy_web_sync.c:538 ../src/conboy_web_sync.c:978
+#: ../src/conboy_web_sync.c:1001 ../src/conboy_web_sync.c:1068
+#: ../src/conboy_web_sync.c:1076 ../src/conboy_web_sync.c:1090
+msgid "Error Message:"
+msgstr ""
+
+#: ../src/conboy_web_sync.c:574
+msgid ""
+"Before you can synchronize your notes, please enter a URL in the settings."
+msgstr ""
+
+#: ../src/conboy_web_sync.c:706
+#, fuzzy
+msgid "Synchronization completed"
+msgstr "Seřídit"
+
+#: ../src/conboy_web_sync.c:707
+#, fuzzy
+msgid "Added notes"
+msgstr "Nová poznámka"
+
+#: ../src/conboy_web_sync.c:708
+#, fuzzy
+msgid "Changed notes"
+msgstr "Zobraziť poznámku"
+
+#: ../src/conboy_web_sync.c:709
+#, fuzzy
+msgid "Deleted notes"
+msgstr "Smazat poznámku"
+
+#: ../src/conboy_web_sync.c:710
+#, fuzzy
+msgid "Uploaded notes"
+msgstr "Otevřít poznámku"
+
+#: ../src/conboy_web_sync.c:711
+#, fuzzy
+msgid "Deleted on server"
+msgstr "Smazat poznámku"
+
+#: ../src/conboy_web_sync.c:978 ../src/conboy_web_sync.c:1001
+msgid "Could not connect to host."
+msgstr ""
+
+#: ../src/conboy_web_sync.c:1020
+msgid ""
+"Please grant access on the website of your service provider that just "
+"opened. After that you will be automatically redirected back to Conboy."
+msgstr ""
+
+#: ../src/conboy_web_sync.c:1042
+msgid "Connecting to server"
+msgstr ""
+
+#: ../src/conboy_web_sync.c:1057
+msgid ""
+"<b>You are successfully authenticated</b>\n"
+"You can now use the synchronization from the main menu."
+msgstr ""
+
+#: ../src/conboy_web_sync.c:1068 ../src/conboy_web_sync.c:1076
+#: ../src/conboy_web_sync.c:1090
+msgid "Could not login to your service provider"
+msgstr ""
+
+#~ msgid "About"
+#~ msgstr "O programu"
 
 #~ msgid "Show search"
 #~ msgstr "Ukáž hľadanie"

@@ -9,3 +9,5 @@ src/conboy_plugin_manager_row.c
 src/plugins/storage_xml/conboy_storage_xml.plugin.desktop.in
 src/extra_strings.h
 src/conboy_note_store.c
+src/conboy_web_sync.c
+
