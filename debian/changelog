@@ -1,3 +1,9 @@
+conboy (1:0.6.3.32) stable; urgency=low
+
+  * Made sync strings translatable
+  
+ -- Cornelius Hald <hald@icandy.de>  Thu, 06 Nov 2010 12:51:12 +0200
+
 conboy (1:0.6.3.31) stable; urgency=low
 
   * Fixed build against new liboauth
