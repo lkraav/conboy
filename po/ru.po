@@ -1,17 +1,21 @@
 # Russian translation of Conboy.
 # Copyright © 2010 by the Conboy authors.
 # This file is distributed under the same license as the Conboy package.
-#
+# Oleg Shmelyov <oshmelyov@ya.ru>, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: conboy\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-11-06 12:34+0100\n"
-"PO-Revision-Date: 2009-06-27\n"
-"Last-Translator: Sergei Ivanov <isn@vu.spb.ru>\n"
+"PO-Revision-Date: 2010-11-06 15:41+0400\n"
+"Last-Translator: Oleg Shmelyov <oshmelyov@ya.ru>\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Virtaal 0.5.2\n"
 
 #. Translators: The title of a newly-created note.
 #: ../src/interface.c:406 ../src/callbacks.c:287 ../src/note.c:170
@@ -146,12 +150,12 @@ msgstr "Общий доступ"
 #. Translators: Send a note via bluetooth
 #: ../src/interface.c:727
 msgid "Via Bluetooth..."
-msgstr ""
+msgstr "Через Bluetooth..."
 
 #. Translators: Send a note via email
 #: ../src/interface.c:729
 msgid "Via E-mail..."
-msgstr ""
+msgstr "По E-mail..."
 
 #. Translators: Small font.
 #: ../src/interface.c:732 ../src/interface.c:829 ../src/interface.c:868
@@ -174,7 +178,6 @@ msgid "Huge"
 msgstr "Огр."
 
 #: ../src/interface.c:950
-#, fuzzy
 msgid "Share Note"
 msgstr "Общий доступ"
 
@@ -342,72 +345,69 @@ msgstr ""
 "совместим с Tomboy на Linux, Mac и Windows."
 
 #: ../src/conboy_web_sync.c:538
-#, fuzzy
 msgid "Synchonization failed"
-msgstr "Синхронизировать"
+msgstr "Ошибка синхронизации"
 
 #: ../src/conboy_web_sync.c:538 ../src/conboy_web_sync.c:978
 #: ../src/conboy_web_sync.c:1001 ../src/conboy_web_sync.c:1068
 #: ../src/conboy_web_sync.c:1076 ../src/conboy_web_sync.c:1090
 msgid "Error Message:"
-msgstr ""
+msgstr "Сообщение об ошибке:"
 
 #: ../src/conboy_web_sync.c:574
 msgid ""
 "Before you can synchronize your notes, please enter a URL in the settings."
-msgstr ""
+msgstr "Для синхронизации, пожалуйста, укажите URL в настройках."
 
 #: ../src/conboy_web_sync.c:706
-#, fuzzy
 msgid "Synchronization completed"
-msgstr "Синхронизировать"
+msgstr "Синхронизация завершена"
 
 #: ../src/conboy_web_sync.c:707
-#, fuzzy
 msgid "Added notes"
-msgstr "Новая заметка"
+msgstr "Добавлено заметок"
 
 #: ../src/conboy_web_sync.c:708
-#, fuzzy
 msgid "Changed notes"
-msgstr "Общий доступ"
+msgstr "Изменено заметок"
 
 #: ../src/conboy_web_sync.c:709
-#, fuzzy
 msgid "Deleted notes"
-msgstr "Удалить заметку"
+msgstr "Удалено заметок"
 
 #: ../src/conboy_web_sync.c:710
-#, fuzzy
 msgid "Uploaded notes"
-msgstr "Открыть заметку"
+msgstr "Загружено заметок"
 
 #: ../src/conboy_web_sync.c:711
-#, fuzzy
 msgid "Deleted on server"
-msgstr "Удалить заметку"
+msgstr "Удалено на сервере"
 
 #: ../src/conboy_web_sync.c:978 ../src/conboy_web_sync.c:1001
 msgid "Could not connect to host."
-msgstr ""
+msgstr "Сервер не отвечает."
 
 #: ../src/conboy_web_sync.c:1020
 msgid ""
 "Please grant access on the website of your service provider that just "
 "opened. After that you will be automatically redirected back to Conboy."
 msgstr ""
+"Пожалуйста, разрешите доступ на открывшемся сайте. После этого автоматически "
+"откроется окно Conboy."
 
 #: ../src/conboy_web_sync.c:1042
 msgid "Connecting to server"
-msgstr ""
+msgstr "Соединяюсь с сервером"
 
 #: ../src/conboy_web_sync.c:1057
 msgid ""
 "<b>You are successfully authenticated</b>\n"
 "You can now use the synchronization from the main menu."
 msgstr ""
+"<b>Вы успешно авторизовались</b>\n"
+"Теперь вы можете синхронизировать заметки из главного меню."
 
 #: ../src/conboy_web_sync.c:1068 ../src/conboy_web_sync.c:1076
 #: ../src/conboy_web_sync.c:1090
 msgid "Could not login to your service provider"
-msgstr ""
+msgstr "Сбой входа в сервис синхронизации."
