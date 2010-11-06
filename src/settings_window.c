@@ -134,9 +134,9 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 {
 
 #ifdef HILDON_HAS_APP_MENU
-	const gchar *url = hildon_entry_get_text(HILDON_ENTRY(widget->url_entry));
+	gchar *url = g_utf8_strdown(hildon_entry_get_text(HILDON_ENTRY(widget->url_entry)), -1);
 #else
-	const gchar *url = gtk_entry_get_text(GTK_ENTRY(widget->url_entry));
+	gchar *url = g_utf8_strdown(gtk_entry_get_text(GTK_ENTRY(widget->url_entry)), -1);
 #endif
 
 	GtkWindow *parent = GTK_WINDOW(widget->window);
@@ -173,6 +173,8 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 	if (web_sync_authenticate(url, parent)) {
 		gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
 	}
+
+	g_free(url);
 }
 
 static void
