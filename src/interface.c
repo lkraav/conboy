@@ -280,7 +280,9 @@ create_sync_dialog(GtkWindow *parent)
 	gtk_widget_set_sensitive(button, FALSE);
 
 	GtkWidget *txt = gtk_label_new("");
-	gtk_label_set_markup(GTK_LABEL(txt), "<b>Synchronization ongoing</b>");
+	gchar *str = g_strconcat("<b>", _("Synchronization ongoing"), "</b>", NULL);
+	gtk_label_set_markup(GTK_LABEL(txt), str);
+	g_free(str);
 	gtk_label_set_line_wrap(GTK_LABEL(txt), TRUE);
 	gtk_widget_show(txt);
 

@@ -2,12 +2,12 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-06 12:34+0100\n"
+"POT-Creation-Date: 2010-11-06 13:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,8 +15,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: ../src/interface.c:283
+msgid "Synchronization ongoing"
+msgstr "Synchronisierung läuft"
+
 #. Translators: The title of a newly-created note.
-#: ../src/interface.c:406 ../src/callbacks.c:287 ../src/note.c:170
+#: ../src/interface.c:408 ../src/callbacks.c:287 ../src/note.c:170
 #: ../src/conboy_note_store.c:394
 #, c-format
 msgid "New Note %i"
@@ -24,165 +28,164 @@ msgstr "Neue Notiz %i"
 
 #. ACTIONS
 #. Translators: Bold font.
-#. TODO: Write a function, which takes GtkActions that contain markup code and
-#. that creates the correct widgets
-#: ../src/interface.c:680 ../src/interface.c:823 ../src/interface.c:862
+#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#: ../src/interface.c:682 ../src/interface.c:825 ../src/interface.c:864
 msgid "Bold"
 msgstr "Fett"
 
 #. Translators: Bullet point for a list.
-#: ../src/interface.c:682
+#: ../src/interface.c:684
 msgid "Bullets"
 msgstr "Aufzählungszeichen"
 
-#: ../src/interface.c:683
+#: ../src/interface.c:685
 msgid "Decrease indent"
 msgstr "Einzug verkleinern"
 
-#: ../src/interface.c:684
+#: ../src/interface.c:686
 msgid "Delete note"
 msgstr "Notiz löschen"
 
 #. Translators: Monospaced (non-proportional) font.
-#: ../src/interface.c:686 ../src/interface.c:828 ../src/interface.c:867
+#: ../src/interface.c:688 ../src/interface.c:830 ../src/interface.c:869
 msgid "Fixed width"
 msgstr "Feste Breite"
 
 #. Translators: Emphasise text with a background colour.
-#: ../src/interface.c:688 ../src/interface.c:826 ../src/interface.c:865
+#: ../src/interface.c:690 ../src/interface.c:828 ../src/interface.c:867
 msgid "Highlight"
 msgstr "Hervorhebung"
 
 #. Translators: Underlined text.
-#: ../src/interface.c:690 ../src/interface.c:827 ../src/interface.c:866
+#: ../src/interface.c:692 ../src/interface.c:829 ../src/interface.c:868
 msgid "Underline"
 msgstr "Unterstichen"
 
-#: ../src/interface.c:691
+#: ../src/interface.c:693
 msgid "Increase indent"
 msgstr "Einzug vergrößern"
 
 #. Translators: Add a [hyper]link to another note.
-#: ../src/interface.c:693
+#: ../src/interface.c:695
 msgid "Link"
 msgstr "Verknüpfung"
 
 #. Translators: Create a new note.
-#: ../src/interface.c:695
+#: ../src/interface.c:697
 msgid "New note"
 msgstr "Neue Notiz"
 
 #. Translators: Open an existing note.
-#: ../src/interface.c:697
+#: ../src/interface.c:699
 msgid "Open note"
 msgstr "Notiz öffnen"
 
 #. Translators: Show the settings dialog.
-#: ../src/interface.c:699 ../src/settings_window.c:478
+#: ../src/interface.c:701 ../src/settings_window.c:478
 #: ../src/settings_window.c:486
 msgid "Settings"
 msgstr "Einstellungen"
 
 #. Translators: Quit the program.
-#: ../src/interface.c:701
+#: ../src/interface.c:703
 msgid "Quit"
 msgstr "Beenden"
 
 #. Translators: Italic (cursive) font.
-#: ../src/interface.c:703 ../src/interface.c:824 ../src/interface.c:863
+#: ../src/interface.c:705 ../src/interface.c:826 ../src/interface.c:865
 msgid "Italic"
 msgstr "Kursiv"
 
 #. Translators: Crossed out text.
-#: ../src/interface.c:705 ../src/interface.c:825 ../src/interface.c:864
+#: ../src/interface.c:707 ../src/interface.c:827 ../src/interface.c:866
 msgid "Strikeout"
 msgstr "Durchgestrichen"
 
 #. Translators: Select font.
-#: ../src/interface.c:707
+#: ../src/interface.c:709
 msgid "Style"
 msgstr "Stil"
 
-#: ../src/interface.c:708
+#: ../src/interface.c:710
 msgid "Zoom in"
 msgstr "Vergrößern"
 
-#: ../src/interface.c:709
+#: ../src/interface.c:711
 msgid "Zoom out"
 msgstr "Verkleinern"
 
 #. Translators: Find text in the current note.
-#: ../src/interface.c:711
+#: ../src/interface.c:713
 msgid "Find in note"
 msgstr "In dieser Notiz suchen"
 
 #. Translators: Synchronize the current note.
-#: ../src/interface.c:713
+#: ../src/interface.c:715
 msgid "Synchronize"
 msgstr "Synchronisieren"
 
 #. Translators: Navigate backwards (like a web browser).
-#: ../src/interface.c:717
+#: ../src/interface.c:719
 msgid "Back"
 msgstr "Zurück"
 
 #. Translators: Navigate forwards (like a web browser).
-#: ../src/interface.c:719
+#: ../src/interface.c:721
 msgid "Forward"
 msgstr "Vorwärts"
 
 #. Translators: View the note fullscreen.
-#: ../src/interface.c:721 ../src/search_window.c:350
+#: ../src/interface.c:723 ../src/search_window.c:350
 msgid "Fullscreen"
 msgstr "Vollbild"
 
 #. Translators: About the program.
-#: ../src/interface.c:723
+#: ../src/interface.c:725
 msgid "About Conboy"
 msgstr "Über Conboy"
 
 #. Translators: Share a note via the sharing dialog.
-#: ../src/interface.c:725
+#: ../src/interface.c:727
 msgid "Share note"
 msgstr "Notiz freigeben"
 
 #. Translators: Send a note via bluetooth
-#: ../src/interface.c:727
+#: ../src/interface.c:729
 msgid "Via Bluetooth..."
 msgstr "Über Bluetooth..."
 
 #. Translators: Send a note via email
-#: ../src/interface.c:729
+#: ../src/interface.c:731
 msgid "Via E-mail..."
 msgstr "Als E-Mail..."
 
 #. Translators: Small font.
-#: ../src/interface.c:732 ../src/interface.c:829 ../src/interface.c:868
+#: ../src/interface.c:734 ../src/interface.c:831 ../src/interface.c:870
 msgid "Small"
 msgstr "Klein"
 
 #. Translators: Normal size font.
-#: ../src/interface.c:734
+#: ../src/interface.c:736
 msgid "Normal"
 msgstr "Normal"
 
 #. Translators: Large font.
-#: ../src/interface.c:736 ../src/interface.c:830 ../src/interface.c:869
+#: ../src/interface.c:738 ../src/interface.c:832 ../src/interface.c:871
 msgid "Large"
 msgstr "Groß"
 
 #. Translators: Very large font.
-#: ../src/interface.c:738 ../src/interface.c:831 ../src/interface.c:870
+#: ../src/interface.c:740 ../src/interface.c:833 ../src/interface.c:872
 msgid "Huge"
 msgstr "Riesig"
 
-#: ../src/interface.c:950
+#: ../src/interface.c:952
 msgid "Share Note"
 msgstr "Notiz freigeben"
 
 #. FIND TOOL BAR
 #. Translators: Search for this term in the current note.
-#: ../src/interface.c:1023 ../src/search_window.c:392
+#: ../src/interface.c:1025 ../src/search_window.c:392
 msgid "Search:"
 msgstr "Suchen:"
 
@@ -219,11 +222,13 @@ msgstr "Zuletzt geändert"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name "
+"for this note before continuing."
 msgstr ""
 "<b>Titel schon verwendet</b>\n"
 "\n"
-"Eine Notiz mit dem Titel <b>%s</b> existiert schon. Bitte wählen Sie einen anderen Name für diese Notiz, bevor sie weiter machen."
+"Eine Notiz mit dem Titel <b>%s</b> existiert schon. Bitte wählen Sie einen "
+"anderen Name für diese Notiz, bevor sie weiter machen."
 
 #. Translators: Does the user really want to delete the
 #. current note? Answer is "yes" or "no".
@@ -332,8 +337,14 @@ msgstr "XML Speicher Plug-in"
 
 #. Translators: Following lines of description used by the package manager
 #: ../src/extra_strings.h:5
-msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
-msgstr "Es ist einfach zu bedienen - aber trotzdem mächtig. Conboy kann das Tomboy Dateiformat lesen und schreiben und ist deswegen kompatibel mit Tomboy auf Linux, Mac und Windows."
+msgid ""
+"It is designed to be easy to use - yet powerful. Conboy can read and write "
+"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
+"Windows."
+msgstr ""
+"Es ist einfach zu bedienen - aber trotzdem mächtig. Conboy kann das Tomboy "
+"Dateiformat lesen und schreiben und ist deswegen kompatibel mit Tomboy auf "
+"Linux, Mac und Windows."
 
 #: ../src/conboy_web_sync.c:538
 msgid "Synchonization failed"
@@ -346,8 +357,11 @@ msgid "Error Message:"
 msgstr "Fehlermeldung:"
 
 #: ../src/conboy_web_sync.c:574
-msgid "Before you can synchronize your notes, please enter a URL in the settings."
-msgstr "Bevor Sie ihre Notizen synchronisieren können, müssen sie in den Einstellungen eine URL eintragen."
+msgid ""
+"Before you can synchronize your notes, please enter a URL in the settings."
+msgstr ""
+"Bevor Sie ihre Notizen synchronisieren können, müssen sie in den "
+"Einstellungen eine URL eintragen."
 
 #: ../src/conboy_web_sync.c:706
 msgid "Synchronization completed"
@@ -378,8 +392,12 @@ msgid "Could not connect to host."
 msgstr "Verbindung fehlgeschlagen."
 
 #: ../src/conboy_web_sync.c:1020
-msgid "Please grant access on the website of your service provider that just opened. After that you will be automatically redirected back to Conboy."
-msgstr "Bitte gewähren Sie auf der Website, die sich gerade geöffnet hat, Zugriff. Danach öffnet sich automatisch wieder Conboy."
+msgid ""
+"Please grant access on the website of your service provider that just "
+"opened. After that you will be automatically redirected back to Conboy."
+msgstr ""
+"Bitte gewähren Sie auf der Website, die sich gerade geöffnet hat, Zugriff. "
+"Danach öffnet sich automatisch wieder Conboy."
 
 #: ../src/conboy_web_sync.c:1042
 msgid "Connecting to server"

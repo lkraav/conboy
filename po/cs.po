@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-06 12:34+0100\n"
+"POT-Creation-Date: 2010-11-06 13:54+0100\n"
 "PO-Revision-Date: 2010-07-13 12:25+0200\n"
 "Last-Translator: Pavel Fric\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
@@ -17,8 +17,13 @@ msgstr ""
 "X-Generator: Lokalize 1.0\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
+#: ../src/interface.c:283
+#, fuzzy
+msgid "Synchronization ongoing"
+msgstr "Seřídit"
+
 #. Translators: The title of a newly-created note.
-#: ../src/interface.c:406 ../src/callbacks.c:287 ../src/note.c:170
+#: ../src/interface.c:408 ../src/callbacks.c:287 ../src/note.c:170
 #: ../src/conboy_note_store.c:394
 #, c-format
 msgid "New Note %i"
@@ -27,165 +32,165 @@ msgstr "Nová poznámka %i"
 #. ACTIONS
 #. Translators: Bold font.
 #. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
-#: ../src/interface.c:680 ../src/interface.c:823 ../src/interface.c:862
+#: ../src/interface.c:682 ../src/interface.c:825 ../src/interface.c:864
 msgid "Bold"
 msgstr "Tučné"
 
 #. Translators: Bullet point for a list.
-#: ../src/interface.c:682
+#: ../src/interface.c:684
 msgid "Bullets"
 msgstr "Odrážky"
 
-#: ../src/interface.c:683
+#: ../src/interface.c:685
 msgid "Decrease indent"
 msgstr "Zmenšit odsazení"
 
-#: ../src/interface.c:684
+#: ../src/interface.c:686
 msgid "Delete note"
 msgstr "Smazat poznámku"
 
 #. Translators: Monospaced (non-proportional) font.
-#: ../src/interface.c:686 ../src/interface.c:828 ../src/interface.c:867
+#: ../src/interface.c:688 ../src/interface.c:830 ../src/interface.c:869
 msgid "Fixed width"
 msgstr "Pevná šířka"
 
 #. Translators: Emphasise text with a background colour.
-#: ../src/interface.c:688 ../src/interface.c:826 ../src/interface.c:865
+#: ../src/interface.c:690 ../src/interface.c:828 ../src/interface.c:867
 msgid "Highlight"
 msgstr "Zvýraznit"
 
 #. Translators: Underlined text.
-#: ../src/interface.c:690 ../src/interface.c:827 ../src/interface.c:866
+#: ../src/interface.c:692 ../src/interface.c:829 ../src/interface.c:868
 msgid "Underline"
 msgstr "Podtržení"
 
-#: ../src/interface.c:691
+#: ../src/interface.c:693
 msgid "Increase indent"
 msgstr "Zvětšit odsazení"
 
 #. Translators: Add a [hyper]link to another note.
-#: ../src/interface.c:693
+#: ../src/interface.c:695
 msgid "Link"
 msgstr "Odkaz"
 
 #. Translators: Create a new note.
-#: ../src/interface.c:695
+#: ../src/interface.c:697
 msgid "New note"
 msgstr "Nová poznámka"
 
 #. Translators: Open an existing note.
-#: ../src/interface.c:697
+#: ../src/interface.c:699
 msgid "Open note"
 msgstr "Otevřít poznámku"
 
 #. Translators: Show the settings dialog.
-#: ../src/interface.c:699 ../src/settings_window.c:478
+#: ../src/interface.c:701 ../src/settings_window.c:478
 #: ../src/settings_window.c:486
 msgid "Settings"
 msgstr "Nastavení"
 
 #. Translators: Quit the program.
-#: ../src/interface.c:701
+#: ../src/interface.c:703
 msgid "Quit"
 msgstr "Ukončit"
 
 #. Translators: Italic (cursive) font.
-#: ../src/interface.c:703 ../src/interface.c:824 ../src/interface.c:863
+#: ../src/interface.c:705 ../src/interface.c:826 ../src/interface.c:865
 msgid "Italic"
 msgstr "Kurzíva"
 
 #. Translators: Crossed out text.
-#: ../src/interface.c:705 ../src/interface.c:825 ../src/interface.c:864
+#: ../src/interface.c:707 ../src/interface.c:827 ../src/interface.c:866
 msgid "Strikeout"
 msgstr "Přeškrtnuté"
 
 #. Translators: Select font.
-#: ../src/interface.c:707
+#: ../src/interface.c:709
 msgid "Style"
 msgstr "Styl"
 
-#: ../src/interface.c:708
+#: ../src/interface.c:710
 msgid "Zoom in"
 msgstr "Přiblížit"
 
-#: ../src/interface.c:709
+#: ../src/interface.c:711
 msgid "Zoom out"
 msgstr "Oddálit"
 
 #. Translators: Find text in the current note.
-#: ../src/interface.c:711
+#: ../src/interface.c:713
 msgid "Find in note"
 msgstr "Najít v poznámce"
 
 #. Translators: Synchronize the current note.
-#: ../src/interface.c:713
+#: ../src/interface.c:715
 msgid "Synchronize"
 msgstr "Seřídit"
 
 #. Translators: Navigate backwards (like a web browser).
-#: ../src/interface.c:717
+#: ../src/interface.c:719
 msgid "Back"
 msgstr "Zpět"
 
 #. Translators: Navigate forwards (like a web browser).
-#: ../src/interface.c:719
+#: ../src/interface.c:721
 msgid "Forward"
 msgstr "Vpřed"
 
 #. Translators: View the note fullscreen.
-#: ../src/interface.c:721 ../src/search_window.c:350
+#: ../src/interface.c:723 ../src/search_window.c:350
 msgid "Fullscreen"
 msgstr "Celá obrazovka"
 
 #. Translators: About the program.
-#: ../src/interface.c:723
+#: ../src/interface.c:725
 msgid "About Conboy"
 msgstr ""
 
 #. Translators: Share a note via the sharing dialog.
-#: ../src/interface.c:725
+#: ../src/interface.c:727
 #, fuzzy
 msgid "Share note"
 msgstr "Zobraziť poznámku"
 
 #. Translators: Send a note via bluetooth
-#: ../src/interface.c:727
+#: ../src/interface.c:729
 msgid "Via Bluetooth..."
 msgstr ""
 
 #. Translators: Send a note via email
-#: ../src/interface.c:729
+#: ../src/interface.c:731
 msgid "Via E-mail..."
 msgstr ""
 
 #. Translators: Small font.
-#: ../src/interface.c:732 ../src/interface.c:829 ../src/interface.c:868
+#: ../src/interface.c:734 ../src/interface.c:831 ../src/interface.c:870
 msgid "Small"
 msgstr "Malé"
 
 #. Translators: Normal size font.
-#: ../src/interface.c:734
+#: ../src/interface.c:736
 msgid "Normal"
 msgstr "Normální"
 
 #. Translators: Large font.
-#: ../src/interface.c:736 ../src/interface.c:830 ../src/interface.c:869
+#: ../src/interface.c:738 ../src/interface.c:832 ../src/interface.c:871
 msgid "Large"
 msgstr "Velké"
 
 #. Translators: Very large font.
-#: ../src/interface.c:738 ../src/interface.c:831 ../src/interface.c:870
+#: ../src/interface.c:740 ../src/interface.c:833 ../src/interface.c:872
 msgid "Huge"
 msgstr "Obrovské"
 
-#: ../src/interface.c:950
+#: ../src/interface.c:952
 #, fuzzy
 msgid "Share Note"
 msgstr "Zobraziť poznámku"
 
 #. FIND TOOL BAR
 #. Translators: Search for this term in the current note.
-#: ../src/interface.c:1023 ../src/search_window.c:392
+#: ../src/interface.c:1025 ../src/search_window.c:392
 msgid "Search:"
 msgstr "Hledat:"
 
