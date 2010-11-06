@@ -132,16 +132,16 @@ web_sync_send_notes(GList *notes, gchar *url, JsonNoteList *all_server_notes, gi
 }
 
 static JsonNoteList*
-web_sync_get_notes(JsonUser *user, int since_rev, gboolean with_content)
+web_sync_get_notes(JsonUser *user, int since_rev, gboolean with_content, GError **error)
 {
-	JsonNoteList *result;
-	gchar *json_string;
+	JsonNoteList *result = NULL;
+	gchar *json_string = NULL;
 	gchar get_all_notes_url[1024];
 
 	g_sprintf(get_all_notes_url, "%s?include_notes=%s&since=%i", user->api_ref, with_content ? "true" : "false", since_rev);
 
 	json_string = conboy_http_get(get_all_notes_url, TRUE);
-	result = json_get_note_list(json_string, NULL);
+	result = json_get_note_list(json_string, error);
 
 	g_free(json_string);
 	return result;
@@ -238,7 +238,7 @@ web_sync_incoming_changes(JsonUser *user, gint *last_sync_rev, time_t last_sync_
 	GList *local_notes = conboy_note_store_get_all(CONBOY_NOTE_STORE(app_data->note_store));
 
 	/* Get all notes since last syncRev*/
-	JsonNoteList *server_note_list = web_sync_get_notes(user, *last_sync_rev, TRUE);
+	JsonNoteList *server_note_list = web_sync_get_notes(user, *last_sync_rev, TRUE, NULL);
 	*last_sync_rev = server_note_list->latest_sync_revision;
 
 	/* Save notes */
@@ -387,7 +387,6 @@ web_sync_delete_local_notes(JsonUser *user, GList *notes_to_upload, JsonNoteList
 	 */
 	AppData *app_data = app_data_get();
 
-	//JsonNoteList *json_server_notes = web_sync_get_notes(user, 0, FALSE);
 	GSList *server_notes = all_server_notes->notes;
 	GList *local_notes = conboy_note_store_get_all(CONBOY_NOTE_STORE(app_data->note_store));
 
@@ -553,6 +552,7 @@ web_sync_do_sync (gpointer *user_data)
 	AppData *app_data = app_data_get();
 	UserInterface *ui = app_data->note_window;
 	GtkProgressBar *bar = data->bar;
+	GError *error = NULL;
 
 	/* Save and make uneditable */
 	/* TODO: Function is returned often, witout making it editable again */
@@ -653,12 +653,15 @@ web_sync_do_sync (gpointer *user_data)
 	GList *local_changes = web_sync_incoming_changes(user, &last_sync_rev, last_sync_time, &added_note_count, &changed_note_count);
 	web_sync_pulse_bar(bar);
 
-
 	/***/
 	/* TODO: Free all_server_notes */
-	JsonNoteList *all_server_notes = web_sync_get_notes(user, 0, FALSE);
+	JsonNoteList *all_server_notes = web_sync_get_notes(user, -1, FALSE, &error);
 	web_sync_pulse_bar(bar);
-
+	if (all_server_notes == NULL) {
+		show_sync_error(data, error->message);
+		g_error_free(error);
+		return NULL;
+	}
 
 	/*
 	 * Process deletions made on server
@@ -675,7 +678,6 @@ web_sync_do_sync (gpointer *user_data)
 	 */
 	gint uploaded_notes = 0;
 
-	GError *error = NULL;
 	int sync_rev = web_sync_send_notes(local_changes, user->api_ref, all_server_notes, last_sync_rev + 1, last_sync_time, &uploaded_notes, &error);
 	web_sync_pulse_bar(bar);
 	g_list_free(local_changes);
