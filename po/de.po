@@ -2,7 +2,7 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -24,7 +24,8 @@ msgstr "Neue Notiz %i"
 
 #. ACTIONS
 #. Translators: Bold font.
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
 #: ../src/interface.c:680 ../src/interface.c:823 ../src/interface.c:862
 msgid "Bold"
 msgstr "Fett"
@@ -148,12 +149,12 @@ msgstr "Notiz freigeben"
 #. Translators: Send a note via bluetooth
 #: ../src/interface.c:727
 msgid "Via Bluetooth..."
-msgstr ""
+msgstr "Über Bluetooth..."
 
 #. Translators: Send a note via email
 #: ../src/interface.c:729
 msgid "Via E-mail..."
-msgstr ""
+msgstr "Als E-Mail..."
 
 #. Translators: Small font.
 #: ../src/interface.c:732 ../src/interface.c:829 ../src/interface.c:868
@@ -176,7 +177,6 @@ msgid "Huge"
 msgstr "Riesig"
 
 #: ../src/interface.c:950
-#, fuzzy
 msgid "Share Note"
 msgstr "Notiz freigeben"
 
@@ -219,13 +219,11 @@ msgstr "Zuletzt geändert"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name "
-"for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
 msgstr ""
 "<b>Titel schon verwendet</b>\n"
 "\n"
-"Eine Notiz mit dem Titel <b>%s</b> existiert schon. Bitte wählen Sie einen "
-"anderen Name für diese Notiz, bevor sie weiter machen."
+"Eine Notiz mit dem Titel <b>%s</b> existiert schon. Bitte wählen Sie einen anderen Name für diese Notiz, bevor sie weiter machen."
 
 #. Translators: Does the user really want to delete the
 #. current note? Answer is "yes" or "no".
@@ -334,85 +332,71 @@ msgstr "XML Speicher Plug-in"
 
 #. Translators: Following lines of description used by the package manager
 #: ../src/extra_strings.h:5
-msgid ""
-"It is designed to be easy to use - yet powerful. Conboy can read and write "
-"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
-"Windows."
-msgstr ""
-"Es ist einfach zu bedienen - aber trotzdem mächtig. Conboy kann das Tomboy "
-"Dateiformat lesen und schreiben und ist deswegen kompatibel mit Tomboy auf "
-"Linux, Mac und Windows."
+msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
+msgstr "Es ist einfach zu bedienen - aber trotzdem mächtig. Conboy kann das Tomboy Dateiformat lesen und schreiben und ist deswegen kompatibel mit Tomboy auf Linux, Mac und Windows."
 
 #: ../src/conboy_web_sync.c:538
-#, fuzzy
 msgid "Synchonization failed"
-msgstr "Synchronisieren"
+msgstr "Synchronisierung fehlgeschlagen"
 
 #: ../src/conboy_web_sync.c:538 ../src/conboy_web_sync.c:978
 #: ../src/conboy_web_sync.c:1001 ../src/conboy_web_sync.c:1068
 #: ../src/conboy_web_sync.c:1076 ../src/conboy_web_sync.c:1090
 msgid "Error Message:"
-msgstr ""
+msgstr "Fehlermeldung:"
 
 #: ../src/conboy_web_sync.c:574
-msgid ""
-"Before you can synchronize your notes, please enter a URL in the settings."
-msgstr ""
+msgid "Before you can synchronize your notes, please enter a URL in the settings."
+msgstr "Bevor Sie ihre Notizen synchronisieren können, müssen sie in den Einstellungen eine URL eintragen."
 
 #: ../src/conboy_web_sync.c:706
-#, fuzzy
 msgid "Synchronization completed"
-msgstr "Synchronisieren"
+msgstr "Synchronisierung abgeschlossen"
 
 #: ../src/conboy_web_sync.c:707
-#, fuzzy
 msgid "Added notes"
-msgstr "Neue Notiz"
+msgstr "Hinzugefügte Notizen"
 
 #: ../src/conboy_web_sync.c:708
-#, fuzzy
 msgid "Changed notes"
-msgstr "Notiz freigeben"
+msgstr "Geänderte Notizen"
 
 #: ../src/conboy_web_sync.c:709
-#, fuzzy
 msgid "Deleted notes"
-msgstr "Notiz löschen"
+msgstr "Gelöschte Notizen"
 
 #: ../src/conboy_web_sync.c:710
-#, fuzzy
 msgid "Uploaded notes"
-msgstr "Notiz öffnen"
+msgstr "Hochgeladene Notizen"
 
 #: ../src/conboy_web_sync.c:711
-#, fuzzy
 msgid "Deleted on server"
-msgstr "Notiz löschen"
+msgstr "Auf Server gelöscht"
 
 #: ../src/conboy_web_sync.c:978 ../src/conboy_web_sync.c:1001
 msgid "Could not connect to host."
-msgstr ""
+msgstr "Verbindung fehlgeschlagen."
 
 #: ../src/conboy_web_sync.c:1020
-msgid ""
-"Please grant access on the website of your service provider that just "
-"opened. After that you will be automatically redirected back to Conboy."
-msgstr ""
+msgid "Please grant access on the website of your service provider that just opened. After that you will be automatically redirected back to Conboy."
+msgstr "Bitte gewähren Sie auf der Website, die sich gerade geöffnet hat, Zugriff. Danach öffnet sich automatisch wieder Conboy."
 
 #: ../src/conboy_web_sync.c:1042
 msgid "Connecting to server"
-msgstr ""
+msgstr "Verbinde mit Server"
 
 #: ../src/conboy_web_sync.c:1057
 msgid ""
 "<b>You are successfully authenticated</b>\n"
 "You can now use the synchronization from the main menu."
 msgstr ""
+"<b>Sie sind erfolgreich angemeldet</b>\n"
+"Sie können nun die Synchronisierung aus dem Hauptmenü starten."
 
 #: ../src/conboy_web_sync.c:1068 ../src/conboy_web_sync.c:1076
 #: ../src/conboy_web_sync.c:1090
 msgid "Could not login to your service provider"
-msgstr ""
+msgstr "Anmeldung am Dienst nicht möglich."
 
 #~ msgid "About"
 #~ msgstr "Über"
