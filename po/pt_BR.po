@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: conboy 0.5.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-06 13:54+0100\n"
+"POT-Creation-Date: 2010-11-06 17:01+0100\n"
 "PO-Revision-Date: 2009-06-27\n"
 "Last-Translator: Leonardo Ferreira Fontenelle <leonardof@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <ldp-br@bazar.conectiva.com.br>\n"
@@ -255,6 +255,14 @@ msgstr "Se você excluir uma nota, ela será perdida para sempre."
 #. Translators: First line of description used by the package manager
 #: ../src/callbacks.c:1055 ../src/extra_strings.h:3
 msgid "Conboy is a note taking application."
+msgstr ""
+
+#: ../src/settings_window.c:153
+msgid "You are currently authenticated with:"
+msgstr ""
+
+#: ../src/settings_window.c:153
+msgid "Are you sure you want to reset the synchonization settings?"
 msgstr ""
 
 #. Translators: Width of the scrollbar.

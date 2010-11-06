@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: conboy main\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-06 13:54+0100\n"
+"POT-Creation-Date: 2010-11-06 17:01+0100\n"
 "PO-Revision-Date: 2010-03-22 22:45+0100\n"
 "Last-Translator: Robert Nordan <rpvn@robpvn.net>\n"
 "Language-Team: conboy-nb\n"
@@ -246,6 +246,14 @@ msgstr "Hvis du sletter et notat kan det ikke gjenopprettes."
 #: ../src/callbacks.c:1055 ../src/extra_strings.h:3
 msgid "Conboy is a note taking application."
 msgstr "Conboy er et program til å ta notater med."
+
+#: ../src/settings_window.c:153
+msgid "You are currently authenticated with:"
+msgstr ""
+
+#: ../src/settings_window.c:153
+msgid "Are you sure you want to reset the synchonization settings?"
+msgstr ""
 
 #. Translators: Width of the scrollbar.
 #: ../src/settings_window.c:245

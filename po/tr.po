@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Conboy\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-06 13:54+0100\n"
+"POT-Creation-Date: 2010-11-06 17:01+0100\n"
 "PO-Revision-Date: 2009-10-26 11:52+0200\n"
 "Last-Translator: GeceBekcisi <gecebekcisi@uniturk.net>\n"
 "Language-Team: GeceBekcisi <gecebekcisi@uniturk.net>\n"
@@ -245,6 +245,14 @@ msgstr "Notu silerseniz kalıcı olarak kaybolacaktır."
 #. Translators: First line of description used by the package manager
 #: ../src/callbacks.c:1055 ../src/extra_strings.h:3
 msgid "Conboy is a note taking application."
+msgstr ""
+
+#: ../src/settings_window.c:153
+msgid "You are currently authenticated with:"
+msgstr ""
+
+#: ../src/settings_window.c:153
+msgid "Are you sure you want to reset the synchonization settings?"
 msgstr ""
 
 #. Translators: Width of the scrollbar.

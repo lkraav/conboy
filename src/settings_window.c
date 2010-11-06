@@ -150,7 +150,7 @@ on_sync_auth_but_clicked(GtkButton *button, SettingsWidget *widget)
 
 	if (old_url != NULL && strcmp(old_url, "") != 0) {
 
-		gchar *msg = g_strconcat("You are currently authenticated with\n'", old_url, "'. Are you sure you want to reset the synchonization settings?", NULL);
+		gchar *msg = g_strconcat(_("You are currently authenticated with:"), "\n'", old_url, "'.", _("Are you sure you want to reset the synchonization settings?"), NULL);
 
 		GtkWidget *dialog = ui_helper_create_yes_no_dialog(parent, msg);
 		int ret = gtk_dialog_run(GTK_DIALOG(dialog));

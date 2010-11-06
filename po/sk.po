@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-06 13:54+0100\n"
+"POT-Creation-Date: 2010-11-06 17:01+0100\n"
 "PO-Revision-Date: 2009-10-23 12:46+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -248,6 +248,14 @@ msgstr "Ak ju zmažete bude nenávratne preč."
 #: ../src/callbacks.c:1055 ../src/extra_strings.h:3
 msgid "Conboy is a note taking application."
 msgstr "Conboy je aplikácia na písanie poznámok."
+
+#: ../src/settings_window.c:153
+msgid "You are currently authenticated with:"
+msgstr ""
+
+#: ../src/settings_window.c:153
+msgid "Are you sure you want to reset the synchonization settings?"
+msgstr ""
 
 #. Translators: Width of the scrollbar.
 #: ../src/settings_window.c:245
