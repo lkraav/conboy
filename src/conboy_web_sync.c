@@ -703,7 +703,7 @@ web_sync_do_sync (gpointer *user_data)
 
 		gchar msg[1000];
 		g_sprintf(msg, "<b>%s</b>\n\n%s: %i\n%s: %i\n%s: %i\n%s: %i\n%s: %i",
-				_("Synchonization completed"),
+				_("Synchronization completed"),
 				_("Added notes"), added_note_count,
 				_("Changed notes"), changed_note_count,
 				_("Deleted notes"), deleted_note_count,
@@ -975,7 +975,7 @@ web_sync_authenticate(const gchar *url, GtkWindow *parent)
 	g_printerr("Reply:\n%s\n", reply);
 
 	if (reply == NULL) {
-		gchar *msg = g_strconcat(_("Could not connect to host.\nMessage: "), "No reply from ", request, NULL);
+		gchar *msg = g_strconcat(_("Could not connect to host."), "\n", _("Error Message:"), "\n", "No reply from '", request, "'", NULL);
 		ui_helper_show_confirmation_dialog(parent, msg, FALSE);
 		g_free(msg);
 		g_free(request);
@@ -998,7 +998,7 @@ web_sync_authenticate(const gchar *url, GtkWindow *parent)
 
 	if (link == NULL) {
 		gchar *error_msg = error->message == NULL ? "No message" : error->message;
-		gchar *msg = g_strconcat(_("Could not connect to host.\nMessage: "), error_msg, NULL);
+		gchar *msg = g_strconcat(_("Could not connect to host."), "\n", _("Error Message:"), "\n", error_msg, NULL);
 
 		ui_helper_show_confirmation_dialog(parent, msg, FALSE);
 
@@ -1065,7 +1065,7 @@ web_sync_authenticate(const gchar *url, GtkWindow *parent)
 
 		/* We did not get the access token */
 		gtk_widget_destroy(wait_dialog);
-		gchar *msg = g_strconcat(_("Could not login to your service provider.\nMessage: "), error->message, NULL);
+		gchar *msg = g_strconcat(_("Could not login to your service provider"), "\n", _("Error Message:"), "\n", error->message, NULL);
 		ui_helper_show_confirmation_dialog(parent, msg, FALSE);
 		g_free(msg);
 		settings_save_sync_base_url("");
@@ -1073,7 +1073,7 @@ web_sync_authenticate(const gchar *url, GtkWindow *parent)
 	}
 
 	if (result == GTK_RESPONSE_REJECT) {
-		gchar *msg = g_strconcat(_("Could not login to your service provider.\nMessage: "), "Could not get OAuth verifier.", NULL);
+		gchar *msg = g_strconcat(_("Could not login to your service provider"), "\n", _("Error Message:"), "\n", "Could not get OAuth verifier.", NULL);
 		ui_helper_show_confirmation_dialog(parent, msg, FALSE);
 		g_free(msg);
 		settings_save_sync_base_url("");
@@ -1087,7 +1087,7 @@ web_sync_authenticate(const gchar *url, GtkWindow *parent)
 
 	/* Some other error */
 	kill_callback_thread();
-	gchar *msg = g_strconcat(_("Could not login to your service provider.\nMessage: "), "Unknown error.", NULL);
+	gchar *msg = g_strconcat(_("Could not login to your service provider"), "\n", _("Error Message:"), "\n", "Unknown error.", NULL);
 	ui_helper_show_confirmation_dialog(parent, msg, FALSE);
 	g_free(msg);
 	return FALSE;
