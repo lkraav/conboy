@@ -68,7 +68,6 @@ Description-cs_CS: Conboy je program na psaní poznámek.
 Description-ca_CA: Conboy és una aplicació per a prendre notes.
  Conboy pot llegir i escriure el format de fitxer Tomboy per ser
  compatible amb Tomboy a Linux, Mac i Windows.
- 
 XB-Maemo-Display-Name: Conboy
 XSBC-Bugtracker: https://bugs.maemo.org/enter_bug.cgi?product=conboy
 XB-Maemo-Icon-26:
