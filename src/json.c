@@ -594,13 +594,13 @@ json_get_api(const gchar* json_string)
 
 
 JsonUser*
-json_get_user(const gchar* json_string)
+json_get_user(const gchar* json_string, GError **error)
 {
 	JsonParser *parser = json_parser_new();
 	JsonUser *result = NULL;
-	GError *error = NULL;
+	GError *parse_error = NULL;
 
-	if (json_parser_load_from_data(parser, json_string, -1, &error)) {
+	if (json_parser_load_from_data(parser, json_string, -1, &parse_error)) {
 
 		result = g_new0(JsonUser, 1);
 
@@ -628,8 +628,14 @@ json_get_user(const gchar* json_string)
 		result->api_ref = json_node_dup_string(node);
 
 	} else {
-		g_printerr("ERROR: %s\n", error->message);
-		g_error_free(error);
+		if (g_strstr_len(json_string, 30, "Subscription required")) {
+			g_set_error(error, 0, 5, "Server said: 'Subscription required'. Please check that your local time is set correctly.");
+		} else {
+			g_set_error(error, 0, 5, "Could not parse server answer.");
+		}
+
+		g_printerr("ERROR: Could not parse server answer. Message: %s\n", parse_error->message);
+		g_error_free(parse_error);
 	}
 
 	g_object_unref(parser);
@@ -657,31 +663,27 @@ json_api_free(JsonApi *api)
 }
 
 JsonNoteList*
-json_get_note_list(const gchar* json_string)
+json_get_note_list(const gchar* json_string, GError **error)
 {
 	/* First sanity checks on the input */
 	if (json_string == NULL || strcmp(json_string, "") == 0) {
-		g_printerr("ERROR: Cannot parse empty string\n");
+		g_printerr("ERROR: Could not parse empty JSON reply.\n");
+		g_set_error(error, 0, 5, "Could not parse empty JSON reply.");
 		return NULL;
 	}
-
-	/* This part is not Snowy compatible, because Snowys answer looks slightly different
-	if (strncmp(json_string, "{\"notes\":", 9) != 0) {
-		g_printerr("ERROR: Cannot parse string. Does not start with '{\"notes\":'\n");
-		return NULL;
-	}
-	*/
 
 	/* Currently known U1 server bug. Remove this, when fixed. */
 	if (strncmp(json_string, "Could not save note record: ResourceConflict", 44) == 0) {
 		g_printerr("ERROR: The sever rejected a note, because the UUID was already used in the past. This is a server bug.\n");
+		g_set_error(error, 0, 5, "The sever rejected a note, because the UUID was already used in the past. This is a Ubuntu One bug.");
+		return NULL;
 	}
 
 	JsonParser *parser = json_parser_new();
 	JsonNoteList *result = NULL;
-	GError *error = NULL;
+	GError *json_error = NULL;
 
-	if (json_parser_load_from_data(parser, json_string, -1, &error)) {
+	if (json_parser_load_from_data(parser, json_string, -1, &json_error)) {
 
 		result = g_new0(JsonNoteList, 1);
 
@@ -703,8 +705,9 @@ json_get_note_list(const gchar* json_string)
 		}
 	} else {
 		g_printerr("ERROR: Could not parse the following JSON string:\n%s\n", json_string);
-		g_printerr("ERRRO: Message is: %s\n", error->message);
-		g_error_free(error);
+		g_printerr("ERRRO: Message is: %s\n", json_error->message);
+		g_set_error(error, 0, 5, "Could not parse JSON reply.");
+		g_error_free(json_error);
 	}
 
 	g_object_unref(G_OBJECT(parser));

@@ -111,12 +111,14 @@ web_sync_send_notes(GList *notes, gchar *url, JsonNoteList *all_server_notes, gi
 	*/
 
 	/* Parse answer and see if expected_rev fits or not */
-	JsonNoteList *note_list = json_get_note_list(reply);
+	GError *parse_error = NULL;
+	JsonNoteList *note_list = json_get_note_list(reply, &parse_error);
 	/* TODO: JsonNoteList plus containing Notes needs to be freed or unrefed */
 	g_free(reply);
 
 	if (note_list == NULL) {
-		g_set_error(error, 0, 0, "json_get_note_list() returned NULL");
+		g_set_error(error, 0, 0, parse_error->message);
+		g_error_free(parse_error);
 		return expected_rev - 1;
 	}
 
@@ -139,7 +141,7 @@ web_sync_get_notes(JsonUser *user, int since_rev, gboolean with_content)
 	g_sprintf(get_all_notes_url, "%s?include_notes=%s&since=%i", user->api_ref, with_content ? "true" : "false", since_rev);
 
 	json_string = conboy_http_get(get_all_notes_url, TRUE);
-	result = json_get_note_list(json_string);
+	result = json_get_note_list(json_string, NULL);
 
 	g_free(json_string);
 	return result;
@@ -500,20 +502,21 @@ web_sync_send_local_deletions(gchar *url, gint expected_rev, gint *local_deletio
 
 	gchar *reply = conboy_http_put(url, json_string, TRUE);
 
-	g_printerr("Reply from Snowy:\n");
+	g_printerr("Reply from Server:\n");
 	g_printerr("%s\n", reply);
 
 	/* Parse answer and see if expected_rev fits or not */
-	JsonNoteList *note_list = json_get_note_list(reply);
+	GError *parse_error = NULL;
+	JsonNoteList *note_list = json_get_note_list(reply, &parse_error);
 
 	if (note_list == NULL) {
-		g_set_error(error, 0, 0, "json_get_note_list() returned NULL");
+		g_set_error(error, 0, 0, parse_error->message);
+		g_error_free(parse_error);
 		return expected_rev - 1;
 	}
 
 	if (note_list->latest_sync_revision != expected_rev) {
 		g_printerr("WARN: Expected sync rev (%i) and actual sync rev (%i) are not the same\n", expected_rev, note_list->latest_sync_revision);
-		//g_set_error(error, 0, 0, "Expected sync rev (%i) and actual sync rev (%i) are not the same\n", expected_rev, note_list->latest_sync_revision);
 		return note_list->latest_sync_revision;
 	}
 
@@ -527,6 +530,13 @@ remove_deleted_notes_file()
 	gchar *filename = g_strconcat(g_get_home_dir(), "/.conboy/deleted_notes.txt", NULL);
 	g_unlink(filename);
 	g_free(filename);
+}
+
+static void
+show_sync_error (WebSyncDialogData *data, gchar *error)
+{
+	gchar *msg = g_strconcat("<b>", _("Synchonization failed"), "</b>\n\n", _("Error Message:"), "\n", error, NULL);
+	web_sync_show_message(data, msg);
 }
 
 /* TODO: This function is way too long */
@@ -561,7 +571,7 @@ web_sync_do_sync (gpointer *user_data)
 
 	gchar *url = settings_load_sync_base_url();
 	if (url == NULL || strcmp(url, "") == 0) {
-		web_sync_show_message(data, "Please first set a URL in the settings");
+		web_sync_show_message(data, _("Before you can synchronize your notes, please enter a URL in the settings."));
 		return NULL;
 	}
 
@@ -575,8 +585,8 @@ web_sync_do_sync (gpointer *user_data)
 	gchar *reply = conboy_http_get(request, TRUE); /* <<<<<<<< PROBLEM TODO: For some reason this calls fails using Snowy, but only on the device */
 
 	if (reply == NULL) {
-		gchar *msg = g_strconcat("Got no reply from: %s\n", request, NULL);
-		web_sync_show_message(data, msg);
+		gchar *msg = g_strconcat("Got no reply from: ", request, NULL);
+		show_sync_error(data, msg);
 		g_free(msg);
 		return NULL;
 	}
@@ -589,7 +599,7 @@ web_sync_do_sync (gpointer *user_data)
 	g_free(reply);
 
 	if (api_ref == NULL) {
-		web_sync_show_message(data, "Authentication failed. Got no api_ref. Make sure your lokal clock is correct.");
+		show_sync_error(data, "Got no api_ref. Please check that your local time is set correctly.");
 		return NULL;
 	}
 
@@ -598,8 +608,8 @@ web_sync_do_sync (gpointer *user_data)
 	reply = conboy_http_get(api_ref, TRUE);
 
 	if (reply == NULL) {
-		gchar *msg = g_strconcat("Got no reply from: \n", api_ref, NULL);
-		web_sync_show_message(data, msg);
+		gchar *msg = g_strconcat("Got no reply from: ", api_ref, NULL);
+		show_sync_error(data, msg);
 		g_free(msg);
 		g_free(api_ref);
 		return NULL;
@@ -610,16 +620,15 @@ web_sync_do_sync (gpointer *user_data)
 	g_printerr("Reply from /user/:: %s\n", reply);
 
 	/* Revision checks */
-	JsonUser *user = json_get_user(reply);
+	GError *user_error = NULL;
+	JsonUser *user = json_get_user(reply, &user_error);
 	if (user == NULL) {
-		if (g_strstr_len(reply, 30, "Subscription required")) {
-			web_sync_show_message(data, "Server said: 'Subscription required'. Please check that your local time is set correctly.\n");
-		} else {
-			web_sync_show_message(data, "Could not parse server answer. Probably server error.");
-		}
+		show_sync_error(data, user_error->message);
 		g_free(reply);
+		g_error_free(user_error);
 		return NULL;
 	}
+
 	g_free(reply);
 
 	if (user->latest_sync_revision < last_sync_rev) {
@@ -642,7 +651,6 @@ web_sync_do_sync (gpointer *user_data)
 	gint added_note_count = 0;
 	gint changed_note_count = 0;
 	GList *local_changes = web_sync_incoming_changes(user, &last_sync_rev, last_sync_time, &added_note_count, &changed_note_count);
-	g_printerr("DEBUG: After web_sync_incoming_changes\n");
 	web_sync_pulse_bar(bar);
 
 
@@ -684,8 +692,6 @@ web_sync_do_sync (gpointer *user_data)
 
 	json_user_free(user);
 
-	gchar msg[1000];
-
 	if (!error) {
 		/* Store new sync_rev and sync_time */
 		settings_save_last_sync_revision(sync_rev);
@@ -695,17 +701,19 @@ web_sync_do_sync (gpointer *user_data)
 		update_synced_notes_file();
 		remove_deleted_notes_file();
 
+		gchar msg[1000];
 		g_sprintf(msg, "<b>%s</b>\n\n%s: %i\n%s: %i\n%s: %i\n%s: %i\n%s: %i",
-				"Synchonization completed",
-				"Added notes", added_note_count,
-				"Changed notes", changed_note_count,
-				"Deleted notes", deleted_note_count,
-				"Uploaded notes", uploaded_notes,
-				"Deleted on server", deleted_on_server_count);
+				_("Synchonization completed"),
+				_("Added notes"), added_note_count,
+				_("Changed notes"), changed_note_count,
+				_("Deleted notes"), deleted_note_count,
+				_("Uploaded notes"), uploaded_notes,
+				_("Deleted on server"), deleted_on_server_count);
+		web_sync_show_message(data, msg);
 
 	} else {
 		g_printerr("ERROR: %s\n", error->message);
-		g_sprintf(msg, "<b>Synchonization failed</b>\n\nError Message was:\n%s\n", error->message);
+		show_sync_error(data, error->message);
 		g_error_free(error);
 	}
 
@@ -713,8 +721,6 @@ web_sync_do_sync (gpointer *user_data)
 	 * Sync finished
 	 */
 
-	/* Show message to user */
-	web_sync_show_message(data, msg);
 
 	/* Try to get previous note */
 	ConboyNote *note = NULL;
@@ -969,7 +975,7 @@ web_sync_authenticate(const gchar *url, GtkWindow *parent)
 	g_printerr("Reply:\n%s\n", reply);
 
 	if (reply == NULL) {
-		gchar *msg = g_strconcat("Got no reply from: ", request, "\n", NULL);
+		gchar *msg = g_strconcat(_("Could not connect to host.\nMessage: "), "No reply from ", request, NULL);
 		ui_helper_show_confirmation_dialog(parent, msg, FALSE);
 		g_free(msg);
 		g_free(request);
@@ -991,13 +997,14 @@ web_sync_authenticate(const gchar *url, GtkWindow *parent)
 	gchar *link = conboy_get_request_token_and_auth_link(api->request_token_url, api->authorize_url, &error);
 
 	if (link == NULL) {
-		if (error == NULL) {
-			ui_helper_show_confirmation_dialog(parent, "Could not connect to host.", FALSE);
-		} else {
-			gchar *msg = g_strconcat("Could not connect to host.\nReason: ", error->message, NULL);
-			ui_helper_show_confirmation_dialog(parent, msg, FALSE);
-			g_free(msg);
-		}
+		gchar *error_msg = error->message == NULL ? "No message" : error->message;
+		gchar *msg = g_strconcat(_("Could not connect to host.\nMessage: "), error_msg, NULL);
+
+		ui_helper_show_confirmation_dialog(parent, msg, FALSE);
+
+		g_free(msg);
+		g_error_free(error);
+
 		json_api_free(api);
 		return FALSE;
 	}
@@ -1010,7 +1017,7 @@ web_sync_authenticate(const gchar *url, GtkWindow *parent)
 	g_printerr("Opening browser with URL: >%s<\n", link);
 	g_free(link);
 
-	GtkWidget *dialog = ui_helper_create_cancel_dialog(parent, "Please grant access on the website of your service provider that just opened.\nAfter that you will be automatically redirected back to Conboy.");
+	GtkWidget *dialog = ui_helper_create_cancel_dialog(parent, _("Please grant access on the website of your service provider that just opened. After that you will be automatically redirected back to Conboy."));
 
 	struct AuthDialogData auth_data;
 	auth_data.dialog = GTK_DIALOG(dialog);
@@ -1032,7 +1039,7 @@ web_sync_authenticate(const gchar *url, GtkWindow *parent)
 	if (result == GTK_RESPONSE_OK) {
 
 		GtkWidget *wait_dialog = gtk_dialog_new();
-		gtk_window_set_title(GTK_WINDOW(wait_dialog), "Connecting to server");
+		gtk_window_set_title(GTK_WINDOW(wait_dialog), _("Connecting to server"));
 		#ifdef HILDON_HAS_APP_MENU
 		hildon_gtk_window_set_progress_indicator(GTK_WINDOW(wait_dialog), TRUE);
 		#endif
@@ -1044,9 +1051,10 @@ web_sync_authenticate(const gchar *url, GtkWindow *parent)
 			gtk_main_iteration_do(FALSE);
 		}
 
-		if (conboy_get_access_token(api->access_token_url, auth_data.verifier)) {
+		GError *error = NULL;
+		if (conboy_get_access_token(api->access_token_url, auth_data.verifier, &error)) {
 			gtk_widget_destroy(wait_dialog);
-			ui_helper_show_confirmation_dialog(parent, "<b>You are successfully authenticated</b>\nYou can now use the synchronization from the main menu.", FALSE);
+			ui_helper_show_confirmation_dialog(parent, _("<b>You are successfully authenticated</b>\nYou can now use the synchronization from the main menu."), FALSE);
 			settings_save_sync_base_url(url);
 			/* Everything is good */
 			json_api_free(api);
@@ -1057,26 +1065,31 @@ web_sync_authenticate(const gchar *url, GtkWindow *parent)
 
 		/* We did not get the access token */
 		gtk_widget_destroy(wait_dialog);
-		ui_helper_show_confirmation_dialog(parent, "Conboy could not get an access token from your service provider. Please try again.", FALSE);
+		gchar *msg = g_strconcat(_("Could not login to your service provider.\nMessage: "), error->message, NULL);
+		ui_helper_show_confirmation_dialog(parent, msg, FALSE);
+		g_free(msg);
 		settings_save_sync_base_url("");
 		return FALSE;
 	}
 
 	if (result == GTK_RESPONSE_REJECT) {
-		ui_helper_show_confirmation_dialog(parent, "There were problems with the data received from your service provider. Please try again.", FALSE);
+		gchar *msg = g_strconcat(_("Could not login to your service provider.\nMessage: "), "Could not get OAuth verifier.", NULL);
+		ui_helper_show_confirmation_dialog(parent, msg, FALSE);
+		g_free(msg);
 		settings_save_sync_base_url("");
 		return FALSE;
 	}
 
 	if (result == 666 || result == -4) {
 		kill_callback_thread();
-		ui_helper_show_confirmation_dialog(parent, "You have manually canceled the authentication process.", FALSE);
 		return FALSE;
 	}
 
 	/* Some other error */
 	kill_callback_thread();
-	ui_helper_show_confirmation_dialog(parent, "An unknown error occured, please try again.", FALSE);
+	gchar *msg = g_strconcat(_("Could not login to your service provider.\nMessage: "), "Unknown error.", NULL);
+	ui_helper_show_confirmation_dialog(parent, msg, FALSE);
+	g_free(msg);
 	return FALSE;
 }
 

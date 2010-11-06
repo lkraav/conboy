@@ -86,6 +86,7 @@ get_request_token_and_auth_link(const gchar *request_url, const gchar *link_url,
 
 	if (req_url == NULL) {
 		g_printerr("ERROR: REQ URL = NULL\n");
+		g_set_error(error, 0, 5, "Request URL is NULL. Internal Error.");
 		return NULL;
 	}
 
@@ -95,26 +96,28 @@ get_request_token_and_auth_link(const gchar *request_url, const gchar *link_url,
 
 	if (reply == NULL) {
 		g_printerr("ERROR: Reply = NULL\n");
-		g_set_error(error, 0, 5, "Reply was no valid JSON string.");
+		g_set_error(error, 0, 5, "Server reply was no valid JSON string.");
 		g_free(req_url);
 		return NULL;
 	}
 
 	if (strstr(reply, "Expired timestamp")) {
 		g_printerr("ERROR: Timestamp is expired. Probably the local clock is wrong.\n");
-		g_set_error(error, 0, 5, "Timestamp is expired. Probably the local clock is wrong.");
+		g_set_error(error, 0, 5, "Server said that timestamp is expired. Please check local clock.");
 		g_free(req_url);
 		return NULL;
 	}
 
 	if (strlen(reply) > 200) {
-		g_printerr("ERROR: Reply is longer then 200 characters, cannot be right\n");
+		g_printerr("ERROR: Reply is longer than 200 characters, cannot be right\n");
+		g_set_error(error, 0, 5, "Server reply was longer than 200 characters. That cannot be right.");
 		g_free(req_url);
 		return NULL;
 	}
 
 	if (parse_reply(reply, t_key, t_secret)) {
 		g_printerr("ERROR: Reply could not be parsed\n");
+		g_set_error(error, 0, 5, "Could not parse server reply.");
 		g_free(req_url);
 		return NULL;
 	}
@@ -132,7 +135,7 @@ get_request_token_and_auth_link(const gchar *request_url, const gchar *link_url,
 
 
 static gboolean
-get_access_token(gchar *url, gchar **t_key, gchar **t_secret)
+get_access_token(gchar *url, gchar **t_key, gchar **t_secret, GError **error)
 {
 	gchar *reply = NULL;
 	gchar *postarg = NULL;
@@ -141,12 +144,14 @@ get_access_token(gchar *url, gchar **t_key, gchar **t_secret)
 
 	if (req_url == NULL) {
 		g_printerr("ERROR: req_url = NULL");
+		g_set_error(error, 0, 5, "Could not sign the request. Internal error.");
 		return FALSE;
 	}
 
 	reply = conboy_http_post(req_url, postarg, FALSE);
 	if (reply == NULL) {
 		g_printerr("ERROR: reply = NULL");
+		g_set_error(error, 0, 5, "Got no reply from server.");
 		g_free(req_url);
 		return FALSE;
 	}
@@ -156,12 +161,14 @@ get_access_token(gchar *url, gchar **t_key, gchar **t_secret)
 	if (strlen(reply) > 200) {
 		/* Answer is too long, cannot be correct */
 		g_printerr("ERROR: Cannot get access token. Answer of server was longer than 200 characters.");
+		g_set_error(error, 0, 5, "Got invalid reply from server. Longer than 200 characters.");
 		g_free(reply);
 		return FALSE;
 	}
 
 	if (parse_reply(reply, t_key, t_secret)) {
-		g_printerr("ERROR: Cannot parse access token reply\n");
+		g_printerr("ERROR: Could not parse access token reply\n");
+		g_set_error(error, 0, 5, "Could not parse received access token.");
 		g_free(reply);
 		return FALSE;
 
@@ -176,7 +183,7 @@ get_access_token(gchar *url, gchar **t_key, gchar **t_secret)
  * Exchanges the saved request token for a access token.
  */
 gboolean
-conboy_get_access_token(const gchar *url, const gchar *verifier) {
+conboy_get_access_token(const gchar *url, const gchar *verifier, GError **error) {
 
 	gchar *tok = settings_load_oauth_access_token();
 	gchar *sec = settings_load_oauth_access_secret();
@@ -184,7 +191,7 @@ conboy_get_access_token(const gchar *url, const gchar *verifier) {
 	gchar *full_url = g_strconcat(url, "?", "oauth_verifier=", verifier, NULL);
 	g_printerr("### AccessToken url: %s\n", full_url);
 
-	if (get_access_token(full_url, &tok, &sec)) {
+	if (get_access_token(full_url, &tok, &sec, error)) {
 		g_printerr("acc_tok: %s\n", tok);
 		g_printerr("acc_sec: %s\n", sec);
 		settings_save_oauth_access_token(tok);
