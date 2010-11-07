@@ -2,6 +2,7 @@ opt/conboy/bin/conboy
 opt/conboy/lib/conboy/libstoragexml.so
 opt/conboy/lib/conboy/libstoragexml.la
 opt/conboy/lib/conboy/conboy_storage_xml.plugin
+opt/conboy/share/midgard2/schema/org_gnome_tomboy.xml     /usr/share/midgard2/schema/
 opt/conboy/share/icons/hicolor/26x26/hildon/*
 opt/conboy/share/icons/hicolor/40x40/hildon/*
 opt/conboy/share/icons/hicolor/48x48/hildon/*
