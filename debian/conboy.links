@@ -1,0 +1,7 @@
+/opt/conboy/bin/conboy /usr/bin/
+/opt/conboy/bin/conboy.launch /usr/bin/
+/opt/conboy/share/icons/hicolor/26x26/hildon/conboy.png /usr/share/icons/hicolor/26x26/hildon/
+/opt/conboy/share/icons/hicolor/40x40/hildon/conboy.png /usr/share/icons/hicolor/40x40/hildon/
+/opt/conboy/share/icons/hicolor/48x48/hildon/conboy.png /usr/share/icons/hicolor/48x48/hildon/
+/opt/conboy/share/icons/hicolor/64x64/hildon/conboy.png /usr/share/icons/hicolor/64x64/hildon/
+/opt/conboy/share/icons/hicolor/scalable/hildon/conboy.png /usr/share/icons/hicolor/scalable/hildon/
