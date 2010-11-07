@@ -10,7 +10,7 @@ Architecture: any
 Depends: libjson-glib-1.0-0 (>=0.8.0-1maemo4) | maemo-release (<< 5.0.0), libjson-glib-1.0-0 (>=0.6.2-7) | maemo-release (>=5.0.0), liboauth0 (>= 0.6.1-2), libcurl3 (>= 7.15.0), libglib2.0-0 (>= 2.14) | libpcre3 (>= 6.7), ${launcher:Depends}, sharing-dialog (>= 1.1.48) | maemo-release (<< 5.0.0), libxslt1.1 (>= 1.1), libhildon-extras1 (>= 0.9) | maemo-release (<< 5.0.0)  
 Conflicts: conboy-unstable
 Replaces: conboy-unstable
-XB-Maemo-Upgrade-Description: Changes since 0.6:
+XB-Maemo-Upgrade-Description: Changes since 0.6.3:
  * Note synchronization with online service
  * HTML note sharing via sharing framework
  * Improved list editing
