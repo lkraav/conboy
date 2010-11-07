@@ -1,3 +1,9 @@
+conboy (1:0.7.0) stable; urgency=low
+
+  * Version bump. Should go into extras-testing.
+  
+ -- Cornelius Hald <hald@icandy.de>  Thu, 07 Nov 2010 16:19:54 +0200
+
 conboy (1:0.6.3.34) stable; urgency=low
 
   * Manual optification since maemo-optify does not work correctly when using plug-ins.
