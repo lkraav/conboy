@@ -1,4 +1,4 @@
 opt/conboy/lib/conboy/libstoragemidgard.so
 opt/conboy/lib/conboy/libstoragemidgard.la
 opt/conboy/lib/conboy/conboy_storage_midgard.plugin
-opt/conboy/share/midgard2/schema/org_gnome_tomboy.xml
+opt/conboy/share/midgard2/schema/org_gnome_tomboy.xml     /usr/share/midgard2/schema/
