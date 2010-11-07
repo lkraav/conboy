@@ -13,13 +13,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Virtaal 0.5.2\n"
 
 #: ../src/interface.c:283
 msgid "Synchronization ongoing"
-msgstr ""
+msgstr "Идёт синхронизация"
 
 #. Translators: The title of a newly-created note.
 #: ../src/interface.c:408 ../src/callbacks.c:287 ../src/note.c:170
@@ -30,7 +29,8 @@ msgstr "Новая заметка %i"
 
 #. ACTIONS
 #. Translators: Bold font.
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
 #: ../src/interface.c:682 ../src/interface.c:825 ../src/interface.c:864
 msgid "Bold"
 msgstr "Жирный"
@@ -224,13 +224,11 @@ msgstr "Последнее изменение"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name "
-"for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
 msgstr ""
 "<b>Заголовок заметки уже использован</b>\n"
 "\n"
-"Заметка с заголовком <b>%s</b> уже существует. Пожалуйста, выберите другой "
-"заголовок для данной заметки."
+"Заметка с заголовком <b>%s</b> уже существует. Пожалуйста, выберите другой заголовок для данной заметки."
 
 #. Translators: Does the user really want to delete the
 #. current note? Answer is "yes" or "no".
@@ -250,11 +248,11 @@ msgstr "Conboy это приложение для создания замето�
 
 #: ../src/settings_window.c:153
 msgid "You are currently authenticated with:"
-msgstr ""
+msgstr "Сейчас вы авторазиваны в:"
 
 #: ../src/settings_window.c:153
 msgid "Are you sure you want to reset the synchonization settings?"
-msgstr ""
+msgstr "Вы уверены, что хотите сбросить настройки синхронизации?"
 
 #. Translators: Width of the scrollbar.
 #: ../src/settings_window.c:245
@@ -347,14 +345,8 @@ msgstr "Использовать XML бэк-энд"
 
 #. Translators: Following lines of description used by the package manager
 #: ../src/extra_strings.h:5
-msgid ""
-"It is designed to be easy to use - yet powerful. Conboy can read and write "
-"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
-"Windows."
-msgstr ""
-"Созданное приложение многофункционально и при этом простое в использовании. "
-"Conboy может читать и редактировать заметки в формате Tomboy, поэтому "
-"совместим с Tomboy на Linux, Mac и Windows."
+msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
+msgstr "Созданное приложение многофункционально и при этом простое в использовании. Conboy может читать и редактировать заметки в формате Tomboy, поэтому совместим с Tomboy на Linux, Mac и Windows."
 
 #: ../src/conboy_web_sync.c:538
 msgid "Synchonization failed"
@@ -367,8 +359,7 @@ msgid "Error Message:"
 msgstr "Сообщение об ошибке:"
 
 #: ../src/conboy_web_sync.c:574
-msgid ""
-"Before you can synchronize your notes, please enter a URL in the settings."
+msgid "Before you can synchronize your notes, please enter a URL in the settings."
 msgstr "Для синхронизации, пожалуйста, укажите URL в настройках."
 
 #: ../src/conboy_web_sync.c:706
@@ -400,12 +391,8 @@ msgid "Could not connect to host."
 msgstr "Сервер не отвечает."
 
 #: ../src/conboy_web_sync.c:1020
-msgid ""
-"Please grant access on the website of your service provider that just "
-"opened. After that you will be automatically redirected back to Conboy."
-msgstr ""
-"Пожалуйста, разрешите доступ на открывшемся сайте. После этого автоматически "
-"откроется окно Conboy."
+msgid "Please grant access on the website of your service provider that just opened. After that you will be automatically redirected back to Conboy."
+msgstr "Пожалуйста, разрешите доступ на открывшемся сайте. После этого автоматически откроется окно Conboy."
 
 #: ../src/conboy_web_sync.c:1042
 msgid "Connecting to server"
