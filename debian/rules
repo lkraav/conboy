@@ -41,7 +41,7 @@ endif
 config.status: configure
 	dh_testdir
 	
-	CFLAGS="$(CFLAGS)" ./configure $(CONF_ARGS) --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
+	CFLAGS="$(CFLAGS)" ./configure $(CONF_ARGS) --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/opt/conboy --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
 
 build: build-stamp
 

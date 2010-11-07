@@ -1,14 +1,14 @@
-usr/bin/conboy
-usr/lib/conboy/libstoragexml.so
-usr/lib/conboy/libstoragexml.la
-usr/lib/conboy/conboy_storage_xml.plugin
-usr/share/icons/hicolor/40x40/hildon/*
-usr/share/icons/hicolor/26x26/hildon/*
-usr/share/icons/hicolor/48x48/hildon/*
-usr/share/icons/hicolor/64x64/hildon/*
-usr/share/icons/hicolor/scalable/hildon/*
-usr/share/dbus-1/services/de.zwong.conboy.service
-usr/share/locale/*
-usr/share/applications/hildon/conboy2.desktop
+opt/conboy/bin/conboy
+opt/conboy/lib/conboy/libstoragexml.so
+opt/conboy/lib/conboy/libstoragexml.la
+opt/conboy/lib/conboy/conboy_storage_xml.plugin
+opt/conboy/share/icons/hicolor/26x26/hildon/*
+opt/conboy/share/icons/hicolor/40x40/hildon/*
+opt/conboy/share/icons/hicolor/48x48/hildon/*
+opt/conboy/share/icons/hicolor/64x64/hildon/*
+opt/conboy/share/icons/hicolor/scalable/hildon/*
+opt/conboy/share/dbus-1/services/de.zwong.conboy.service  /usr/share/dbus-1/services/
+opt/conboy/share/locale/*
+opt/conboy/share/applications/hildon/conboy2.desktop      /usr/share/applications/hildon/
 etc/osso-backup/applications/conboy.conf
-usr/share/conboy/*
+opt/conboy/share/conboy/*

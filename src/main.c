@@ -101,6 +101,10 @@ main (int argc, char *argv[])
       return OSSO_ERROR;
   }
 
+  /* Setup theme paths */
+  GtkIconTheme *theme = gtk_icon_theme_get_default();
+  gtk_icon_theme_prepend_search_path(theme, "/usr/share/icons/");
+
   /* Create the Hildon program and setup the title */
   program = HILDON_PROGRAM(hildon_program_get_instance());
   g_set_application_name("Conboy");

@@ -482,9 +482,9 @@ add_icon(const gchar *filename, GtkToolButton *button)
 	/* If we don't find the icons in these two paths, we return the stock button */
 	gchar *full_path = g_build_filename(PREFIX, "/share/icons/hicolor/48x48/hildon", filename, NULL);
 	if (!g_file_test(full_path, G_FILE_TEST_EXISTS)) {
-		g_printerr("not found: %s\n", full_path);
+		//g_printerr("WARN: Cound not find: %s\n", full_path);
 		g_free(full_path);
-		full_path = g_build_filename("/home/conny/workspace/conboy/data/icons/48x48", filename, NULL);
+		full_path = g_build_filename("/usr/share/icons/hicolor/48x48/hildon", filename, NULL);
 		if (!g_file_test(full_path, G_FILE_TEST_EXISTS)) {
 			g_free(full_path);
 			return GTK_WIDGET(button);
