@@ -1,7 +1,7 @@
 # Norwegian Bokmål translation of Conboy
 # This file is distributed under the same license as the conboy package.
 # Robert Nordan <rpvn@robpvn.net>, 2010.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: conboy main\n"
@@ -15,9 +15,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../src/interface.c:283
-#, fuzzy
 msgid "Synchronization ongoing"
-msgstr "Synkroniser"
+msgstr "Synkroniserer"
 
 #. Translators: The title of a newly-created note.
 #: ../src/interface.c:408 ../src/callbacks.c:287 ../src/note.c:170
@@ -28,7 +27,8 @@ msgstr "Nytt notat %i"
 
 #. ACTIONS
 #. Translators: Bold font.
-#. TODO: Write a function, which takes GtkActions that contain markup code and that creates the correct widgets
+#. TODO: Write a function, which takes GtkActions that contain markup code and
+#. that creates the correct widgets
 #: ../src/interface.c:682 ../src/interface.c:825 ../src/interface.c:864
 msgid "Bold"
 msgstr "Fet"
@@ -152,12 +152,12 @@ msgstr "Del notat"
 #. Translators: Send a note via bluetooth
 #: ../src/interface.c:729
 msgid "Via Bluetooth..."
-msgstr ""
+msgstr "Via Bluetooth..."
 
 #. Translators: Send a note via email
 #: ../src/interface.c:731
 msgid "Via E-mail..."
-msgstr ""
+msgstr "Via E-post..."
 
 #. Translators: Small font.
 #: ../src/interface.c:734 ../src/interface.c:831 ../src/interface.c:870
@@ -223,13 +223,11 @@ msgstr "Sist endret"
 msgid ""
 "<b>Note title taken</b>\n"
 "\n"
-"A note with the title <b>%s</b> already exists. Please choose another name "
-"for this note before continuing."
+"A note with the title <b>%s</b> already exists. Please choose another name for this note before continuing."
 msgstr ""
 "<b>Notattittel i bruk</b>\n"
 "\n"
-"Et notat med tittelen <b>%s</b> finnes allerede. Vennligst velg et annet "
-"navn for dette notatet før du fortsetter."
+"Et notat med tittelen <b>%s</b> finnes allerede. Vennligst velg et annet navn for dette notatet før du fortsetter."
 
 #. Translators: Does the user really want to delete the
 #. current note? Answer is "yes" or "no".
@@ -249,11 +247,11 @@ msgstr "Conboy er et program til å ta notater med."
 
 #: ../src/settings_window.c:153
 msgid "You are currently authenticated with:"
-msgstr ""
+msgstr "Du er for øyeblikket verifisert med:"
 
 #: ../src/settings_window.c:153
 msgid "Are you sure you want to reset the synchonization settings?"
-msgstr ""
+msgstr "Er du sikker på at du vil nullstille synkroniseringsinnstillingene?"
 
 #. Translators: Width of the scrollbar.
 #: ../src/settings_window.c:245
@@ -347,85 +345,74 @@ msgstr "XML-lagringsmodul"
 
 #. Translators: Following lines of description used by the package manager
 #: ../src/extra_strings.h:5
-msgid ""
-"It is designed to be easy to use - yet powerful. Conboy can read and write "
-"the Tomboy file format to be compatible with Tomboy on Linux, Mac and "
-"Windows."
-msgstr ""
-"Den er laget for å være lett å bruke - men likevel kraftig. Conboy kan lese "
-"og skrive Tomboy-filformatet og er kompatibel med Tomboy på Linux, Mac og "
-"Windows."
+msgid "It is designed to be easy to use - yet powerful. Conboy can read and write the Tomboy file format to be compatible with Tomboy on Linux, Mac and Windows."
+msgstr "Den er laget for å være lett å bruke - men likevel kraftig. Conboy kan lese og skrive Tomboy-filformatet og er kompatibel med Tomboy på Linux, Mac og Windows."
 
 #: ../src/conboy_web_sync.c:538
-#, fuzzy
 msgid "Synchonization failed"
-msgstr "Synkroniser"
+msgstr "Synkronisering mislyktes"
 
 #: ../src/conboy_web_sync.c:538 ../src/conboy_web_sync.c:978
 #: ../src/conboy_web_sync.c:1001 ../src/conboy_web_sync.c:1068
 #: ../src/conboy_web_sync.c:1076 ../src/conboy_web_sync.c:1090
 msgid "Error Message:"
-msgstr ""
+msgstr "Feilmelding:"
 
 #: ../src/conboy_web_sync.c:574
-msgid ""
-"Before you can synchronize your notes, please enter a URL in the settings."
-msgstr ""
+#, fuzzy
+msgid "Before you can synchronize your notes, please enter a URL in the settings."
+msgstr "Før du synkroniserer notatene dine, vennligst sett en URL i innstillingene."
 
 #: ../src/conboy_web_sync.c:706
-#, fuzzy
 msgid "Synchronization completed"
-msgstr "Synkroniser"
+msgstr "Synkronisering fullført"
 
 #: ../src/conboy_web_sync.c:707
-#, fuzzy
 msgid "Added notes"
-msgstr "Nytt notat"
+msgstr "Notater lagt til"
 
 #: ../src/conboy_web_sync.c:708
-#, fuzzy
 msgid "Changed notes"
-msgstr "Del notat"
+msgstr "Endrede notater"
 
 #: ../src/conboy_web_sync.c:709
-#, fuzzy
 msgid "Deleted notes"
-msgstr "Slett notat"
+msgstr "Slettede notater"
 
 #: ../src/conboy_web_sync.c:710
-#, fuzzy
 msgid "Uploaded notes"
-msgstr "Åpne notat"
+msgstr "Notater lastet opp"
 
 #: ../src/conboy_web_sync.c:711
-#, fuzzy
 msgid "Deleted on server"
-msgstr "Slett notat"
+msgstr "Notat slettet fra tjener"
 
 #: ../src/conboy_web_sync.c:978 ../src/conboy_web_sync.c:1001
 msgid "Could not connect to host."
-msgstr ""
+msgstr "Klarte ikke å koble til tjener."
 
 #: ../src/conboy_web_sync.c:1020
-msgid ""
-"Please grant access on the website of your service provider that just "
-"opened. After that you will be automatically redirected back to Conboy."
-msgstr ""
+#, fuzzy
+msgid "Please grant access on the website of your service provider that just opened. After that you will be automatically redirected back to Conboy."
+msgstr "Vennligst åpne for tilgang på hjemmesiden til tjenesteyteren som nettopp har åpnet seg. Etter det vil du automatisk bli ført tilbake til Conboy."
 
 #: ../src/conboy_web_sync.c:1042
 msgid "Connecting to server"
-msgstr ""
+msgstr "Kobler til tjener"
 
 #: ../src/conboy_web_sync.c:1057
 msgid ""
 "<b>You are successfully authenticated</b>\n"
 "You can now use the synchronization from the main menu."
 msgstr ""
+"<b>Du har blitt verifisert</b>\n"
+" Du kan nå bruke synkronisering fra hovedmenyen."
 
 #: ../src/conboy_web_sync.c:1068 ../src/conboy_web_sync.c:1076
 #: ../src/conboy_web_sync.c:1090
+#, fuzzy
 msgid "Could not login to your service provider"
-msgstr ""
+msgstr "Kunne ikke logge inn til din tjenesteyter."
 
 #~ msgid "About"
 #~ msgstr "Om Conboy"
